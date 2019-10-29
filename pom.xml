@@ -55,7 +55,7 @@
         <ec-fastweixin.version>1.4.20191028</ec-fastweixin.version>
 
 
-        <jackson.version>2.9.9</jackson.version>
+        <jackson.version>2.10.0</jackson.version>
         <swagger2.version>2.9.2</swagger2.version>
     </properties>
 
