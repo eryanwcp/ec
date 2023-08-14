@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.eryansky.j2cache.autoconfigure.J2CacheAutoConfiguration,\
+com.eryansky.j2cache.autoconfigure.J2CacheSpringCacheAutoConfiguration,\
+com.eryansky.j2cache.autoconfigure.J2CacheSpringRedisAutoConfiguration

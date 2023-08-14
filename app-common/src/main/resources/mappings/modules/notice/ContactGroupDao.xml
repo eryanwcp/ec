@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eryansky.modules.notice.dao.ContactGroupDao">
+
+    <sql id="contactGroupColumns">
+        a.id AS "id",
+        a.create_user AS "createUser",
+        a.create_time AS "createTime",
+        a.status AS "status",
+        a.update_user AS "updateUser",
+        a.update_time AS "updateTime",
+        a.version AS "version",
+        a.CONTACT_GROUP_TYPE AS "contactGroupType",
+        a.IS_DEFAULT AS "isDefault",
+        a.NAME AS "name",
+        a.sort AS "sort",
+        a.ORIGIN_USER_ID AS "originUserId",
+        a.REMARK AS "remark",
+        a.USER_ID AS "userId"
+    </sql>
+
+    <sql id="userColumns">
+        a.id AS "id",
+        a.create_user AS "createUser",
+        a.create_time AS "createTime",
+        a.status AS "status",
+        a.update_user AS "updateUser",
+        a.update_time AS "updateTime",
+        a.version AS "version",
+        a.LOGIN_NAME AS "loginName",
+        a.CODE AS "code",
+        a.ORIGINAL_PASSWORD AS "originalPassword",
+        a.PASSWORD AS "password",
+        a.NAME AS "name",
+        a.SEX AS "sex",
+        a.BIRTHDAY AS "birthday",
+        a.PHOTO AS "photo",
+        a.EMAIL AS "email",
+        a.PERSON_EMAIL AS "personEmail",
+        a.MOBILE AS "mobile",
+        a.TEL AS "tel",
+        a.QQ AS "qq",
+        a.ADDRESS AS "address",
+        a.DEFAULT_ORGAN_ID AS "defaultOrganId",
+        a.sort AS "sort",
+        a.USER_TYPE AS "userType",
+        a.REMARK AS "remark",
+        a.weixin AS "weixin"
+    </sql>
+
+    <select id="get" resultType="ContactGroup">
+        SELECT
+        <include refid="contactGroupColumns"/>
+        FROM t_notice_contact_group a
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="checkExist" resultType="ContactGroup">
+        SELECT
+        <include refid="contactGroupColumns"/>
+        FROM t_notice_contact_group a
+        <where>
+            a.status = #{status}
+            AND a.user_id = #{userId}
+            <if test="contactGroupType != null and contactGroupType !=''">
+                AND a.contact_group_type = #{contactGroupType}
+            </if>
+            <if test="name != null and name !=''">
+                AND a.name = #{name}
+            </if>
+            <if test="id != null and id !=''">
+                AND a.id <![CDATA[ <> ]]> #{id}
+            </if>
+        </where>
+    </select>
+
+    <select id="getMaxSort" resultType="java.lang.Integer">
+        SELECT max(a.sort)
+        FROM t_notice_contact_group a
+    </select>
+
+    <select id="findList" resultType="ContactGroup">
+        SELECT
+        <include refid="contactGroupColumns"/>
+        FROM t_notice_contact_group a
+        <where>
+            a.status = #{status}
+        </where>
+        <choose>
+            <when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
+                ORDER BY ${entityPage.orderBy} ${entityPage.order}
+            </when>
+            <otherwise>
+                ORDER BY a.update_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findAllList" resultType="ContactGroup">
+        SELECT
+        <include refid="contactGroupColumns"/>
+        FROM t_notice_contact_group a
+        <where>
+        </where>
+        <choose>
+            <when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
+                ORDER BY ${entityPage.orderBy} ${entityPage.order}
+            </when>
+            <otherwise>
+                ORDER BY a.update_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findUserContactGroups" resultType="ContactGroup">
+        SELECT
+        <include refid="contactGroupColumns"/>
+        FROM t_notice_contact_group a
+        <where>
+            a.status = #{status}
+            <if test="userId != null and userId !=''">
+                AND a.user_id = #{userId}
+            </if>
+            <if test="contactGroupType != null and contactGroupType !=''">
+                AND a.contact_group_type = #{contactGroupType}
+            </if>
+            <if test="query != null and query !=''">
+                AND a.name LIKE
+                <choose>
+                    <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+                    <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+                    <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+                    <otherwise>'%${query}%'</otherwise>
+                </choose>
+            </if>
+        </where>
+        <choose>
+            <when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
+                ORDER BY ${entityPage.orderBy} ${entityPage.order}
+            </when>
+            <otherwise>
+                ORDER BY a.sort
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findContactGroupUsers" resultType="User">
+        SELECT
+        <include refid="userColumns"/>
+        FROM t_sys_user a
+        LEFT JOIN t_notice_contact_group_object cgo ON cgo.object_id = a.id
+        LEFT JOIN t_notice_contact_group cg ON cg.id = cgo.contact_group_id
+        <where>
+            a.status = #{status}
+            <if test="contactGroupId != null and contactGroupId !=''">
+                AND cg.id = #{contactGroupId}
+            </if>
+            <if test="contactGroupType != null and contactGroupType !=''">
+                AND cg.contact_group_type = #{contactGroupType}
+            </if>
+            <if test="query != null and query !=''">
+                AND (
+                a.name LIKE
+                <choose>
+                    <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+                    <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+                    <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+                    <otherwise>'%${query}%'</otherwise>
+                </choose>
+                OR
+                a.login_name LIKE
+                <choose>
+                    <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+                    <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+                    <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+                    <otherwise>'%${query}%'</otherwise>
+                </choose>
+                )
+            </if>
+        </where>
+        <choose>
+            <when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
+                ORDER BY ${entityPage.orderBy} ${entityPage.order}
+            </when>
+            <otherwise>
+                ORDER BY a.sort
+            </otherwise>
+        </choose>
+    </select>
+
+    <insert id="insert">
+        INSERT INTO t_notice_contact_group(
+        id,
+        status,
+        version,
+        create_user,
+        create_time,
+        update_user,
+        update_time,
+        CONTACT_GROUP_TYPE,
+        IS_DEFAULT,
+        NAME,
+        sort,
+        ORIGIN_USER_ID,
+        REMARK,
+        USER_ID
+        ) VALUES (
+        #{id},
+        #{status},
+        1,
+        #{createUser},
+        #{createTime},
+        #{updateUser},
+        #{updateTime},
+        #{contactGroupType},
+        #{isDefault},
+        #{name},
+        #{sort},
+        #{originUserId},
+        #{remark},
+        #{userId}
+        )
+    </insert>
+    <insert id="insertBatch">
+        INSERT INTO t_notice_contact_group(
+        id,
+        status,
+        version,
+        create_user,
+        create_time,
+        update_user,
+        update_time,
+        CONTACT_GROUP_TYPE,
+        IS_DEFAULT,
+        NAME,
+        sort,
+        ORIGIN_USER_ID,
+        REMARK,
+        USER_ID
+        ) VALUES <foreach collection="list" item="item" separator=",">(
+        #{item.id},
+        #{item.status},
+        1,
+        #{item.createUser},
+        #{item.createTime},
+        #{item.updateUser},
+        #{item.updateTime},
+        #{item.contactGroupType},
+        #{item.isDefault},
+        #{item.name},
+        #{item.sort},
+        #{item.originUserId},
+        #{item.remark},
+        #{item.userId}
+        )</foreach>
+    </insert>
+
+    <update id="update">
+        UPDATE t_notice_contact_group SET
+        status = #{status},
+        version = version +1,
+        update_user = #{updateUser},
+        update_time = #{updateTime},
+        CONTACT_GROUP_TYPE = #{contactGroupType},
+        IS_DEFAULT = #{isDefault},
+        NAME = #{name},
+        sort = #{sort},
+        ORIGIN_USER_ID = #{originUserId},
+        REMARK = #{remark},
+        USER_ID = #{userId}
+        WHERE id = #{id}
+    </update>
+
+    <update id="delete">
+        UPDATE t_notice_contact_group SET
+        status = #{STATUS_DELETE},
+        version = version +1,
+        update_user = #{updateUser},
+        update_time = #{updateTime}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="clear">
+        DELETE FROM t_notice_contact_group WHERE id = #{id}
+    </delete>
+
+    <delete id="clearAll">
+        DELETE FROM t_notice_contact_group
+    </delete>
+
+
+    <!--分组对象-->
+    <select id="findObjectIdsByContactGroupId" resultType="java.lang.String">
+		SELECT a.object_id
+		FROM t_notice_contact_group_object a
+		WHERE a.contact_group_id = #{contactGroupId}
+	</select>
+
+    <delete id="deleteContactGroupObjects">
+        DELETE FROM t_notice_contact_group_object
+        <where>
+            <if test="id != null and id !=''">
+                AND contact_group_id = #{id}
+            </if>
+            <if test="ids != null and ids.size() !=0">
+                AND object_id IN <foreach collection="ids" item="item" open="(" separator="," close=")">#{item}</foreach>
+            </if>
+        </where>
+    </delete>
+
+    <insert id="insertContactGroupObjects">
+        INSERT INTO t_notice_contact_group_object(contact_group_id, object_id)
+        <foreach collection="ids" item="item" separator=" union all ">
+            SELECT #{id}, #{item} FROM dual
+        </foreach>
+    </insert>
+    <!--分组对象-->
+
+
+</mapper>

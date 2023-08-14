@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eryansky.modules.sys.dao.AreaDao">
+
+	<cache type="com.eryansky.j2cache.mybatis.J2CacheAdapter">
+		<property name="encodeKey" value="true"></property>
+	</cache>
+
+	<sql id="areaColumns">
+		a.id AS "id",
+		a.status AS "status",
+		a.version AS "version",
+		a.create_user AS "createUser",
+		a.create_time AS "createTime",
+		a.update_user AS "updateUser",
+		a.update_time AS "updateTime",
+		a.parent_ids AS "parent_ids",
+		a.parent_id AS "parent.id",
+		p.name AS "parent.name",
+		a.name AS "name",
+		a.short_name AS "shortName",
+		a.code AS "code",
+		a.type AS "type",
+		a.sort AS "sort",
+		a.remark AS "remark"
+	</sql>
+
+	<sql id="areaJoins">
+		LEFT JOIN t_sys_area p ON p.id = a.parent_id
+	</sql>
+
+	<select id="get" resultType="Area">
+		SELECT
+		<include refid="areaColumns"/>
+		FROM t_sys_area a
+		<include refid="areaJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="getByCode" resultType="Area">
+		SELECT
+		<include refid="areaColumns"/>
+		FROM t_sys_area a
+		<include refid="areaJoins"/>
+		WHERE a.code = #{code} AND a.status = '0'
+	</select>
+
+	<select id="findList" resultType="Area">
+		SELECT
+		<include refid="areaColumns"/>
+		FROM t_sys_area a
+		<include refid="areaJoins"/>
+		WHERE a.status = #{STATUS_NORMAL}
+		<!-- 数据范围过滤 -->
+		${sqlMap.dsf}
+		OR a.id = #{currentUser.office.area.id}
+		ORDER BY a.code
+	</select>
+
+	<select id="findAllList" resultType="Area">
+		SELECT
+		<include refid="areaColumns"/>
+		FROM t_sys_area a
+		<include refid="areaJoins"/>
+		WHERE a.status = #{STATUS_NORMAL}
+		ORDER BY a.code
+	</select>
+
+
+	<select id="selectMany" resultType="Post">
+		${selectStatement}
+	</select>
+
+	<select id="selectOne" resultType="Post">
+		${selectStatement}
+	</select>
+
+	<select id="findByParentIdsLike" resultType="Area">
+		SELECT
+		a.id,
+		a.parent_id AS "parent.id",
+		a.parent_ids
+		FROM t_sys_area a
+		WHERE a.status = #{STATUS_NORMAL}
+		AND a.parent_ids LIKE #{parentIds}
+		ORDER BY a.code
+	</select>
+
+
+	<select id="findByParentId" resultType="Area">
+		SELECT
+		<include refid="areaColumns"/>
+		FROM t_sys_area a
+		<include refid="areaJoins"/>
+		<where>
+			a.status = '0'
+			<choose>
+				<when test="parentId != null and parentId !=''">
+					AND a.parent_id = #{parentId}
+				</when>
+				<otherwise>
+					AND (a.parent_id IS  NULL OR a.parent_id == '')
+				</otherwise>
+			</choose>
+		</where>
+
+		ORDER BY a.code
+	</select>
+
+
+	<select id="findOwnAndChild" resultType="Area">
+		SELECT
+		<include refid="areaColumns"/>
+		FROM t_sys_area a
+		<include refid="areaJoins"/>
+		WHERE
+		a.status = '0'
+		<if test="parentId != null and parentId !=''">
+			AND (a.id = #{parentId} OR a.parent_ids LIKE
+			<choose>
+				<when test="dbName == 'db2'">'%,'||#{parentId}||',%'</when>
+				<when test="dbName == 'mysql'">CONCAT('%,', #{parentId}, ',%')</when>
+				<when test="dbName == 'oracle'">'%,'||#{parentId}||',%'</when>
+				<otherwise>'%,'+#{parentId}+',%'</otherwise>
+			</choose>
+			)
+		</if>
+		ORDER BY a.code
+	</select>
+
+
+	<select id="findChild" resultType="Area">
+		SELECT
+		<include refid="areaColumns"/>
+		FROM t_sys_organ a
+		<include refid="areaJoins"/>
+		<where>
+			<if test="types != null and types.size() !=0">
+				AND a.type IN
+				<foreach collection="types" open="(" separator="," close=")" item="item">
+					#{item}
+				</foreach>
+			</if>
+			<choose>
+				<when test="parentId != null and parentId !=''">
+					AND a.parent_id = #{parentId}
+				</when>
+				<when test="parentCode != null and parentCode !=''">
+					AND p.code = #{parentCode}
+				</when>
+				<otherwise>
+					AND (a.parent_id IS NULL OR a.parent_id = '' OR a.parent_id = '0')
+				</otherwise>
+			</choose>
+		</where>
+		ORDER BY a.sort ASC
+	</select>
+
+
+	<select id="findAreaUp" resultType="Area">
+		SELECT
+		<include refid="areaColumns"/>
+		FROM t_sys_area a
+		<include refid="areaJoins"/>
+		WHERE
+		a.status = #{STATUS_NORMAL}
+		AND a.type IN (2,3,4)
+	</select>
+
+	<select id="findAreaDown" resultType="Area">
+		SELECT
+		<include refid="areaColumns"/>
+		FROM t_sys_area a
+		<include refid="areaJoins"/>
+		<where>
+			a.status = '0'
+			<if test="areaId != null and areaId !=''">
+				AND (a.id = #{areaId} OR a.parent_ids LIKE
+				<choose>
+					<when test="dbName == 'db2'">'%,'||#{areaId}||',%'</when>
+					<when test="dbName == 'mysql'">CONCAT('%,', #{areaId}, ',%')</when>
+					<when test="dbName == 'oracle'">'%,'||#{areaId}||',%'</when>
+					<otherwise>'%,'+#{areaId}+',%'</otherwise>
+				</choose>
+				)
+			</if>
+
+			AND a.type IN (4,5,6)
+		</where>
+
+	</select>
+
+	<insert id="insert">
+		INSERT INTO t_sys_area(
+		id,
+		status,
+		version,
+		create_user,
+		create_time,
+		update_user,
+		update_time,
+		parent_id,
+		parent_ids,
+		name,
+		short_name,
+		code,
+		type,
+		sort,
+		remark
+		) VALUES (
+		#{id},
+		#{status},
+		0,
+		#{createUser},
+		#{createTime},
+		#{updateUser},
+		#{updateTime},
+		#{parent.id},
+		#{parentIds},
+		#{name},
+		#{shortName},
+		#{code},
+		#{type},
+		#{sort},
+		#{remark}
+		)
+	</insert>
+	<insert id="insertBatch">
+		INSERT INTO t_sys_area(
+		id,
+		status,
+		version,
+		create_user,
+		create_time,
+		update_user,
+		update_time,
+		parent_id,
+		parent_ids,
+		name,
+		short_name,
+		code,
+		type,
+		sort,
+		remark
+		) VALUES <foreach collection="list" item="item" separator=",">(
+		#{item.id},
+		#{item.status},
+		0,
+		#item.createUser},
+		#{item.createTime},
+		#{item.updateUser},
+		#{item.updateTime},
+		#{item.parent.id},
+		#{item.parentIds},
+		#{item.name},
+		#{item.shortName},
+		#{item.code},
+		#{item.type},
+		#{item.sort},
+		#{item.remark}
+		)</foreach>
+	</insert>
+
+	<update id="update">
+		UPDATE t_sys_area SET
+		status = #{status},
+		version = version +1,
+		update_user = #{updateUser},
+		update_time = #{updateTime},
+		parent_id = #{parent.id},
+		parent_ids = #{parentIds},
+		name = #{name},
+		short_name = #{shortName},
+		code = #{code},
+		type = #{type},
+		sort = #{sort},
+		remark = #{remark}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateParentIds">
+		UPDATE t_sys_area SET
+		parent_id = #{parent.id},
+		parent_ids = #{parentIds}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE t_sys_area SET
+		status = #{STATUS_DELETE},
+		version = version +1,
+		update_user = #{updateUser},
+		update_time = #{updateTime}
+		WHERE id = #{id}
+	</update>
+
+	<delete id="deleteOwnerAndChilds">
+		UPDATE t_sys_area SET
+		status = #{STATUS_DELETE},
+		version = version +1,
+		update_user = #{updateUser},
+		update_time = #{updateTime}
+		WHERE id = #{id} OR parent_id = #{id} OR parent_ids LIKE
+		<choose>
+			<when test="dbName == 'db2'">'%,'||#{id}||',%'</when>
+			<when test="dbName == 'mysql'">CONCAT('%,', #{id}, ',%')</when>
+			<when test="dbName == 'oracle'">'%,'||#{id}||',%'</when>
+			<otherwise>'%,'+#{id}+',%'</otherwise>
+		</choose>
+	</delete>
+
+</mapper>

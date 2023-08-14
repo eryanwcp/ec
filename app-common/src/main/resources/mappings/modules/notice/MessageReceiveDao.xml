@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eryansky.modules.notice.dao.MessageReceiveDao">
+
+	<sql id="messageReceiveColumns">
+		a.id AS "id",
+		a.message_id AS "messageId",
+		a.user_id AS "userId",
+		a.is_send AS "isSend",
+		a.is_read AS "isRead",
+		a.read_time AS "readTime"
+	</sql>
+
+	<sql id="messageReceiveJoins">
+		LEFT JOIN t_notice_message m ON m.id = a.message_id
+	</sql>
+
+	<select id="get" resultType="MessageReceive">
+		SELECT
+		<include refid="messageReceiveColumns"/>
+		FROM t_notice_message_receive a
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="MessageReceive">
+		SELECT
+		<include refid="messageReceiveColumns"/>
+		FROM t_notice_message_receive a
+		<where>
+			<if test="messageId != null and messageId != ''">
+				a.message_id = #{messageId}
+			</if>
+		</where>
+		<choose>
+			<when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
+				ORDER BY ${entityPage.orderBy} ${entityPage.order}
+			</when>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="MessageReceive">
+		SELECT
+		<include refid="messageReceiveColumns"/>
+		FROM t_notice_message_receive a
+		<where>
+		</where>
+		<choose>
+			<when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
+				ORDER BY ${entityPage.orderBy} ${entityPage.order}
+			</when>
+		</choose>
+	</select>
+
+	<select id="selectMany" resultType="MessageReceive">
+		${selectStatement}
+	</select>
+
+	<select id="selectOne" resultType="MessageReceive">
+		${selectStatement}
+	</select>
+
+	<!--用户消息-->
+	<select id="findUserList" resultType="MessageReceive">
+		SELECT
+		<include refid="messageReceiveColumns"/>
+		FROM t_notice_message_receive a
+		<include refid="messageReceiveJoins"/>
+		<where>
+			m.status = #{status}
+			AND m.biz_mode = #{bizMode}
+			AND a.user_id = #{userId}
+			<if test="category != null and category != ''">
+				AND m.category = #{category}
+			</if>
+			<if test="appId != null and appId != ''">
+				AND m.app_id = #{appId}
+			</if>
+			<if test="isRead != null and isRead != ''">
+				AND a.is_read = #{isRead}
+			</if>
+			<if test="isSend != null and isSend != ''">
+				AND a.is_send = #{isSend}
+			</if>
+		</where>
+		ORDER BY m.update_time DESC
+	</select>
+
+
+	<select id="getUserMessageReceiveByMessageId" resultType="MessageReceive">
+		SELECT
+		<include refid="messageReceiveColumns"/>
+		FROM t_notice_message_receive a
+		<include refid="messageReceiveJoins"/>
+		<where>
+			m.status = #{status}
+			AND a.user_id = #{userId}
+			AND a.message_id = #{messageId}
+		</where>
+	</select>
+
+	<select id="findByMessageId" resultType="MessageReceive">
+		SELECT
+		<include refid="messageReceiveColumns"/>
+		FROM t_notice_message_receive a
+		<where>
+			a.message_id = #{messageId}
+			<if test="isRead != null and isRead != ''">
+				AND a.is_read = #{isRead}
+			</if>
+			<if test="isSend != null and isSend != ''">
+				AND a.is_send = #{isSend}
+			</if>
+		</where>
+	</select>
+
+	<select id="findBySenderUserId" resultType="MessageReceive">
+		SELECT
+		<include refid="messageReceiveColumns"/>
+		FROM t_notice_message_receive a
+		<include refid="messageReceiveJoins"/>
+		<where>
+			m.status = #{status}
+			AND m.sender = #{senderUserId}
+			<if test="messageId != null and messageId !=''">
+				AND a.message_id = #{messageId}
+			</if>
+			<if test="isRead != null and isRead != ''">
+				AND a.is_read = #{isRead}
+			</if>
+			<if test="isSend != null and isSend != ''">
+				AND a.is_send = #{isSend}
+			</if>
+		</where>
+	</select>
+
+
+	<update id="updateByUserIdAndMessageId">
+		UPDATE t_notice_message_receive
+		<set>
+			<if test="isSend != null and isSend !=''">
+				is_send = #{isSend},
+			</if>
+			<if test="isRead != null and isRead !=''">
+				is_read = #{isRead},
+			</if>
+			<if test="readTime != null">
+				read_time = #{readTime},
+			</if>
+		</set>
+		WHERE user_id = #{userId} AND message_id = #{messageId}
+	</update>
+
+	<insert id="insert">
+		INSERT INTO t_notice_message_receive(
+		id,
+		message_id,
+		user_id,
+		is_send,
+		is_read,
+		read_time
+		) VALUES (
+		#{id},
+		#{messageId},
+		#{userId},
+		#{isSend},
+		#{isRead},
+		#{readTime}
+		)
+	</insert>
+	<insert id="insertBatch">
+		INSERT INTO t_notice_message_receive(
+		id,
+		message_id,
+		user_id,
+		is_send,
+		is_read,
+		read_time
+		) VALUES <foreach collection="list" item="item" separator=",">(
+		#{item.id},
+		#{item.messageId},
+		#{item.userId},
+		#{item.isSend},
+		#{item.isRead},
+		#{item.readTime}
+		)</foreach>
+	</insert>
+
+	<update id="update">
+		UPDATE t_notice_message_receive SET
+		message_id = #{messageId},
+		user_id = #{userId},
+		is_send = #{isSend},
+		is_read = #{isRead},
+		read_time = #{readTime}
+		WHERE id = #{id}
+	</update>
+
+	<update id="setUserMessageRead">
+		UPDATE t_notice_message_receive
+		<if test="appId != null and appId != ''">
+			LEFT JOIN t_notice_message ON t_notice_message.id = t_notice_message_receive.message_id
+		</if>
+		SET t_notice_message_receive.is_send = #{isSend},
+		t_notice_message_receive.is_read = #{isRead},
+		t_notice_message_receive.read_time = #{readTime}
+		<where>
+			user_id = #{userId}
+			<if test="appId != null and appId != ''">
+				AND t_notice_message.app_id = #{appId}
+			</if>
+		</where>
+	</update>
+
+	<delete id="delete">
+		DELETE FROM t_notice_message_receive
+		WHERE id = #{id}
+	</delete>
+
+	<delete id="deleteByMessageId">
+		DELETE FROM t_notice_message_receive
+		WHERE message_id = #{id}
+	</delete>
+</mapper>

@@ -1,0 +1,17 @@
+/j2cache-spring-boot-starter/ec-j2cache-spring-boot-starter.iml
+/.idea
+/j2cache/ec-j2cache.iml
+/ec-parent.iml
+/app/ec-app.iml
+/common/ec-common.iml
+/app-common/ec-app-common.iml
+/fastweixin/ec-fastweixin.iml
+/app/target/
+/app-common/target/classes/
+/fastweixin/target/
+/common/target/
+/j2cache/target/
+/j2cache-spring-boot-starter/target/
+/app-common/target/
+/client-common/ec-client-common.iml
+/client-common/target/

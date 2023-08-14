@@ -1,0 +1,47 @@
+/**
+*  Copyright (c) ${productName} 2013-${year} ${productUrl}
+*
+*/
+package $entityPackage;
+
+
+import com.eryansky.core.orm.mybatis.entity.PDataEntity;
+import com.eryansky.common.utils.jackson.LongJsonSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+/**
+ * $tableComment
+ * @author ${author}
+ * @date ${date}
+ */
+public class $entityName extends PDataEntity<$entityName,Long>{
+
+#foreach ($column in $columns)
+   #if($column.comment)
+	/**
+	 * $column.comment
+     */
+    #end
+private $column.javaType $column.fieldName;
+#end
+
+    public $entityName() {
+
+    }
+
+    @JsonSerialize(using = LongJsonSerializer.class)
+    @Override
+    public Long getId() {
+        return super.getId();
+    }
+
+#foreach ($column in $columns)
+    public void ${column.setMethod}(${column.javaType} ${column.fieldName}){
+       this.${column.fieldName} = ${column.fieldName};
+    }
+    
+    public ${column.javaType} ${column.getMethod}(){
+       return this.${column.fieldName} ;
+    }
+#end
+	
+}

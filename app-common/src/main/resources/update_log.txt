@@ -1,0 +1,276 @@
+﻿20230614
+V4.2.20230521.26
+1、密码修改安全优化
+ALTER TABLE t_sys_user_password ADD COLUMN type char(1) COMMENT '修改类型 重置：0 用户初始化：1 用户安全修改：2';
+注意修改：LoginController portal.js user.js user-password.jsp
+
+20230531
+1、用户管理取消数据查看“sys:user:dataView”权限
+/a/sys/user/organUserTree
+/a/sys/user/customUserList
+2、增加URL黑名单访问限制
+UrlLimitInterceptor
+
+
+20230529
+V4.2.20230521.04
+1、修复部分URL垂直越权漏洞,用户管理增加功能权限：数据查看“sys:user:dataView”
+/a/sys/user/organUserTree
+/a/sys/user/customUserList
+2、修复部分请求错误页面信息泄露
+server.tomcat.relaxed-query-chars=|,{,},[,],\,
+
+20230320
+V4.2.20230326.04
+1、修复因变更机构岗位重复问题（自动清除历史机构岗位数据），以及优化人员岗位配置；
+#历史数据修复方法
+执行一次URL方法：/a/sys/user/fixUserPostData
+#组织机构同步，删除用户不在这些部门下的用户岗位信息
+userService.deleteNotInUserOrgansPostsByUserId(user.getId(), Lists.newArrayList(user.getDefaultOrganId()));
+
+2、角色管理，优化分级授权配置，支持资源复制、支持分机构授权
+非管理账号仅授权查看：是否系统角色【是】、权限类型【普通角色】或 是否系统角色【否】、所属机构【本单位】（可管理）或授权机构（可读，不可修改）相关数据
+DROP TABLE IF EXISTS `t_sys_role_data_organ`;
+CREATE TABLE `t_sys_role_data_organ`  (
+  `ORGAN_ID` varchar(36) COMMENT '机构ID',
+  `ROLE_ID` varchar(36) COMMENT '角色ID',
+  INDEX `ROLE_ID`(`ROLE_ID`) USING BTREE,
+  INDEX `ORGAN_ID`(`ORGAN_ID`) USING BTREE
+) ENGINE = InnoDB COMMENT = '角色数据权限机构范围表';
+-- t_sys_role_organ 用于角色授权机构表
+新增资源权限（功能）：
+设置用户：sys:role:user:edit
+设置资源：sys:role:resource:edit
+
+3、内部应用单点跳转（仅限同源账号、组织机构管理）
+规则：/a/sso/目标代理URL全地址
+目标系统config.properties 开启system.security.oauth2.enable=true
+
+4、岗位管理，优化分级授权配置以及岗位用户配置，支持按机构选人操作
+新增资源权限（功能）：
+设置用户：sys:post:user:edit
+
+5、用户管理，优化按钮权限
+新增资源权限（功能）：
+密码修改：sys:user:password:edit
+设置机构：sys:user:organ:edit
+设置岗位：sys:user:post:edit
+设置角色：sys:user:role:edit
+设置资源：sys:user:resource:edit
+
+6、角色管理，优化按钮权限
+新增资源权限（功能）：
+编辑：sys:resource:edit
+角色：sys:resource:role:edit
+用户：sys:resource:user:edit
+
+6、修复部分账号切换账号权限不成功问题。
+账号切换时，APP与webview会话不同步问题。
+
+20230113
+V4.2.20221227.02
+1、新增接口：删除用户全部岗位信息
+
+20220805
+V4.2.20220722.10
+1、修复部分可能造成的SSRF漏洞。
+Proxy授权访问以及关闭StaticContentServlet
+#启用内部代理
+system.security.proxy.enable=false
+#内部代理URL白名单 每行一个或多个之间以";"分割，支持"*"通配符
+system.security.proxy.whitelist=*
+
+20220527
+V4.2.50220522.04
+1、升级Spring boot 2.6.8
+2、quartz支持指定实例执行
+
+    quartz.properties配置如下：
+    #集群是否开启
+    spring.quartz.properties.org.quartz.jobStore.isClustered = true
+    #quartz集群实例名称 “AUTO”为系统自动生成
+    spring.quartz.properties.org.quartz.scheduler.instanceId = AUTO
+    #quartz集群实例名称生成器 linux为IP地址；windows、macos为机器名
+    spring.quartz.properties.org.quartz.scheduler.instanceIdGenerator.class=com.eryansky.core.quartz.extend.QuartzSchedulerInstanceIdGenerator
+    #JDBC代理类（增加指定实例执行）
+    spring.quartz.properties.org.quartz.jobStore.driverDelegateClass = com.eryansky.core.quartz.extend.StdJDBCDelegate
+
+    #代码使用，instanceId指定实例名称，默认为“AUTO” linux为IP地址；windows、macos为机器名
+    @QuartzJob(instanceId = "AUTO")
+
+20220427
+V4.2.20220422.02
+1、升级Spring boot 2.6.7
+2、jquery-validate由1.11.1升级到1.19.3
+3、其它升级
+tomcat 9.5.56->9.0.62
+jackson 2.12.5->2.13.2
+logback 7.0.1->7.1.1
+fastjson 1.2.79->1.2.80
+
+20220117-V4.2.20220125.04
+1、修复事务嵌套导致的序号生成器并发问题；
+2、支持全局事务与注解式事务共存。
+
+20211228
+1、升级Spring Boot 2.6.2
+2、其它升级
+tomcat 9.5.54->9.5.56
+jackson 2.12.5->2.13.1
+logback 6.3.0->7.0.1
+fastjson 1.2.78->1.2.79
+
+20211223
+1、升级Spring Boot 2.5.8
+2、application.properties调整配置
+旧配置：
+spring.quartz.properties.org.quartz.jobStore.class = org.quartz.impl.jdbcjobstore.JobStoreTX
+新配置
+spring.quartz.properties.org.quartz.jobStore.class = org.springframework.scheduling.quartz.LocalDataSourceJobStore
+3、log4j2升级2.17.0
+4、其它升级
+tomcat 9.5.54->9.5.56
+jackson 2.12.5->2.12.6
+logback 6.3.0->7.0.1
+fastjson 1.2.78->1.2.79
+
+20211129
+1、动态加密登录密码
+2、XSS防注入
+
+20211105
+1、增加防重复提交支持
+在Controller的方法上增加注解@NoRepeatSubmit（返回值为Result）
+2、API访问频率限制
+在Controller的方法上增加注解@LimitApi（返回值为Result）
+
+20211103
+1、增加内部应用单点登录跳转
+SSORedirctController
+
+20211012-4.2.20210924.04
+1、升级My97DatePicker 4.8.5
+
+
+20210519-V4.2.20210415.09
+20210511-V4.2.20210415.08
+1、添加Quartz定时任务管理
+菜单：/a/sys/job
+权限（查看）：sys:job:view
+权限（编辑）：sys:job:edit
+2、修复版本管理选择错误bug
+
+20201229
+1、通知公告支持回复
+ALTER TABLE t_notice
+ADD COLUMN is_reply char(1) COMMENT '是否需要回复 是：1 否：0';
+
+ALTER TABLE t_notice_receive_info ADD COLUMN  is_reply char(1) COMMENT '是否已回复 是：1 否：0';
+ALTER TABLE t_notice_receive_info ADD COLUMN  reply_time datetime(0) COMMENT '回复时间';
+ALTER TABLE t_notice_receive_info ADD COLUMN  reply_content text COMMENT '回复内容';
+ALTER TABLE t_notice_receive_info ADD COLUMN  reply_file_ids varchar(255) COMMENT '回复附件';
+
+
+
+2020-10-08
+1、序列号生成器支持多分类划分
+增加支持自定义参数(n个),示例："CustomStr@param1#Str@字符串"
+mybatis-config.xml添加如下配置：
+<typeHandlers>
+    <typeHandler javaType="com.eryansky.modules.sys.sn.MaxSerial"  handler="com.eryansky.common.orm.mybatis.type.JsonTypeHandler"></typeHandler>
+</typeHandlers>
+变更SQL：
+ALTER TABLE `t_sys_serial_number` MODIFY COLUMN `max_serial` text COMMENT '系列号最大值';
+UPDATE t_sys_serial_number SET max_serial = CONCAT('{"items":[{"key":"maxSerial","value":',max_serial,'}]}');-- {"items":[{"key":"maxSerial","value":0}]}
+2、添加自定义联系人组
+变更SQL：
+-- ----------------------------
+-- 自定义联系人组
+-- ----------------------------
+DROP TABLE IF EXISTS `t_notice_contact_group`;
+CREATE TABLE `t_notice_contact_group`  (
+  `ID` varchar(36) COMMENT '主键ID UUID',
+  `STATUS` char(1) COMMENT '状态 正常/删除/审核/锁定 0/1/2/3',
+  `VERSION` int(11) COMMENT '版本号',
+  `CREATE_USER` varchar(36) COMMENT '创建者',
+  `CREATE_TIME` datetime(0) COMMENT '创建时间',
+  `UPDATE_USER` varchar(36) COMMENT '更新者',
+  `UPDATE_TIME` datetime(0) COMMENT '更新时间',
+  `CONTACT_GROUP_TYPE` varchar(36) COMMENT '联系人组类型 系统:0 邮件：1',
+  `IS_DEFAULT` char(1) COMMENT '默认组 是：1 否：0',
+  `NAME` varchar(128) COMMENT '联系人组名称',
+  `SORT` int(11) COMMENT '排序号',
+  `ORIGIN_USER_ID` varchar(36) COMMENT '来源用户',
+  `REMARK` varchar(255) COMMENT '备注',
+  `USER_ID` varchar(36) COMMENT '用户ID',
+  PRIMARY KEY (`ID`) USING BTREE
+) ENGINE = InnoDB COMMENT = '联系人分组';
+
+-- ----------------------------
+-- 自定义联系人关联对象
+-- ----------------------------
+DROP TABLE IF EXISTS `t_notice_contact_group_object`;
+CREATE TABLE `t_notice_contact_group_object`  (
+  `CONTACT_GROUP_ID` varchar(36) COMMENT '分组ID',
+  `OBJECT_ID` varchar(36) COMMENT '对象ID',
+  INDEX `FK_7le7xf32qlksdtdb1wl8mdgud`(`CONTACT_GROUP_ID`) USING BTREE,
+  CONSTRAINT `t_notice_contact_group_object_ibfk_1` FOREIGN KEY (`CONTACT_GROUP_ID`) REFERENCES `t_notice_contact_group` (`ID`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB COMMENT = '分组关联对象';
+
+-- ----------------------------
+-- 邮件联系人
+-- ----------------------------
+DROP TABLE IF EXISTS `t_notice_mail_contact`;
+CREATE TABLE `t_notice_mail_contact`  (
+  `ID` varchar(36) COMMENT '主键ID UUID',
+  `STATUS` char(1) COMMENT '状态 正常/删除/审核/锁定 0/1/2/3',
+  `VERSION` int(11) COMMENT '版本号',
+  `CREATE_USER` varchar(36) COMMENT '创建者',
+  `CREATE_TIME` datetime(0) COMMENT '创建时间',
+  `UPDATE_USER` varchar(36) COMMENT '更新者',
+  `UPDATE_TIME` datetime(0) COMMENT '更新时间',
+  `EMAIL` varchar(128) COMMENT '邮件地址',
+  `NAME` varchar(128) COMMENT '姓名',
+  `MOBILE` varchar(36) COMMENT '手机号',
+  `USER_ID` varchar(36) COMMENT '用户ID',
+  `CONTACT_GROUP_ID` varchar(36) COMMENT '分组ID',
+  `REMARK` varchar(255) COMMENT '备注',
+  PRIMARY KEY (`ID`) USING BTREE,
+  INDEX `USER_ID`(`USER_ID`) USING BTREE
+) ENGINE = InnoDB COMMENT = '邮件联系人';
+
+
+
+
+2020-07-13
+1、新增多账号切换支持
+
+2020-07-10
+1、添加机构自定义扩展机构类型
+数据字典编码：SYS_ORGAN_TYPE_EXTEND
+2、添加用户自定义扩展用户类型
+数据字典编码：SYS_USER_TYPE_EXTEND
+
+2020-03-31
+1、通知支持提醒
+
+ALTER TABLE t_notice
+ADD COLUMN tip_message varchar(64) DEFAULT NULL COMMENT '提醒通道 多个之间以“,”分割 系统提醒：Message 微信：Weixin 短信 SMS 企业微信提醒：QYWeixin APP提醒：APP';
+ALTER TABLE t_notice
+ADD COLUMN head_image varchar(36) DEFAULT NULL COMMENT '标题图';
+ALTER TABLE t_notice_receive_info
+ADD COLUMN is_send char(1) DEFAULT NULL COMMENT '是否发送 是/否 1/0';
+
+
+
+2020-01-07
+1、添加相关数学计算函数
+
+2020-01-05
+1、修复全局异常处理，异常返回
+
+2020-01-02
+1、升级AdminLTE至2.4.18（原2.3.8）
+
+2019-11-15
+1、初始化版本

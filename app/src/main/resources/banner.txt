@@ -1,0 +1,11 @@
+  ______                   _____          _
+ |  ____|                 / ____|        | |
+ | |__   __ _ ___ _   _  | |     ___   __| | ___
+ |  __| / _` / __| | | | | |    / _ \ / _` |/ _ \
+ | |___| (_| \__ \ |_| | | |___| (_) | (_| |  __/
+ |______\__,_|___/\__, |  \_____\___/ \__,_|\___|
+                   __/ |
+                  |___/
+
+Application Version: ${application.version}${application.formatted-version}
+Spring Boot Version: ${spring-boot.version}${spring-boot.formatted-version}

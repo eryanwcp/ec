@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="https://www.eryansky.com/thymeleaf/shiro">
+  <head>
+    <title>用户信息维护-[[${T(com.eryansky.utils.AppConstants).getAppFullName()}]]</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=EDGE;chrome=1" />
+    <meta name="renderer" content="webkit">
+    <link rel="shortcut icon" href="/static/img/favicon.ico" th:href="@{/static/img/favicon.ico}"/>
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" th:href="@{/static/js/adminlte/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css" th:href="@{/static/js/adminlte/dist/css/font-awesome.min.css}">
+    <link rel="stylesheet" href="bower_components/Ionicons/css/ionicons.min.css" th:href="@{/static/js/adminlte/dist/css/ionicons.min.css}">
+    <link rel="stylesheet" href="bower_components/iconfont/iconfont.css" th:href="@{/js/iconfont/iconfont.css}">
+    <link rel="stylesheet" href="dist/css/AdminLTE.min.css" th:href="@{/static/js/adminlte/dist/css/AdminLTE.min.css}">
+    <link rel="stylesheet" href="dist/css/skins/_all-skins.min.css" th:href="@{/static/js/adminlte/dist/css/skins/_all-skins.min.css}">
+    <link href="/static/js/jquery-jbox/2.3/Skins/Bootstrap/jbox.css" th:href="@{/static/js/jquery-jbox/2.3/Skins/Bootstrap/jbox.css}" rel="stylesheet" />
+    <link href="/static/js/jquery-validation-1.19.3/dist/extend/jquery-validate-extend.min.css" th:href="@{/static/js/jquery-validation-1.19.3/dist/extend/jquery-validate-extend.min.css}" rel="stylesheet" />
+    <link href="/static/js/uploadify/css/Huploadify.css" th:href="@{/static/js/uploadify/css/Huploadify.css}" rel="stylesheet" />
+    <style type="text/css">
+      html {overflow: hidden;}
+    </style>
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="../plugins/ie9/html5shiv.min.js" th:src="@{/static/js/adminlte/plugins/ie9/html5shiv.min.js}"></script>
+    <script src="../plugins/ie9/respond.min.js" th:src="@{/static/js/adminlte/plugins/ie9/respond.min.js}"></script>
+    <![endif]-->
+    <script type="text/javascript">
+      var ctx = window.document.location.pathname.substring(0, window.document.location.pathname.indexOf('\/', 1));
+      var ctxAdmin = ctx+'/a';
+      var ctxStatic = ctx+'/static';
+      var appURL = "[[${T(com.eryansky.utils.AppUtils).getClientAppURL()}]]";
+      var fileSizeLimit = '[[${T(com.eryansky.utils.AppConstants).getDiskMaxUploadSize()}]]';
+    </script>
+  </head>
+  <body class="hold-transition skin-blue sidebar-mini fixed">
+    <div>
+      <div class="box box-info">
+        <div class="box-header with-border">
+          <h3 class="box-title">用户信息维护</h3>
+        </div>
+        <!-- /.box-header -->
+        <!-- form start -->
+        <form id="inputForm" class="form-horizontal">
+          <input type="hidden" class="form-control" name="id" th:value="${sessionInfo.userId}">
+          <div class="box-body">
+            <div class="form-group">
+              <label for="name" class="col-sm-2 control-label">姓名</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="name" name="name" th:value="${model.name}" placeholder="姓名">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="sex" class="col-sm-2 control-label">性别</label>
+              <div class="col-sm-10">
+                <label class="radio-inline">
+                  <input type="radio" name="sex"  value="0"> 女
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="sex" value="1"> 男
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="sex"  value="2"> 保密
+                </label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="birthday" class="col-sm-2 control-label">出生日期</label>
+              <div class="col-sm-10">
+                <input type="date" class="form-control" id="birthday" name="birthday" th:value="${#dates.format(model.birthday,'yyyy-MM-dd')}" placeholder="出生日期">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="photo" class="col-sm-2 control-label">头像</label>
+              <div class="col-sm-10">
+                <input id="image" name="photo" readonly="readonly" th:value="${model.photo}" type="hidden"/>
+                <div class="img_div">
+                  <img id="image_pre" class="img-rounded" th:src="${model.photoUrl}" alt="头像" style="max-height: 72px;display: none;" />
+                  <div class="delete" onclick="delImageFile();" style="display: none;">x</div>
+                </div>
+                <div id="image_uploadify"></div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="mobile" class="col-sm-2 control-label">手机号</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="mobile" name="mobile"  th:value="${model.mobile}" placeholder="手机号">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="email" class="col-sm-2 control-label">公司邮箱</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="email" name="email" th:value="${model.email}" placeholder="公司邮箱">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="personEmail" class="col-sm-2 control-label">个人邮箱</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="personEmail" name="personEmail" th:value="${model.personEmail}" placeholder="个人邮箱">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="address" class="col-sm-2 control-label">地址</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="address" name="address" th:value="${model.address}" placeholder="地址">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="tel" class="col-sm-2 control-label">办公电话</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="tel" name="tel" th:value="${model.tel}" placeholder="办公电话">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="qq" class="col-sm-2 control-label">QQ</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="qq" name="qq" th:value="${model.qq}" placeholder="QQ">
+              </div>
+            </div>
+          </div>
+          <!-- /.box-body -->
+          <div class="box-footer">
+            <button type="button" onclick="save();"  class="btn btn-info pull-right">保存</button>
+          </div>
+          <!-- /.box-footer -->
+        </form>
+      </div>
+    </div>
+    <!-- ./wrapper -->
+    <!-- REQUIRED JS SCRIPTS -->
+    <script src="/static/js/jquery/jquery-1.12.2.min.js" th:src="@{/static/js/jquery/jquery-1.12.4.min.js}" ></script>
+    <script src="/static/js/jquery/jquery-migrate-1.4.1.min.js" th:src="@{/static/js/jquery/jquery-migrate-1.4.1.min.js}" ></script>
+    <script src="/static/js/jquery/jquery-extend.min.js" th:src="@{/static/js/jquery/jquery-extend.min.js}" ></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js" th:src="@{/static/js/adminlte/bootstrap/js/bootstrap.min.js}"></script>
+    <!-- FastClick -->
+    <script src="../plugins/fastclick/fastclick.js" th:src="@{/static/js/adminlte/plugins/fastclick/fastclick.js}"></script>
+
+    <script src="/static/js/jquery-validation-1.19.3/dist/jquery.validate.min.js" th:src="@{/static/js/jquery-validation-1.19.3/dist/jquery.validate.min.js}"></script>
+    <script src="/static/js/jquery-validation-1.19.3/dist/extend/jquery-validate-extend-methods.min.js" th:src="@{/static/js/jquery-validation-1.19.3/dist/extend/jquery-validate-extend-methods.min.js}"></script>
+    <script src="/static/js/common/common.min.js" th:src="@{/static/js/common/common.min.js}"></script>
+    <script src="/static/js/jquery-jbox/2.3/jquery.jBox-2.3.min.js" th:src="@{/static/js/jquery-jbox/2.3/jquery.jBox-2.3.min.js}" type="text/javascript"></script>
+    <script src="/static/js/jquery-jbox/2.3/i18n/jquery.jBox-zh-CN.min.js" th:src="@{/static/js/jquery-jbox/2.3/i18n/jquery.jBox-zh-CN.min.js}" type="text/javascript"></script>
+    <script src="/static/js/uploadify/scripts/jquery.Huploadify.js" th:src="@{/static/js/uploadify/scripts/jquery.Huploadify.js}" type="text/javascript"></script>
+    <script type="text/javascript">
+      var $validator;
+      var modelSex = "[[${model.sex}]]";
+      $(function () {
+        $validator = $("form").validate({
+          rules: {
+            name: {
+              required: true
+            },
+            mobile: {
+              mobile: true
+            },
+            tel: {
+              mobileOrPhone: true
+            },
+            email:{
+              email:true
+            },
+            personEmail:{
+              email:true
+            },
+            qq:{
+              qq:true
+            }
+          }
+        });
+
+        if ($('#image').val()) {
+          addImageFile($('#image').val());
+        }
+        $('input[name=sex][value=' + modelSex + ']').prop("checked", 'checked');
+
+        uploadifyImage();
+      });
+
+      function save(){
+        var valid = $("form").valid();
+        if(!valid){
+          // showTip("表单校验不通过，请完善相关数据！");
+          return false;
+        }
+        var formData = $.serializeObject($("form"));
+        $.ajax({
+          url: appURL + '/m/sys/user/saveUserInfo',
+          type: 'post',
+          dataType: 'json',
+          data:formData,
+          success: function (data) {
+            if (data.code === 1) {
+              showTip(data['msg']);
+              window.setTimeout(function(){
+                window.location.reload();
+              },2*1000);
+            } else {
+              showTip(data['msg']);
+            }
+          }
+        });
+      }
+
+
+      function addImageFile(id, url) {
+        $('#image').val(id);
+        if (url) {
+          $('#image_pre').attr("src", url);
+        }
+        $('#image_pre').show();
+        $('#image_pre').next().show();
+        var left = $('#image_pre').position().left;
+        var top = $('#image_pre').position().top;
+        $('#image_cencel').css({position: "absolute", left: left + 75, top: top + 10, display: "block"});
+      }
+
+      function delImageFile() {
+        $('#image_pre').attr("src", "");
+        $('#image_pre').hide();
+        $('#image_pre').next().hide();
+        $('#image').val("");
+      }
+
+      var imageDataMap = new HashMap();
+      function uploadifyImage() {
+        $('#image_uploadify').Huploadify({
+          auto: true,
+          showUploadedPercent: true,
+          showUploadedSize: true,
+          uploader: appURL + '/a/sys/user/upload',
+          formData: {},
+          fileObjName: 'uploadFile',
+          buttonText: '浏 览',
+          multi: false,
+          fileSizeLimit: fileSizeLimit, //单个文件大小，0为无限制，可接受KB,MB,GB等单位的字符串值
+          removeTimeout: 24 * 60 * 60 * 1000,
+          fileTypeExts: '*.gif; *.jpg; *.png; *.bmp',  //上传的文件后缀过滤器
+          //上传到服务器，服务器返回相应信息到data里
+          onUploadSuccess: function (file, data, response) {
+            data = eval("(" + data + ")");
+            if (1 === data['code']) {
+              addImageFile(data['obj']['id'], data['obj']['url']);
+              imageDataMap.put(file.index, data.obj);
+            } else {
+              eu.showAlertMsg(data['msg']);
+            }
+          },
+          onCancel: function (file) {
+            var sf = imageDataMap.get(file['index']);
+            delImageFile(sf['id']);
+            imageDataMap.remove(file['index']);
+          }
+
+        });
+      }
+    </script>
+  </body>
+</html>

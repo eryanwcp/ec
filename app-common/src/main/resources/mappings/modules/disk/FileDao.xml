@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eryansky.modules.disk.dao.FileDao">
+
+    <sql id="fileColumns">
+        a.id AS "id",
+        a.create_user AS "createUser",
+        a.create_time AS "createTime",
+        a.status AS "status",
+        a.update_user AS "updateUser",
+        a.update_time AS "updateTime",
+        a.version AS "version",
+        a.code AS "code",
+        a.file_path AS "filePath",
+        a.file_size AS "fileSize",
+        a.file_suffix AS "fileSuffix",
+        a.file_type AS "fileType",
+        a.keyword AS "keyword",
+        a.name AS "name",
+        a.remark AS "remark",
+        a.share_user_id AS "shareUserId",
+        a.user_id AS "userId",
+        a.folder_id AS "folderId"
+    </sql>
+
+    <sql id="fileJoins">
+        LEFT JOIN t_disk_folder f ON f.id = a.folder_id
+    </sql>
+
+    <select id="get" resultType="File">
+        SELECT
+        <include refid="fileColumns"/>
+        FROM t_disk_file a
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="findByCode" resultType="File">
+        SELECT
+        <include refid="fileColumns"/>
+        FROM t_disk_file a
+        <where>
+            a.status = #{status}
+            AND a.code = #{code}
+            <if test="excludeFileId != null and excludeFileId != ''">
+                AND a.id <![CDATA[ <> ]]> #{excludeFileId}
+            </if>
+        </where>
+    </select>
+
+    <select id="findFilesByIds" resultType="File">
+        SELECT
+        <include refid="fileColumns"/>
+        FROM t_disk_file a
+        <where>
+            a.id IN
+            <foreach collection="fileIds" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </where>
+    </select>
+
+
+    <select id="findList" resultType="File">
+        SELECT
+        <include refid="fileColumns"/>
+        FROM t_disk_file a
+        <where>
+            a.status = #{status}
+              <if test="folderId != null and folderId !=''">
+                  AND a.folder_id = #{folderId}
+              </if>
+
+            <if test="query != null and query !=''">
+                AND a.name LIKE
+                <choose>
+                    <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+                    <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+                    <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+                    <otherwise>'%'+#{query}+'%'</otherwise>
+                </choose>
+            </if>
+        </where>
+        <choose>
+            <when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
+                ORDER BY ${entityPage.orderBy} ${entityPage.order}
+            </when>
+            <otherwise>
+                ORDER BY a.update_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <select id="findAdvenceQueryList" resultType="File">
+        SELECT
+        <include refid="fileColumns"/>
+        FROM t_disk_file a
+        <include refid="fileJoins"/>
+        <where>
+            a.status = #{status}
+            <if test="folderId != null and folderId !=''">
+                AND a.folder_id = #{folderId}
+            </if>
+            <if test="folderAuthorize != null and folderAuthorize !=''">
+                AND f.folder_authorize = #{folderAuthorize}
+            </if>
+            <choose>
+                <when test="isAdmin">
+                    <if test="userId != null and userId !=''">
+                        AND a.user_id = #{userId}
+                    </if>
+                </when>
+                <otherwise>
+                    <if test="userId == null or userId ==''">
+                        AND 1 = 0
+                    </if>
+                    AND ((a.user_id = #{userId} AND f.folder_authorize = '0')
+                    OR f.folder_authorize = "1")
+                    AND f.type = '0'
+                </otherwise>
+            </choose>
+            <if test="query != null and query !=''">
+                AND a.name LIKE
+                <choose>
+                    <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+                    <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+                    <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+                    <otherwise>'%'+#{query}+'%'</otherwise>
+                </choose>
+            </if>
+            <if test="fileSizeType != null and fileSizeType !=''">
+                <choose>
+                    <when test="fileSizeType == '0'.toString()">
+                        AND a.file_size <![CDATA[ < ]]>#{fileSize}
+                    </when>
+                    <when test="fileSizeType == '1'.toString()">
+                        AND a.file_size <![CDATA[ >= ]]>#{minSize} AND a.file_size <![CDATA[ <= ]]>#{maxSize}
+                    </when>
+                    <when test="fileSizeType == '2'.toString()">
+                        AND a.file_size <![CDATA[ > ]]>#{fileSize}
+                    </when>
+                </choose>
+            </if>
+            <choose>
+                <when test="startTime != null and endTime != null">
+                    AND a.update_time BETWEEN #{startTime} AND #{endTime}
+                </when>
+                <when test="startTime != null and endTime == null">
+                    AND a.update_time <![CDATA[>=]]> #{startTime}
+                </when>
+                <when test="startTime == null and endTime != null">
+                    AND a.update_time <![CDATA[<=]]> #{endTime}
+                </when>
+            </choose>
+        </where>
+        <choose>
+            <when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
+                ORDER BY ${entityPage.orderBy} ${entityPage.order}
+            </when>
+            <otherwise>
+                ORDER BY a.update_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findFolderFiles" resultType="File">
+        SELECT
+        <include refid="fileColumns"/>
+        FROM t_disk_file a
+        <include refid="fileJoins"/>
+        <where>
+            a.status = #{status}
+            AND a.folder_id = #{folderId}
+            <if test="fileSuffixs != null and fileIds.size() !=0">
+                AND a.file_suffix IN
+                <foreach collection="fileSuffixs" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        <choose>
+            <when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
+                ORDER BY ${entityPage.orderBy} ${entityPage.order}
+            </when>
+            <otherwise>
+                ORDER BY a.update_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <select id="findOwnerAndChildsFolderFiles" resultType="File">
+        SELECT
+        <include refid="fileColumns"/>
+        FROM t_disk_file a
+        <include refid="fileJoins"/>
+        <where>
+            a.status = #{status}
+            AND (
+                f.id = #{folderId} OR f.parent_ids LIKE
+            <choose>
+                <when test="dbName == 'db2'">'%,'||#{folderId}||',%'</when>
+                <when test="dbName == 'mysql'">CONCAT('%,', #{folderId}, ',%')</when>
+                <when test="dbName == 'oracle'">'%,'||#{folderId}||',%'</when>
+                <otherwise>'%,'+#{folderId}+',%'</otherwise>
+            </choose>
+            )
+            <if test="fileSuffixs != null and fileIds.size() !=0">
+                AND a.file_suffix IN
+                <foreach collection="fileSuffixs" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY a.update_time DESC
+    </select>
+
+    <select id="findOwnerAndChildsIdsFolderFiles" resultType="java.lang.String">
+        SELECT
+        a.id
+        FROM t_disk_file a
+        <include refid="fileJoins"/>
+        <where>
+            a.status = #{status}
+            AND (
+                f.id = #{folderId} OR f.parent_ids LIKE
+            <choose>
+                <when test="dbName == 'db2'">'%,'||#{folderId}||',%'</when>
+                <when test="dbName == 'mysql'">CONCAT('%,', #{folderId}, ',%')</when>
+                <when test="dbName == 'oracle'">'%,'||#{folderId}||',%'</when>
+                <otherwise>'%,'+#{folderId}+',%'</otherwise>
+            </choose>
+            )
+            <if test="fileSuffixs != null and fileIds.size() !=0">
+                AND a.file_suffix IN
+                <foreach collection="fileSuffixs" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY a.update_time DESC
+    </select>
+
+
+
+    <select id="countFileSize" resultType="java.lang.Long">
+        SELECT
+          sum(a.file_size)
+        FROM t_disk_file a
+        <where>
+            a.status = #{status}
+            <if test="fileIds != null and fileIds.size() !=0">
+                AND a.id IN
+                <foreach collection="fileIds" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+
+    <select id="findAllList" resultType="File">
+        SELECT
+        <include refid="fileColumns"/>
+        FROM t_disk_file a
+        <where>
+        </where>
+        <choose>
+            <when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
+                ORDER BY ${entityPage.orderBy} ${entityPage.order}
+            </when>
+            <otherwise>
+                ORDER BY a.update_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="selectMany" resultType="File">
+		${selectStatement}
+	</select>
+
+    <select id="selectOne" resultType="File">
+		${selectStatement}
+	</select>
+
+    <insert id="insert">
+        INSERT INTO t_disk_file(
+        id,
+        status,
+        version,
+        create_user,
+        create_time,
+        update_user,
+        update_time,
+        code,
+        file_path,
+        file_size,
+        file_suffix,
+        file_type,
+        keyword,
+        name,
+        remark,
+        share_user_id,
+        user_id,
+        folder_id
+        ) VALUES (
+        #{id},
+        #{status},
+        1,
+        #{createUser},
+        #{createTime},
+        #{updateUser},
+        #{updateTime},
+        #{code},
+        #{filePath},
+        #{fileSize},
+        #{fileSuffix},
+        #{fileType},
+        #{keyword},
+        #{name},
+        #{remark},
+        #{shareUserId},
+        #{userId},
+        #{folderId}
+        )
+    </insert>
+
+    <insert id="insertBatch">
+        INSERT INTO t_disk_file(
+        id,
+        status,
+        version,
+        create_user,
+        create_time,
+        update_user,
+        update_time,
+        code,
+        file_path,
+        file_size,
+        file_suffix,
+        file_type,
+        keyword,
+        name,
+        remark,
+        share_user_id,
+        user_id,
+        folder_id
+        ) VALUES <foreach collection="list" item="item" separator=",">(
+        #{item.id},
+        #{item.status},
+        1,
+        #{item.createUser},
+        #{item.createTime},
+        #{item.updateUser},
+        #{item.updateTime},
+        #{item.code},
+        #{item.filePath},
+        #{item.fileSize},
+        #{item.fileSuffix},
+        #{item.fileType},
+        #{item.keyword},
+        #{item.name},
+        #{item.remark},
+        #{item.shareUserId},
+        #{item.userId},
+        #{item.folderId}
+        )</foreach>
+    </insert>
+
+    <update id="update">
+        UPDATE t_disk_file SET
+        status = #{status},
+        version = version +1,
+        update_user = #{updateUser},
+        update_time = #{updateTime},
+        code = #{code},
+        file_path = #{filePath},
+        file_size = #{fileSize},
+        file_suffix = #{fileSuffix},
+        file_type = #{fileType},
+        keyword = #{keyword},
+        name = #{name},
+        remark = #{remark},
+        share_user_id = #{shareUserId},
+        user_id = #{userId},
+        folder_id = #{folderId}
+         WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        UPDATE t_disk_file SET
+        status = #{STATUS_DELETE},
+        version = version +1,
+        update_user = #{updateUser},
+        update_time = #{updateTime}
+        WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteCascadeByFolderId">
+        UPDATE t_disk_file a
+        LEFT JOIN t_disk_folder f  ON f.id = a.folder_id
+         SET
+        a.status = #{STATUS_DELETE},
+        a.version = a.version +1,
+        a.update_user = #{updateUser},
+        a.update_time = #{updateTime}
+        WHERE (f.id = #{folderId} OR f.parent_ids LIKE
+        <choose>
+            <when test="dbName == 'db2'">'%,'||#{folderId}||',%'</when>
+            <when test="dbName == 'mysql'">CONCAT('%,', #{folderId}, ',%')</when>
+            <when test="dbName == 'oracle'">'%,'||#{folderId}||',%'</when>
+            <otherwise>'%,'+#{folderId}+',%'</otherwise>
+        </choose>
+    </delete>
+
+</mapper>

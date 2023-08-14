@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eryansky.modules.sys.dao.VersionLogDao">
+
+	<cache type="com.eryansky.j2cache.mybatis.J2CacheAdapter">
+		<property name="encodeKey" value="true"/>
+	</cache>
+
+	<sql id="sysVersionLogColumns">
+		a.id AS "id",
+		a.status AS "status",
+		a.version AS "version",
+		a.create_user AS "createUser",
+		a.create_time AS "createTime",
+		a.update_user AS "updateUser",
+		a.update_time AS "updateTime",
+		a.app AS "app",
+		a.version_log_type AS "versionLogType",
+		a.version_name AS "versionName",
+		a.version_code AS "versionCode",
+		a.is_pub AS "isPub",
+		a.is_tip AS "isTip",
+		a.is_shelf AS "isShelf",
+		a.pub_time AS "pubTime",
+		a.remark AS "remark",
+		a.file_id AS "fileId"
+	</sql>
+
+	<sql id="sysVersionLogJoins">
+		LEFT JOIN t_sys_user u ON u.id = a.update_user
+	</sql>
+
+	<select id="get" resultType="VersionLog">
+		SELECT
+		<include refid="sysVersionLogColumns"/>
+		FROM t_sys_version_log a
+		<include refid="sysVersionLogJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+
+	<select id="getByVersionCode" resultType="VersionLog">
+		SELECT
+		<include refid="sysVersionLogColumns"/>
+		FROM t_sys_version_log a
+		<include refid="sysVersionLogJoins"/>
+		WHERE
+		a.status = #{status}
+		AND a.version_code = #{versionCode}
+		<if test="app != null and app !=''">
+			AND a.app = #{app}
+		</if>
+		<if test="versionLogType != null and versionLogType != ''">
+			AND a.version_log_type = #{versionLogType}
+		</if>
+		<if test="isPub != null and isPub != ''">
+			AND a.is_pub = #{isPub}
+		</if>
+	</select>
+
+	<select id="getByVersionName" resultType="VersionLog">
+		SELECT
+		<include refid="sysVersionLogColumns"/>
+		FROM t_sys_version_log a
+		<include refid="sysVersionLogJoins"/>
+		WHERE
+		a.status = #{status}
+		AND a.version_name = #{versionName}
+		<if test="app != null and app !=''">
+			AND a.app = #{app}
+		</if>
+		<if test="versionLogType != null and versionLogType != ''">
+			AND a.version_log_type = #{versionLogType}
+		</if>
+		<if test="isPub != null and isPub != ''">
+			AND a.is_pub = #{isPub}
+		</if>
+	</select>
+
+	<select id="getLatestVersionLog" resultType="VersionLog">
+		SELECT
+		<include refid="sysVersionLogColumns"/>
+		FROM t_sys_version_log a
+		<include refid="sysVersionLogJoins"/>
+		<where>
+			a.status = #{status}
+			AND a.version_log_type = #{versionLogType}
+			<if test="app != null and app !=''">
+				AND a.app = #{app}
+			</if>
+			<if test="isPub != null and isPub !=''">
+				AND a.is_pub = #{isPub}
+			</if>
+			<if test="isShelf != null and isShelf !=''">
+				AND a.is_shelf = #{isShelf}
+			</if>
+			AND a.version_code = (SELECT MAX(CAST(c.version_code AS signed)) FROM t_sys_version_log c WHERE c.version_log_type = #{versionLogType} AND c.status = #{status}
+			<if test="app != null and app !=''">
+				AND c.app = #{app}
+			</if>
+			<if test="isPub != null and isPub !=''">
+				AND c.is_pub = #{isPub}
+			</if>
+			<if test="isShelf != null and isShelf !=''">
+				AND c.is_shelf = #{isShelf}
+			</if>
+			)
+		</where>
+
+	</select>
+
+
+	<select id="findList" resultType="VersionLog">
+		SELECT
+		<include refid="sysVersionLogColumns"/>
+		FROM t_sys_version_log a
+		<include refid="sysVersionLogJoins"/>
+		<where>
+			a.status = #{status}
+			<if test="app != null and app !=''">
+				AND a.app = #{app}
+			</if>
+		</where>
+		<choose>
+			<when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
+				ORDER BY ${entityPage.orderBy} ${entityPage.order}
+			</when>
+			<otherwise>
+				ORDER BY a.update_time DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findQueryList" resultType="VersionLog">
+		SELECT
+		<include refid="sysVersionLogColumns"/>
+		FROM t_sys_version_log a
+		<include refid="sysVersionLogJoins"/>
+		<where>
+			a.status = #{status}
+			<if test="versionLogType != null and versionLogType != ''">
+				AND a.version_log_type = #{versionLogType}
+			</if>
+			<if test="query != null and query != ''">
+				AND (a.version_name LIKE
+				<choose>
+					<when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+					<when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+					<when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+					<otherwise>'%'+#{versionName}+'%'</otherwise>
+				</choose>
+				OR a.version_code LIKE
+				<choose>
+					<when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+					<when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+					<when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+					<otherwise>'%'+#{query}+'%'</otherwise>
+				</choose>
+				OR a.remark LIKE
+				<choose>
+					<when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+					<when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+					<when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+					<otherwise>'%'+#{query}+'%'</otherwise>
+				</choose>
+				)
+			</if>
+
+			<choose>
+				<when test="startTime != null and endTime != null">
+					AND a.update_time BETWEEN #{startTime} AND #{endTime}
+				</when>
+				<when test="startTime != null and endTime == null">
+					AND a.update_time <![CDATA[>=]]> #{startTime}
+				</when>
+				<when test="startTime == null and endTime != null">
+					AND a.update_time <![CDATA[<=]]> #{endTime}
+				</when>
+			</choose>
+		</where>
+		<choose>
+			<when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
+				ORDER BY ${entityPage.orderBy} ${entityPage.order}
+			</when>
+			<otherwise>
+				ORDER BY a.update_time DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="VersionLog">
+		SELECT
+		<include refid="sysVersionLogColumns"/>
+		FROM t_sys_version_log a
+		<include refid="sysVersionLogJoins"/>
+		<where>
+			a.status = #{status}
+		</where>
+		<choose>
+			<when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
+				ORDER BY ${entityPage.orderBy} ${entityPage.order}
+			</when>
+			<otherwise>
+				ORDER BY a.update_time DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="selectMany" resultType="VersionLog">
+		${selectStatement}
+	</select>
+
+	<select id="selectOne" resultType="VersionLog">
+		${selectStatement}
+	</select>
+
+	<insert id="insert">
+		INSERT INTO t_sys_version_log(
+        id,
+        status,
+        version,
+        create_user,
+        create_time,
+        update_user,
+        update_time,
+        APP,
+        VERSION_LOG_TYPE,
+        VERSION_CODE,
+        VERSION_NAME,
+        IS_PUB,
+        is_tip,
+        is_shelf,
+        PUB_TIME,
+        REMARK,
+        FILE_ID
+        ) VALUES (
+        #{id},
+        #{status},
+        1,
+        #{createUser},
+        #{createTime},
+        #{updateUser},
+        #{updateTime},
+        #{app},
+        #{versionLogType},
+        #{versionCode},
+        #{versionName},
+        #{isPub},
+        #{isTip},
+        #{isShelf},
+        #{pubTime},
+        #{remark},
+        #{fileId}
+        )
+	</insert>
+	<insert id="insertBatch">
+		INSERT INTO t_sys_version_log(
+        id,
+        status,
+        version,
+        create_user,
+        create_time,
+        update_user,
+        update_time,
+        APP,
+        VERSION_LOG_TYPE,
+        VERSION_CODE,
+        VERSION_NAME,
+        IS_PUB,
+        is_tip,
+        is_shelf,
+        PUB_TIME,
+        REMARK,
+        FILE_ID
+        ) VALUES <foreach collection="list" item="item" separator=",">(
+        #{item.id},
+        #{item.status},
+        1,
+        #{item.createUser},
+        #{item.createTime},
+        #{item.updateUser},
+        #{item.updateTime},
+        #{item.app},
+        #{item.versionLogType},
+        #{item.versionCode},
+        #{item.versionName},
+        #{item.isPub},
+        #{item.isTip},
+        #{item.isShelf},
+        #{item.pubTime},
+        #{item.remark},
+        #{item.fileId}
+		)</foreach>
+	</insert>
+
+	<update id="update">
+		UPDATE t_sys_version_log SET
+        status = #{status},
+        version = version +1,
+        update_user = #{updateUser},
+        update_time = #{updateTime},
+        APP = #{app},
+        VERSION_LOG_TYPE = #{versionLogType},
+        VERSION_CODE = #{versionCode},
+        VERSION_NAME = #{versionName},
+        IS_PUB = #{isPub},
+        is_tip = #{isTip},
+        is_shelf = #{isShelf},
+        PUB_TIME = #{pubTime},
+        REMARK = #{remark},
+        FILE_ID = #{fileId}
+         WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		 UPDATE t_sys_version_log SET
+        status = #{STATUS_DELETE},
+        version = version +1,
+        update_user = #{updateUser},
+        update_time = #{updateTime}
+        WHERE id = #{id}
+	</update>
+
+	<delete id="clear">
+		DELETE FROM t_sys_version_log
+		WHERE id = #{id}
+	</delete>
+
+	<delete id="clearAll">
+		DELETE FROM t_sys_version_log
+	</delete>
+
+
+</mapper>

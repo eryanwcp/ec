@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eryansky.modules.notice.dao.MessageDao">
+    
+	<sql id="noticeMessageColumns">
+		a.id AS "id",
+		a.status AS "status",
+		a.version AS "version",
+		a.create_user AS "createUser",
+		a.create_time AS "createTime",
+		a.update_user AS "updateUser",
+		a.update_time AS "updateTime",
+		a.app_id AS "appId",
+		a.category AS "category",
+		a.title AS "title",
+		a.url AS "url",
+		a.image AS "image",
+		a.content AS "content",
+		a.biz_mode AS "bizMode",
+		a.sender AS "sender",
+		a.send_time AS "sendTime",
+		a.organ_id AS "organId",
+		a.tip_message AS "tipMessage"
+	</sql>
+	
+	<sql id="noticeMessageJoins">
+		LEFT JOIN t_sys_user u ON u.id = a.sender
+		LEFT JOIN t_sys_organ_extend o ON o.id = a.organ_id
+	</sql>
+    
+	<select id="get" resultType="Message">
+		SELECT 
+			<include refid="noticeMessageColumns"/>
+		FROM t_notice_message a
+		<include refid="noticeMessageJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Message">
+		SELECT 
+			<include refid="noticeMessageColumns"/>
+		FROM t_notice_message a
+		<include refid="noticeMessageJoins"/>
+		<where>
+			a.status = #{status}
+			<if test="appId != null and appId != ''">
+				AND a.app_id = #{appId}
+			</if>
+			<if test="organId != null and organId != ''">
+				AND a.organ_id = #{organId}
+			</if>
+			
+			<if test="category != null and category != ''">
+				AND a.category = #{category}
+			</if>
+ 
+			<if test="query != null and query != ''">
+				AND (
+				a.title LIKE
+				<choose>
+					<when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+					<when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+					<when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+					<otherwise>'%'+#{query}+'%'</otherwise>
+				</choose>
+				OR a.url LIKE
+				<choose>
+					<when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+					<when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+					<when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+					<otherwise>'%'+#{query}+'%'</otherwise>
+				</choose>
+				OR a.content LIKE
+				<choose>
+					<when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+					<when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+					<when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+					<otherwise>'%'+#{query}+'%'</otherwise>
+				</choose>
+				OR a.app_id = #{query}
+				)
+			</if>
+			${sqlMap.dsf}
+		</where>
+		<choose>
+			<when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
+				ORDER BY ${entityPage.orderBy} ${entityPage.order}
+			</when>
+			<otherwise>
+				ORDER BY a.update_time DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findQueryList" resultType="Message">
+		SELECT
+		<include refid="noticeMessageColumns"/>
+		FROM t_notice_message a
+		<include refid="noticeMessageJoins"/>
+		<where>
+			a.status = #{status}
+			<if test="appId != null and appId != ''">
+				AND a.app_id = #{appId}
+			</if>
+			<if test="organId != null and organId != ''">
+				AND a.organ_id = #{organId}
+			</if>
+			<if test="userId != null and userId != ''">
+				AND a.sender = #{userId}
+			</if>
+
+			<if test="category != null and category != ''">
+				AND a.category = #{category}
+			</if>
+
+			<if test="query != null and query != ''">
+				AND (
+				a.title LIKE
+				<choose>
+					<when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+					<when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+					<when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+					<otherwise>'%'+#{query}+'%'</otherwise>
+				</choose>
+				OR a.url LIKE
+				<choose>
+					<when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+					<when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+					<when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+					<otherwise>'%'+#{query}+'%'</otherwise>
+				</choose>
+				OR a.content LIKE
+				<choose>
+					<when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+					<when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+					<when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+					<otherwise>'%'+#{query}+'%'</otherwise>
+				</choose>
+				OR a.app_id = #{query}
+				)
+			</if>
+
+			<choose>
+				<when test="startTime != null and endTime != null">
+					AND a.send_time BETWEEN #{startTime} AND #{endTime}
+				</when>
+				<when test="startTime != null and endTime == null">
+					AND a.send_time <![CDATA[>=]]> #{startTime}
+				</when>
+				<when test="startTime == null and endTime != null">
+					AND a.send_time <![CDATA[<=]]> #{endTime}
+				</when>
+			</choose>
+			${sqlMap.dsf}
+		</where>
+		<choose>
+			<when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
+				ORDER BY ${entityPage.orderBy} ${entityPage.order}
+			</when>
+			<otherwise>
+				ORDER BY a.send_time DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="Message">
+		SELECT 
+			<include refid="noticeMessageColumns"/>
+		FROM t_notice_message a
+		<include refid="noticeMessageJoins"/>
+		<where>
+			a.status = #{STATUS_NORMAL}
+			<if test="organId != null and organId != ''">
+				AND a.organ_id = #{organId}
+			</if>
+		</where>
+		<choose>
+			<when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
+				ORDER BY ${entityPage.orderBy} ${entityPage.order}
+			</when>
+			<otherwise>
+				ORDER BY a.update_time DESC
+			</otherwise>
+		</choose>
+	</select>
+
+
+	<select id="selectMany" resultType="Message">
+		${selectStatement}
+	</select>
+
+	<select id="selectOne" resultType="Message">
+		${selectStatement}
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO t_notice_message(
+			id,
+			status,
+			version,
+			create_user,
+			create_time,
+			update_user,
+			update_time,
+			app_id,
+			category,
+			title,
+			url,
+			image,
+			content,
+			biz_mode,
+			sender,
+			send_time,
+			organ_id,
+			tip_message
+		) VALUES (
+			#{id},
+			#{status},
+			0,
+			#{createUser},
+			#{createTime},
+			#{updateUser},
+			#{updateTime},
+			#{appId},
+			#{category},
+			#{title},
+			#{url},
+			#{image},
+			#{content},
+			#{bizMode},
+			#{sender},
+			#{sendTime},
+			#{organId},
+			#{tipMessage}
+		)
+	</insert>
+	<insert id="insertBatch">
+		INSERT INTO t_notice_message(
+			id,
+			status,
+			version,
+			create_user,
+			create_time,
+			update_user,
+			update_time,
+			app_id,
+			category,
+			title,
+			url,
+			image,
+			content,
+			biz_mode,
+			sender,
+			send_time,
+			organ_id,
+			tip_message
+		) VALUES <foreach collection="list" item="item" separator=",">(
+			#{item.id},
+			#{item.status},
+			0,
+			#{item.createUser},
+			#{item.createTime},
+			#{item.updateUser},
+			#{item.updateTime},
+			#{item.appId},
+			#{item.category},
+			#{item.title},
+			#{item.url},
+			#{item.image},
+			#{item.content},
+			#{item.bizMode},
+			#{item.sender},
+			#{item.sendTime},
+			#{item.organId},
+			#{item.tipMessage}
+		)</foreach>
+	</insert>
+
+	<update id="update">
+		UPDATE t_notice_message SET
+			status = #{status},
+			version = version +1,
+			update_user = #{updateUser},
+			update_time = #{updateTime},
+			app_id = #{appId},
+			category = #{category},
+			title = #{title},
+			url = #{url},
+			image = #{image},
+			content = #{content},
+			sender = #{sender},
+			biz_mode = #{bizMode},
+			send_time = #{sendTime},
+			organ_id = #{organId},
+			tip_message = #{tipMessage}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE t_notice_message SET
+		status = #{STATUS_DELETE},
+		version = version +1,
+        update_user = #{updateUser},
+        update_time = #{updateTime}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

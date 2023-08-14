@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >  
+<mapper namespace="com.eryansky.modules.sys.dao.JobDao">
+    
+    <select id="findJobList" resultType="com.eryansky.modules.sys.mapper.QuartzJobDetail">
+		SELECT
+			a.JOB_NAME AS 'jobName',
+			a.JOB_GROUP AS 'jobGroup',
+			a.JOB_CLASS_NAME AS 'jobClassName',
+			b.TRIGGER_NAME AS 'triggerName',
+			b.TRIGGER_GROUP AS 'triggerGroup',
+			b.TRIGGER_STATE AS 'triggerState',
+			c.CRON_EXPRESSION AS 'cronExpression',
+			c.TIME_ZONE_ID AS 'timeZoneId',
+			FROM_UNIXTIME(b.NEXT_FIRE_TIME/1000,'%Y-%m-%d %H:%i:%S') AS 'nextFireTime',
+			FROM_UNIXTIME(b.PREV_FIRE_TIME/1000,'%Y-%m-%d %H:%i:%S') AS 'prevFireTime'
+		FROM
+			qrtz_job_details a
+		INNER JOIN qrtz_triggers b ON a.JOB_NAME = b.JOB_NAME AND a.JOB_GROUP = b.JOB_GROUP
+		INNER JOIN qrtz_cron_triggers c ON b.TRIGGER_NAME = c.TRIGGER_NAME AND b.TRIGGER_GROUP = c.TRIGGER_GROUP
+		WHERE 1=1
+		<if test="jobName !=null and jobName !=''" >
+			and a.JOB_NAME = #{jobName}
+		</if>
+		<if test="jobState !=null and jobState !=''" >
+			AND b.TRIGGER_STATE = #{jobState}
+		</if>
+    </select>
+
+</mapper>

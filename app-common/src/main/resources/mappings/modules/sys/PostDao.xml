@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eryansky.modules.sys.dao.PostDao">
+
+    <sql id="postColumns">
+        a.id AS "id",
+        a.create_user AS "createUser",
+        a.create_time AS "createTime",
+        a.status AS "status",
+        a.update_user AS "updateUser",
+        a.update_time AS "updateTime",
+        a.version AS "version",
+        a.NAME AS "name",
+        a.CODE AS "code",
+        a.sort AS "sort",
+        a.REMARK AS "remark",
+        a.ORGAN_ID AS "organId"
+    </sql>
+
+    <select id="get" resultType="Post">
+        SELECT
+        <include refid="postColumns"/>
+        FROM t_sys_post a
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="getByCode" resultType="Post">
+        SELECT
+        <include refid="postColumns"/>
+        FROM t_sys_post a
+        WHERE a.status = '0' AND a.code = #{code}
+    </select>
+
+    <select id="findPost" resultType="Post">
+        SELECT DISTINCT
+        <include refid="postColumns"/>
+        FROM t_sys_post a
+        LEFT JOIN t_sys_post_organ po ON po.post_id = a.id
+        LEFT JOIN t_sys_organ o ON o.id = a.organ_id
+        <where>
+            a.status = '0'
+            AND a.code = #{code}
+            <if test="organId != null and organId !=''">
+                AND (a.organ_id = #{organId}
+                OR o.id = #{organId}
+                )
+            </if>
+        </where>
+    </select>
+
+
+
+    <select id="findList" resultType="Post">
+        SELECT
+        <include refid="postColumns"/>
+        FROM t_sys_post a
+        <where>
+            a.status = #{status}
+        </where>
+        <choose>
+            <when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
+                ORDER BY ${entityPage.orderBy} ${entityPage.order}
+            </when>
+            <otherwise>
+                ORDER BY a.update_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findAllList" resultType="Post">
+        SELECT
+        <include refid="postColumns"/>
+        FROM t_sys_post a
+        <where>
+        </where>
+        <choose>
+            <when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
+                ORDER BY ${entityPage.orderBy} ${entityPage.order}
+            </when>
+            <otherwise>
+                ORDER BY a.update_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="selectMany" resultType="Post">
+		${selectStatement}
+	</select>
+
+    <select id="selectOne" resultType="Post">
+		${selectStatement}
+	</select>
+
+    <select id="findQuery" resultType="Post">
+        SELECT DISTINCT
+        <include refid="postColumns"/>
+        FROM t_sys_post a
+        LEFT JOIN t_sys_post_organ po ON po.post_id = a.id
+        LEFT JOIN t_sys_organ o ON po.organ_id = o.id
+        <where>
+            a.status = #{status}
+            <if test="organId != null and organId !=''">
+                AND (a.organ_id = #{organId}  OR o.id = #{organId})
+            </if>
+            <if test="query != null and query !=''">
+                AND (a.name LIKE
+                <choose>
+                    <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+                    <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+                    <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+                    <otherwise>'%'+#{query}+'%'</otherwise>
+                </choose>
+                    OR
+                    a.code LIKE
+                <choose>
+                    <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+                    <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+                    <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+                    <otherwise>'%'+#{query}+'%'</otherwise>
+                </choose>
+                )
+            </if>
+        </where>
+        <choose>
+            <when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
+                ORDER BY ${entityPage.orderBy} ${entityPage.order}
+            </when>
+            <otherwise>
+                ORDER BY a.sort ASC
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <select id="findPostsByOrganId" resultType="Post">
+        SELECT DISTINCT
+        <include refid="postColumns"/>
+        FROM t_sys_post a
+        LEFT JOIN t_sys_post_organ po ON po.post_id = a.id
+        LEFT JOIN t_sys_organ o ON po.organ_id = o.id
+        <where>
+            a.status = '0'
+            AND (a.organ_id = #{organId} OR o.id = #{organId})
+        </where>
+    </select>
+
+
+    <select id="findPostsByOrganIds" resultType="Post">
+        SELECT DISTINCT
+        <include refid="postColumns"/>
+        FROM t_sys_post a
+        LEFT JOIN t_sys_post_organ po ON po.post_id = a.id
+        LEFT JOIN t_sys_organ o ON po.organ_id = o.id
+        <where>
+            a.status = '0'
+            AND (a.organ_id IN  <foreach collection="organIds" open="(" separator="," close=")" item="item">#{item}</foreach>
+                 OR o.id IN <foreach collection="organIds" open="(" separator="," close=")" item="item">#{item} </foreach>
+             )
+
+        </where>
+    </select>
+
+    <select id="findPostsByUserId" resultType="Post">
+        SELECT
+        <include refid="postColumns"/>
+        FROM t_sys_post a
+        LEFT JOIN t_sys_user_post up ON up.post_id = a.id
+        LEFT JOIN t_sys_user u ON u.id = up.user_id
+        <where>
+            a.status = #{status}
+            AND u.id = #{userId}
+            <if test="organId != null and organId !=''">
+                AND up.organ_id = #{organId}
+            </if>
+        </where>
+    </select>
+
+    <select id="findPostIdsByUserId" resultType="java.lang.String">
+        SELECT
+        a.id
+        FROM t_sys_post a
+        LEFT JOIN t_sys_user_post up ON up.post_id = a.id
+        LEFT JOIN t_sys_user u ON u.id = up.user_id
+        <where>
+            a.status = #{status}
+            AND u.id = #{userId}
+            <if test="organId != null and organId !=''">
+                AND up.organ_id = #{organId}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="findByWhereSQL" resultType="Post">
+        SELECT
+        <include refid="postColumns"/>
+        FROM t_sys_post a
+        <where>
+            ${whereSQL}
+        </where>
+        ORDER BY a.sort ASC
+    </select>
+
+
+    <select id="findBySql" resultType="Post">
+        SELECT
+        <include refid="postColumns"/>
+        FROM t_sys_post a
+        ${sql}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO t_sys_post(
+        id,
+        status,
+        version,
+        create_user,
+        create_time,
+        update_user,
+        update_time,
+        NAME,
+        CODE,
+        sort,
+        REMARK,
+        ORGAN_ID
+        ) VALUES (
+        #{id},
+        #{status},
+        1,
+        #{createUser},
+        #{createTime},
+        #{updateUser},
+        #{updateTime},
+        #{name},
+        #{code},
+        #{sort},
+        #{remark},
+        #{organId}
+        )
+    </insert>
+
+    <insert id="insertBatch">
+        INSERT INTO t_sys_post(
+        id,
+        status,
+        version,
+        create_user,
+        create_time,
+        update_user,
+        update_time,
+        NAME,
+        CODE,
+        sort,
+        REMARK,
+        ORGAN_ID
+        ) VALUES <foreach collection="list" item="item" separator=",">(
+        #{item.id},
+        #{item.status},
+        1,
+        #{item.createUser},
+        #{item.createTime},
+        #{item.updateUser},
+        #{item.updateTime},
+        #{item.name},
+        #{item.code},
+        #{item.sort},
+        #{item.remark},
+        #{item.organId}
+        )</foreach>
+    </insert>
+
+    <update id="update">
+        UPDATE t_sys_post SET
+        status = #{status},
+        version = version +1,
+        update_user = #{updateUser},
+        update_time = #{updateTime},
+        NAME = #{name},
+        CODE = #{code},
+        sort = #{sort},
+        REMARK = #{remark},
+        ORGAN_ID = #{organId}
+         WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        UPDATE t_sys_post SET
+        status = #{STATUS_DELETE},
+        version = version +1,
+        update_user = #{updateUser},
+        update_time = #{updateTime}
+        WHERE id = #{id}
+    </delete>
+
+
+    <!--岗位机构-->
+    <delete id="deletePostOrgansByPostId">
+        DELETE FROM t_sys_post_organ WHERE post_id = #{id}
+    </delete>
+
+    <insert id="insertPostOrgans">
+        INSERT INTO t_sys_post_organ(post_id, organ_id)
+        <foreach collection="ids" item="item" separator=" union all ">
+            SELECT #{id}, #{item} FROM dual
+        </foreach>
+    </insert>
+    <!--岗位机构-->
+
+
+    <!--岗位用户-->
+    <delete id="deletePostUsersByPostId">
+        DELETE FROM t_sys_user_post WHERE post_id = #{id}
+    </delete>
+
+    <delete id="deletePostUsersByPostIdAndOrganId">
+        DELETE FROM t_sys_user_post WHERE post_id = #{id} AND organ_id = #{organId}
+    </delete>
+
+    <delete id="deletePostUsersByPostIdAndUserId">
+        DELETE FROM t_sys_user_post WHERE post_id = #{id} AND user_id = #{userId}
+    </delete>
+
+    <delete id="deletePostUsersByPostIdAndOrganIdAndUserIds">
+        DELETE FROM t_sys_user_post WHERE post_id = #{id} AND organ_id = #{organId} AND user_id IN
+        <foreach item="item" collection="ids" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <insert id="insertPostUsers">
+        INSERT INTO t_sys_user_post(post_id, user_id,organ_id)
+        <foreach collection="ids" item="item" separator=" union all ">
+            SELECT #{id}, #{item},#{organId} FROM dual
+        </foreach>
+    </insert>
+    <!--岗位用户-->
+
+
+</mapper>

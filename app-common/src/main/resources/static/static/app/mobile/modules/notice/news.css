@@ -1,0 +1,68 @@
+.tabBox .hd{ height:45px;width:200%;line-height:30px;font-size:medium; background:#f4f4f4; border-bottom:1px solid #E4E4E4;overflow-x: auto;/*position: fixed;top:0;z-index: 555;*/}
+.tabBox .hd ul{height:45px;overflow-x: auto;width: 200%;list-style: none;}
+.tabBox .hd ul li{ float:left; margin:7px 5px; color:#464646;padding:0 5px;}
+.tabBox .hd ul li.on{color:#fff;background: #0088d1;border-radius: 7px;}
+.tabBox .hd ul .on a{ display:block;color:#fff; /* 修复Android 4.0.x 默认浏览器当前样色无效果bug */  }
+
+
+/* 焦点图 */
+.slideBox{ position:relative; overflow:hidden; margin:0 auto;  max-width:560px;/* 设置焦点图最大宽度 *//*margin-top: 45px;*/}
+.slideBox .myhd{ position:absolute; height:28px; line-height:28px; bottom:0; right:0; z-index:1;}
+.slideBox .myhd li{ display:inline-block; width:5px; height:5px; -webkit-border-radius:5px; -moz-border-radius:5px; border-radius:5px; background:#B4B4B4; text-indent:-9999px; overflow:hidden; margin:11px 6px 12px;}
+.slideBox .myhd li.on{ background:#595959;  }
+.slideBox .bd{ position:relative; z-index:0; }
+.slideBox .bd li{ position:relative; text-align:center;  }
+.slideBox .bd li img{ vertical-align:top; width:100%;height:200px;/* 图片宽度100%，达到自适应效果 */}
+.slideBox .bd li a{ -webkit-tap-highlight-color:rgba(0,0,0,0); text-decoration: none; }  /* 去掉链接触摸高亮 */
+.slideBox .bd li .tit{ display:block; width:100%;  position:absolute; bottom:0; text-indent:10px; height:28px; line-height:28px;color:#fff;  text-align:left;background-color: #000;}
+
+/* 本例子css -------------------------------------- */
+
+
+.flag li{
+    border-bottom: 1px solid #E4E4E4;
+    padding:8px 0;
+    margin: 0 8px;
+    position: relative;
+    list-style: none;
+}
+.flag li a{
+    display: block;
+    position: relative;
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #000000;
+    font-size:medium;
+}
+.flag li span{
+    position: absolute;
+    top: 0;
+    left:110px;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.flag li em{
+    font-style: normal;
+    font-size: smaller;
+    color: #B9B9B9;
+}
+.hasimgem{
+    position: absolute;
+    bottom: 0;
+    left: 110px;
+}
+.flag li:last-child{
+    border-bottom: none;
+}
+
+.flag .summary {
+    top: 21px;
+    white-space: normal;
+    font-size: small;
+    color: #B9B9B9;
+    line-height: 18px;
+}

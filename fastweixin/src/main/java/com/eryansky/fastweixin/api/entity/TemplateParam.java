@@ -1,0 +1,48 @@
+package com.eryansky.fastweixin.api.entity;
+
+/**
+ * 模版参数
+ */
+public class TemplateParam extends BaseModel {
+
+    /**
+     * 值
+     */
+    private String value;
+    /**
+     * 颜色
+     */
+    private String color;
+
+    public TemplateParam() {
+        super();
+    }
+
+    public TemplateParam(String value) {
+        this.value = value;
+    }
+
+    public TemplateParam(String value, String color) {
+        super();
+        this.value = value;
+        this.color = color;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public TemplateParam setValue(String value) {
+        this.value = value;
+        return this;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public TemplateParam setColor(String color) {
+        this.color = color;
+        return this;
+    }
+}

@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eryansky.modules.notice.dao.MailContactDao">
+
+    <sql id="contactColumns">
+        a.id AS "id",
+        a.create_user AS "createUser",
+        a.create_time AS "createTime",
+        a.status AS "status",
+        a.update_user AS "updateUser",
+        a.update_time AS "updateTime",
+        a.version AS "version",
+        a.EMAIL AS "email",
+        a.NAME AS "name",
+        a.MOBILE AS "mobile",
+        a.USER_ID AS "userId",
+        a.REMARK AS "remark"
+    </sql>
+
+    <select id="get" resultType="MailContact">
+        SELECT
+        <include refid="contactColumns"/>
+        FROM t_notice_mail_contact a
+        WHERE a.id = #{id}
+    </select>
+
+    <select id="checkExist" resultType="MailContact">
+        SELECT
+        <include refid="contactColumns"/>
+        FROM t_notice_mail_contact a
+        LEFT JOIN t_notice_contact_group_object cgo ON cgo.object_id = a.id
+        LEFT JOIN t_notice_contact_group cg ON cg.id = a.contact_group_id
+        <where>
+            a.status = #{status}
+            <if test="contactGroupId != null and contactGroupId !=''">
+                AND cg.id = #{contactGroupId}
+            </if>
+            <if test="userId != null and userId !=''">
+                AND a.user_id = #{userId}
+            </if>
+            <if test="email != null and email !=''">
+                AND a.email = #{email}
+            </if>
+        </where>
+    </select>
+
+    <select id="findList" resultType="MailContact">
+        SELECT
+        <include refid="contactColumns"/>
+        FROM t_notice_mail_contact a
+        <where>
+            a.status = #{status}
+        </where>
+        <choose>
+            <when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
+                ORDER BY ${entityPage.orderBy} ${entityPage.order}
+            </when>
+            <otherwise>
+                ORDER BY a.update_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <select id="findByUserId" resultType="MailContact">
+        SELECT
+        <include refid="contactColumns"/>
+        FROM t_notice_mail_contact a
+        <where>
+            a.status = #{status}
+            AND a.user_id = #{userId}
+        </where>
+        <choose>
+            <when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
+                ORDER BY ${entityPage.orderBy} ${entityPage.order}
+            </when>
+            <otherwise>
+                ORDER BY a.update_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findByContactGroupId" resultType="MailContact">
+        SELECT
+        <include refid="contactColumns"/>
+        FROM t_notice_mail_contact a
+        LEFT JOIN t_notice_contact_group_object cgo ON cgo.object_id = a.id
+        LEFT JOIN t_notice_contact_group cg ON cg.id = cgo.contact_group_id
+        <where>
+            a.status = #{status}
+            AND cg.id = #{contactGroupId}
+        </where>
+        <choose>
+            <when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
+                ORDER BY ${entityPage.orderBy} ${entityPage.order}
+            </when>
+            <otherwise>
+                ORDER BY a.update_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findByUserIdWithInclude" resultType="MailContact">
+        SELECT
+        <include refid="contactColumns"/>
+        FROM t_notice_mail_contact a
+        <where>
+            a.status = #{status}
+            AND a.user_id = #{userId}
+            <choose>
+                <when test="ids != null and ids.size != 0 and query != null and query != ''">
+                    AND (a.id IN
+                    <foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                    OR a.name LIKE
+                    <choose>
+                        <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+                        <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+                        <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+                        <otherwise>'%${query}%'</otherwise>
+                    </choose>
+                    OR a.email LIKE
+                    <choose>
+                        <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+                        <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+                        <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+                        <otherwise>'%${query}%'</otherwise>
+                    </choose>
+                    )
+                </when>
+                <when test="ids != null and ids.size != 0 ">
+                    AND a.id IN
+                    <foreach item="item" index="index" collection="ids" open="("  separator="," close=")">
+                        #{item}
+                    </foreach>
+                </when>
+                <when test="query != null and query != ''">
+                    AND (a.name LIKE
+                    <choose>
+                        <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+                        <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+                        <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+                        <otherwise>'%${query}%'</otherwise>
+                    </choose>
+                    OR a.email LIKE
+                    <choose>
+                        <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+                        <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+                        <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+                        <otherwise>'%${query}%'</otherwise>
+                    </choose>
+                    )
+                </when>
+                <otherwise>
+                    AND 1  <![CDATA[ <> ]]> 1
+                </otherwise>
+            </choose>
+        </where>
+        <choose>
+            <when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
+                ORDER BY ${entityPage.orderBy} ${entityPage.order}
+            </when>
+            <otherwise>
+                ORDER BY a.update_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="findAllList" resultType="MailContact">
+        SELECT
+        <include refid="contactColumns"/>
+        FROM t_notice_mail_contact a
+        <where>
+        </where>
+        <choose>
+            <when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
+                ORDER BY ${entityPage.orderBy} ${entityPage.order}
+            </when>
+            <otherwise>
+                ORDER BY a.update_time DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <insert id="insert">
+        INSERT INTO t_notice_mail_contact(
+        id,
+        status,
+        version,
+        create_user,
+        create_time,
+        update_user,
+        update_time,
+        EMAIL,
+        NAME,
+        MOBILE,
+        USER_ID,
+        REMARK
+        ) VALUES (
+        #{id},
+        #{status},
+        1,
+        #{createUser},
+        #{createTime},
+        #{updateUser},
+        #{updateTime},
+        #{email},
+        #{name},
+        #{mobile},
+        #{userId},
+        #{remark}
+        )
+    </insert>
+    <insert id="insertBatch">
+        INSERT INTO t_notice_mail_contact(
+        id,
+        status,
+        version,
+        create_user,
+        create_time,
+        update_user,
+        update_time,
+        EMAIL,
+        NAME,
+        MOBILE,
+        USER_ID,
+        REMARK
+        ) VALUES <foreach collection="list" item="item" separator=",">(
+        #{item.id},
+        #{item.status},
+        1,
+        #{item.createUser},
+        #{item.createTime},
+        #{item.updateUser},
+        #{item.updateTime},
+        #{item.email},
+        #{item.name},
+        #{item.mobile},
+        #{item.userId},
+        #{item.remark}
+        )</foreach>
+    </insert>
+
+    <update id="update">
+        UPDATE t_notice_mail_contact SET
+        status = #{status},
+        version = version +1,
+        update_user = #{updateUser},
+        update_time = #{updateTime},
+        EMAIL = #{email},
+        NAME = #{name},
+        MOBILE = #{mobile},
+        USER_ID = #{userId},
+        REMARK = #{remark}
+        WHERE id = #{id}
+    </update>
+
+    <update id="delete">
+        UPDATE t_notice_mail_contact SET
+        status = #{STATUS_DELETE},
+        version = version +1,
+        update_user = #{updateUser},
+        update_time = #{updateTime}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="clear">
+        DELETE FROM t_notice_mail_contact WHERE id = #{id}
+    </delete>
+
+    <delete id="clearAll">
+        DELETE FROM t_notice_mail_contact
+    </delete>
+
+</mapper>

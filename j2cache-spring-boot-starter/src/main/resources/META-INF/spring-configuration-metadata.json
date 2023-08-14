@@ -1,0 +1,107 @@
+{
+  "properties": [
+    {
+      "name": "j2cache.config-location",
+      "type": "java.lang.String"
+    },{
+      "name": "j2cache.open-spring-cache",
+      "type": "java.lang.Boolean",
+      "defaultValue": true
+    },{
+      "name": "j2cache.allow-null-values",
+      "type": "java.lang.Boolean",
+      "defaultValue": false
+    },{
+      "name": "j2cache.cache-clean-mode",
+      "type": "java.lang.String",
+      "defaultValue": "blend"
+    },{
+      "name": "j2cache.l2-cache-open",
+      "type": "java.lang.Boolean",
+      "defaultValue": false
+    },{
+      "name": "j2cache.redis-client",
+      "type": "java.lang.String",
+      "defaultValue": "lettuce"
+    },{
+      "name": "j2cache.session.filter.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable SessionFilter.",
+      "defaultValue": true,
+      "sourceType": "com.eryansky.j2cache.properties.J2CacheSessionProperties"
+    },{
+      "name": "j2cache.session.maxSizeInMemory",
+      "type": "java.lang.Integer",
+      "defaultValue": "1000"
+    },{
+      "name": "j2cache.session.maxAge",
+      "type": "java.lang.Integer",
+      "defaultValue": "1800"
+    },{
+      "name": "j2cache.session.filter.order",
+      "type": "java.lang.Integer",
+      "description": "SessionFilter Order."
+    },{
+      "name": "j2cache.session.filter.blackListURL",
+      "type": "java.lang.String"
+    },{
+      "name": "j2cache.session.filter.whiteListURL",
+      "type": "java.lang.String",
+      "defaultValue": "/**"
+    },{
+      "name": "j2cache.session.filter.cookieName",
+      "type": "java.lang.String",
+      "defaultValue": "J2CACHE_SESSION_ID"
+    },{
+      "name": "j2cache.session.filter.cookieDomain",
+      "type": "java.lang.String",
+      "defaultValue": "/"
+    },{
+      "name": "j2cache.session.filter.cookiePath",
+      "type": "java.lang.String"
+    },{
+      "name": "j2cache.session.redis.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable SessionFilter.",
+      "defaultValue": true
+    },{
+      "name": "j2cache.session.redis.mode",
+      "type": "java.lang.String",
+      "defaultValue": "single"
+    },{
+      "name": "j2cache.session.redis.hosts",
+      "type": "java.lang.String",
+      "defaultValue": "127.0.0.1:6379"
+    },{
+      "name": "j2cache.session.redis.channel",
+      "type": "java.lang.String",
+      "defaultValue": "j2cache-session"
+    },{
+      "name": "j2cache.session.redis.cluster_name",
+      "type": "java.lang.String",
+      "defaultValue": "j2cache-session"
+    },{
+      "name": "j2cache.session.redis.timeout",
+      "type": "java.lang.String"
+    },{
+      "name": "j2cache.session.redis.password",
+      "type": "java.lang.String"
+    },{
+      "name": "j2cache.session.redis.database",
+      "type": "java.lang.String",
+      "defaultValue": "0"
+    },{
+      "name": "j2cache.session.redis.maxTotal",
+      "type": "java.lang.String",
+      "defaultValue": "100"
+    },{
+      "name": "j2cache.session.redis.maxIdle",
+      "type": "java.lang.String",
+      "defaultValue": "10"
+    },{
+      "name": "j2cache.session.redis.minIdle",
+      "type": "java.lang.String",
+      "defaultValue": "1"
+    }
+  ]
+}

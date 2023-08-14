@@ -1,0 +1,22 @@
+/**
+*  Copyright (c) ${productName} 2013-${year} ${productUrl}
+*
+*/
+package ${servicePackage};
+
+import org.springframework.stereotype.Service;
+
+import ${entityPackage}.${entityName};
+import ${daoPackage}.${entityName}Dao;
+import com.eryansky.core.orm.mybatis.service.PCrudService;
+/**
+ * $tableComment service
+ * @author ${author}
+ * @date ${date}
+ */
+@Service
+public class ${entityName}Service extends PCrudService<${entityName}Dao, ${entityName},Long> {
+
+
+
+}

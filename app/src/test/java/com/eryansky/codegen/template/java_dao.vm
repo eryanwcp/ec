@@ -1,0 +1,20 @@
+/**
+*  Copyright (c) ${productName} 2013-${year} ${productUrl}
+*
+*/
+package ${daoPackage};
+
+import com.eryansky.common.orm.mybatis.MyBatisDao;
+import com.eryansky.common.orm.persistence.PCrudDao;
+
+import ${entityPackage}.${entityName};
+/**
+ * $tableComment
+ * @author ${author}
+ * @date ${date}
+ */
+@MyBatisDao
+public interface ${entityName}Dao extends PCrudDao<${entityName},Long> {
+
+
+}

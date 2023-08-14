@@ -1,0 +1,35 @@
+
+/*bootstrap查询条件折叠样式*/
+.accordion {
+    background-color: #fff;
+    margin-bottom: 0;
+    border: none;
+}
+#form_accordion {
+    padding: 16px;
+}
+#searchForm {
+    margin: 16px 0;
+}
+#searchForm .span3 {
+    text-align: right;
+}
+.row-fluid {
+    margin-bottom: 10px;
+}
+input {
+    margin-bottom: 0 !important;
+}
+.input-append, .input-prepend {
+    margin-bottom: 0;
+}
+
+
+.alert {
+    padding: 8px 35px 8px 14px !important;
+    margin-bottom: 10px !important;
+}
+
+#list {
+    padding: 0 16px;
+}

@@ -1,0 +1,86 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+    <title>$tableComment</title>
+    <meta name="decorator" content="default_sys"/>
+    <script type="text/javascript">
+        #set( $J = '$' )$J(function(){
+            loadData();
+            $("#btnSubmit").click(function(){
+                $("#pageNo").val(1);
+                loadData();
+            });
+            $("#btnReset").click(function(){
+                $('#searchForm').find("input[type=hidden]").val("");
+                // $('#searchForm').find("select").val(null).trigger("change");
+            });
+        });
+        function loadData(){
+            var queryParam = $.serializeObject($("#searchForm"));
+            $.ajax({
+                url: ctxAdmin + '/${modulePath}/${entityInstance}',
+                type: 'post',
+                dataType: "json",
+                cache:false,
+                data:queryParam,
+                beforeSend: function (jqXHR, settings) {
+                    $("#list").html("<div style='padding: 10px 30px;text-align:center;font-size: 16px;'><img src='${ctxStatic}/js/easyui/themes/bootstrap/images/loading.gif' />数据加载中...</div>");
+                    $("#btnSubmit").attr("disabled", true);
+                },
+                success: function (data) {
+                    $("#btnSubmit").attr("disabled", false);
+                    if (data['code'] == 1 && data['obj']['totalCount'] > 0) {
+                        var html = Mustache.render($("#list_template").html(), data['obj']);
+                        $("#list").html(html);
+                        $(".pagination").append(data['obj']['html']);
+                    } else {
+                        $("#list").html("<div style='color: red;padding: 10px 30px;text-align:center;font-size: 16px;'>查无数据</div>");
+                    }
+                }
+            });
+        }
+        function page(n,s){
+            $("#pageNo").val(n);
+            $("#pageSize").val(s);
+            loadData();
+            return false;
+        }
+    </script>
+    <script type="text/template" id="list_template">
+        <table id="contentTable" class="table table-striped table-bordered table-condensed">
+            <thead>
+            <tr>
+                #foreach ($column in $columns)#if($column.comment)<th>$column.comment</th>#end#end
+                <e:hasPermission name="${modulePermission}:${entityInstance}:edit"><th>操作</th></e:hasPermission></tr>
+            </thead>
+            <tbody>
+            {{#result}}
+                <tr>
+                    #foreach ($column in $columns)#if($column.comment)<td>{{$column.fieldName}}</td>#end#end
+                    <e:hasPermission name="${module}:${entityInstance}:edit"><td>
+                        <a href="${ctxAdmin}/${modulePath}/${entityInstance}/form?id={{id}}">修改</a>
+                        <a href="${ctxAdmin}/${modulePath}/${entityInstance}/delete?id={{id}}" onclick="return confirmx('确认要删除该数据吗？', this.href)" >删除</a>
+                    </td></e:hasPermission>
+                </tr>
+            {{/result}}
+            </tbody>
+        </table>
+        <div class="page pagination"></div>
+    </script>
+</head>
+<body>
+<ul class="nav nav-tabs">
+    <li class="active"><a href="${ctxAdmin}/${modulePath}/${entityInstance}">$tableComment列表</a></li>
+    <e:hasPermission name="${modulePermission}:${entityInstance}:edit"><li><a href="${ctxAdmin}/${modulePath}/${entityInstance}/form">$tableComment添加</a></li></e:hasPermission>
+</ul>
+<form:form id="searchForm" modelAttribute="model" action="${ctxAdmin}/${modulePath}/${entityInstance}" method="post" class="breadcrumb form-search">
+    <input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
+    <input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
+    <input id="btnSubmit" class="btn btn-primary" type="submit" value="查 询"/>&nbsp;&nbsp;
+    <input id="btnReset" class="btn btn-primary" type="reset" value="重 置"/>&nbsp;&nbsp;
+</form:form>
+<tags:message content="${message}"/>
+<div id="list"></div>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.eryansky.modules.sys.dao.SystemDao">
+
+	<!--organ表同步到扩展表-->
+	<insert id="insertToOrganExtend">
+		INSERT INTO t_sys_organ_extend (
+		id,
+		status,
+		version,
+		create_user,
+		create_time,
+		update_user,
+		update_time,
+		name,
+		short_name,
+		type,
+		code,
+		sys_code,
+		address,
+		mobile,
+		phone,
+		fax,
+		manager_user_id,
+		deputy_manager_user_id,
+		super_manager_user_id,
+		sort,
+		parent_id,
+		parent_ids,
+		area_id,
+		remark,
+		company_id,
+		company_code,
+		home_company_id,
+		home_company_code,
+		tree_level
+# 		is_leaf
+		) SELECT id,
+		status,
+		version,
+		create_user,
+		create_time,
+		update_user,
+		update_time,
+		name,
+		short_name,
+		type,
+		code,
+		sys_code,
+		address,
+		mobile,
+		phone,
+		fax,
+		manager_user_id,
+		deputy_manager_user_id,
+		super_manager_user_id,
+		sort,
+		parent_id,
+		parent_ids,
+		area_id,
+		remark,
+		<choose>
+			<when test="id != null and companyId != null and homeCompanyId !=null">
+				#{companyId},
+				#{companyCode},
+				#{homeCompanyId},
+				#{homeCompanyCode},
+				#{treeLevel}
+			</when>
+			<otherwise>
+				getOrganCompanyId(ID),
+				getOrganCompanyCode(ID),
+				getOrganHomeCompanyId(ID),
+				getOrganHomeCompanyCode(ID),
+				(length(t_sys_organ.PARENT_IDS) - length(replace(t_sys_organ.PARENT_IDS,',','')))
+			</otherwise>
+		</choose>
+<!--		,<choose>-->
+<!--			<when test="isLeaf != null and isLeaf !=''">-->
+<!--				#{isLeaf}-->
+<!--			</when>-->
+<!--			<otherwise>-->
+<!--				NULL-->
+<!--			</otherwise>-->
+<!--		</choose>-->
+		FROM t_sys_organ
+		<where>
+			<if test="id != null and id != ''">
+				AND id = #{id}
+			</if>
+		</where>
+	</insert>
+
+	<!--删除organ扩展表数据-->
+	<delete id="deleteOrganExtend">
+		DELETE FROM t_sys_organ_extend
+		<where>
+			<if test="id != null and id != ''">
+				AND id = #{id}
+			</if>
+		</where>
+	</delete>
+
+</mapper>
