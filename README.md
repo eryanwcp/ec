@@ -20,7 +20,7 @@ Docker发布
     mvn package com.google.cloud.tools:jib-maven-plugin:3.3.2:build -DsendCredentialsOverHttp=true
 
 
-Docker验证码字体库确实修复方法（在容器中执行）
+Docker验证码字体库缺失修复方法（在容器中执行）
 
     apk add --update font-adobe-100dpi ttf-dejavu fontconfig
 
