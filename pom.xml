@@ -5,7 +5,7 @@
 
     <groupId>com.eryansky</groupId>
     <artifactId>ec-parent</artifactId>
-    <version>4.2.20230821.01</version>
+    <version>4.2.20230221.01</version>
     <modules>
         <module>common</module>
         <module>j2cache</module>
@@ -34,12 +34,12 @@
         <java.version>1.8</java.version>
         <tomcat-plugin.version>2.2</tomcat-plugin.version>
 
-        <spring-boot.version>2.7.15</spring-boot.version>
-        <spring-integration-redis.version>5.5.18</spring-integration-redis.version>
+        <spring-boot.version>2.7.16</spring-boot.version>
+        <spring-integration-redis.version>5.5.19</spring-integration-redis.version>
         <logback.version>7.3</logback.version>
         <byte-buddy.version>1.14.2</byte-buddy.version>
 
-        <tomcat.version>9.0.79</tomcat.version>
+        <tomcat.version>9.0.80</tomcat.version>
 
         <mybatis-spring-boot.version>2.3.0</mybatis-spring-boot.version>
         <commons-pool2.version>2.11.1</commons-pool2.version>
@@ -53,12 +53,12 @@
         <commons-codec.version>1.15</commons-codec.version>
 
 
-        <ec-common.version>4.2.20230821.01</ec-common.version>
-        <ec-app-common.version>4.2.20230821.01</ec-app-common.version>
-        <ec-client-common.version>4.2.20230821.01</ec-client-common.version>
-        <ec-j2cache.version>4.2.20230821.01</ec-j2cache.version>
-        <ec-j2cache-spring-boot-starter.version>4.2.20230821.01</ec-j2cache-spring-boot-starter.version>
-        <ec-fastweixin.version>4.2.20230821.01</ec-fastweixin.version>
+        <ec-common.version>4.2.20230221.01</ec-common.version>
+        <ec-app-common.version>4.2.20230221.01</ec-app-common.version>
+        <ec-client-common.version>4.2.20230221.01</ec-client-common.version>
+        <ec-j2cache.version>4.2.20230221.01</ec-j2cache.version>
+        <ec-j2cache-spring-boot-starter.version>4.2.20230221.01</ec-j2cache-spring-boot-starter.version>
+        <ec-fastweixin.version>4.2.20230221.01</ec-fastweixin.version>
 
         <jackson.version>2.15.2</jackson.version>
     </properties>
