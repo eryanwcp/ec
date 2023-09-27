@@ -262,6 +262,7 @@ $(function () {
         columns: [
             [
                 {field: 'code', title: '员工编号', width: 80, hidden: true, sortable: true},
+                {field: 'position', title: '职务', width: 200, sortable: true},
                 {field: 'id', title: '主键', hidden: true, sortable: true, align: 'right', width: 80},
                 {field: 'tel', title: '办公电话', width: 100},
                 {field: 'mobileSensitive', title: '手机号', width: 100},

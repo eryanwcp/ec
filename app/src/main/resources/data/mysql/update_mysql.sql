@@ -1,3 +1,6 @@
+-- V4.2.20230921.04 用户管理增加“职务”字段
+ALTER TABLE t_sys_user ADD COLUMN position varchar(128) COMMENT '职务';
+
 -- V4.2.20230521.26
 ALTER TABLE t_sys_user_password ADD COLUMN type char(1) COMMENT '修改类型 重置：0 用户初始化：1 用户安全修改：2';
 

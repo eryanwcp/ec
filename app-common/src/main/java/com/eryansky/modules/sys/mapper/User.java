@@ -51,6 +51,10 @@ public class User extends DataEntity<User> implements IUser {
      */
     private String code;
     /**
+     * 职务
+     */
+    private String position;
+    /**
      * 原始密码
      */
     private String originalPassword;
@@ -170,6 +174,14 @@ public class User extends DataEntity<User> implements IUser {
 
     public String getCode() {
         return this.code;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
     }
 
     public void setOriginalPassword(String originalPassword) {

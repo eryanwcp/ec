@@ -56,6 +56,11 @@
             <input type="text" id="code" name="code" maxLength="36" value="${model.code}"
                    class="easyui-validatebox textbox"/>
         </div>
+        <div>
+            <label>职务：</label>
+            <input type="text" id="position" name="position" maxLength="64" value="${model.position}"
+                   class="easyui-validatebox textbox"/>
+        </div>
         <div id="password_div">
             <label>密码：</label>
             <input type="password" id="password"
