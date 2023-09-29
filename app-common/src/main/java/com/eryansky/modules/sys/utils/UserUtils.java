@@ -22,6 +22,7 @@ import com.eryansky.modules.sys.service.*;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Lists;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -488,6 +489,15 @@ public class UserUtils {
             return Collections.emptyList();
         }
         return Static.organService.findOrgansByUserId(userId);
+    }
+
+    /**
+     * 根据IDS查询
+     * @param userIds 用户IDS
+     * @return
+     */
+    public static List<User> findUserIdsByOrganId(Collection<String> userIds){
+        return Static.userService.findByIds(userIds);
     }
 
 

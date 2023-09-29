@@ -735,4 +735,27 @@ public class AppConstants extends SysConstants {
         }
         return Collections.emptyList();
     }
+
+    /**
+     * 统预警消息推送（运维账号） 接收消息账号
+     * @return
+     */
+    public static String getSystemOpsWarnLoginNames() {
+        String code = "system.ops.warn.loginNames";
+        String value = getConfigValue(code);
+        return value;
+    }
+
+
+    /**
+     * 统预警消息推送（运维账号） 接收消息账号
+     * @return
+     */
+    public static List<String> getSystemOpsWarnLoginNameList() {
+        String value = getSystemOpsWarnLoginNames();
+        if(StringUtils.isNotBlank(value)){
+            return Arrays.asList(StringUtils.split(StringUtils.trim(value).replaceAll("\r\n", ",").replaceAll("，", ",").replaceAll("；", ",").replaceAll(";", ","), ","));
+        }
+        return Collections.emptyList();
+    }
 }

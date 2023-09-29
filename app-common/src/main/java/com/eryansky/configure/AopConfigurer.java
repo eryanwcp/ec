@@ -1,11 +1,16 @@
 package com.eryansky.configure;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.stream.Collectors;
 
+import com.eryansky.core.orm.mybatis.entity.BaseEntity;
 import com.eryansky.modules.notice.utils.MessageUtils;
 import com.eryansky.modules.sys.mapper.User;
+import com.eryansky.modules.sys.utils.UserUtils;
+import com.eryansky.utils.AppConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
@@ -51,6 +56,8 @@ public class AopConfigurer implements AsyncConfigurer {
             msg.append("当前任务线程池队列已满：").append(executor.getActiveCount()).append("/").append(executor.getCorePoolSize()).append("~").append(executor.getMaxPoolSize());
             logger.error(msg.toString());
             MessageUtils.sendToUserMessage(User.SUPERUSER_ID,msg.toString());
+            List<String>  systemOpsWarnUserIds = UserUtils.findUserIdsByOrganId(AppConstants.getSystemOpsWarnLoginNameList()).stream().map(BaseEntity::getId).collect(Collectors.toList());
+            MessageUtils.sendToUserMessage(systemOpsWarnUserIds,msg.toString());
         });
         executor.initialize();
         return executor;
