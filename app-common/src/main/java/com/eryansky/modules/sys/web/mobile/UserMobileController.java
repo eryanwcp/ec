@@ -253,7 +253,9 @@ public class UserMobileController extends SimpleController {
                 Map<String,Object> map = Maps.newHashMap();
                 map.put("id",v.getId());
                 map.put("name",v.getName());
+                map.put("remark",v.getRemark());
                 map.put("phone",v.getMobile());
+                map.put("tel",v.getTel());
                 if(showPhoto){
                     map.put("photoSrc",v.getPhotoSrc());
                 }
