@@ -235,7 +235,7 @@ public class AppConstants extends SysConstants {
     public static List<String> getOauth2IncludePathList() {
         String value = getOauth2IncludePaths();
         if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(value.split(","));
+            return Arrays.asList(StringUtils.split(StringUtils.trim(value).replaceAll("\r\n", ",").replaceAll("，", ",").replaceAll("；", ",").replaceAll(";", ","), ","));
         }
         return Collections.emptyList();
     }
@@ -324,7 +324,7 @@ public class AppConstants extends SysConstants {
         String code = "system.security.limit.ip.blacklist";
         String value = getConfigValue(code);
         if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(StringUtils.split(value.toUpperCase().replaceAll("，", ","), ","));
+            return Arrays.asList(StringUtils.split(StringUtils.trim(value).replaceAll("\r\n", ",").replaceAll("，", ",").replaceAll("；", ",").replaceAll(";", ","), ","));
         }
         return Collections.emptyList();
     }
