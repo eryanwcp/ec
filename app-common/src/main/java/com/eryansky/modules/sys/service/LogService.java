@@ -182,17 +182,17 @@ public class LogService extends CrudService<LogDao, Log> {
 
         logger.info("备份日志表开始：{}", DateUtils.format(gc.getTime(), DateUtils.DATE_FORMAT));
         int countInsert = dao.insertToHistory(parameter);//插入历史表
-        logger.info("备份日志表结束:{}", new Object[]{countInsert});
+        logger.info("备份日志表结束。{}", new Object[]{countInsert});
         logger.info("删除日志表开始：{}", DateUtils.format(gc.getTime(), DateUtils.DATE_FORMAT));
         int countDelete = dao.clearInvalidLog(parameter);//删除数据
-        logger.info("删除日志表结束:{}", new Object[]{countDelete});
+        logger.info("删除日志表结束。{}", new Object[]{countDelete});
 
         parameter = new Parameter();
         gc.add(Calendar.DAY_OF_MONTH, -day);
         parameter.put("createTime", DateUtils.format(gc.getTime(), DateUtils.DATE_FORMAT));
         logger.info("删除历史日志表开始：{}", DateUtils.format(gc.getTime(), DateUtils.DATE_FORMAT));
         int countClearHistory = dao.clearHistoryLog(parameter);//删除历史日志数据
-        logger.info("删除历史日志表结束:{}", new Object[]{countClearHistory});
+        logger.info("删除历史日志表结束。{}", new Object[]{countClearHistory});
     }
 
     /**
