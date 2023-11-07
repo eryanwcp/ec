@@ -496,8 +496,17 @@ public class UserUtils {
      * @param userIds 用户IDS
      * @return
      */
-    public static List<User> findUserIdsByOrganId(Collection<String> userIds){
+    public static List<User> findUsersByUserIds(Collection<String> userIds){
         return Static.userService.findByIds(userIds);
+    }
+
+    /**
+     * 根据loginNames查询
+     * @param loginNames 用户账号
+     * @return
+     */
+    public static List<User> findUsersByLoginNames(Collection<String> loginNames){
+        return Static.userService.findByLoginNames(loginNames);
     }
 
 
