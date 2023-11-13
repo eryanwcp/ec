@@ -13,6 +13,9 @@ import com.eryansky.server.result.WSResult;
 @WebService(name = "IApiWebService")
 public interface IApiWebService {
 	
+	@WebMethod
+	WSResult sendMessage(@WebParam(name = "data") String data);
+
 	/**
 	 * 发送消息
 	 * 参数说明:
@@ -40,13 +43,14 @@ public interface IApiWebService {
 	 * linkUrl    :消息链接    可选
 	 * linkSSO    :消息链接是否单点 默认：否（0） 1|0    可选
 	 * receiveType:接收对象类型（用户：user，部门：organ）默认为"user" 可选（暂不可用）
-	 * receiveIds :接收者账号 必选
+	 * receiveIds :接收者账号(第三方系统账号，需在统一平台做账号映射) 必选
 	 * tipType    :消息通道（消息：Message，企业微信:QYWeixin，邮件:Mail，短信:SMS，APP:APP） 默认为："['Message','QYWeixin',"APP"]" 可选
+	 * function   :{@link IFunction}  转换函数
 	 * @return
-	 * 
+	 *
 	 */
 	@WebMethod
-	WSResult sendMessage(@WebParam(name = "data") String data);
+	WSResult sendMessage(@WebParam(name = "data") String data,IFunction function);
 
 	/**
 	 * 发送消息
@@ -95,4 +99,5 @@ public interface IApiWebService {
 	 */
 	@WebMethod
 	WSResult sendNotice(@WebParam(name = "data") String data);
+	WSResult sendNotice(@WebParam(name = "data") String data,IFunction function);
 }

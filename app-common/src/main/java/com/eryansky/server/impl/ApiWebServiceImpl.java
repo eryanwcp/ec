@@ -17,6 +17,7 @@ import com.eryansky.modules.notice.service.NoticeService;
 import com.eryansky.modules.sys.mapper.Organ;
 import com.eryansky.modules.sys.service.OrganService;
 import com.eryansky.server.IApiWebService;
+import com.eryansky.server.IFunction;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,11 @@ public class ApiWebServiceImpl implements IApiWebService {
 
     @Override
     public WSResult sendMessage(String data) {
+        return sendMessage(data,null);
+    }
+
+    @Override
+    public WSResult sendMessage(String data, IFunction function) {
         logger.debug(data);
         try {
             Map<String, Object> map = JsonMapper.getInstance().fromJson(data, HashMap.class);
@@ -105,6 +111,10 @@ public class ApiWebServiceImpl implements IApiWebService {
             User senderUser = null;
             if (StringUtils.isNotBlank(senderId)) {
                 senderUser = Static.userService.getUserByIdOrLoginName(senderId);
+                //用户转换
+                if (senderUser == null && null != function) {
+                    senderUser = Static.userService.getUserByIdOrLoginName(function.queryData(appId,senderId));
+                }
 //                if (senderUser == null) {
 //                    return WSResult.buildResult(WSResult.class, WSResult.IMAGE_ERROR, "senderId:" + senderId + ",无相关账号信息");
 //                }
@@ -122,6 +132,10 @@ public class ApiWebServiceImpl implements IApiWebService {
             if(MessageReceiveObjectType.User.equals(messageReceiveObjectType)){
                 for (String localLoginName : receiveIds) {
                     User receiveUser = Static.userService.getUserByIdOrLoginName(localLoginName);
+                    //用户转换
+                    if (receiveUser == null && null != function) {
+                        receiveUser = Static.userService.getUserByIdOrLoginName(function.queryData(appId,localLoginName));
+                    }
                     if (receiveUser == null) {
                         logger.error("统一平台无相关账号信息：{} {}", appId,localLoginName);
                         return WSResult.buildResult(WSResult.class, WSResult.IMAGE_ERROR, "统一平台无相关账号信息："+localLoginName);
@@ -225,6 +239,11 @@ public class ApiWebServiceImpl implements IApiWebService {
 
     @Override
     public WSResult sendNotice(String data) {
+        return sendMessage(data,null);
+    }
+
+    @Override
+    public WSResult sendNotice(String data, IFunction function) {
         logger.debug(data);
         try {
             Map<String, Object> map = JsonMapper.getInstance().fromJson(data, HashMap.class);
@@ -276,6 +295,10 @@ public class ApiWebServiceImpl implements IApiWebService {
             User senderUser = null;
             if (StringUtils.isNotBlank(senderId)) {
                 senderUser = Static.userService.getUserByLoginName(senderId);
+                //用户转换
+                if (senderUser == null && null != function) {
+                    senderUser = Static.userService.getUserByIdOrLoginName(function.queryData(appId,senderId));
+                }
 //                if (senderUser == null) {
 //                    return WSResult.buildResult(WSResult.class, WSResult.IMAGE_ERROR, "senderId:" + senderId + ",统一平台无相关账号映射信息");
 //                }
