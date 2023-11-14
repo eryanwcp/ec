@@ -36,7 +36,7 @@
 			<tr>
 				<%--<td><a href="${ctxAdmin}/notice/message/form?id=${model.id}" title="${model.title}">${fns:abbr(model.title,40)}</a></td>--%>
 				<td>${model.appId}</td>
-				<td><a href="javascript:" onclick="$('#c_${model.id}').toggle()">${fns:rabbr(model.content,60)}</a></td>
+				<td><a href="javascript:" onclick="$('#c_${model.id}').toggle()">${fns:rabbr(model.content,100)}</a></td>
 				<td>${model.senderName}</td>
 				<td><fmt:formatDate value="${model.sendTime}" pattern="yyyy-MM-dd HH:mm"/></td>
 				<td><fmt:formatDate value="${model.updateTime}" pattern="yyyy-MM-dd HH:mm"/></td>
