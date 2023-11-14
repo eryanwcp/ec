@@ -30,7 +30,7 @@
 	</form:form>
 	<tags:message content="${message}"/>
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
-		<thead><tr><th>应用</th><th>消息内容</th><th>发送者</th><th>发送时间</th><th>状态</th><th>机构</th><e:hasPermission name="notice:message:edit"><th>操作</th></e:hasPermission></tr></thead>
+		<thead><tr><th>应用</th><th>消息内容</th><th>发送者</th><th>发送时间</th><th>更新时间</th><th>状态</th><th>机构</th><e:hasPermission name="notice:message:edit"><th>操作</th></e:hasPermission></tr></thead>
 		<tbody>
 		<c:forEach items="${page.result}" var="model">
 			<tr>
@@ -39,6 +39,7 @@
 				<td><a href="javascript:" onclick="$('#c_${model.id}').toggle()">${fns:rabbr(model.content,60)}</a></td>
 				<td>${model.senderName}</td>
 				<td><fmt:formatDate value="${model.sendTime}" pattern="yyyy-MM-dd HH:mm"/></td>
+				<td><fmt:formatDate value="${model.updateTime}" pattern="yyyy-MM-dd HH:mm"/></td>
 				<td>${model.modeView}</td>
 				<td>${model.organName}</td>
 				<td>
