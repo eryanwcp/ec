@@ -102,6 +102,37 @@ public class MessageRestController extends SimpleController {
         return Result.errorResult();
     }
 
+
+    /**
+     * 查询消息
+     * @param data 参数说明:
+     * {
+     * 	 appId:"appId",
+     * 	 messageId:"messageId"
+     * }
+     * appId      :应用编码   必选
+     * messageId  :消息ID  必选
+     * @return
+     * {
+     * code:1,
+     * msg:"提示信息",
+     * data:"消息ID"
+     * }
+     * code 1:成功 0:失败
+     * msg 提示信息
+     * data 返回的数据信息
+     */
+    @Logging(value = "消息接口-推送消息",logType = LogType.REST)
+    @PostMapping(value = { "getMessage"})
+    @ResponseBody
+    public Result getMessage(String data) {
+        if(SystemInitListener.Static.apiWebService != null){
+            WSResult wsResult = SystemInitListener.Static.apiWebService.getMessage(data);
+            return WSResult.SUCCESS.equals(wsResult.getCode()) ? Result.successResult().setMsg(wsResult.getMessage()).setData(wsResult.getData()): Result.errorResult().setMsg(wsResult.getMessage());
+        }
+        return Result.errorResult();
+    }
+
     /**
      * 发送通知
      * @param data 参数说明:

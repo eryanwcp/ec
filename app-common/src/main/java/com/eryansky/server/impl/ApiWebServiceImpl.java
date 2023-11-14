@@ -13,6 +13,7 @@ import com.eryansky.modules.notice._enum.MessageChannel;
 import com.eryansky.modules.notice._enum.MessageReceiveObjectType;
 import com.eryansky.modules.notice._enum.ReceiveObjectType;
 import com.eryansky.modules.notice.mapper.Message;
+import com.eryansky.modules.notice.service.MessageReceiveService;
 import com.eryansky.modules.notice.service.NoticeService;
 import com.eryansky.modules.sys.mapper.Organ;
 import com.eryansky.modules.sys.service.OrganService;
@@ -46,6 +47,7 @@ public class ApiWebServiceImpl implements IApiWebService {
         private static UserService userService = SpringContextHolder.getBean(UserService.class);
         private static OrganService organService = SpringContextHolder.getBean(OrganService.class);
         private static NoticeService noticeService = SpringContextHolder.getBean(NoticeService.class);
+        private static MessageReceiveService messageReceiveService = SpringContextHolder.getBean(MessageReceiveService.class);
     }
 
     @Override
@@ -207,7 +209,7 @@ public class ApiWebServiceImpl implements IApiWebService {
 
             //推送消息
             try {
-                CompletableFuture<Message> messageCompletableFuture = MessageUtils.pushMessage(appId);
+                CompletableFuture<Message> messageCompletableFuture = MessageUtils.pushMessage(messageId);
                 Message message = null;
                 try {
                     message = messageCompletableFuture.get();
@@ -218,6 +220,44 @@ public class ApiWebServiceImpl implements IApiWebService {
                 return null == message ? WSResult.buildResult(WSResult.class, WSResult.IMAGE_ERROR, "消息推送失败"): WSResult.buildResult(WSResult.class, WSResult.SUCCESS, "消息推送成功").setData(message.getId());
             } catch (Exception e) {
                 return WSResult.buildResult(WSResult.class, WSResult.IMAGE_ERROR, "消息推送失败");
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+            return WSResult.buildDefaultErrorResult(WSResult.class);
+        }
+    }
+
+
+
+    @Override
+    public WSResult getMessage(String data) {
+        logger.debug(data);
+        try {
+            Map<String, Object> map = JsonMapper.getInstance().fromJson(data, HashMap.class);
+            if(map == null){
+                logger.error("请求参数格式错误:" + data);
+                return WSResult.buildResult(WSResult.class, WSResult.PARAMETER_ERROR, "请求参数格式错误:data=" + data);
+            }
+
+            String appId = (String) map.get("appId");
+            String messageId = (String) map.get("messageId");
+            try {
+                checkOptional(appId, "appId");
+                checkOptional(messageId, "messageId");
+            } catch (Exception e) {//2.判断必填参数
+                logger.error(e.getMessage());
+                return WSResult.buildResult(WSResult.class, WSResult.PARAMETER_ERROR, e.getMessage());
+            }
+
+            //推送消息
+            try {
+                Message message  = MessageUtils.get(messageId);
+                if(null != message){
+                    message.setMessageReceives(Static.messageReceiveService.findByMessageId(messageId));
+                }
+                return null == message ? WSResult.buildResult(WSResult.class, WSResult.IMAGE_ERROR, "消息获取失败"): WSResult.buildResult(WSResult.class, WSResult.SUCCESS, "消息获取成功").setData(message);
+            } catch (Exception e) {
+                return WSResult.buildResult(WSResult.class, WSResult.IMAGE_ERROR, "消息获取失败");
             }
         } catch (Exception e) {
             logger.error(e.getMessage(),e);

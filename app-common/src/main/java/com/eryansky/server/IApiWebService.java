@@ -53,7 +53,7 @@ public interface IApiWebService {
 	WSResult sendMessage(@WebParam(name = "data") String data,IFunction function);
 
 	/**
-	 * 发送消息
+	 * 推送消息
 	 * 参数说明:
 	 * data:json字符串
 	 * data={
@@ -67,6 +67,23 @@ public interface IApiWebService {
 	 *
 	 */
 	WSResult pushMessage(@WebParam(name = "data") String data);
+
+
+	/**
+	 * 查询消息
+	 * 参数说明:
+	 * data:json字符串
+	 * data={
+	 * 	 appId:"appId",
+	 * 	 serviceId:"serviceId",
+	 *   messageId:"消息ID",
+	 * }
+	 * appId      :应用编码   必选
+	 * messageId  :消息ID  必选
+	 * @return
+	 *
+	 */
+	WSResult getMessage(@WebParam(name = "data") String data);
 
 	/**
 	 * 发送通知
