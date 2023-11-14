@@ -116,7 +116,7 @@ public class MessageRestController extends SimpleController {
      * {
      * code:1,
      * msg:"提示信息",
-     * data:"消息ID"
+     * data:{消息内容}
      * }
      * code 1:成功 0:失败
      * msg 提示信息
