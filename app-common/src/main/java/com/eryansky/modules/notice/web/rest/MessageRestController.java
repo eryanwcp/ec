@@ -122,7 +122,7 @@ public class MessageRestController extends SimpleController {
      * msg 提示信息
      * data 返回的数据信息
      */
-    @Logging(value = "消息接口-推送消息",logType = LogType.REST)
+    @Logging(value = "消息接口-查询消息",logType = LogType.REST)
     @PostMapping(value = { "getMessage"})
     @ResponseBody
     public Result getMessage(String data) {
