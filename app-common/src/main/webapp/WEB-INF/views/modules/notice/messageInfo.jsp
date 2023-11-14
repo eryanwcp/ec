@@ -16,10 +16,9 @@
 <body>
 <br/>
 <div class="container-fluid">
-	<div>消息ID：${model.id}</div>
+	<div>消息 ID：${model.id}</div>
 	<div>消息内容：${model.content}</div>
-	<div>链接地址：${model.url}</div>
-	<%--<div style="border-top:1px solid #ddd;padding:10px;margin:25px 0;">发布者：${article.createUser.name} &nbsp; 点击数：${article.hits} &nbsp; 发布时间：<fmt:formatDate value="${article.createTime}" pattern="yyyy-MM-dd HH:mm:ss"/> &nbsp; 更新时间：<fmt:formatDate value="${article.updateTime}" pattern="yyyy-MM-dd HH:mm:ss"/></div>--%>
+	<div>链接地址：${model.url} &nbsp;</div>
 	<div>推送方式：${model.tipMessage} &nbsp;</div>
 	<div>发 布 人：${model.senderName} &nbsp;</div>
 	<div>发布时间：<fmt:formatDate value="${model.sendTime}" pattern="yyyy-MM-dd HH:mm"/> &nbsp;</div>
@@ -30,12 +29,13 @@
 	<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
 </form:form>
 <table id="contentTable" class="table table-striped table-bordered table-condensed">
-	<thead><tr><th>接收人</th><th>所属部门</th><th>推送状态</th><th>阅读状态</th></tr></thead>
+	<thead><tr><th>接收人</th><th>所属部门</th><th>所属单位</th><th>推送状态</th><th>阅读状态</th></tr></thead>
 	<tbody>
 	<c:forEach items="${page.result}" var="model">
 		<tr>
 			<td>${model.userName}</td>
 			<td>${model.organName}</td>
+			<td>${model.companyName}</td>
 			<td>${model.isSendView}</td>
 			<td>${model.isReadView}</td>
 		</tr>
