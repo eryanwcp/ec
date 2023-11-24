@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
  * 	<li>如果安装了JDK，将两个jar文件放到%JDK_HOME%\jre\lib\security目录下覆盖原来文件</li>
  * </ol>
  */
-public class WXBizMsgCrypt implements AutoCloseable {
+public class WXBizMsgCrypt {
 
     private static final Logger logger = LoggerFactory.getLogger(WXBizMsgCrypt.class);
 
@@ -293,8 +293,4 @@ public class WXBizMsgCrypt implements AutoCloseable {
         return result;
     }
 
-    @Override
-    public void close() throws IOException {
-
-    }
 }

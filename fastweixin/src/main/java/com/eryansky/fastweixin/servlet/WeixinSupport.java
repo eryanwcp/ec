@@ -36,8 +36,6 @@ public abstract class WeixinSupport {
     //充当锁
     private static final Object LOCK = new Object();
 
-    protected String fromUserName, toUserName;
-
     /**
      * 微信消息处理器列表
      */
@@ -114,8 +112,8 @@ public abstract class WeixinSupport {
      */
     public String processRequest(HttpServletRequest request) {
         Map<String, Object> reqMap = MessageUtil.parseXml(request, getToken(), getAppId(), getAESKey());
-        fromUserName = (String) reqMap.get("FromUserName");
-        toUserName = (String) reqMap.get("ToUserName");
+        String fromUserName = (String) reqMap.get("FromUserName");
+        String toUserName = (String) reqMap.get("ToUserName");
         String msgType = (String) reqMap.get("MsgType");
 
         LOG.debug("收到消息,消息类型:{}", msgType);
@@ -310,7 +308,8 @@ public abstract class WeixinSupport {
             msg.setToUserName(fromUserName);
             result = msg.toXml();
             if (StrUtil.isNotBlank(getAESKey())) {
-                try (WXBizMsgCrypt pc = new WXBizMsgCrypt(getToken(), getAESKey(), getAppId())){
+                try{
+                    WXBizMsgCrypt pc = new WXBizMsgCrypt(getToken(), getAESKey(), getAppId());
                     result = pc.encryptMsg(result, request.getParameter("timestamp"), request.getParameter("nonce"));
                     LOG.debug("加密后密文:{}", result);
                 } catch (Exception e) {

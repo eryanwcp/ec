@@ -70,18 +70,17 @@ public final class MessageUtil {
                 Element root = document.getDocumentElement();
                 NodeList nodelist1 = root.getElementsByTagName("Encrypt");
 
-                try (WXBizMsgCrypt pc = new WXBizMsgCrypt(token, aesKey, appId)){
-                    String msgSignature = request.getParameter("msg_signature");
-                    String timeStamp = request.getParameter("timestamp");
-                    String nonce = request.getParameter("nonce");
-                    LOG.debug("msgSignature:{}", msgSignature);
-                    LOG.debug("timeStamp:{}", timeStamp);
-                    LOG.debug("nonce:{}", nonce);
-                    String encrypt = nodelist1.item(0).getTextContent();
-                    String fromXML = String.format(FORMAT, encrypt);
-                    String message = pc.decryptMsg(msgSignature, timeStamp, nonce, fromXML);
-                    inputStream = new ByteArrayInputStream(message.getBytes(StandardCharsets.UTF_8));
-                }
+                WXBizMsgCrypt pc = new WXBizMsgCrypt(token, aesKey, appId);
+                String msgSignature = request.getParameter("msg_signature");
+                String timeStamp = request.getParameter("timestamp");
+                String nonce = request.getParameter("nonce");
+                LOG.debug("msgSignature:{}", msgSignature);
+                LOG.debug("timeStamp:{}", timeStamp);
+                LOG.debug("nonce:{}", nonce);
+                String encrypt = nodelist1.item(0).getTextContent();
+                String fromXML = String.format(FORMAT, encrypt);
+                String message = pc.decryptMsg(msgSignature, timeStamp, nonce, fromXML);
+                inputStream = new ByteArrayInputStream(message.getBytes(StandardCharsets.UTF_8));
 
             }
             XMLInputFactory factory = XMLInputFactory.newInstance();

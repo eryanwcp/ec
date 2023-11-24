@@ -29,19 +29,10 @@ public abstract class QYWeixinControllerSupport extends QYWeixinSupport {
      * @param request
      * @return
      */
-    @GetMapping()
+    @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
-    protected final String bind(HttpServletRequest request,
-                                HttpServletResponse response,
-                                @RequestParam(value = "msg_signature", required = false) String msgSignature,
-                                @RequestParam(value = "nonce", required = false) String nonce,
-                                @RequestParam(value = "echostr", required = false) String echoStr,
-                                @RequestParam(value = "timestamp", required = false) String timestamp,
-                                @RequestBody(required = false) String xml) throws IOException {
-        logger.debug("{'msg_signature'：{},'nonce':{},'echostr':{},'timestamp':{}},'body':{}",msgSignature,nonce,echoStr,timestamp,xml);
-        String result = legalStr(request,msgSignature,nonce,timestamp,echoStr);
-        response.getWriter().write(result);
-        return null;
+    protected final String bind(HttpServletRequest request){
+        return legalStr(request);
     }
 
     /**
@@ -50,15 +41,9 @@ public abstract class QYWeixinControllerSupport extends QYWeixinSupport {
      * @param request
      * @return
      */
-    @PostMapping()
+    @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
-    protected final String process(HttpServletRequest request,
-                                   HttpServletResponse response,
-                                   @RequestParam(value = "msg_signature", required = false) String msgSignature,
-                                   @RequestParam(value = "nonce", required = false) String nonce,
-                                   @RequestParam(value = "echostr", required = false) String echoStr,
-                                   @RequestParam(value = "timestamp", required = false) String timestamp,
-                                   @RequestBody(required = false) String xml) throws ServletException, IOException{
+    protected final String process(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
 //        if(StrUtil.isBlank(legalStr(request))){
 //            return "";
 //        }
@@ -73,13 +58,14 @@ public abstract class QYWeixinControllerSupport extends QYWeixinSupport {
      * @param request
      * @return
      */
-    protected String legalStr(HttpServletRequest request,String msgSignature,String nonce,String timestamp,String echoStr){
+    protected String legalStr(HttpServletRequest request){
         String _echoStr = "";
         if(StrUtil.isBlank(getToken()) || StrUtil.isBlank(getAESKey()) || StrUtil.isBlank(getCropId())){
             return _echoStr;
         }
-        try (WXBizMsgCrypt pc = new WXBizMsgCrypt(getToken(), getAESKey(), getCropId())){
-            _echoStr = pc.verifyUrl(msgSignature, timestamp, nonce, echoStr);
+        try{
+            WXBizMsgCrypt pc = new WXBizMsgCrypt(getToken(), getAESKey(), getCropId());
+            _echoStr = pc.verifyUrl(request.getParameter("msg_signature"), request.getParameter("timestamp"), request.getParameter("nonce"), request.getParameter("echostr"));
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
         }

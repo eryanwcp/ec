@@ -5,6 +5,7 @@ import com.eryansky.fastweixin.company.handle.QYMessageHandle;
 import com.eryansky.fastweixin.company.message.req.*;
 import com.eryansky.fastweixin.company.message.resp.QYBaseRespMsg;
 import com.eryansky.fastweixin.company.message.resp.QYTextRespMsg;
+import com.eryansky.fastweixin.message.aes.AesException;
 import com.eryansky.fastweixin.message.aes.WXBizMsgCrypt;
 import com.eryansky.fastweixin.util.BeanUtil;
 import com.eryansky.fastweixin.util.CollectionUtil;
@@ -31,9 +32,6 @@ public abstract class QYWeixinSupport{
 
     private static final Object LOCK = new Object();
 
-    protected String fromUserName, toUserName;
-
-    private WXBizMsgCrypt wxcpt;
 
     /**
      * 子类提供token用于绑定微信企业平台
@@ -90,22 +88,28 @@ public abstract class QYWeixinSupport{
      * @param response
      */
     public void bindServer(HttpServletRequest request, HttpServletResponse response) {
-        try (PrintWriter pw = response.getWriter()) {
-            if (StrUtil.isBlank(getToken()) || StrUtil.isBlank(getAESKey()) || StrUtil.isBlank(getCropId())) {
-                pw.write("");
-                pw.flush();
-            }
-            try (WXBizMsgCrypt pc = new WXBizMsgCrypt(getToken(), getAESKey(), getCropId())) {
-                String echoStr = pc.verifyUrl(request.getParameter("msg_signature"), request.getParameter("timestamp"), request.getParameter("nonce"), request.getParameter("echostr"));
-                pw.write(echoStr);
-                pw.flush();
-            } catch (Exception e) {
-                logger.error(e.getMessage(),e);
-                pw.write("");
-                pw.flush();
-            }
+        PrintWriter pw = null;
+        try {
+            pw = response.getWriter();
         } catch (IOException e) {
             logger.error(e.getMessage(),e);
+        }
+        if(StrUtil.isBlank(getToken()) || StrUtil.isBlank(getAESKey()) || StrUtil.isBlank(getCropId())){
+            pw.write("");
+            pw.flush();
+            pw.close();
+        }
+        try {
+            WXBizMsgCrypt pc = new WXBizMsgCrypt(getToken(), getAESKey(), getCropId());
+            String echoStr = pc.verifyUrl(request.getParameter("msg_signature"), request.getParameter("timestamp"), request.getParameter("nonce"), request.getParameter("echostr"));
+            pw.write(echoStr);
+            pw.flush();
+            pw.close();
+        } catch (AesException e) {
+            logger.error(e.getMessage(),e);
+            pw.write("");
+            pw.flush();
+            pw.close();
         }
     }
 
@@ -117,8 +121,8 @@ public abstract class QYWeixinSupport{
      */
     public String processRequest(HttpServletRequest request){
         Map<String, Object> reqMap = MessageUtil.parseXml(request, getToken(), getCropId(), getAESKey());
-        fromUserName = (String)reqMap.get("FromUserName");
-        toUserName = (String)reqMap.get("ToUserName");
+        String fromUserName = (String) reqMap.get("FromUserName");
+        String toUserName = (String) reqMap.get("ToUserName");
         String msgType = (String)reqMap.get("MsgType");
 
         logger.debug("收到消息，消息类型：{}", msgType);
@@ -277,7 +281,8 @@ public abstract class QYWeixinSupport{
             msg.setFromUserName(toUserName);
             msg.setToUserName(fromUserName);
             result = msg.toXml();
-            try(WXBizMsgCrypt pc = new WXBizMsgCrypt(getToken(), getAESKey(), getCropId())){
+            try{
+                WXBizMsgCrypt pc = new WXBizMsgCrypt(getToken(), getAESKey(), getCropId());
                 result = pc.encryptMsg(result, request.getParameter("timestamp"), request.getParameter("nonce"));
                 logger.debug("加密后密文：{}", result);
             }catch (Exception e){
