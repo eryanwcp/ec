@@ -40,6 +40,7 @@ public interface IApiWebService {
 	 * sendTime   :发布时间(格式：yyyy-MM-dd HH:mm:ss)  可选
 	 * title      :消息标题    可选
 	 * category   :消息分类    可选
+	 * msgType    :消息类型 文本：text；文本卡片：textcard     可选
 	 * content    :消息内容    必选
 	 * linkUrl    :消息链接    可选
 	 * linkSSO    :消息链接是否单点 默认：否（0） 1|0    可选
