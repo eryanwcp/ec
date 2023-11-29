@@ -35,9 +35,9 @@ public class MessageRestController extends SimpleController {
      * 	 serviceId:"serviceId",
      * 	 senderId:"",
      * 	 sendTime:"yyyy-MM-dd HH:mm:ss",
-     *   title:"标题",
-     *   category:"消息分类",
      *   msgType:"消息类型",
+     *   category:"消息分类",
+     *   title:"标题",
      *   content:"消息内容",
      *   linkUrl:"",
      *   receiveIds:["loginName1","loginName2",...]
@@ -46,9 +46,9 @@ public class MessageRestController extends SimpleController {
      * serviceId  :服务ID  可选
      * senderId   :发送者账号(第三方系统账号，需在统一平台做账号映射) 可选
      * sendTime   :发布时间(格式：yyyy-MM-dd HH:mm:ss)  可选
-     * title    :消息标题     可选
-     * category    :消息分类     可选
      * msgType    :消息类型 文本：text；文本卡片：textcard     可选
+     * category    :消息分类     可选
+     * title    :消息标题     可选
      * content    :消息内容     必选
      * linkUrl    :消息链接    可选
      * receiveIds :接收者账号(第三方系统账号，需在统一平台做账号映射) 必选
