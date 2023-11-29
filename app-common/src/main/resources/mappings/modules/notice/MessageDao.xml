@@ -12,6 +12,7 @@
 		a.update_time AS "updateTime",
 		a.app_id AS "appId",
 		a.category AS "category",
+		a.msg_type AS "msgType",
 		a.title AS "title",
 		a.url AS "url",
 		a.image AS "image",
@@ -53,7 +54,9 @@
 			<if test="category != null and category != ''">
 				AND a.category = #{category}
 			</if>
- 
+			<if test="msgType != null and msgType != ''">
+				AND a.msg_type = #{msgType}
+			</if>
 			<if test="query != null and query != ''">
 				AND (
 				a.title LIKE
@@ -111,6 +114,10 @@
 
 			<if test="category != null and category != ''">
 				AND a.category = #{category}
+			</if>
+
+			<if test="msgType != null and msgType != ''">
+				AND a.msg_type = #{msgType}
 			</if>
 
 			<if test="query != null and query != ''">
@@ -204,6 +211,7 @@
 			update_time,
 			app_id,
 			category,
+			msg_type,
 			title,
 			url,
 			image,
@@ -223,6 +231,7 @@
 			#{updateTime},
 			#{appId},
 			#{category},
+			#{msgType},
 			#{title},
 			#{url},
 			#{image},
@@ -245,6 +254,7 @@
 			update_time,
 			app_id,
 			category,
+			msg_type,
 			title,
 			url,
 			image,
@@ -264,6 +274,7 @@
 			#{item.updateTime},
 			#{item.appId},
 			#{item.category},
+			#{item.msgType},
 			#{item.title},
 			#{item.url},
 			#{item.image},
@@ -284,6 +295,7 @@
 			update_time = #{updateTime},
 			app_id = #{appId},
 			category = #{category},
+			msg_type = #{msgType},
 			title = #{title},
 			url = #{url},
 			image = #{image},

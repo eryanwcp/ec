@@ -141,7 +141,7 @@ public class MessageUtils {
                                    String linkUrl,
                                    String receiveObjectType, Collection<String> receiveObjectIds, Date date, List<MessageChannel> messageChannels) {
         MessageReceiveObjectType m = MessageReceiveObjectType.getByValue(receiveObjectType);
-        return sendMessage(appId, sender, null,null, content, linkUrl, m, receiveObjectIds, date, messageChannels);
+        return sendMessage(appId, sender, null,null, content,null, linkUrl, m, receiveObjectIds, date, messageChannels);
     }
 
 
@@ -158,7 +158,7 @@ public class MessageUtils {
     public static CompletableFuture<Message> sendMessage(String sender, String content,
                                    String linkUrl,
                                    MessageReceiveObjectType messageReceiveObjectType, List<String> receiveObjectIds, List<MessageChannel> messageChannels) {
-        return sendMessage(null, sender,null, null, content, linkUrl, messageReceiveObjectType, receiveObjectIds, null, messageChannels);
+        return sendMessage(null, sender,null, null,null, content, linkUrl, messageReceiveObjectType, receiveObjectIds, null, messageChannels);
     }
 
     /**
@@ -168,13 +168,14 @@ public class MessageUtils {
      * @param sender                   发送者用户ID {@link User}
      * @param title                    标题
      * @param category                 可选 消息分类
+     * @param msgType                 可选 消息类型 {@link com.eryansky.modules.notice._enum.MessageType}
      * @param content                  必选 消息内容
      * @param linkUrl                  消息URL链接地址
      * @param messageReceiveObjectType 必选 接收类型 {@link MessageReceiveObjectType}
      * @param receiveObjectIds         必选 接收对象ID集合
      * @param messageChannels          可选 消息接收通道 默认值：{@link MessageChannel#Message}
      */
-    public static CompletableFuture<Message> sendMessage(String appId, String sender, String title, String category, String content,
+    public static CompletableFuture<Message> sendMessage(String appId, String sender, String title, String category, String msgType, String content,
                                                          String linkUrl,
                                                          MessageReceiveObjectType messageReceiveObjectType, Collection<String> receiveObjectIds, Date date, List<MessageChannel> messageChannels) {
         Message model = new Message();
@@ -192,6 +193,7 @@ public class MessageUtils {
         model.setAppId(appId);
         model.setTitle(title);
         model.setCategory(category);
+        model.setMsgType(msgType);
         model.setOrganId(user.getCompanyId());
         model.setSender(user.getId());
         model.setContent(content);

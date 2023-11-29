@@ -1,4 +1,10 @@
-﻿20230927
+﻿20231129
+V4.2.20231124.02
+1、消息管理增加消息类型
+ALTER TABLE t_notice_message ADD COLUMN msg_type varchar(32) COMMENT '消息类型 文本：text；文本卡片：textcard';
+
+
+20230927
 V4.2.20230921.04
 1、用户管理增加“职务”字段
 ALTER TABLE t_sys_user ADD COLUMN position varchar(128) COMMENT '职务';

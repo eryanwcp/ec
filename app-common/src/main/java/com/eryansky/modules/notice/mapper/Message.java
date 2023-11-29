@@ -34,6 +34,10 @@ public class Message extends DataEntity<Message> {
      */
     private String category;
     /**
+     * 消息类型 {@link com.eryansky.modules.notice._enum.MessageType}
+     */
+    private String msgType;
+    /**
      * 标题
      */
     private String title;
@@ -125,6 +129,14 @@ public class Message extends DataEntity<Message> {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public String getMsgType() {
+        return msgType;
+    }
+
+    public void setMsgType(String msgType) {
+        this.msgType = msgType;
     }
 
     public String getTitle() {

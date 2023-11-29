@@ -27,6 +27,7 @@ public interface IApiWebService {
 	 * 	 sendTime:"yyyy-MM-dd HH:mm:ss",
 	 *   title:"标题",
 	 *   category:"分类",
+	 *   msgType:"消息类型 文本：text；文本卡片：textcard",
 	 *   content:"消息内容",
 	 *   linkUrl:"",
 	 *   receiveType:"user",

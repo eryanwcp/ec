@@ -70,6 +70,7 @@ public class ApiWebServiceImpl implements IApiWebService {
             String senderId = (String) map.get("senderId");
             String title = (String) map.get("title");
             String category = (String) map.get("category");
+            String msgType = (String) map.get("msgType");
             String content = (String) map.get("content");
             String linkUrl = (String) map.get("linkUrl");
             String linkSSO = (String) map.get("linkSSO");
@@ -169,7 +170,7 @@ public class ApiWebServiceImpl implements IApiWebService {
 
             //发送消息
             try {
-                CompletableFuture<Message> messageCompletableFuture = MessageUtils.sendMessage(appId, senderUser.getId(),title,category, content, linkUrl, messageReceiveObjectType, receiveObjectIds,sendTime,messageChannels);
+                CompletableFuture<Message> messageCompletableFuture = MessageUtils.sendMessage(appId, senderUser.getId(),title,category,msgType, content, linkUrl, messageReceiveObjectType, receiveObjectIds,sendTime,messageChannels);
                 Message message = null;
                 try {
                     message = messageCompletableFuture.get();
