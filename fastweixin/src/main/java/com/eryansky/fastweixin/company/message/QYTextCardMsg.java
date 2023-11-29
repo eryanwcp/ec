@@ -16,6 +16,7 @@ public class QYTextCardMsg extends QYBaseMsg {
     }
 
     public QYTextCardMsg(String title, String description, String url, String btnTxt) {
+        this.setMsgType("textcard");
         this.textCard = new TextCard(title, description, url, btnTxt);
     }
 
