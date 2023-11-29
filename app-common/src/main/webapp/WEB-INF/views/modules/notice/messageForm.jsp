@@ -48,7 +48,6 @@
 	</ul><br/>
 	<form:form id="inputForm" modelAttribute="model" action="${ctxAdmin}/notice/message/save" method="post" class="form-horizontal">
 		<form:hidden path="id"/>
-		<form:hidden path="title"/>
 		<tags:message content="${message}"/>
 		<div id="user_div" class="control-group">
 			<label class="control-label">接收对象：</label>
@@ -69,12 +68,12 @@
 			</div>
 		</div>
 
-		<%--<div class="control-group">--%>
-			<%--<label class="control-label">标题：</label>--%>
-			<%--<div class="controls">--%>
-				<%--<form:input path="title" htmlEscape="false" maxlength="200" class="input-xlarge"/>--%>
-			<%--</div>--%>
-		<%--</div>--%>
+		<div class="control-group">
+			<label class="control-label">标题：</label>
+			<div class="controls">
+				<form:input path="title" htmlEscape="false" maxlength="255" class="input-xxlarge"/>
+			</div>
+		</div>
 		<div class="control-group">
 			<label class="control-label">消息内容：</label>
 			<div class="controls">
@@ -104,6 +103,12 @@
 				</div>
 			</div>
 		</c:if>
+		<div id="tip_div" class="control-group">
+			<label class="control-label">消息类型：</label>
+			<div class="controls">
+				<form:radiobuttons path="msgType" items="${msgTypes}" itemLabel="description" itemValue="value" htmlEscape="false" />
+			</div>
+		</div>
 		<div class="form-actions">
 			<e:hasPermission name="notice:message:edit">
 				<input id="btnSubmit" class="btn btn-primary" type="submit" value="发送"/>&nbsp;

@@ -18,8 +18,9 @@
 <div class="container-fluid">
 	<div>应用标识：${model.appId}</div>
 	<div>消息 ID：${model.id}</div>
-	<div>消息标题：${model.title}</div>
+	<div>消息类型：${model.msgTypeView}</div>
 	<div>消息分类：${model.category}</div>
+	<div>消息标题：${model.title}</div>
 	<div>消息内容：${model.content}</div>
 	<div>链接地址：${model.url} &nbsp;</div>
 	<div>推送方式：${model.tipMessage} &nbsp;</div>

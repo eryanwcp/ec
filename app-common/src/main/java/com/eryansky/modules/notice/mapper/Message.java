@@ -6,6 +6,7 @@
 package com.eryansky.modules.notice.mapper;
 
 import com.eryansky.modules.notice._enum.MessageChannel;
+import com.eryansky.modules.notice._enum.MessageType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
 import com.eryansky.modules.notice._enum.MessageMode;
@@ -137,6 +138,12 @@ public class Message extends DataEntity<Message> {
 
     public void setMsgType(String msgType) {
         this.msgType = msgType;
+    }
+
+
+    public String getMsgTypeView() {
+        MessageType e = MessageType.getByValue(msgType);
+        return null != e ? e.getDescription():msgType;
     }
 
     public String getTitle() {
