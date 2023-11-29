@@ -36,7 +36,7 @@ public class MessageRestController extends SimpleController {
      * 	 senderId:"",
      * 	 sendTime:"yyyy-MM-dd HH:mm:ss",
      *   title:"标题",
-     *   category:"分类",
+     *   category:"消息分类",
      *   msgType:"消息类型",
      *   content:"消息内容",
      *   linkUrl:"",
