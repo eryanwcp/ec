@@ -61,8 +61,7 @@ $(function () {
         var _password = $password.val();
         if(needEncrypt){
             // _password = md5(md5(_password+SALT)+securityToken);
-
-            let encrypt = new JSEncrypt(); //创建加密实例
+            var encrypt = new JSEncrypt(); //创建加密实例
             encrypt.setPublicKey(publicKey);
             _password = encrypt.encrypt(_password);
         }
@@ -93,7 +92,7 @@ function login() {
     var _password = $password.val();
     if(needEncrypt){
         // _password = md5(md5(_password+SALT)+securityToken);
-        let encrypt = new JSEncrypt(); //创建加密实例
+        var encrypt = new JSEncrypt(); //创建加密实例
         encrypt.setPublicKey(publicKey);
         _password = encrypt.encrypt(_password);
     }
