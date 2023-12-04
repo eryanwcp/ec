@@ -224,10 +224,9 @@ public class LoginController extends SimpleController {
         String _password = password;
         if ("RSA".equals(encrypt)) {
             originPassword = RSAUtil.decryptBase64(_password);
-            System.out.println(originPassword+":"+_password);
         }
         if (!"true".equals(encrypt)) {
-            _password = Encrypt.e(password);
+            _password = Encrypt.e(originPassword);
         }
 
 
