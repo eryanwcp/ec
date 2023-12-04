@@ -1,4 +1,9 @@
-﻿20231129
+﻿20231204
+V4.2.20231124.03
+1、登录密码加密传输；
+
+
+20231129
 V4.2.20231124.02
 1、消息管理增加消息类型
 ALTER TABLE t_notice_message ADD COLUMN msg_type varchar(32) COMMENT '消息类型 文本：text；文本卡片：textcard';

@@ -5,6 +5,7 @@ var $rememberMe;
 var needEncrypt = needEncrypt;
 var SALT;
 var securityToken;
+var publicKey;
 $(function () {
     $loginName = $("#loginName");
     $password = $("#password");
@@ -27,7 +28,10 @@ $(function () {
         var checked = $(this).prop('checked');
         var _password = $password.val();
         if(needEncrypt){
-            _password = md5(md5(_password+SALT)+securityToken);
+            // _password = md5(md5(_password+SALT)+securityToken);
+            let encrypt = new JSEncrypt(); //创建加密实例
+            encrypt.setPublicKey(publicKey);
+            _password = encrypt.encrypt(_password);
         }
         if (checked) {
             window.localStorage.setItem("loginName", $loginName.val());
@@ -62,13 +66,16 @@ function login() {
         return;
     }
     if(needEncrypt){
-        _password = md5(md5(_password+SALT)+securityToken);
+        // _password = md5(md5(_password+SALT)+securityToken);
+        let encrypt = new JSEncrypt(); //创建加密实例
+        encrypt.setPublicKey(publicKey);
+        _password = encrypt.encrypt(_password);
     }
 
     $.ajax({
         url: ctxAdmin + '/login/login',
         type: 'post',
-        data: {loginName: $loginName.val(), password: _password, checkDevice: false},
+        data: {loginName: $loginName.val(), password: _password,encrypt:"RSA", checkDevice: false},
         traditional: true,
         async: false,
         dataType: 'json',

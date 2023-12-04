@@ -69,6 +69,21 @@ public class MobileIndexController extends SimpleController {
         return new ModelAndView("layout/index_content");
     }
 
+    /**
+     * APP初始化数据获取
+     *
+     * @return
+     */
+    @PrepareOauth2(enable = false)
+    @RequiresUser(required = false)
+    @RequestMapping(value = {"appInitData"},method = {RequestMethod.GET,RequestMethod.POST})
+    @ResponseBody
+    public Result appInitData(HttpServletRequest request){
+        Map<String,Object> data = Maps.newHashMap();
+        data.put("appThemeMode","default");
+//        data.put("appThemeMode","grey");//灰色模式
+        return Result.successResult().setObj(data);
+    }
 
     /**
      * 下载页面

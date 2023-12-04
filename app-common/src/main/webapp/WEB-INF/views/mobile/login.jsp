@@ -24,12 +24,15 @@
     <script type="text/javascript" charset="utf-8" src="${ctxStatic}/mobile/af/appframework.ui.js"></script>
 
     <link rel="stylesheet" type="text/css" href="${ctxStatic}/app/mobile/login.mobile${yuicompressor}.css?_=${sysInitTime}" />
-    <script src="${ctxStatic}/js/md5/md5.min.js"></script>
+<%--    <script src="${ctxStatic}/js/md5/md5.min.js"></script>--%>
+    <script src="${ctxStatic}/js/jsencrypt/jsencrypt.min.js"></script>
+
     <script type="text/javascript">
         var lPassword = window.localStorage.getItem("password");
         var needEncrypt = null != lPassword;
-        var SALT = "<%=Encrypt.SALT%>";
+        <%--var SALT = "<%=Encrypt.SALT%>";--%>
         var securityToken = "${securityToken}";
+        var publicKey = "${publicKey}";
     </script>
     <script type="text/javascript" charset="utf-8" src="${ctxStatic}/app/mobile/login.mobile${yuicompressor}.js?_=${sysInitTime}"></script>
 </head>

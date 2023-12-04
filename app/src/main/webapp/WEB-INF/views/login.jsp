@@ -42,7 +42,8 @@
 <script src="${ctxStatic}/js/bootstrap/bsie/js/bootstrap-ie.min.js" type="text/javascript"></script><![endif]-->
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]> <script src="${ctxStatic}/js/common/html5.js"></script><![endif]-->
-    <script src="${ctxStatic}/js/md5/md5.min.js"></script>
+<%--    <script src="${ctxStatic}/js/md5/md5.min.js"></script>--%>
+    <script src="${ctxStatic}/js/jsencrypt/jsencrypt.min.js"></script>
     <style type="text/css">
         .control-group{border-bottom:0px;}
         .login-form label {
@@ -57,6 +58,7 @@
         var isValidateCodeLogin = "${isValidateCodeLogin}";
         var rememberMeCookieValue = "${cookie.rememberMe.value}";
         var needEncrypt = ${empty cookie._password.value};
+        var publicKey = "${publicKey}";
         var SALT = "<%=Encrypt.SALT%>";
         var securityToken = "${securityToken}";
         var homePage = "<%=request.getContextPath() + AppConstants.getAppHomePage()%>";

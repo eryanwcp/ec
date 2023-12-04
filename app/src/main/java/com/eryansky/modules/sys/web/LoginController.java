@@ -16,6 +16,7 @@ import com.eryansky.common.utils.UserAgentUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.encode.EncodeUtils;
 import com.eryansky.common.utils.encode.Encrypt;
+import com.eryansky.common.utils.encode.RSAUtil;
 import com.eryansky.common.web.servlet.ValidateCodeServlet;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
@@ -42,6 +43,7 @@ import com.eryansky.modules.sys.mapper.Resource;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Sets;
+import com.oracle.wls.shaded.org.apache.regexp.RE;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -89,7 +91,9 @@ public class LoginController extends SimpleController {
         modelAndView.addObject("isMobile", UserAgentUtils.isMobile(request));
         String randomSecurityToken = Identities.randomBase62(64);
         modelAndView.addObject("securityToken", randomSecurityToken);
+        modelAndView.addObject("publicKey", RSAUtil.generateBase64PublicKey());
         CacheUtils.put("securityToken:"+request.getSession().getId(),randomSecurityToken);
+        CacheUtils.put("publicKey",RSAUtil.generateBase64PublicKey());
         return modelAndView;
     }
 
@@ -146,17 +150,33 @@ public class LoginController extends SimpleController {
     }
 
     /**
-     * 预登录信息获取 动态登录码
+     * 预登录信息获取 动态登录码等信息
      *
      * @return
      */
     @RequiresUser(required = false)
-    @PostMapping(value = {"prepareLogin"})
+    @RequestMapping(value = {"prepareLogin"},method = {RequestMethod.GET,RequestMethod.POST})
     @ResponseBody
     public Result prepareLogin(HttpServletRequest request){
         String randomSecurityToken = Identities.randomBase62(64);
+        String publicKey = RSAUtil.generateBase64PublicKey();
+        Map<String,Object> data = Maps.newHashMap();
+        data.put("securityToken:",randomSecurityToken);
+        data.put("publicKey",publicKey);
         CacheUtils.put("securityToken:"+request.getSession().getId(),randomSecurityToken);
-        return Result.successResult().setObj(randomSecurityToken);
+        CacheUtils.put("publicKey",publicKey);
+        return Result.successResult().setObj(data);
+    }
+
+    /**
+     * 后端登录生成公钥方法
+     * @return
+     */
+    @GetMapping(value = "getPublicKey")
+    @ResponseBody
+    public Result RSAKey(){
+        String publicKey = RSAUtil.generateBase64PublicKey();
+        return Result.successResult().setObj(publicKey);
     }
 
     /**
@@ -176,7 +196,7 @@ public class LoginController extends SimpleController {
     @PostMapping(value = {"login"})
     public Result login(@RequestParam(required = true) String loginName,
                         @RequestParam(required = true) String password,
-                        @RequestParam(defaultValue = "true") Boolean encrypt,
+                        @RequestParam(defaultValue = "true") String encrypt,
                         String validateCode,
                         String theme, HttpServletRequest request, Model uiModel) {
         //登录限制
@@ -200,8 +220,13 @@ public class LoginController extends SimpleController {
             }
         }
 
+        String originPassword = password;
         String _password = password;
-        if (!encrypt) {
+        if ("RSA".equals(encrypt)) {
+            originPassword = RSAUtil.decryptBase64(_password);
+            System.out.println(originPassword+":"+_password);
+        }
+        if (!"true".equals(encrypt)) {
             _password = Encrypt.e(password);
         }
 

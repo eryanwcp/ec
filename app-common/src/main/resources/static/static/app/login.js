@@ -5,6 +5,7 @@ var sysInitTime = sysInitTime;
 var isValidateCodeLogin = isValidateCodeLogin;
 var rememberMeCookieValue = rememberMeCookieValue;
 var needEncrypt = needEncrypt;
+var publicKey = publicKey;
 var SALT = SALT;
 var securityToken = securityToken;
 var homePage = homePage;
@@ -59,7 +60,11 @@ $(function () {
         var checked = $(this).prop('checked');
         var _password = $password.val();
         if(needEncrypt){
-            _password = md5(md5(_password+SALT)+securityToken);
+            // _password = md5(md5(_password+SALT)+securityToken);
+
+            let encrypt = new JSEncrypt(); //创建加密实例
+            encrypt.setPublicKey(publicKey);
+            _password = encrypt.encrypt(_password);
         }
         if (checked) {
             $.cookie('_password', _password, {
@@ -87,7 +92,10 @@ function login() {
     });
     var _password = $password.val();
     if(needEncrypt){
-        _password = md5(md5(_password+SALT)+securityToken);
+        // _password = md5(md5(_password+SALT)+securityToken);
+        let encrypt = new JSEncrypt(); //创建加密实例
+        encrypt.setPublicKey(publicKey);
+        _password = encrypt.encrypt(_password);
     }
     if ($rememberMe.prop("checked")) {
         $.cookie('_password', _password, {
@@ -97,7 +105,7 @@ function login() {
     $.ajax({
         url: ctxAdmin + '/login/login',
         type: 'post',
-        data: {theme:'',encrypt:true,loginName:$("#loginName").val(),password:_password,validateCode:$("#validateCode").val()},
+        data: {theme:'',encrypt:'RSA',loginName:$("#loginName").val(),password:_password,validateCode:$("#validateCode").val()},
         traditional: true,
         async:false,
         dataType: 'json',
