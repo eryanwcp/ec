@@ -149,7 +149,7 @@ public class QYAPIConfig extends Observable implements Serializable {
         // 记住原本的事件，用于出错回滚
         final long oldTime = this.weixinTokenStartTime;
         this.weixinTokenStartTime = refreshTime;
-        String url = (null != this.url ? this.url:"https://qyapi.weixin.qq.com") + "/cgi-bin/gettoken?corpid=" + corpid + "&corpsecret=" + corpsecret;
+        String url = (null != this.url ? this.url:"https://qyapi.weixin.qq.com/") + "cgi-bin/gettoken?corpid=" + corpid + "&corpsecret=" + corpsecret;
         NetWorkCenter.get(url, null, new NetWorkCenter.ResponseCallback() {
             @Override
             public void onResponse(int resultCode, String resultJson) {
@@ -177,7 +177,7 @@ public class QYAPIConfig extends Observable implements Serializable {
         // 记住原本的事件，用于出错回滚
         final long oldTime = this.jsTokenStartTime;
         this.jsTokenStartTime = refreshTime;
-        String url = (null != this.url ? this.url:"https://qyapi.weixin.qq.com") + "/cgi-bin/get_jsapi_ticket?access_token=" + accessToken;
+        String url = (null != this.url ? this.url:"https://qyapi.weixin.qq.com/") + "cgi-bin/get_jsapi_ticket?access_token=" + accessToken;
         NetWorkCenter.get(url, null, new NetWorkCenter.ResponseCallback() {
 
             @Override
