@@ -46,7 +46,7 @@ public final class ClusterQYAPIConfig extends QYAPIConfig {
         super(corpid,corpsecret,enableJsApi,url);
         this.url = url;
         if(accessTokenCacheService == null){
-            throw new WeixinException("参数[accessTokenCacheService]不能为null");
+            throw new WeixinException(corpid+",参数[accessTokenCacheService]不能为null");
         }
         this.accessTokenCacheService = accessTokenCacheService;
         //初始化
@@ -65,11 +65,11 @@ public final class ClusterQYAPIConfig extends QYAPIConfig {
         try {
             if (null == accessTokenCache) {
                 accessTokenCache = new AccessTokenCache();
-                LOG.debug("准备刷新tokean.........");
+                LOG.debug("准备刷新AccessToken......... {}",corpid);
                 initToken(now,accessTokenCache);
             }
         } catch (Exception e) {
-            LOG.error("刷新token异常", e);
+            LOG.error("刷新AccessToken异常:"+corpid, e);
             tokenRefreshing.set(false);
         }
         return accessTokenCache.getAccessToken();
@@ -82,11 +82,11 @@ public final class ClusterQYAPIConfig extends QYAPIConfig {
             try {
                 if (null == accessTokenCache) {
                     accessTokenCache = new AccessTokenCache();
-                    LOG.debug("准备刷新JSTokean..........");
+                    LOG.debug("准备刷新JsApiTicket.......... {}",corpid);
                     initJSToken(now,accessTokenCache);
                 }
             } catch (Exception e) {
-                LOG.error("刷新jsToken异常", e);
+                LOG.error("刷新JsApiTicket异常:"+corpid, e);
                 jsRefreshing.set(false);
             }
         } else {
@@ -108,7 +108,7 @@ public final class ClusterQYAPIConfig extends QYAPIConfig {
     }
 
     private ClusterQYAPIConfig initToken(final long refreshTime, final AccessTokenCache accessTokenCache) {
-        LOG.debug("开始初始化access_token..........");
+        LOG.debug("开始初始化access_token.......... {}",corpid);
         // 记住原本的事件，用于出错回滚
         final long oldTime = accessTokenCache.getWeixinTokenStartTime();
         accessTokenCache.setWeixinTokenStartTime(refreshTime);
@@ -118,12 +118,12 @@ public final class ClusterQYAPIConfig extends QYAPIConfig {
             public void onResponse(int resultCode, String resultJson) {
                 if (HttpStatus.SC_OK == resultCode) {
                     GetTokenResponse response = JSONUtil.toBean(resultJson, GetTokenResponse.class);
-                    LOG.debug("获取access_token:{}", response.getAccessToken());
+                    LOG.debug("获取access_token:{} {}", corpid,response.getAccessToken());
                     if (null == response.getAccessToken()) {
                         // 刷新时间回滚
                         accessTokenCache.setWeixinTokenStartTime(oldTime);
                         accessTokenCacheService.putAccessTokenCache(accessTokenCache);
-                        throw new WeixinException("微信企业号token获取出错，错误信息:" + response.getErrcode() + "," + response.getErrmsg());
+                        throw new WeixinException("微信企业号token获取出错，错误信息:" + corpid+"," +  response.getErrcode() + "," + response.getErrmsg());
                     }
                     String accessToken = response.getAccessToken();
                     accessTokenCache.setAccessToken(accessToken);
@@ -139,7 +139,7 @@ public final class ClusterQYAPIConfig extends QYAPIConfig {
     }
 
     private ClusterQYAPIConfig initJSToken(final long refreshTime, final AccessTokenCache accessTokenCache) {
-        LOG.debug("初始化 jsapi_ticket.........");
+        LOG.debug("初始化 jsapi_ticket......... {}",corpid);
         // 记住原本的事件，用于出错回滚
         final long oldTime = accessTokenCache.getWeixinTokenStartTime();
         accessTokenCache.setJsTokenStartTime(refreshTime);
@@ -150,12 +150,12 @@ public final class ClusterQYAPIConfig extends QYAPIConfig {
             public void onResponse(int resultCode, String resultJson) {
                 if (HttpStatus.SC_OK == resultCode) {
                     GetJsApiTicketResponse response = JSONUtil.toBean(resultJson, GetJsApiTicketResponse.class);
-                    LOG.debug("获取jsapi_ticket:{}", response.getTicket());
+                    LOG.debug("获取jsapi_ticket:{} {}", corpid,response.getTicket());
                     if (StrUtil.isBlank(response.getTicket())) {
                         //刷新时间回滚
                         accessTokenCache.setJsTokenStartTime(oldTime);
                         accessTokenCacheService.putAccessTokenCache(accessTokenCache);
-                        throw new WeixinException("微信企业号jsToken获取出错，错误信息:" + response.getErrcode() + "," + response.getErrmsg());
+                        throw new WeixinException("微信企业号jsToken获取出错，错误信息:" + corpid+","+ response.getErrcode() + "," + response.getErrmsg());
                     }
                     String jsApiTicket = response.getTicket();
                     accessTokenCache.setJsApiTicket(jsApiTicket);
