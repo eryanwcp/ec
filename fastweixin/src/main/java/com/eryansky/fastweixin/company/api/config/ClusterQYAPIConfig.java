@@ -51,19 +51,20 @@ public final class ClusterQYAPIConfig extends QYAPIConfig {
         this.accessTokenCacheService = accessTokenCacheService;
         //初始化
         AccessTokenCache accessTokenCache = accessTokenCacheService.getAccessTokenCache();
-        accessTokenCache = accessTokenCache == null ? new AccessTokenCache():accessTokenCache;
         long now = System.currentTimeMillis();
-        initToken(now,accessTokenCache);
+        if (null == accessTokenCache) {
+            accessTokenCache = new AccessTokenCache();
+            initToken(now,accessTokenCache);
+        }
         if (enableJsApi) initJSToken(now,accessTokenCache);
     }
 
     public String getAccessToken() {
         AccessTokenCache accessTokenCache = accessTokenCacheService.getAccessTokenCache();
-        accessTokenCache = accessTokenCache == null ? new AccessTokenCache():accessTokenCache;
         long now = System.currentTimeMillis();
-        long time = now - accessTokenCache.getWeixinTokenStartTime();
         try {
-            if (time > CACHE_TIME && tokenRefreshing.compareAndSet(false, true)) {
+            if (null == accessTokenCache) {
+                accessTokenCache = new AccessTokenCache();
                 LOG.debug("准备刷新tokean.........");
                 initToken(now,accessTokenCache);
             }
@@ -76,12 +77,11 @@ public final class ClusterQYAPIConfig extends QYAPIConfig {
 
     public String getJsApiTicket() {
         AccessTokenCache accessTokenCache = accessTokenCacheService.getAccessTokenCache();
-        accessTokenCache = accessTokenCache == null ? new AccessTokenCache():accessTokenCache;
         if (enableJsApi) {
             long now = System.currentTimeMillis();
-            long time = now - accessTokenCache.getJsTokenStartTime();
             try {
-                if (time > CACHE_TIME && jsRefreshing.compareAndSet(false, true)) {
+                if (null == accessTokenCache) {
+                    accessTokenCache = new AccessTokenCache();
                     LOG.debug("准备刷新JSTokean..........");
                     initJSToken(now,accessTokenCache);
                 }
