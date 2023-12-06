@@ -88,11 +88,11 @@ public class QYAPIConfig extends Observable implements Serializable {
         long time = now - this.weixinTokenStartTime;
         try {
             if (time > CACHE_TIME && tokenRefreshing.compareAndSet(false, true)) {
-                LOG.debug("准备刷新tokean.........");
+                LOG.debug("准备刷新AccessToken.........");
                 initToken(now);
             }
         } catch (Exception e) {
-            LOG.error("刷新token异常", e);
+            LOG.error("刷新AccessToken异常", e);
             tokenRefreshing.set(false);
         }
         return accessToken;
@@ -104,12 +104,12 @@ public class QYAPIConfig extends Observable implements Serializable {
             long time = now - this.jsTokenStartTime;
             try {
                 if (now - this.jsTokenStartTime > CACHE_TIME && jsRefreshing.compareAndSet(false, true)) {
-                    LOG.debug("准备刷新JSTokean..........");
+                    LOG.debug("准备刷新JsApiTicket..........");
                     getAccessToken();
                     initJSToken(now);
                 }
             } catch (Exception e) {
-                LOG.error("刷新jsToken异常", e);
+                LOG.error("刷新JsApiTicket异常", e);
                 jsRefreshing.set(false);
             }
         } else {
