@@ -19,7 +19,7 @@ import java.util.List;
  */
 public abstract class QYBaseAPI {
 
-    protected static String BASE_API_URL = "https://qyapi.weixin.qq.com/";
+    protected String BASE_API_URL = "https://qyapi.weixin.qq.com/";
 
     protected final QYAPIConfig config;
 
