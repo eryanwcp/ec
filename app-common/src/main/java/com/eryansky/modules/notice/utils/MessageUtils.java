@@ -141,7 +141,7 @@ public class MessageUtils {
                                    String linkUrl,
                                    String receiveObjectType, Collection<String> receiveObjectIds, Date date, List<MessageChannel> messageChannels) {
         MessageReceiveObjectType m = MessageReceiveObjectType.getByValue(receiveObjectType);
-        return sendMessage(appId, sender, null,null, content,null, linkUrl, m, receiveObjectIds, date, messageChannels);
+        return sendMessage(appId, sender, null,null, null,content, linkUrl, m, receiveObjectIds, date, messageChannels);
     }
 
 
