@@ -216,13 +216,13 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>7.7.1</version>
+            <version>7.8.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mybatis.dynamic-sql</groupId>
             <artifactId>mybatis-dynamic-sql</artifactId>
-            <version>1.4.1</version>
+            <version>1.5.0</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
