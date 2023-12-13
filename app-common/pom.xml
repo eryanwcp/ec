@@ -15,7 +15,7 @@
     <description>web</description>
 
     <properties>
-        <poi.version>5.2.3</poi.version>
+        <poi.version>5.2.5</poi.version>
         <xwpf.version>2.0.4</xwpf.version>
         <bsh.version>2.0b6</bsh.version>
 
@@ -108,12 +108,6 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
             <version>${poi.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-codec</groupId>
-                    <artifactId>commons-codec</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>

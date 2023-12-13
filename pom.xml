@@ -36,7 +36,7 @@
 
         <spring-boot.version>2.7.18</spring-boot.version>
         <spring-integration-redis.version>5.5.20</spring-integration-redis.version>
-        <logback.version>7.3</logback.version>
+        <logback.version>7.4</logback.version>
         <byte-buddy.version>1.14.2</byte-buddy.version>
 
         <tomcat.version>9.0.83</tomcat.version>
@@ -50,7 +50,7 @@
         <oscar.driver.version>4.0.2</oscar.driver.version>
 
         <httpcomponents.version>4.5.14</httpcomponents.version>
-        <commons-codec.version>1.15</commons-codec.version>
+        <commons-codec.version>1.16.0</commons-codec.version>
 
 
         <ec-common.version>4.2.20231124.06</ec-common.version>
