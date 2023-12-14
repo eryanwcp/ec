@@ -460,8 +460,6 @@ public class SecurityUtils {
         sessionInfo.setUserAgent(UserAgentUtils.getHTTPUserAgent(request));
 
         sessionInfo.setBrowserType(UserAgentUtils.getBrowser(request).getName());
-        String deviceCode = WebUtils.getParameter(request, "deviceCode");
-        sessionInfo.setDeviceCode(deviceCode);
         String longitude_s = WebUtils.getParameter(request, "longitude");
         String latitude_s = WebUtils.getParameter(request, "latitude");
         String accuracy_s = WebUtils.getParameter(request, "accuracy");
