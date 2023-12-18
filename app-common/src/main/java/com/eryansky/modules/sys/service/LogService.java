@@ -17,6 +17,7 @@ import com.eryansky.core.orm.mybatis.service.CrudService;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.modules.sys.dao.LogDao;
 import com.eryansky.modules.sys.mapper.Log;
+import com.eryansky.modules.sys.mapper.Organ;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Maps;
@@ -318,9 +319,22 @@ public class LogService extends CrudService<LogDao, Log> {
      * @return
      */
     public List<Log> findByWhereSQL(String whereSQL) {
-        Parameter parameter = Parameter.newParameter();
-        parameter.put("whereSQL", whereSQL);
-        return dao.findByWhereSQL(parameter);
+        return findByWhereSQL(whereSQL,null);
+    }
+
+    /**
+     * 自定义SQL查询
+     *
+     * @param whereSQL
+     * @return
+     */
+    public List<Log> findByWhereSQL(String whereSQL,Parameter parameter) {
+        Parameter _parameter = parameter;
+        if(null == _parameter){
+            _parameter = Parameter.newParameter();
+        }
+        _parameter.put("whereSQL", whereSQL);
+        return dao.findByWhereSQL(_parameter);
     }
 
     /**
@@ -330,9 +344,7 @@ public class LogService extends CrudService<LogDao, Log> {
      * @return
      */
     public List<Log> findBySql(String sql) {
-        Parameter parameter = Parameter.newParameter();
-        parameter.put("sql", sql);
-        return dao.findBySql(parameter);
+        return findBySql(sql,null);
     }
 
     /**
@@ -342,10 +354,11 @@ public class LogService extends CrudService<LogDao, Log> {
      * @return
      */
     public List<Log> findBySql(String sql,Parameter parameter) {
-        if(null == parameter){
-            parameter = Parameter.newParameter();
+        Parameter _parameter = parameter;
+        if(null == _parameter){
+            _parameter = Parameter.newParameter();
         }
-        parameter.put("sql", sql);
-        return dao.findBySql(parameter);
+        _parameter.put("sql", sql);
+        return dao.findBySql(_parameter);
     }
 }

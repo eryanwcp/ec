@@ -12,6 +12,7 @@ import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
 import com.eryansky.modules.sys._enum.RoleType;
 import com.eryansky.modules.sys._enum.YesOrNo;
+import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.utils.CacheConstants;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -285,9 +286,22 @@ public class RoleService extends CrudService<RoleDao, Role> {
      * @return
      */
     public List<Role> findByWhereSQL(String whereSQL) {
-        Parameter parameter = Parameter.newParameter();
-        parameter.put("whereSQL", whereSQL);
-        return dao.findByWhereSQL(parameter);
+        return findByWhereSQL(whereSQL,null);
+    }
+
+    /**
+     * 自定义SQL查询
+     *
+     * @param whereSQL
+     * @return
+     */
+    public List<Role> findByWhereSQL(String whereSQL,Parameter parameter) {
+        Parameter _parameter = parameter;
+        if(null == _parameter){
+            _parameter = Parameter.newParameter();
+        }
+        _parameter.put("whereSQL", whereSQL);
+        return dao.findByWhereSQL(_parameter);
     }
 
     /**
@@ -297,9 +311,22 @@ public class RoleService extends CrudService<RoleDao, Role> {
      * @return
      */
     public List<Role> findBySql(String sql) {
-        Parameter parameter = Parameter.newParameter();
-        parameter.put("sql", sql);
-        return dao.findBySql(parameter);
+        return findBySql(sql,null);
+    }
+
+    /**
+     * 自定义SQL查询
+     *
+     * @param sql
+     * @return
+     */
+    public List<Role> findBySql(String sql,Parameter parameter) {
+        Parameter _parameter = parameter;
+        if(null == _parameter){
+            _parameter = Parameter.newParameter();
+        }
+        _parameter.put("sql", sql);
+        return dao.findBySql(_parameter);
     }
 
 

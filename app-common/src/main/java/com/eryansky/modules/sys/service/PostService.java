@@ -10,6 +10,7 @@ import com.eryansky.common.orm.model.Parameter;
 import com.eryansky.common.orm.mybatis.interceptor.BaseInterceptor;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
+import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.utils.AppConstants;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -201,9 +202,22 @@ public class PostService extends CrudService<PostDao, Post> {
      * @return
      */
     public List<Post> findByWhereSQL(String whereSQL) {
-        Parameter parameter = Parameter.newParameter();
-        parameter.put("whereSQL", whereSQL);
-        return dao.findByWhereSQL(parameter);
+        return findByWhereSQL(whereSQL,null);
+    }
+
+    /**
+     * 自定义SQL查询
+     *
+     * @param whereSQL
+     * @return
+     */
+    public List<Post> findByWhereSQL(String whereSQL,Parameter parameter) {
+        Parameter _parameter = parameter;
+        if(null == _parameter){
+            _parameter = Parameter.newParameter();
+        }
+        _parameter.put("whereSQL", whereSQL);
+        return dao.findByWhereSQL(_parameter);
     }
 
     /**
@@ -213,9 +227,22 @@ public class PostService extends CrudService<PostDao, Post> {
      * @return
      */
     public List<Post> findBySql(String sql) {
-        Parameter parameter = Parameter.newParameter();
-        parameter.put("sql", sql);
-        return dao.findBySql(parameter);
+        return findBySql(sql,null);
+    }
+
+    /**
+     * 自定义SQL查询
+     *
+     * @param sql
+     * @return
+     */
+    public List<Post> findBySql(String sql,Parameter parameter) {
+        Parameter _parameter = parameter;
+        if(null == _parameter){
+            _parameter = Parameter.newParameter();
+        }
+        _parameter.put("sql", sql);
+        return dao.findBySql(_parameter);
     }
 
     /**

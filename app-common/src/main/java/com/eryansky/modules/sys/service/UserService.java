@@ -2080,9 +2080,22 @@ public class UserService extends CrudService<UserDao, User> {
      * @return
      */
     public List<User> findByWhereSQL(String whereSQL) {
-        Parameter parameter = Parameter.newParameter();
-        parameter.put("whereSQL", whereSQL);
-        return dao.findByWhereSQL(parameter);
+        return findByWhereSQL(whereSQL,null);
+    }
+
+    /**
+     * 自定义SQL查询
+     *
+     * @param whereSQL
+     * @return
+     */
+    public List<User> findByWhereSQL(String whereSQL,Parameter parameter) {
+        Parameter _parameter = parameter;
+        if(null == _parameter){
+            _parameter = Parameter.newParameter();
+        }
+        _parameter.put("whereSQL", whereSQL);
+        return dao.findByWhereSQL(_parameter);
     }
 
     /**
@@ -2092,9 +2105,7 @@ public class UserService extends CrudService<UserDao, User> {
      * @return
      */
     public List<User> findBySql(String sql) {
-        Parameter parameter = Parameter.newParameter();
-        parameter.put("sql", sql);
-        return dao.findBySql(parameter);
+        return findBySql(sql,null);
     }
 
     /**
@@ -2104,11 +2115,12 @@ public class UserService extends CrudService<UserDao, User> {
      * @return
      */
     public List<User> findBySql(String sql,Parameter parameter) {
-        if(null == parameter){
-          parameter = Parameter.newParameter();
+        Parameter _parameter = parameter;
+        if(null == _parameter){
+            _parameter = Parameter.newParameter();
         }
-        parameter.put("sql", sql);
-        return dao.findBySql(parameter);
+        _parameter.put("sql", sql);
+        return dao.findBySql(_parameter);
     }
 
     /**

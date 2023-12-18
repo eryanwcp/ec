@@ -12,6 +12,7 @@ import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.core.orm.mybatis.service.CrudService;
 import com.eryansky.modules.sys.dao.DictionaryDao;
 import com.eryansky.modules.sys.mapper.Dictionary;
+import com.eryansky.modules.sys.mapper.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -126,9 +127,22 @@ public class DictionaryService extends CrudService<DictionaryDao, Dictionary> {
      * @return
      */
     public List<Dictionary> findByWhereSQL(String whereSQL) {
-        Parameter parameter = Parameter.newParameter();
-        parameter.put("whereSQL", whereSQL);
-        return dao.findByWhereSQL(parameter);
+        return findByWhereSQL(whereSQL,null);
+    }
+
+    /**
+     * 自定义SQL查询
+     *
+     * @param whereSQL
+     * @return
+     */
+    public List<Dictionary> findByWhereSQL(String whereSQL,Parameter parameter) {
+        Parameter _parameter = parameter;
+        if(null == _parameter){
+            _parameter = Parameter.newParameter();
+        }
+        _parameter.put("whereSQL", whereSQL);
+        return dao.findByWhereSQL(_parameter);
     }
 
     /**
@@ -138,8 +152,21 @@ public class DictionaryService extends CrudService<DictionaryDao, Dictionary> {
      * @return
      */
     public List<Dictionary> findBySql(String sql) {
-        Parameter parameter = Parameter.newParameter();
-        parameter.put("sql", sql);
-        return dao.findBySql(parameter);
+        return findBySql(sql,null);
+    }
+
+    /**
+     * 自定义SQL查询
+     *
+     * @param sql
+     * @return
+     */
+    public List<Dictionary> findBySql(String sql,Parameter parameter) {
+        Parameter _parameter = parameter;
+        if(null == _parameter){
+            _parameter = Parameter.newParameter();
+        }
+        _parameter.put("sql", sql);
+        return dao.findBySql(_parameter);
     }
 }

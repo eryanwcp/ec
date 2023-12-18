@@ -18,6 +18,7 @@ import com.eryansky.core.orm.mybatis.entity.DataEntity;
 import com.eryansky.core.orm.mybatis.service.TreeService;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.modules.sys._enum.ResourceType;
+import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.AppUtils;
 import com.eryansky.utils.CacheConstants;
@@ -843,9 +844,22 @@ public class ResourceService extends TreeService<ResourceDao, Resource> {
      * @return
      */
     public List<Resource> findByWhereSQL(String whereSQL) {
-        Parameter parameter = Parameter.newParameter();
-        parameter.put("whereSQL", whereSQL);
-        return dao.findByWhereSQL(parameter);
+        return findByWhereSQL(whereSQL,null);
+    }
+
+    /**
+     * 自定义SQL查询
+     *
+     * @param whereSQL
+     * @return
+     */
+    public List<Resource> findByWhereSQL(String whereSQL,Parameter parameter) {
+        Parameter _parameter = parameter;
+        if(null == _parameter){
+            _parameter = Parameter.newParameter();
+        }
+        _parameter.put("whereSQL", whereSQL);
+        return dao.findByWhereSQL(_parameter);
     }
 
     /**
@@ -855,9 +869,22 @@ public class ResourceService extends TreeService<ResourceDao, Resource> {
      * @return
      */
     public List<Resource> findBySql(String sql) {
-        Parameter parameter = Parameter.newParameter();
-        parameter.put("sql", sql);
-        return dao.findBySql(parameter);
+        return findBySql(sql,null);
+    }
+
+    /**
+     * 自定义SQL查询
+     *
+     * @param sql
+     * @return
+     */
+    public List<Resource> findBySql(String sql,Parameter parameter) {
+        Parameter _parameter = parameter;
+        if(null == _parameter){
+            _parameter = Parameter.newParameter();
+        }
+        _parameter.put("sql", sql);
+        return dao.findBySql(_parameter);
     }
 
 
