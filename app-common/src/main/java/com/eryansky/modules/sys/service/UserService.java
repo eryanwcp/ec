@@ -445,6 +445,35 @@ public class UserService extends CrudService<UserDao, User> {
         return dao.getUserByIdOrMobile(parameter);
     }
 
+
+
+    /**
+     * 根据信息分类编码查找.
+     * @param bizCode 信息分类编码
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public User getUserByBizCode(String bizCode) {
+        return getUserByBizCode(bizCode,DataEntity.STATUS_NORMAL);
+    }
+
+    /**
+     * 根据信息分类编码查找.
+     * @param bizCode 信息分类编码
+     * @param status
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public User getUserByBizCode(String bizCode, String status) {
+        Assert.notNull(bizCode, "参数[bizCode]不能为空!");
+        Parameter parameter = new Parameter();
+        parameter.put(DataEntity.FIELD_STATUS, status);
+        parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
+        parameter.put("bizCode", bizCode);
+        return dao.getUserByBizCode(parameter);
+    }
+
+
     /**
      * 根据编号查找.
      * <br>注：排除已删除的对象
@@ -2064,6 +2093,20 @@ public class UserService extends CrudService<UserDao, User> {
      */
     public List<User> findBySql(String sql) {
         Parameter parameter = Parameter.newParameter();
+        parameter.put("sql", sql);
+        return dao.findBySql(parameter);
+    }
+
+    /**
+     * 自定义SQL查询
+     *
+     * @param sql
+     * @return
+     */
+    public List<User> findBySql(String sql,Parameter parameter) {
+        if(null == parameter){
+          parameter = Parameter.newParameter();
+        }
         parameter.put("sql", sql);
         return dao.findBySql(parameter);
     }

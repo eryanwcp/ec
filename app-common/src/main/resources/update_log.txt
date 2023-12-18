@@ -1,4 +1,30 @@
-﻿20231204
+﻿20231218
+V4.2.20231124.09
+1、用户、组织增加信息分类编码以及自定义扩展数据。
+
+ALTER TABLE t_sys_user ADD COLUMN biz_code varchar(64) COMMENT '信息分类编码';
+ALTER TABLE t_sys_user ADD COLUMN extend_attr text COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}';
+ALTER TABLE t_sys_organ ADD COLUMN biz_code varchar(64) COMMENT '信息分类编码';
+ALTER TABLE t_sys_organ ADD COLUMN extend_attr text COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}';
+ALTER TABLE t_sys_organ_extend ADD COLUMN biz_code varchar(64) COMMENT '信息分类编码';
+ALTER TABLE t_sys_organ_extend ADD COLUMN extend_attr text COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}';
+2、日志增加自定义扩展数据。
+ALTER TABLE t_sys_log ADD COLUMN extend_attr text COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}';
+ALTER TABLE t_sys_log_history ADD COLUMN extend_attr text COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}';
+
+需在mybatis-config.xml添加如下内容
+    <typeHandlers>
+		<typeHandler javaType="com.eryansky.modules.sys.vo.ExtendAttr" handler="com.eryansky.core.orm.mybatis.type.ExtendAttrJsonTypeHandler"/>
+	</typeHandlers>
+
+扩展属性自定义查询示例：
+    //SQL语句
+    SELECT * FROM t_sys_user a WHERE JSON_EXTRACT(a.extend_attr,'$.key1') = 'data1'
+    String sql = "WHERE JSON_EXTRACT(a.extend_attr,'$.key1') = 'data1'";
+    List<User> users = userService.findBySql(sql);
+
+
+20231204
 V4.2.20231124.03
 1、登录密码加密传输；
 

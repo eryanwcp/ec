@@ -90,6 +90,8 @@ public interface OrganDao extends TreeDao<Organ> {
 
     Organ getBySysCode(Parameter parameter);
 
+    Organ getByBizCode(Parameter parameter);
+
     int deleteOwnerAndChilds(Organ entity);
 
 //    机构扩展表信息

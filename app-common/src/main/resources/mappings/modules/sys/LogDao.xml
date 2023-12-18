@@ -25,7 +25,8 @@
 		a.exception AS "exception",
 		u.name AS "userName",
 		a.longitude AS "longitude",
-		a.latitude AS "latitude"
+		a.latitude AS "latitude",
+		a.extend_attr AS "extendAttr"
 	</sql>
 
     <sql id="sysLogJoins">
@@ -437,6 +438,23 @@
         a.module = #{module} LIMIT 1;
     </select>
 
+    <select id="findByWhereSQL" resultType="Log">
+        SELECT
+        <include refid="sysLogColumns"/>
+        FROM t_sys_log a
+        <where>
+            ${whereSQL}
+        </where>
+    </select>
+
+
+    <select id="findBySql" resultType="Log">
+        SELECT
+        <include refid="sysLogColumns"/>
+        FROM t_sys_log a
+        ${sql}
+    </select>
+
     <insert id="insert">
 		INSERT INTO t_sys_log(
 		id,
@@ -460,7 +478,8 @@
 		remark,
 		exception,
 		longitude,
-		latitude
+		latitude,
+        extend_attr
 		) VALUES (
 		#{id},
 		#{status},
@@ -483,7 +502,8 @@
 		#{remark},
 		#{exception},
 		#{longitude},
-		#{latitude}
+		#{latitude},
+		#{extendAttr}
 		)
 	</insert>
     <insert id="insertBatch">
@@ -509,7 +529,8 @@
 		remark,
 		exception,
 		longitude,
-		latitude
+		latitude,
+        extend_attr
 		) VALUES <foreach collection="list" item="item" separator=",">(
 		#{item.id},
 		#{item.status},
@@ -532,7 +553,8 @@
 		#{item.remark},
 		#{item.exception},
 		#{item.longitude},
-		#{item.latitude}
+		#{item.latitude},
+		#{item.extendAttr}
         )</foreach>
 	</insert>
 
@@ -554,7 +576,8 @@
 		remark = #{remark},
 		exception = #{exception},
 		longitude = #{longitude},
-		latitude = #{latitude}
+		latitude = #{latitude},
+        extend_attr = #{extendAttr}
 		WHERE id = #{id}
 	</update>
 
@@ -615,7 +638,8 @@
 		remark,
 		exception,
 		longitude,
-		latitude
+		latitude,
+        extend_attr
 		) SELECT id,
 		status,
 		version,
@@ -637,7 +661,8 @@
 		remark,
 		exception,
 		longitude,
-		latitude
+		latitude,
+        extend_attr
 		FROM t_sys_log
 		<where>
 			<if test="createTime != null ">

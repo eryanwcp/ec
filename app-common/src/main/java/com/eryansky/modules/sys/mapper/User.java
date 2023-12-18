@@ -23,9 +23,12 @@ import com.eryansky.modules.sys._enum.OrganType;
 import com.eryansky.modules.sys._enum.SexType;
 import com.eryansky.modules.sys._enum.UserType;
 import com.eryansky.modules.sys.utils.DictionaryUtils;
+import com.eryansky.modules.sys.utils.ExtendAttrSerializer;
 import com.eryansky.modules.sys.utils.UserUtils;
+import com.eryansky.modules.sys.vo.ExtendAttr;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.Date;
 
@@ -50,6 +53,10 @@ public class User extends DataEntity<User> implements IUser {
      * 员工编号
      */
     private String code;
+    /**
+     * 分类编码
+     */
+    private String bizCode;
     /**
      * 职务
      */
@@ -122,6 +129,10 @@ public class User extends DataEntity<User> implements IUser {
      * 备注
      */
     private String remark;
+    /**
+     * 自定义扩展数据
+     */
+    private ExtendAttr extendAttr;
 
     //扩展信息
     /**
@@ -178,6 +189,14 @@ public class User extends DataEntity<User> implements IUser {
 
     public String getPosition() {
         return position;
+    }
+
+    public String getBizCode() {
+        return bizCode;
+    }
+
+    public void setBizCode(String bizCode) {
+        this.bizCode = bizCode;
     }
 
     public void setPosition(String position) {
@@ -319,6 +338,15 @@ public class User extends DataEntity<User> implements IUser {
 
     public String getRemark() {
         return this.remark;
+    }
+
+    @JsonSerialize(using = ExtendAttrSerializer.class)
+    public ExtendAttr getExtendAttr() {
+        return extendAttr;
+    }
+
+    public void setExtendAttr(ExtendAttr extendAttr) {
+        this.extendAttr = extendAttr;
     }
 
     public void setWeixin(String weixin) {

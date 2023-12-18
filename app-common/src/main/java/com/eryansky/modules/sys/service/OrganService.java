@@ -186,14 +186,54 @@ public class OrganService extends TreeService<OrganDao, Organ> {
      * @return
      */
     public Organ getBySysCode(String sysCode) {
+        return getBySysCode(sysCode,DataEntity.STATUS_NORMAL);
+    }
+
+    /**
+     * 根据系统编码得到Organ.
+     *
+     * @param sysCode 机构系统编码
+     * @param status
+     * @return
+     */
+    public Organ getBySysCode(String sysCode,String status) {
         if (StringUtils.isBlank(sysCode)) {
             return null;
         }
         Parameter parameter = new Parameter();
-        parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
+        parameter.put(DataEntity.FIELD_STATUS, status);
         parameter.put("sysCode", sysCode);
         return dao.getBySysCode(parameter);
     }
+
+
+    /**
+     * 根据系统编码得到Organ.
+     *
+     * @param sysCode 机构系统编码
+     * @return
+     */
+    public Organ getByBizCode(String bizCode) {
+        return getByBizCode(bizCode,DataEntity.STATUS_NORMAL);
+    }
+
+    /**
+     * 根据信息分类编码得到Organ.
+     *
+     * @param bizCode 信息分类编码
+     * @param status
+     * @return
+     */
+    public Organ getByBizCode(String bizCode,String status) {
+        if (StringUtils.isBlank(bizCode)) {
+            return null;
+        }
+        Parameter parameter = new Parameter();
+        parameter.put(DataEntity.FIELD_STATUS, status);
+        parameter.put("bizCode", bizCode);
+        return dao.getByBizCode(parameter);
+    }
+
 
 
     /**
@@ -1254,6 +1294,20 @@ public class OrganService extends TreeService<OrganDao, Organ> {
      */
     public List<Organ> findBySql(String sql) {
         Parameter parameter = Parameter.newParameter();
+        parameter.put("sql", sql);
+        return dao.findBySql(parameter);
+    }
+
+    /**
+     * 自定义SQL查询
+     *
+     * @param sql
+     * @return
+     */
+    public List<Organ> findBySql(String sql,Parameter parameter) {
+        if(null == parameter){
+            parameter = Parameter.newParameter();
+        }
         parameter.put("sql", sql);
         return dao.findBySql(parameter);
     }

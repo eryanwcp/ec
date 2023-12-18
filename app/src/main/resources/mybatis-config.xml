@@ -47,6 +47,8 @@
 	<typeHandlers>
 		<typeHandler javaType="com.eryansky.modules.sys.sn.MaxSerial"
 					 handler="com.eryansky.common.orm.mybatis.type.JsonTypeHandler"/>
+		<typeHandler javaType="com.eryansky.modules.sys.vo.ExtendAttr"
+					 handler="com.eryansky.core.orm.mybatis.type.ExtendAttrJsonTypeHandler"/>
 	</typeHandlers>
 
 	<!-- 插件配置 -->

@@ -17,6 +17,7 @@ import com.eryansky.core.orm.mybatis.service.CrudService;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.modules.sys.dao.LogDao;
 import com.eryansky.modules.sys.mapper.Log;
+import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Maps;
 import org.springframework.stereotype.Service;
@@ -307,5 +308,44 @@ public class LogService extends CrudService<LogDao, Log> {
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
         List<Map<String, Object>> list = dao.getDayLoginStatistics(parameter);
         return list;
+    }
+
+
+    /**
+     * 自定义SQL查询
+     *
+     * @param whereSQL
+     * @return
+     */
+    public List<Log> findByWhereSQL(String whereSQL) {
+        Parameter parameter = Parameter.newParameter();
+        parameter.put("whereSQL", whereSQL);
+        return dao.findByWhereSQL(parameter);
+    }
+
+    /**
+     * 自定义SQL查询
+     *
+     * @param sql
+     * @return
+     */
+    public List<Log> findBySql(String sql) {
+        Parameter parameter = Parameter.newParameter();
+        parameter.put("sql", sql);
+        return dao.findBySql(parameter);
+    }
+
+    /**
+     * 自定义SQL查询
+     *
+     * @param sql
+     * @return
+     */
+    public List<Log> findBySql(String sql,Parameter parameter) {
+        if(null == parameter){
+            parameter = Parameter.newParameter();
+        }
+        parameter.put("sql", sql);
+        return dao.findBySql(parameter);
     }
 }

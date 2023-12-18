@@ -93,4 +93,21 @@ public interface LogDao extends CrudDao<Log> {
      */
     List<Map<String, Object>> getDayLoginStatistics(Map<String, Object> parameter);
 
+
+    /**
+     * 自定义SQL查询
+     *
+     * @param parameter
+     * @return
+     */
+    List<Log> findByWhereSQL(Parameter parameter);
+
+    /**
+     * 自定义SQL查询
+     *
+     * @param parameter
+     * @return
+     */
+    List<Log> findBySql(Parameter parameter);
+
 }

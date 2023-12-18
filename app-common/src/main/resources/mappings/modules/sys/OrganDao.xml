@@ -18,6 +18,8 @@
         a.SHORT_NAME AS "shortName",
         a.TYPE AS "type",
         a.CODE AS "code",
+        a.biz_code AS "bizCode",
+        a.extend_attr AS "extendAttr",
         a.SYS_CODE AS "sysCode",
         a.ADDRESS AS "address",
         a.MOBILE AS "mobile",
@@ -143,7 +145,26 @@
         <include refid="organColumns"/>
         FROM t_sys_organ a
         <include refid="organJoins"/>
-        WHERE a.status = '0' AND a.sys_code = #{code}
+        <where>
+            a.sys_code = #{sysCode}
+            <if test="status != null and status !=''">
+                AND a.status = #{status}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="getByBizCode" resultType="Organ">
+        SELECT
+        <include refid="organColumns"/>
+        FROM t_sys_organ a
+        <include refid="organJoins"/>
+        <where>
+            a.biz_code = #{bizCode}
+            <if test="status != null and status !=''">
+                AND a.status = #{status}
+            </if>
+        </where>
     </select>
 
     <select id="findList" resultType="Organ">
@@ -580,6 +601,8 @@
         SHORT_NAME,
         TYPE,
         CODE,
+        biz_code,
+        extend_attr,
         SYS_CODE,
         ADDRESS,
         MOBILE,
@@ -605,6 +628,8 @@
         #{shortName},
         #{type},
         #{code},
+        #{bizCode},
+        #{extendAttr},
         #{sysCode},
         #{address},
         #{mobile},
@@ -633,6 +658,8 @@
         SHORT_NAME,
         TYPE,
         CODE,
+        biz_code,
+        extend_attr,
         SYS_CODE,
         ADDRESS,
         MOBILE,
@@ -658,6 +685,8 @@
         #{item.shortName},
         #{item.type},
         #{item.code},
+        #{item.bizCode},
+        #{item.extendAttr},
         #{item.sysCode},
         #{item.address},
         #{item.mobile},
@@ -684,6 +713,8 @@
         SHORT_NAME = #{shortName},
         TYPE = #{type},
         CODE = #{code},
+        biz_code = #{bizCode},
+        extend_attr = #{extendAttr},
         SYS_CODE = #{sysCode},
         ADDRESS = #{address},
         MOBILE = #{mobile},
@@ -744,6 +775,8 @@
         a.SHORT_NAME AS "shortName",
         a.TYPE AS "type",
         a.CODE AS "code",
+        a.biz_code AS "bizCode",
+        a.extend_attr AS "extendAttr",
         a.SYS_CODE AS "sysCode",
         a.ADDRESS AS "address",
         a.MOBILE AS "mobile",

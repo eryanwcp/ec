@@ -16,6 +16,8 @@
         a.version AS "version",
         a.LOGIN_NAME AS "loginName",
         a.CODE AS "code",
+        a.biz_code AS "bizCode",
+        a.extend_attr AS "extendAttr",
         a.position AS "position",
         a.ORIGINAL_PASSWORD AS "originalPassword",
         a.PASSWORD AS "password",
@@ -95,10 +97,10 @@
         <include refid="userColumns"/>
         FROM t_sys_user a
         <where>
+            a.login_name = #{loginName}
             <if test="status != null and status !=''">
                 AND a.status = #{status}
             </if>
-            AND a.login_name = #{loginName}
         </where>
         LIMIT 1
     </select>
@@ -108,10 +110,10 @@
         <include refid="userColumns"/>
         FROM t_sys_user a
         <where>
+            a.mobile = #{mobile}
             <if test="status != null and status !=''">
                 AND a.status = #{status}
             </if>
-            AND a.mobile = #{mobile}
         </where>
     </select>
 
@@ -121,10 +123,10 @@
         <include refid="userColumns"/>
         FROM t_sys_user a
         <where>
+            (a.id = #{idOrMobile} OR a.login_name = #{idOrMobile} OR a.mobile = #{idOrMobile})
             <if test="status != null and status !=''">
                 AND a.status = #{status}
             </if>
-            AND (a.id = #{idOrMobile} OR a.login_name = #{idOrMobile} OR a.mobile = #{idOrMobile})
         </where>
     </select>
 
@@ -133,10 +135,10 @@
         <include refid="userColumns"/>
         FROM t_sys_user a
         <where>
+            (a.id = #{idOrLoginName} OR a.login_name = #{idOrLoginName})
             <if test="status != null and status !=''">
                 AND a.status = #{status}
             </if>
-            AND (a.id = #{idOrLoginName} OR a.login_name = #{idOrLoginName})
         </where>
     </select>
 
@@ -146,10 +148,22 @@
         <include refid="userColumns"/>
         FROM t_sys_user a
         <where>
+            (a.login_name = #{loginNameOrMobile} OR a.mobile = #{loginNameOrMobile})
             <if test="status != null and status !=''">
                 AND a.status = #{status}
             </if>
-            AND (a.login_name = #{loginNameOrMobile} OR a.mobile = #{loginNameOrMobile})
+        </where>
+    </select>
+
+    <select id="getUserByBizCode" resultType="User">
+        SELECT
+        <include refid="userColumns"/>
+        FROM t_sys_user a
+        <where>
+            a.biz_code = #{bizCode}
+            <if test="status != null and status !=''">
+                AND a.status = #{status}
+            </if>
         </where>
     </select>
 
@@ -1130,6 +1144,8 @@
         update_time,
         LOGIN_NAME,
         CODE,
+        biz_code,
+        extend_attr,
         position,
         ORIGINAL_PASSWORD,
         PASSWORD,
@@ -1158,6 +1174,8 @@
         #{updateTime},
         #{loginName},
         #{code},
+        #{bizCode},
+        #{extendAtrr},
         #{position},
         #{originalPassword},
         #{password},
@@ -1191,6 +1209,8 @@
             update_time,
             LOGIN_NAME,
             CODE,
+            biz_code,
+            extend_attr,
             position,
             ORIGINAL_PASSWORD,
             PASSWORD,
@@ -1219,6 +1239,8 @@
             #{item.updateTime},
             #{item.loginName},
             #{item.code},
+            #{item.bizCode},
+            #{item.extendAttr},
             #{item.position},
             #{item.originalPassword},
             #{item.password},
@@ -1248,6 +1270,8 @@
         update_time = #{updateTime},
         LOGIN_NAME = #{loginName},
         CODE = #{code},
+        biz_code = #{bizCode},
+        extend_attr = #{extendAttr},
         position = #{position},
         ORIGINAL_PASSWORD = #{originalPassword},
         PASSWORD = #{password},
@@ -1365,7 +1389,6 @@
         </foreach>
     </insert>
 
-
     <select id="findUsersByResourceId" resultType="User">
         SELECT
         <include refid="userColumns"/>
@@ -1375,7 +1398,6 @@
             AND  a.id IN ( SELECT user_id FROM t_sys_user_resource WHERE resource_id = #{resourceId})
         </where>
     </select>
-
 
     <delete id="deleteUserResourceByResourceIdAndUserId">
         DELETE FROM t_sys_user_resource WHERE resource_id = #{resourceId} AND user_id = #{userId}

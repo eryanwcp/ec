@@ -5,12 +5,15 @@ import com.eryansky.common.utils.encode.Encrypt;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.modules.sys.dao.VersionLogDao;
 import com.eryansky.modules.sys.mapper.OrganExtend;
+import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.mapper.VersionLog;
 import com.eryansky.modules.sys.service.*;
 import com.eryansky.modules.sys.utils.OrganUtils;
 import com.eryansky.modules.sys.utils.SystemSerialNumberUtils;
 import com.eryansky.modules.sys.utils.UserUtils;
+import com.eryansky.modules.sys.vo.ExtendAttr;
 import com.google.common.collect.Maps;
+import org.apache.commons.compress.utils.Lists;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mybatis.dynamic.sql.render.RenderingStrategies;
@@ -19,10 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.eryansky.modules.sys.mapper.VersionLogDynamicSqlSupport.*;
 import static org.mybatis.dynamic.sql.SqlBuilder.isEqualTo;
@@ -45,6 +45,27 @@ public class ApplicationTests {
 
     @Test
     public void contextLoads() {
+
+    }
+
+
+    @Test
+    public void extendAttr() {
+        User user = userService.getUserByLoginName("admin");
+        System.out.println(JsonMapper.toJsonString(user));
+        ExtendAttr extendAttr = new ExtendAttr();
+        extendAttr.addOrUpdate("key1","data1");
+        extendAttr.addOrUpdate("key2", Arrays.asList("1","2"));
+        user.setExtendAttr(extendAttr);
+        userService.save(user);
+        user = userService.getUserByLoginName("admin");
+        System.out.println(JsonMapper.toJsonString(user));
+        //SELECT * FROM t_sys_user a WHERE JSON_EXTRACT(a.extend_attr,'$.key1') = 'data1'
+        String sql = "WHERE JSON_EXTRACT(a.extend_attr,'$.key1') = 'data1'";
+
+        List<User> users = userService.findBySql(sql);
+        System.out.println(JsonMapper.toJsonString(users));
+
     }
 
 

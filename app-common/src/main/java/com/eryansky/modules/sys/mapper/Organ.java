@@ -13,11 +13,14 @@ import com.eryansky.core.orm.mybatis.entity.TreeEntity;
 import com.eryansky.modules.sys._enum.OrganType;
 import com.eryansky.modules.sys._enum.ResourceType;
 import com.eryansky.modules.sys.utils.DictionaryUtils;
+import com.eryansky.modules.sys.utils.ExtendAttrSerializer;
 import com.eryansky.modules.sys.utils.OrganUtils;
 import com.eryansky.modules.sys.utils.UserUtils;
+import com.eryansky.modules.sys.vo.ExtendAttr;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * 机构
@@ -42,6 +45,10 @@ public class Organ extends TreeEntity<Organ> {
      * 机构编码
      */
     private String code;
+    /**
+     * 分类编码
+     */
+    private String bizCode;
     /**
      * 机构系统编码
      */
@@ -82,6 +89,10 @@ public class Organ extends TreeEntity<Organ> {
      * 备注
      */
     private String remark;
+    /**
+     * 自定义扩展数据
+     */
+    private ExtendAttr extendAttr;
 
     public Organ() {
     }
@@ -131,6 +142,14 @@ public class Organ extends TreeEntity<Organ> {
 
     public String getCode() {
         return this.code;
+    }
+
+    public String getBizCode() {
+        return bizCode;
+    }
+
+    public void setBizCode(String bizCode) {
+        this.bizCode = bizCode;
     }
 
     public void setSysCode(String sysCode) {
@@ -211,6 +230,15 @@ public class Organ extends TreeEntity<Organ> {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    @JsonSerialize(using = ExtendAttrSerializer.class)
+    public ExtendAttr getExtendAttr() {
+        return extendAttr;
+    }
+
+    public void setExtendAttr(ExtendAttr extendAttr) {
+        this.extendAttr = extendAttr;
     }
 
     @Override

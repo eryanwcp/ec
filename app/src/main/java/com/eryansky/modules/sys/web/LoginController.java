@@ -43,7 +43,6 @@ import com.eryansky.modules.sys.mapper.Resource;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Sets;
-import com.oracle.wls.shaded.org.apache.regexp.RE;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -692,7 +691,7 @@ public class LoginController extends SimpleController {
     public Result sessionInfo(Boolean reload) {
         Result result = Result.successResult();
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
-        if (null != reload && reload) {
+        if (null != reload && reload && null != sessionInfo) {
             SecurityUtils.reloadSession(sessionInfo.getUserId());
             sessionInfo = SecurityUtils.getCurrentSessionInfo();
         }

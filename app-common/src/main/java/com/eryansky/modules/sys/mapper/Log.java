@@ -8,11 +8,14 @@ package com.eryansky.modules.sys.mapper;
 import com.eryansky.common.orm._enum.GenericEnumUtils;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.modules.sys._enum.OrganType;
+import com.eryansky.modules.sys.utils.ExtendAttrSerializer;
+import com.eryansky.modules.sys.vo.ExtendAttr;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
 import com.eryansky.modules.sys._enum.LogType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.eryansky.modules.sys.utils.UserUtils;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -117,6 +120,10 @@ public class Log extends DataEntity<Log> {
      * 结束时间
      */
     private Long endTime;
+    /**
+     * 自定义扩展数据
+     */
+    private ExtendAttr extendAttr;
 
     public Log() {
         super();
@@ -329,5 +336,14 @@ public class Log extends DataEntity<Log> {
 
     public void setEndTime(Long endTime) {
         this.endTime = endTime;
+    }
+
+    @JsonSerialize(using = ExtendAttrSerializer.class)
+    public ExtendAttr getExtendAttr() {
+        return extendAttr;
+    }
+
+    public void setExtendAttr(ExtendAttr extendAttr) {
+        this.extendAttr = extendAttr;
     }
 }
