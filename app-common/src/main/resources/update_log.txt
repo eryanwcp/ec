@@ -20,8 +20,10 @@ ALTER TABLE t_sys_log_history ADD COLUMN extend_attr text COMMENT '自定义扩�
 扩展属性自定义查询示例：
     //SQL语句
     SELECT * FROM t_sys_user a WHERE JSON_EXTRACT(a.extend_attr,'$.key1') = 'data1'
-    String sql = "WHERE JSON_EXTRACT(a.extend_attr,'$.key1') = 'data1'";
-    List<User> users = userService.findBySql(sql);
+    String sql = "WHERE JSON_EXTRACT(a.extend_attr,'$.key1') = #{extendAttrKey1}";
+    Parameter parameter = Parameter.newParameter();
+    parameter.put("extendAttrKey1","data1");
+    List<User> users = userService.findBySql(sql,parameter);
 
 
 20231204
