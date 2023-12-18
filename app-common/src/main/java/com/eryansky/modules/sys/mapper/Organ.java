@@ -13,11 +13,10 @@ import com.eryansky.modules.sys._enum.OrganType;
 import com.eryansky.modules.sys.utils.DictionaryUtils;
 import com.eryansky.modules.sys.utils.OrganUtils;
 import com.eryansky.modules.sys.utils.UserUtils;
-import com.eryansky.modules.sys.vo.ExtendAttr;
+import com.eryansky.client.common.vo.ExtendAttr;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * 机构

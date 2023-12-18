@@ -3,9 +3,7 @@
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
-package com.eryansky.modules.sys.vo;
-
-import com.eryansky.common.utils.mapper.JsonMapper;
+package com.eryansky.client.common.vo;
 
 import java.util.HashMap;
 
@@ -16,12 +14,5 @@ import java.util.HashMap;
 public class ExtendAttr extends HashMap<String,Object> {
 
 
-    public ExtendAttr() {
-    }
-
-    @Override
-    public String toString() {
-        return JsonMapper.toJsonString(this);
-    }
 
 }

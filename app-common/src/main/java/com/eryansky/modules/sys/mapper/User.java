@@ -19,10 +19,9 @@ import com.eryansky.modules.sys._enum.SexType;
 import com.eryansky.modules.sys._enum.UserType;
 import com.eryansky.modules.sys.utils.DictionaryUtils;
 import com.eryansky.modules.sys.utils.UserUtils;
-import com.eryansky.modules.sys.vo.ExtendAttr;
+import com.eryansky.client.common.vo.ExtendAttr;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.Date;
 
