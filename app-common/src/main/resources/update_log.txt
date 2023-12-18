@@ -1,6 +1,6 @@
 ﻿20231218
 V4.2.20231124.09
-1、用户、组织增加信息分类编码以及自定义扩展数据。
+1、用户、组织增加信息分类编码以及自定义扩展数据；日志增加自定义扩展数据。
 
 ALTER TABLE t_sys_user ADD COLUMN biz_code varchar(64) COMMENT '信息分类编码';
 ALTER TABLE t_sys_user ADD COLUMN extend_attr text COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}';
@@ -8,7 +8,7 @@ ALTER TABLE t_sys_organ ADD COLUMN biz_code varchar(64) COMMENT '信息分类编
 ALTER TABLE t_sys_organ ADD COLUMN extend_attr text COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}';
 ALTER TABLE t_sys_organ_extend ADD COLUMN biz_code varchar(64) COMMENT '信息分类编码';
 ALTER TABLE t_sys_organ_extend ADD COLUMN extend_attr text COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}';
-2、日志增加自定义扩展数据。
+
 ALTER TABLE t_sys_log ADD COLUMN extend_attr text COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}';
 ALTER TABLE t_sys_log_history ADD COLUMN extend_attr text COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}';
 
