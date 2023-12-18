@@ -1,5 +1,6 @@
 package com.eryansky;
 
+import com.eryansky.common.orm.model.Parameter;
 import com.eryansky.common.utils.ThreadUtils;
 import com.eryansky.common.utils.encode.Encrypt;
 import com.eryansky.common.utils.mapper.JsonMapper;
@@ -61,9 +62,14 @@ public class ApplicationTests {
         user = userService.getUserByLoginName("admin");
         System.out.println(JsonMapper.toJsonString(user));
         //SELECT * FROM t_sys_user a WHERE JSON_EXTRACT(a.extend_attr,'$.key1') = 'data1'
-        String sql = "WHERE JSON_EXTRACT(a.extend_attr,'$.key1') = 'data1'";
+//        String sql = "WHERE JSON_EXTRACT(a.extend_attr,'$.key1') = 'data1'";
+//        List<User> users = userService.findBySql(sql);
 
-        List<User> users = userService.findBySql(sql);
+        String sql = "WHERE JSON_EXTRACT(a.extend_attr,'$.key1') = #{extendAttrKey1}";
+        Parameter parameter = Parameter.newParameter();
+        parameter.put("extendAttrKey1","data1");
+
+        List<User> users = userService.findBySql(sql,parameter);
         System.out.println(JsonMapper.toJsonString(users));
 
     }
