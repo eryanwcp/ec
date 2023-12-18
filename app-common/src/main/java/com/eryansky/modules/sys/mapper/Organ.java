@@ -8,12 +8,9 @@ package com.eryansky.modules.sys.mapper;
 
 import com.eryansky.common.model.TreeNode;
 import com.eryansky.common.orm._enum.GenericEnumUtils;
-import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.core.orm.mybatis.entity.TreeEntity;
 import com.eryansky.modules.sys._enum.OrganType;
-import com.eryansky.modules.sys._enum.ResourceType;
 import com.eryansky.modules.sys.utils.DictionaryUtils;
-import com.eryansky.modules.sys.utils.ExtendAttrSerializer;
 import com.eryansky.modules.sys.utils.OrganUtils;
 import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.modules.sys.vo.ExtendAttr;
@@ -232,7 +229,6 @@ public class Organ extends TreeEntity<Organ> {
         this.remark = remark;
     }
 
-    @JsonSerialize(using = ExtendAttrSerializer.class)
     public ExtendAttr getExtendAttr() {
         return extendAttr;
     }

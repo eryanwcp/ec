@@ -7,9 +7,6 @@ package com.eryansky.modules.sys.mapper;
 
 
 import com.eryansky.common.orm._enum.GenericEnumUtils;
-import com.eryansky.common.orm.mybatis.sensitive.annotation.EncryptField;
-import com.eryansky.common.orm.mybatis.sensitive.annotation.SensitiveEncryptEnabled;
-import com.eryansky.common.orm.mybatis.sensitive.annotation.SensitiveField;
 import com.eryansky.common.orm.mybatis.sensitive.type.SensitiveType;
 import com.eryansky.common.orm.mybatis.sensitive.utils.SensitiveUtils;
 import com.eryansky.common.orm.persistence.IUser;
@@ -18,12 +15,9 @@ import com.eryansky.common.utils.StringUtils;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.modules.disk.utils.DiskUtils;
-import com.eryansky.modules.sys._enum.DataScope;
-import com.eryansky.modules.sys._enum.OrganType;
 import com.eryansky.modules.sys._enum.SexType;
 import com.eryansky.modules.sys._enum.UserType;
 import com.eryansky.modules.sys.utils.DictionaryUtils;
-import com.eryansky.modules.sys.utils.ExtendAttrSerializer;
 import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.modules.sys.vo.ExtendAttr;
 import com.fasterxml.jackson.annotation.JsonFilter;
@@ -340,7 +334,6 @@ public class User extends DataEntity<User> implements IUser {
         return this.remark;
     }
 
-    @JsonSerialize(using = ExtendAttrSerializer.class)
     public ExtendAttr getExtendAttr() {
         return extendAttr;
     }

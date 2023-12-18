@@ -54,8 +54,8 @@ public class ApplicationTests {
         User user = userService.getUserByLoginName("admin");
         System.out.println(JsonMapper.toJsonString(user));
         ExtendAttr extendAttr = new ExtendAttr();
-        extendAttr.addOrUpdate("key1","data1");
-        extendAttr.addOrUpdate("key2", Arrays.asList("1","2"));
+        extendAttr.put("key1","data1");
+        extendAttr.put("key2", Arrays.asList("1","2"));
         user.setExtendAttr(extendAttr);
         userService.save(user);
         user = userService.getUserByLoginName("admin");

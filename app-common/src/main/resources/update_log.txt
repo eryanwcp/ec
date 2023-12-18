@@ -14,7 +14,7 @@ ALTER TABLE t_sys_log_history ADD COLUMN extend_attr text COMMENT '自定义扩�
 
 需在mybatis-config.xml添加如下内容
     <typeHandlers>
-		<typeHandler javaType="com.eryansky.modules.sys.vo.ExtendAttr" handler="com.eryansky.core.orm.mybatis.type.ExtendAttrJsonTypeHandler"/>
+		<typeHandler javaType="com.eryansky.modules.sys.vo.ExtendAttr" handler="com.eryansky.common.orm.mybatis.type.JsonTypeHandler"/>
 	</typeHandlers>
 
 扩展属性自定义查询示例：
