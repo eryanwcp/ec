@@ -1175,7 +1175,7 @@
         #{loginName},
         #{code},
         #{bizCode},
-        #{extendAtrr},
+        #{extendAttr},
         #{position},
         #{originalPassword},
         #{password},

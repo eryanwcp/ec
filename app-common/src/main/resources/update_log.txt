@@ -1,5 +1,5 @@
 ﻿20231218
-V4.2.20231124.09
+V4.2.20231124.11
 1、用户、组织增加信息分类编码以及自定义扩展数据；日志增加自定义扩展数据。
 
 ALTER TABLE t_sys_user ADD COLUMN biz_code varchar(64) COMMENT '信息分类编码';
