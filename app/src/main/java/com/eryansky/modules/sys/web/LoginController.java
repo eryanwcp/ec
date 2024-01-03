@@ -14,7 +14,6 @@ import com.eryansky.common.utils.Identities;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.UserAgentUtils;
 import com.eryansky.common.utils.collections.Collections3;
-import com.eryansky.common.utils.encode.EncodeUtils;
 import com.eryansky.common.utils.encode.Encrypt;
 import com.eryansky.common.utils.encode.RSAUtil;
 import com.eryansky.common.web.servlet.ValidateCodeServlet;
@@ -90,9 +89,8 @@ public class LoginController extends SimpleController {
         modelAndView.addObject("isMobile", UserAgentUtils.isMobile(request));
         String randomSecurityToken = Identities.randomBase62(64);
         modelAndView.addObject("securityToken", randomSecurityToken);
-        modelAndView.addObject("publicKey", RSAUtil.generateBase64PublicKey());
+        modelAndView.addObject("publicKey", RSAUtil.getDefaultBase64PublicKey());
         CacheUtils.put("securityToken:"+request.getSession().getId(),randomSecurityToken);
-        CacheUtils.put("publicKey",RSAUtil.generateBase64PublicKey());
         return modelAndView;
     }
 
@@ -158,12 +156,11 @@ public class LoginController extends SimpleController {
     @ResponseBody
     public Result prepareLogin(HttpServletRequest request){
         String randomSecurityToken = Identities.randomBase62(64);
-        String publicKey = RSAUtil.generateBase64PublicKey();
+        String publicKey = RSAUtil.getDefaultBase64PublicKey();
         Map<String,Object> data = Maps.newHashMap();
         data.put("securityToken:",randomSecurityToken);
         data.put("publicKey",publicKey);
         CacheUtils.put("securityToken:"+request.getSession().getId(),randomSecurityToken);
-        CacheUtils.put("publicKey",publicKey);
         return Result.successResult().setObj(data);
     }
 
@@ -174,7 +171,7 @@ public class LoginController extends SimpleController {
     @GetMapping(value = "getPublicKey")
     @ResponseBody
     public Result RSAKey(){
-        String publicKey = RSAUtil.generateBase64PublicKey();
+        String publicKey = RSAUtil.getDefaultBase64PublicKey();
         return Result.successResult().setObj(publicKey);
     }
 
