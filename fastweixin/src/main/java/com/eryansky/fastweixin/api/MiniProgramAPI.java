@@ -29,7 +29,7 @@ public class MiniProgramAPI extends BaseAPI {
      * @param code 授权后得到的code
      * @return token对象
      */
-    public OauthJscode2sessionResponse getToken(String code) {
+    public OauthJscode2sessionResponse jscodeToSession(String code) {
         BeanUtil.requireNonNull(code, "code is null");
         OauthJscode2sessionResponse response = null;
         String url = BASE_API_URL + "sns/jscode2session?appid=" + this.config.getAppid() + "&secret=" + this.config.getSecret() + "&js_code=" + code + "&grant_type=authorization_code";
