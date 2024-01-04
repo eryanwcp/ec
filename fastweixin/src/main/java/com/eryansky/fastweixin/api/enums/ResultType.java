@@ -157,7 +157,7 @@ public enum ResultType {
     /**
      * 不合法的oauth_code
      */
-    ILLEGAL_OAUTH_CODE(40029, "不合法的oauth_code"),
+    ILLEGAL_OAUTH_CODE(40029, "不合法的oauth_code/js_code无效"),
 
     /**
      * 不合法的refresh_token
@@ -373,6 +373,10 @@ public enum ResultType {
      * 创建菜单个数超过限制
      */
     MENU_OVER_LIMIT(45010, "创建菜单个数超过限制"),
+    /**
+     * API 调用太频繁，请稍候再试
+     */
+    MINI_LIMIT_RETRY(45011, "API 调用太频繁，请稍候再试"),
 
     /**
      * 回复时间超过限制
@@ -393,6 +397,10 @@ public enum ResultType {
      * 分组数量超过上限
      */
     GROUP_COUNT_TOO_MANY(45018, "分组数量超过上限"),
+    /**
+     * 高风险等级用户
+     */
+    MINI_CODE_BLOCK(40226, "高风险等级用户，小程序登录拦截 。"),
 
     /**
      * 客服接口下行条数超过上限
