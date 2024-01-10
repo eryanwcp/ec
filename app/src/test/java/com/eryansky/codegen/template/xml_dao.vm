@@ -83,6 +83,32 @@
         #end)
     </insert>
 
+    <insert id="insertBatch">
+        INSERT INTO ${tableName}(
+        id,
+        status,
+        version,
+        create_user,
+        create_time,
+        update_user,
+        update_time,
+        #set ($i=0)#foreach ($column in $columns)
+        #set($i=$i+1)${column.columnName}#if($i != $columns.size()),#end
+
+    #end) VALUES  <foreach collection="list" item="item" separator=",">(
+        #{item.id},
+        #{item.status},
+        1,
+        #{item.createUser},
+        #{item.createTime},
+        #{item.updateUser},
+        #{item.updateTime},
+        #set ($i=0)#foreach ($column in $columns)
+            #set($i=$i+1)#{item.${column.fieldName}}#if($i != $columns.size()),#end
+
+        #end)</foreach >
+    </insert>
+
     <update id="update">
         UPDATE ${tableName} SET
         status = #{status},
