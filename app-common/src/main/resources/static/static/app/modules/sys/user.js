@@ -290,6 +290,7 @@ $(function () {
                         return value;
                     }
                 },
+                {field: 'extendAttr', title: '自定义参数', width: 260,hidden: true},
                 {field: 'updateTime', title: '更新时间', width: 146},
                 {
                     field: 'operater', title: '操作', width: 260, formatter: function (value, rowData, rowIndex) {

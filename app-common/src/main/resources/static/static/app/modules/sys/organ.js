@@ -57,13 +57,13 @@ $(function () {
         treeField: "name",
         frozenColumns: [[
             {field: 'name', title: '机构名称', width: 300},
-            {field: 'sysCode', title: '机构系统编码', width: 120, hidden: true}
+            {field: 'sysCode', title: '系统编码', width: 120, hidden: true}
         ]],
         columns: [[
             {field: 'id', title: '主键', hidden: true, sortable: true, width: 80},
             {field: 'managerUserName', title: '主管', width: 120, sortable: true},
             {field: 'superManagerUserName', title: '分管领导', width: 120, sortable: true},
-            {field: 'code', title: '机构编码', width: 120, sortable: true},
+            {field: 'code', title: '编码', width: 120, sortable: true},
             {field: 'address', title: '地址', width: 120, hidden: true},
             {field: 'mobile', title: '手机号', width: 120, sortable: true, hidden: true},
             {field: 'phone', title: '电话号码', width: 120, sortable: true, hidden: true},
@@ -72,6 +72,7 @@ $(function () {
             {field: 'sort', title: '排序', align: 'right', width: 60, sortable: true},
             {field: 'statusView', title: '状态', align: 'center', width: 60},
             {field: 'remark', title: '备注', width: 260},
+            {field: 'extendAttr', title: '自定义参数', width: 260,hidden: true},
             {field: 'updateTime', title: '更新时间', width: 146}
         ]],
         toolbar: toolbar,
