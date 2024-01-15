@@ -77,7 +77,6 @@ function ImageUploader($parent, options) {
             n.$fileInput.focus();
         });
         n.$controller.parent().find(".upload-area").on("click", 'img',function() {
-            console.log(n);
             _wrapperShow(n,this.dataset['url'], "img_" + this.dataset['fileid'],this.dataset['fileid'],n.config.deleteImage);
         });
         return n.uploadImage();//默认进入uploadImage
