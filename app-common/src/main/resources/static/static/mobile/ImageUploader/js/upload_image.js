@@ -310,7 +310,7 @@ function ImageUploader($parent, options) {
                 e.preventDefault();
             });
 
-            $(".J_Image_Del").on("click", function() {
+            $(".J_Image_Del").on("click", function(e) {
                 var imageName = $(this).data("cname");
                 $("." + imageName).remove();
                 $slider.remove();
