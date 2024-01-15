@@ -66,9 +66,9 @@ function ImageUploader($parent, options) {
             afterComplete: function() {},//图片上传完成回调函数
             afterDeleteImageComplete: function() {}//图片删除回调函数
         }, options);
-            n.file = null;
-            n.$controller = $parent;
-            n.$uploadBtn = $parent.find(n.config.uploadBtn);
+        n.file = null;
+        n.$controller = $parent;
+        n.$uploadBtn = $parent.find(n.config.uploadBtn);
         n.$fileInput = $parent.find(n.config.fileInput);
         n.$uploadBtn.css({
             overflow: "hidden"
@@ -76,7 +76,8 @@ function ImageUploader($parent, options) {
         n.$uploadBtn.on("click", function() {
             n.$fileInput.focus();
         });
-        $(".upload-area").on("click", 'img',function() {
+        n.$controller.parent().find(".upload-area").on("click", 'img',function() {
+            console.log(n);
             _wrapperShow(n,this.dataset['url'], "img_" + this.dataset['fileid'],this.dataset['fileid'],n.config.deleteImage);
         });
         return n.uploadImage();//默认进入uploadImage
@@ -304,13 +305,13 @@ function ImageUploader($parent, options) {
         //显示遮罩层
         wrap.show(function() {
 
-            $(".J_Slider_Close").on("click", function(e) {
+            $slider.find(".J_Slider_Close").on("click", function(e) {
                 $slider.remove();
                 wrap.close();
                 e.preventDefault();
             });
 
-            $(".J_Image_Del").on("click", function(e) {
+            $slider.find(".J_Image_Del").on("click", function(e) {
                 var imageName = $(this).data("cname");
                 $("." + imageName).remove();
                 $slider.remove();
