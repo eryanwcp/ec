@@ -103,6 +103,13 @@ public class AppConstants extends SysConstants {
     }
 
     /**
+     * 系统文件存储方式
+     */
+    public static String getSystemDiskType() {
+        return SysConstants.getAppConfig().getProperty("system.disk.type");
+    }
+
+    /**
      * 配置文件(config.properties)
      */
     public static PropertiesLoader getConfig() {

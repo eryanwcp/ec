@@ -569,7 +569,6 @@ public class DiskUtils {
         String tempDir = AppConstants.getDiskTempDir();
         java.io.File file = new java.io.File(tempDir);
         FileUtils.deleteFile(file.listFiles());
-
     }
 
     /**
