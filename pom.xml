@@ -5,7 +5,7 @@
 
     <groupId>com.eryansky</groupId>
     <artifactId>ec-parent</artifactId>
-    <version>4.2.20231124.15</version>
+    <version>4.2.20231124.16</version>
     <modules>
         <module>common</module>
         <module>j2cache</module>
@@ -53,12 +53,12 @@
         <commons-codec.version>1.16.0</commons-codec.version>
 
 
-        <ec-common.version>4.2.20231124.15</ec-common.version>
-        <ec-app-common.version>4.2.20231124.15</ec-app-common.version>
-        <ec-client-common.version>4.2.20231124.15</ec-client-common.version>
-        <ec-j2cache.version>4.2.20231124.15</ec-j2cache.version>
-        <ec-j2cache-spring-boot-starter.version>4.2.20231124.15</ec-j2cache-spring-boot-starter.version>
-        <ec-fastweixin.version>4.2.20231124.15</ec-fastweixin.version>
+        <ec-common.version>4.2.20231124.16</ec-common.version>
+        <ec-app-common.version>4.2.20231124.16</ec-app-common.version>
+        <ec-client-common.version>4.2.20231124.16</ec-client-common.version>
+        <ec-j2cache.version>4.2.20231124.16</ec-j2cache.version>
+        <ec-j2cache-spring-boot-starter.version>4.2.20231124.16</ec-j2cache-spring-boot-starter.version>
+        <ec-fastweixin.version>4.2.20231124.16</ec-fastweixin.version>
 
         <jackson.version>2.15.2</jackson.version>
     </properties>

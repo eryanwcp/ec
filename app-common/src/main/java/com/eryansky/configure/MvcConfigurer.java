@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -157,7 +158,7 @@ public class MvcConfigurer implements WebMvcConfigurer {
 
 
    @Bean("fileManager")
-   @ConditionalOnMissingBean(name = "fileManager")
+   @ConditionalOnProperty(name = "system.disk.type", havingValue = "disk", matchIfMissing = true)
    public IFileManager fileManager() {
       return new DISKManager();
    }
