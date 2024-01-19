@@ -11,13 +11,13 @@
 Docker打包
 
 
-    mvn package com.google.cloud.tools:jib-maven-plugin:3.3.2:buildTar -DsendCredentialsOverHttp=true
+    mvn package com.google.cloud.tools:jib-maven-plugin:3.4.0:buildTar -DsendCredentialsOverHttp=true
 
 
 Docker发布
 
 
-    mvn package com.google.cloud.tools:jib-maven-plugin:3.3.2:build -DsendCredentialsOverHttp=true
+    mvn package com.google.cloud.tools:jib-maven-plugin:3.4.0:build -DsendCredentialsOverHttp=true
 
 
 Docker验证码字体库缺失修复方法（在容器中执行）
