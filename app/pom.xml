@@ -256,23 +256,15 @@
                             <password>password</password>
                         </auth>
                     </to>
-                    <extraDirectories>
-                        <paths>
-<!--                            <path>-->
-<!--                                <from>bin/docker/fonts</from>-->
-<!--                                <into>/usr/share/fonts</into>-->
-<!--                            </path>-->
-                            <path>
-                                <from>bin/docker/fonts</from>
-                                <into>/usr/lib/jvm/java-1.8-openjdk/jre/fonts</into>
-                            </path>
-                        </paths>
-                    </extraDirectories>
                     <allowInsecureRegistries>true</allowInsecureRegistries>
                     <container>
                         <mainClass>com.eryansky.Application</mainClass>
                         <jvmFlags>
                             <jvmFlag>-Dspring.profiles.active=${profileActive}</jvmFlag>
+                            <jvmFlag>-Xms1g</jvmFlag>
+                            <jvmFlag>-Xmx1g</jvmFlag>
+                            <jvmFlag>-Djava.awt.headless=true</jvmFlag>
+                            <jvmFlag>-Duser.timezone=GMT+08</jvmFlag>
                         </jvmFlags>
                         <args>
                         </args>
@@ -283,6 +275,10 @@
                         <ports>
                             <port>8080</port>
                         </ports>
+                        <!-- 设置时区  -->
+                        <environment>
+                            <TZ>Asia/Shanghai</TZ>
+                        </environment>
                         <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
                     </container>
                 </configuration>
