@@ -1371,7 +1371,7 @@ public class ExcelUtils {
 
         DecimalFormat df = new DecimalFormat("0");// 格式化 number String字符
         // SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");// 格式化日期字符串
-        DecimalFormat nf = new DecimalFormat("0");// 格式化数字
+        DecimalFormat nf = new DecimalFormat("0.00");// 格式化数字
 
         switch (cell.getCellType()) {
             case BLANK:
@@ -1393,7 +1393,14 @@ public class ExcelUtils {
                     }
                     return value;
                 } else if ("General".equals(cell.getCellStyle().getDataFormatString())) {
-                    String value = nf.format(cell.getNumericCellValue());
+                    String value = null;
+                    Double mainWastage = Double.parseDouble(cell.toString());
+                    if(mainWastage.intValue()-mainWastage==0){//判断是否符合取整条件
+                        value = df.format(cell.getNumericCellValue());
+                    }else{
+                        return cell.getNumericCellValue();
+//                        value = nf.format(cell.getNumericCellValue());
+                    }
                     if (StringUtils.isBlank(value)) {
                         return null;
                     }

@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.eryansky</groupId>
         <artifactId>ec-parent</artifactId>
-        <version>4.2.20231124.18</version>
+        <version>4.2.20231124.20</version>
     </parent>
 
     <artifactId>ec-app</artifactId>
@@ -256,6 +256,18 @@
                             <password>password</password>
                         </auth>
                     </to>
+                    <extraDirectories>
+                        <paths>
+<!--                            <path>-->
+<!--                                <from>bin/docker/fonts</from>-->
+<!--                                <into>/usr/share/fonts</into>-->
+<!--                            </path>-->
+                            <path>
+                                <from>bin/docker/fonts</from>
+                                <into>/usr/lib/jvm/java-1.8-openjdk/jre/fonts</into>
+                            </path>
+                        </paths>
+                    </extraDirectories>
                     <allowInsecureRegistries>true</allowInsecureRegistries>
                     <container>
                         <mainClass>com.eryansky.Application</mainClass>
