@@ -20,24 +20,23 @@
 2，拦截mybatis的ResultSetHandler，对读请求的响应进行加密字段的解密赋值。<br/>
 ## 使用方式
 
-```
 1,编写加解密实现类以及配置mybatis的插件，下面在springboot场景下的一个配置案例。
 ```java
     /**
      * 插件配置
      */
     @Configuration
-    public class EncryptPluginConfig {
+    public class MybatisEncryptPluginConfig {
     
         //加密方式
         @Bean
-        Encrypt encryptor() throws Exception{
+        public IEncrypt encryptor() throws Exception{
             return new AesSupport("1870577f29b17d6787782f35998c4a79");
         }
         
         //配置插件
         @Bean
-        ConfigurationCustomizer configurationCustomizer() throws Exception{
+        public ConfigurationCustomizer configurationCustomizer() throws Exception{
             DecryptReadInterceptor decryptReadInterceptor = new DecryptReadInterceptor(encryptor());
             SensitiveAndEncryptWriteInterceptor sensitiveAndEncryptWriteInterceptor = new SensitiveAndEncryptWriteInterceptor(encryptor());
     
@@ -47,6 +46,14 @@
             };
         }
     }
+```
+
+```
+<!-- mybatis-config.xml 插件配置 -->
+    <plugins>
+		<plugin interceptor="com.eryansky.common.orm.mybatis.sensitive.interceptor.DecryptReadInterceptor" />
+		<plugin interceptor="com.eryansky.common.orm.mybatis.sensitive.interceptor.SensitiveAndEncryptWriteInterceptor" />
+    </plugins>
 ```
 2，在vo类上添加功能注解使得插件生效：
 ```java
