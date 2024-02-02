@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.eryansky</groupId>
         <artifactId>ec-parent</artifactId>
-        <version>4.2.20231124.21</version>
+        <version>4.2.20231124.22</version>
     </parent>
 
     <artifactId>ec-app</artifactId>
@@ -18,7 +18,7 @@
     <properties>
         <velocity.version>2.3</velocity.version>
         <ckfinder.version>2.3</ckfinder.version>
-        <sitemesh.version>2.4.2</sitemesh.version>
+        <sitemesh.version>2.5.0</sitemesh.version>
         <liquibase.version>4.20.0</liquibase.version>
         <commons-cli.version>1.5.0</commons-cli.version>
 

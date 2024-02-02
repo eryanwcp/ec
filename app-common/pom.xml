@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.eryansky</groupId>
         <artifactId>ec-parent</artifactId>
-        <version>4.2.20231124.21</version>
+        <version>4.2.20231124.22</version>
     </parent>
     <artifactId>ec-app-common</artifactId>
     <version>${ec-app-common.version}</version>
@@ -19,7 +19,7 @@
         <xwpf.version>2.0.4</xwpf.version>
         <bsh.version>2.0b6</bsh.version>
 
-        <sitemesh.version>2.4.2</sitemesh.version>
+        <sitemesh.version>2.5.0</sitemesh.version>
         <commons-csv.version>1.10.0</commons-csv.version>
         <commons-dbutils.version>1.7</commons-dbutils.version>
         <commons-cli.version>1.5.0</commons-cli.version>
