@@ -58,10 +58,10 @@
             {{#result}}
                 <tr>
                     #foreach ($column in $columns)#if($column.comment)<td>{{$column.fieldName}}</td>#end#end
-                    <e:hasPermission name="${module}:${entityInstance}:edit"><td>
+                    <td><e:hasPermission name="${modulePermission}:${entityInstance}:edit">
                         <a href="${ctxAdmin}/${modulePath}/${entityInstance}/form?id={{id}}">修改</a>
                         <a href="${ctxAdmin}/${modulePath}/${entityInstance}/delete?id={{id}}" onclick="return confirmx('确认要删除该数据吗？', this.href)" >删除</a>
-                    </td></e:hasPermission>
+                    </e:hasPermission></td>
                 </tr>
             {{/result}}
             </tbody>
