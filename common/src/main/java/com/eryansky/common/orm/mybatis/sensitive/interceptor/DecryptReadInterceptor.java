@@ -78,7 +78,7 @@ public class DecryptReadInterceptor implements Interceptor {
             for (Map.Entry<String, EncryptField> entry : sensitiveFieldMap.entrySet()) {
                 String property = entry.getKey();
                 String value = (String) objMetaObject.getValue(property);
-                if (value != null) {
+                if (null != value && !"".equals(value)) {
                     String decryptValue = IEncrypt.decrypt(value);
                     objMetaObject.setValue(property, decryptValue);
                 }

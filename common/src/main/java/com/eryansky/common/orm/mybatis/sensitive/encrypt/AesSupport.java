@@ -24,7 +24,7 @@ import java.security.SecureRandom;
  */
 public class AesSupport implements IEncrypt {
 
-    private static final Logger logger = LoggerFactory.getLogger(AesSupport.class);
+    private static final Logger log = LoggerFactory.getLogger(AesSupport.class);
 
     private static final String KEY_ALGORITHM = "AES";
     /**
@@ -32,25 +32,27 @@ public class AesSupport implements IEncrypt {
      */
     private static final String DEFAULT_CIPHER_ALGORITHM = "AES/GCM/NoPadding";
     /**
+     * 默认密钥, 256位32个字节
+     */
+    public static final String DEFAULT_KEY = "ecececececececececececececececec";
+    /**
      * 密钥, 256位32个字节
      */
-    public static final String DEFAULT_KEY = "ec";
-
     private String key;
     private final SensitiveTypeHandler sensitiveTypeHandler = SensitiveTypeRegisty.get(SensitiveType.DEFAUL);
 
     private SecretKeySpec secretKeySpec;
     /**
-     * 初始向量IV, 初始向量IV的长度规定为128位16个字节, 初始向量的来源为随机生成.
+     * 初始向量IV
      */
     private static GCMParameterSpec gcMParameterSpec;
-    private static SecureRandom random;
+    /**
+     * 默认初始向量IV 长度为128位16个字节
+     */
+    public static final String DEFAULT_IV = "ecececececececec";
 
     static {
-        random = new SecureRandom();
-        byte[] bytesIV = new byte[16];
-        random.nextBytes(bytesIV);
-        gcMParameterSpec = new GCMParameterSpec(128, bytesIV);
+        gcMParameterSpec = new GCMParameterSpec(128, DEFAULT_IV.getBytes());
         java.security.Security.setProperty("crypto.policy", "unlimited");
     }
     public AesSupport() throws NoSuchAlgorithmException {
@@ -70,7 +72,9 @@ public class AesSupport implements IEncrypt {
 
     @Override
     public String encrypt(String value) {
-
+        if (StringUtils.isEmpty(value)) {
+            return "";
+        }
         try {
             Cipher cipher = Cipher.getInstance(DEFAULT_CIPHER_ALGORITHM);
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec,gcMParameterSpec);
@@ -80,7 +84,7 @@ public class AesSupport implements IEncrypt {
 
             return Hex.bytesToHexString(encryptData);
         } catch (Exception e) {
-            logger.error("AES加密时出现问题，密钥为：{}",sensitiveTypeHandler.handle(key));
+            log.error("AES加密时出现问题，密钥为：{}",sensitiveTypeHandler.handle(key));
             throw new IllegalStateException("AES加密时出现问题" + e.getMessage(), e);
         }
     }
@@ -97,7 +101,7 @@ public class AesSupport implements IEncrypt {
             byte[] content = cipher.doFinal(encryptData);
             return new String(content, StandardCharsets.UTF_8);
         } catch (Exception e) {
-            logger.error("AES解密时出现问题，密钥为：{}，密文为：{}", sensitiveTypeHandler.handle(key), value);
+            log.error("AES解密时出现问题，密钥为：{}，密文为：{}", sensitiveTypeHandler.handle(key), value);
             throw new IllegalStateException("AES解密时出现问题" + e.getMessage(), e);
         }
     }
