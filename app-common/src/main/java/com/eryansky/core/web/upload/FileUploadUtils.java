@@ -398,7 +398,7 @@ public class FileUploadUtils {
 
         long size = file.getSize();
         if (maxSize != -1 && size > maxSize) {
-            throw new FileSizeLimitExceededException("not allowed upload upload", size, maxSize);
+            throw new FileSizeLimitExceededException("not allowed upload size", size, maxSize);
         }
     }
 
@@ -423,7 +423,7 @@ public class FileUploadUtils {
 
         long size = file.length();
         if (maxSize != -1 && size > maxSize) {
-            throw new FileSizeLimitExceededException("not allowed upload upload", size, maxSize);
+            throw new FileSizeLimitExceededException("not allowed upload size", size, maxSize);
         }
     }
 
