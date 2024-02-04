@@ -453,18 +453,43 @@ public class DiskController extends SimpleController {
         if (StringUtils.isBlank(folderId)) {
             return Result.errorResult().setMsg("文件夹Id丢失！");
         }
-        FileUploadUtils.assertAllowed(multipartFile, FileUploadUtils.DEFAULT_ALLOWED_EXTENSION, AppConstants.getDiskMaxUploadSize());
-        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
+
         Folder folder = folderService.get(folderId);
         if (null == folder) {
             return Result.errorResult().setMsg("文件夹不存在，已被删除或移除！");
         }
-        File file = fileService.fileUpload(sessionInfo, folder, multipartFile);
-        String obj = null;
-        if (file != null) {
-            obj = file.getId();
+
+        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
+        Result result = null;
+        Exception exception = null;
+        File file = null;
+        try {
+            FileUploadUtils.assertAllowed(multipartFile,FileUploadUtils.DEFAULT_ALLOWED_EXTENSION, AppConstants.getDiskMaxUploadSize());
+            file = fileService.fileUpload(sessionInfo, folder, multipartFile);
+            result = Result.successResult().setObj(file).setMsg("文件上传成功！");
+        } catch (InvalidExtensionException e) {
+            exception = e;
+            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
+        } catch (FileUploadBase.FileSizeLimitExceededException e) {
+            exception = e;
+            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG);
+        } catch (FileNameLengthLimitExceededException e) {
+            exception = e;
+            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG);
+        } catch (ActionException e) {
+            exception = e;
+            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
+        } catch (IOException e) {
+            exception = e;
+            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
+        } finally {
+            if (exception != null) {
+                if (file != null) {
+                    DiskUtils.deleteFile(file.getId());
+                }
+            }
         }
-        return Result.successResult().setObj(obj);
+        return result;
     }
 
     /**
