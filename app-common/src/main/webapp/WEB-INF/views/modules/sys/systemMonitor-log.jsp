@@ -70,7 +70,7 @@
 		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
 	<select id="fileName" name="fileName">
 		<c:forEach items="${fileNames}" var="item">
-			<option value="${item}" <c:if test="${item eq fileName}">selected</c:if>>< >${item}</option>
+			<option value="${item}" <c:if test="${item eq fileName}">selected</c:if> >${item}</option>
 		</c:forEach>
 	</select>
 	<label> <input id="showTotal" name="showTotal" type="checkbox" value="true">全部显示</label>&nbsp;
