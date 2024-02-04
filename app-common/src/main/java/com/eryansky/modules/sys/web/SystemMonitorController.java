@@ -17,6 +17,7 @@ import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.encode.EncodeUtils;
 import com.eryansky.common.utils.io.FileUtils;
 import com.eryansky.common.utils.mapper.JsonMapper;
+import com.eryansky.common.web.filter.XsslHttpServletRequestWrapper;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.aop.annotation.Logging;
@@ -309,6 +310,7 @@ public class SystemMonitorController extends SimpleController {
                 }
 
                 List<String> resultLogs = showLogs.parallelStream().map(line->{
+                    line = XsslHttpServletRequestWrapper.replaceXSS(line);
                     if (pretty) {
                         //先转义
                         line = line.replaceAll("&", "&amp;")

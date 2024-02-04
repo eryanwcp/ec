@@ -18,7 +18,7 @@
     <link rel="stylesheet" type="text/css" href="${ctxStatic}/mobile/af/icons.css" />
     <link rel="stylesheet" type="text/css" href="${ctxStatic}/mobile/af/af.ui.css" />
 
-    <script type="text/javascript" charset="utf-8" src="${ctxStatic}/js/jquery/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="${ctxStatic}/js/jquery/jquery-2.2.4.min.js"></script>
     <script type="text/javascript" charset="utf-8" src="${ctxStatic}/js/jquery/jquery.cookie.min.js"></script>
     <script type="text/javascript" charset="utf-8" src="${ctxStatic}/mobile/af/fastclick.min.js"></script>
     <script type="text/javascript" charset="utf-8" src="${ctxStatic}/mobile/af/appframework.ui.js"></script>

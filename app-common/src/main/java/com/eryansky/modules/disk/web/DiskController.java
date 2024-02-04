@@ -14,15 +14,15 @@ import com.eryansky.common.orm.Page;
 import com.eryansky.common.utils.Identities;
 import com.eryansky.common.utils.PrettyMemoryUtils;
 import com.eryansky.common.utils.StringUtils;
-import com.eryansky.common.utils.UserAgentUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.mapper.JsonMapper;
-import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
-import com.eryansky.common.web.utils.DownloadUtils;
 import com.eryansky.core.security.annotation.RequiresPermissions;
 import com.eryansky.core.web.upload.FileUploadUtils;
+import org.apache.commons.fileupload.FileUploadBase;
+import com.eryansky.core.web.upload.exception.FileNameLengthLimitExceededException;
+import com.eryansky.core.web.upload.exception.InvalidExtensionException;
 import com.eryansky.modules.disk.mapper.Folder;
 import com.eryansky.modules.sys.utils.DownloadFileUtils;
 import com.eryansky.utils.AppConstants;
@@ -468,13 +468,7 @@ public class DiskController extends SimpleController {
         } catch (FileUploadBase.FileSizeLimitExceededException e) {
             exception = e;
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG);
-        } catch (FileNameLengthLimitExceededException e) {
-            exception = e;
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG);
-        } catch (ActionException e) {
-            exception = e;
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
-        } catch (IOException e) {
+        } catch (Exception e) {
             exception = e;
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
         } finally {

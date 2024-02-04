@@ -233,6 +233,7 @@ public class J2CacheSessionFilter implements Filter {
             }
             try {
                 cookie.setHttpOnly(true);
+                cookie.setSecure(true);
             } catch (Exception e) {
             }
             response.addCookie(cookie);

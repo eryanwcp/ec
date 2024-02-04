@@ -8,7 +8,7 @@
 <meta name="author" content="Eryan"/>
 <link rel="shortcut icon" href="${appURL}/static/img/favicon.ico" />
 <%-- 引入jQuery --%>
-<script type="text/javascript" src="${appURL}/static/js/jquery/jquery-2.1.4.min.js" charset="utf-8"></script>
+<script type="text/javascript" src="${appURL}/static/js/jquery/jquery-2.2.4.min.js" charset="utf-8"></script>
 <script type="text/javascript" src="${appURL}/static/js/jquery/jquery-extend${yuicompressor}.js" charset="utf-8"></script>
 <%-- jQuery Cookie插件 --%>
 <script type="text/javascript" src="${appURL}/static/js/jquery/jquery.cookie${yuicompressor}.js" charset="utf-8"></script>
