@@ -52,7 +52,8 @@
             <thead>
             <tr>
                 #foreach ($column in $columns)#if($column.comment)<th>$column.comment</th>#end#end
-                <e:hasPermission name="${modulePermission}:${entityInstance}:edit"><th>操作</th></e:hasPermission></tr>
+                <th>操作</th>
+            </tr>
             </thead>
             <tbody>
             {{#result}}
