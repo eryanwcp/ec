@@ -20,6 +20,7 @@ import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
 import com.eryansky.core.web.annotation.Mobile;
 import com.eryansky.core.web.annotation.MobileValue;
+import com.eryansky.core.web.upload.FileUploadUtils;
 import com.eryansky.core.web.upload.exception.FileNameLengthLimitExceededException;
 import com.eryansky.core.web.upload.exception.InvalidExtensionException;
 import com.eryansky.modules.disk.mapper.File;
@@ -34,6 +35,7 @@ import com.eryansky.modules.notice.utils.MessageUtils;
 import com.eryansky.modules.notice.vo.NoticeQueryVo;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys._enum.YesOrNo;
+import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Lists;
 import org.apache.commons.fileupload.FileUploadBase;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -165,6 +167,7 @@ public class NoticeReceiveController extends SimpleController {
         Exception exception = null;
         File file = null;
         try {
+            FileUploadUtils.assertAllowed(multipartFile,FileUploadUtils.DEFAULT_ALLOWED_EXTENSION, AppConstants.getNoticeMaxUploadSize());
             file = DiskUtils.saveSystemFile(NoticeReceiveInfo.FOLDER_NOTICE_RECEIVE, sessionInfo.getUserId(), multipartFile);
             result = Result.successResult().setObj(file).setMsg("文件上传成功！");
         } catch (InvalidExtensionException e) {

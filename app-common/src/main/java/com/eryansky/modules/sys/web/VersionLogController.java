@@ -21,6 +21,7 @@ import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
 import com.eryansky.core.security.annotation.RequiresPermissions;
+import com.eryansky.core.web.upload.FileUploadUtils;
 import com.eryansky.core.web.upload.exception.FileNameLengthLimitExceededException;
 import com.eryansky.core.web.upload.exception.InvalidExtensionException;
 import com.eryansky.modules.disk._enum.FolderType;
@@ -31,6 +32,7 @@ import com.eryansky.modules.sys._enum.VersionLogType;
 import com.eryansky.modules.sys.mapper.VersionLog;
 import com.eryansky.modules.sys.service.VersionLogService;
 import com.eryansky.modules.sys.utils.VersionLogUtils;
+import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.SelectType;
 import com.google.common.collect.Lists;
 import org.apache.commons.fileupload.FileUploadBase;
@@ -168,6 +170,7 @@ public class VersionLogController extends SimpleController {
         Exception exception = null;
         File file = null;
         try {
+            FileUploadUtils.assertAllowed(multipartFile,FileUploadUtils.DEFAULT_ALLOWED_EXTENSION, AppConstants.getDiskMaxUploadSize());
             file = DiskUtils.saveSystemFile(VersionLog.FOLDER_VERSIONLOG, FolderType.NORMAL.getValue(), sessionInfo.getUserId(), multipartFile.getInputStream(),DiskUtils.getMultipartOriginalFilename(multipartFile));
             result = Result.successResult().setObj(file).setMsg("文件上传成功！");
         } catch (InvalidExtensionException e) {

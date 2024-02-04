@@ -22,8 +22,10 @@ import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.common.web.utils.DownloadUtils;
 import com.eryansky.core.security.annotation.RequiresPermissions;
+import com.eryansky.core.web.upload.FileUploadUtils;
 import com.eryansky.modules.disk.mapper.Folder;
 import com.eryansky.modules.sys.utils.DownloadFileUtils;
+import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.AppUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -439,35 +441,30 @@ public class DiskController extends SimpleController {
      * 文件上传
      *
      * @param folderId   文件夹
-     * @param uploadFile 上传文件
+     * @param multipartFile 上传文件
      * @return
      */
     @PostMapping(value = {"fileUpload"})
     @ResponseBody
     public Result fileUpload(
             @RequestParam(value = "folderId", required = false) String folderId,
-            @RequestParam(value = "uploadFile", required = false) MultipartFile uploadFile)
+            @RequestParam(value = "uploadFile", required = true) MultipartFile multipartFile)
             throws Exception {
-        Result result = Result.errorResult();
         if (StringUtils.isBlank(folderId)) {
-            result.setMsg("文件夹Id丢失！");
-        } else if (uploadFile == null) {
-            result.setMsg("上传文件丢失！");
-        } else {
-            SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
-            Folder folder = folderService.get(folderId);
-            if (folder != null) {
-                File file = fileService.fileUpload(sessionInfo, folder, uploadFile);
-                String obj = null;
-                if (file != null) {
-                    obj = file.getId();
-                }
-                result = Result.successResult().setObj(obj);
-            } else {
-                result.setMsg("文件夹不存在，已被删除或移除！");
-            }
+            return Result.errorResult().setMsg("文件夹Id丢失！");
         }
-        return result;
+        FileUploadUtils.assertAllowed(multipartFile, FileUploadUtils.DEFAULT_ALLOWED_EXTENSION, AppConstants.getDiskMaxUploadSize());
+        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
+        Folder folder = folderService.get(folderId);
+        if (null == folder) {
+            return Result.errorResult().setMsg("文件夹不存在，已被删除或移除！");
+        }
+        File file = fileService.fileUpload(sessionInfo, folder, multipartFile);
+        String obj = null;
+        if (file != null) {
+            obj = file.getId();
+        }
+        return Result.successResult().setObj(obj);
     }
 
     /**

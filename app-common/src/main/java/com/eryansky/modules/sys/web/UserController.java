@@ -21,6 +21,7 @@ import com.eryansky.core.security._enum.Logical;
 import com.eryansky.core.security.annotation.RequiresPermissions;
 import com.eryansky.core.security.annotation.RequiresRoles;
 import com.eryansky.core.security.annotation.RestApi;
+import com.eryansky.core.web.upload.FileUploadUtils;
 import com.eryansky.modules.disk.mapper.File;
 import com.eryansky.modules.sys.mapper.*;
 import com.eryansky.modules.sys.utils.DictionaryUtils;
@@ -416,6 +417,7 @@ public class UserController extends SimpleController {
                          @RequestParam(value = "uploadFile", required = false) MultipartFile multipartFile) {
         Result result = null;
         try {
+            FileUploadUtils.assertAllowed(multipartFile,FileUploadUtils.IMAGE_EXTENSION,FileUploadUtils.DEFAULT_MAX_SIZE);
             SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
             File file = DiskUtils.saveSystemFile(User.FOLDER_USER_PHOTO, sessionInfo.getUserId(), multipartFile);
             result = Result.successResult().setObj(file);

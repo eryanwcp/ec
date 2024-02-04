@@ -436,9 +436,9 @@ public class AppConstants extends SysConstants {
      *
      * @return
      */
-    public static Integer getDiskMaxUploadSize() {
+    public static Long getDiskMaxUploadSize() {
         String code = "disk.maxUploadSize";
-        return Integer.valueOf(getConfigValue(code));
+        return Long.valueOf(getConfigValue(code));
     }
 
     /**
@@ -447,7 +447,7 @@ public class AppConstants extends SysConstants {
      * @return
      */
     public static String getPrettyDiskMaxUploadSize() {
-        Integer maxUploadSize = getDiskMaxUploadSize();
+        Long maxUploadSize = getDiskMaxUploadSize();
         return PrettyMemoryUtils.prettyByteSize(maxUploadSize);
     }
 
@@ -456,13 +456,13 @@ public class AppConstants extends SysConstants {
      *
      * @return
      */
-    public static Integer getNoticeMaxUploadSize() {
+    public static Long getNoticeMaxUploadSize() {
         String code = "notice.maxUploadSize";
         String value = getConfigValue(code);
         if (StringUtils.isBlank(value)) {
             return getDiskMaxUploadSize();
         }
-        return Integer.valueOf(value);
+        return Long.valueOf(value);
     }
 
     /**
@@ -471,7 +471,7 @@ public class AppConstants extends SysConstants {
      * @return
      */
     public static String getPrettyNoticeMaxUploadSize() {
-        Integer maxUploadSize = getNoticeMaxUploadSize();
+        Long maxUploadSize = getNoticeMaxUploadSize();
         return PrettyMemoryUtils.prettyByteSize(maxUploadSize);
     }
 

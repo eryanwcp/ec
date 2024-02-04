@@ -17,6 +17,7 @@ import com.eryansky.core.security.annotation.PrepareOauth2;
 import com.eryansky.core.security.annotation.RequiresUser;
 import com.eryansky.core.web.annotation.Mobile;
 import com.eryansky.core.web.annotation.MobileValue;
+import com.eryansky.core.web.upload.FileUploadUtils;
 import com.eryansky.core.web.upload.exception.FileNameLengthLimitExceededException;
 import com.eryansky.core.web.upload.exception.InvalidExtensionException;
 import com.eryansky.modules.disk._enum.FolderType;
@@ -338,6 +339,7 @@ public class MobileIndexController extends SimpleController {
         Exception exception = null;
         File file = null;
         try {
+            FileUploadUtils.assertAllowed(multipartFile,FileUploadUtils.IMAGE_EXTENSION, FileUploadUtils.DEFAULT_MAX_SIZE);
             String _folderName = "IMAGE";//默认文件夹
             if(StringUtils.isNotBlank(folderCode)){
                 _folderName = FilenameUtils.getName(folderCode);
