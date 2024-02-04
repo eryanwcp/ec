@@ -447,13 +447,8 @@ public class DiskController extends SimpleController {
     @PostMapping(value = {"fileUpload"})
     @ResponseBody
     public Result fileUpload(
-            @RequestParam(value = "folderId", required = false) String folderId,
-            @RequestParam(value = "uploadFile", required = true) MultipartFile multipartFile)
-            throws Exception {
-        if (StringUtils.isBlank(folderId)) {
-            return Result.errorResult().setMsg("文件夹Id丢失！");
-        }
-
+            @RequestParam(value = "folderId", required = true) String folderId,
+            @RequestParam(value = "uploadFile", required = true) MultipartFile multipartFile) {
         Folder folder = folderService.get(folderId);
         if (null == folder) {
             return Result.errorResult().setMsg("文件夹不存在，已被删除或移除！");
