@@ -1,3 +1,16 @@
+-- V4.2.20231124.11 用户、组织增加信息分类编码以及自定义扩展数据；日志增加自定义扩展数据。
+ALTER TABLE t_sys_user ADD COLUMN biz_code varchar(64) COMMENT '信息分类编码';
+ALTER TABLE t_sys_user ADD COLUMN extend_attr text COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}';
+ALTER TABLE t_sys_organ ADD COLUMN biz_code varchar(64) COMMENT '信息分类编码';
+ALTER TABLE t_sys_organ ADD COLUMN extend_attr text COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}';
+ALTER TABLE t_sys_organ_extend ADD COLUMN biz_code varchar(64) COMMENT '信息分类编码';
+ALTER TABLE t_sys_organ_extend ADD COLUMN extend_attr text COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}';
+ALTER TABLE t_sys_log ADD COLUMN extend_attr text COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}';
+ALTER TABLE t_sys_log_history ADD COLUMN extend_attr text COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}';
+
+-- V4.2.20231124.02 消息管理增加消息类型
+ALTER TABLE t_notice_message ADD COLUMN msg_type varchar(32) COMMENT '消息类型 文本：text；文本卡片：textcard';
+
 -- V4.2.20230921.04 用户管理增加“职务”字段
 ALTER TABLE t_sys_user ADD COLUMN position varchar(128) COMMENT '职务';
 
