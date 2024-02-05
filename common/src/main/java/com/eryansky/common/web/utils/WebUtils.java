@@ -401,13 +401,13 @@ public class WebUtils extends org.springframework.web.util.WebUtils {
      * @param path
      */
     public static void setCookie(HttpServletResponse response, String name,
-                                 String value, String path) {
+                                 String value, String path,boolean secure) {
         if (logger.isDebugEnabled()) {
             logger.debug("设置Cookie {},位置: {}",name,path);
         }
 
         Cookie cookie = new Cookie(name, value);
-        cookie.setSecure(false);
+        cookie.setSecure(secure);
         cookie.setPath(path);
         cookie.setMaxAge(2592000);
 

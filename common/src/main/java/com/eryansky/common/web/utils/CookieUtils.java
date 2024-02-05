@@ -26,7 +26,7 @@ public class CookieUtils {
 	 * @param value 值
 	 */
 	public static void setCookie(HttpServletResponse response, String name, String value) {
-		setCookie(response, name, value, 60*60*24);
+		setCookie(response, name, value, 60*60*24,false);
 	}
 	
 	/**
@@ -35,15 +35,15 @@ public class CookieUtils {
 	 * @param value 值
 	 * @param maxAge 生存时间（单位秒）
 	 */
-	public static void setCookie(HttpServletResponse response, String name, String value, int maxAge) {
-		Cookie cookie = new Cookie(name, null);
+	public static void setCookie(HttpServletResponse response, String name, String value, int maxAge,boolean secure) {
+		Cookie cookie = new Cookie(name, EncodeUtils.urlEncode(value));
         if(StringUtils.isNotBlank(SpringContextHolder.getApplicationContext().getApplicationName())){
             cookie.setPath(SpringContextHolder.getApplicationContext().getApplicationName());
         }else{
             cookie.setPath("/");
         }
 		cookie.setMaxAge(maxAge);
-        cookie.setValue(EncodeUtils.urlEncode(value));
+        cookie.setSecure(secure);
 		response.addCookie(cookie);
 	}
 	/**

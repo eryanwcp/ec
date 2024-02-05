@@ -37,6 +37,7 @@ public class J2CacheSessionFilter implements Filter {
     private String cookiePath;
     private String cookieDomain;
     private int cookieMaxAge;
+    private boolean cookieSecure;
 
     private boolean discardNonSerializable;
 
@@ -63,6 +64,7 @@ public class J2CacheSessionFilter implements Filter {
         this.cookieName = this.cookieName != null ? this.cookieName:"J2CACHE_SESSION_ID";
         this.cookieDomain   = config.getInitParameter("cookie.domain");
         this.cookiePath     = config.getInitParameter("cookie.path");
+        this.cookieSecure = "true".equalsIgnoreCase(config.getInitParameter("cookie.secure"));
         String ctx = config.getServletContext().getContextPath();
         this.cookiePath = null != this.cookiePath && !"".equals(this.cookiePath) ? this.cookiePath:"".equals(ctx) ? "/":ctx;
         String maxAge     = config.getInitParameter("session.maxAge");
@@ -233,7 +235,8 @@ public class J2CacheSessionFilter implements Filter {
             }
             try {
                 cookie.setHttpOnly(true);
-                cookie.setSecure(true);
+                //仅HTTPS环境设置微true
+                cookie.setSecure(cookieSecure);
             } catch (Exception e) {
             }
             response.addCookie(cookie);
