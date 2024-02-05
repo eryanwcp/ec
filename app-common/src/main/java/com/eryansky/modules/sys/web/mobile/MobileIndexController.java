@@ -345,7 +345,7 @@ public class MobileIndexController extends SimpleController {
 
             String filename = DiskUtils.getMultipartOriginalFilename(multipartFile);
             String extension = FilenameUtils.getExtension(filename);
-            //兼容处理 TODO 非安全操作
+            //兼容处理 无后缀文件的处理
             if(StringUtils.isNotBlank(extension)){
                 FileUploadUtils.assertAllowed(multipartFile,FileUploadUtils.IMAGE_EXTENSION, FileUploadUtils.DEFAULT_MAX_SIZE);
             }
