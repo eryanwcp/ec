@@ -45,6 +45,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.nio.file.Files;
 import java.util.Map;
 
 /**
@@ -351,7 +352,7 @@ public class MobileIndexController extends SimpleController {
             file = DiskUtils.saveSystemFile(_folderName, sessionInfo.getUserId(), multipartFile);
             DiskUtils.saveFile(file);
             Map<String, Object> _data = Maps.newHashMap();
-            String data = "data:image/jpeg;base64," + Base64Utils.encodeToString(FileCopyUtils.copyToByteArray(new FileInputStream(file.getDiskFile())));
+            String data = "data:image/jpeg;base64," + Base64Utils.encodeToString(FileCopyUtils.copyToByteArray(Files.newInputStream(file.getDiskFile().toPath())));
             _data.put("file", file);
             _data.put("data", data);
             _data.put("url", AppConstants.getAdminPath() + "/disk/fileDownload/" + file.getId());
