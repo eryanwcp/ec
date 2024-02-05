@@ -342,8 +342,11 @@ public class MobileIndexController extends SimpleController {
         try {
 //            FileUploadUtils.assertAllowed(multipartFile,FileUploadUtils.IMAGE_EXTENSION, FileUploadUtils.DEFAULT_MAX_SIZE);
             String _folderName = "IMAGE";//默认文件夹
-            //兼容处理
-            if(!StringUtils.startsWith(folderCode,_folderName)){
+
+            String filename = DiskUtils.getMultipartOriginalFilename(multipartFile);
+            String extension = FilenameUtils.getExtension(filename);
+            //兼容处理 TODO 非安全操作
+            if(!StringUtils.isBlank(extension)){
                 FileUploadUtils.assertAllowed(multipartFile,FileUploadUtils.IMAGE_EXTENSION, FileUploadUtils.DEFAULT_MAX_SIZE);
             }
             if(StringUtils.isNotBlank(folderCode)){
