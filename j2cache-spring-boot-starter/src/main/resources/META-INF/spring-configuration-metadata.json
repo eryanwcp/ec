@@ -60,6 +60,11 @@
       "name": "j2cache.session.filter.cookiePath",
       "type": "java.lang.String"
     },{
+      "name": "j2cache.session.filter.cookieSecure",
+      "type": "java.lang.Boolean",
+      "description": "Enable Cookie Secure.",
+      "defaultValue": false
+    },{
       "name": "j2cache.session.redis.enabled",
       "type": "java.lang.Boolean",
       "description": "Enable SessionFilter.",
