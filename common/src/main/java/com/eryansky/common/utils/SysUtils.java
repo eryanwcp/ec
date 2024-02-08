@@ -5,29 +5,16 @@
  */
 package com.eryansky.common.utils;
 
-import org.apache.oro.text.regex.MalformedPatternException;
-import org.apache.oro.text.regex.Perl5Compiler;
-import org.apache.oro.text.regex.Perl5Matcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
-
-import com.eryansky.common.exception.SystemException;
-
-
 import java.awt.*;
 import java.io.*;
 import java.math.BigDecimal;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.sql.Blob;
 import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -914,47 +901,6 @@ public class SysUtils {
 		return strEmail.substring(strEmail.lastIndexOf("@")).toLowerCase();
 	}
 
-	/**
-	 * HTML标签过滤
-	 * 
-	 * @param value
-	 * @return
-	 */
-	public static String dhtmlspecialchars(String value) {
-		if (matches(value, "(&|\"|<|>)")) {
-			value = value.replaceAll("&", "&amp;");
-			value = value.replaceAll("\"", "&quot;");
-			value = value.replaceAll("<", "&lt;");
-			value = value.replaceAll(">", "&gt;");
-		}
-		return value;
-	}
-
-	/**
-	 * HTML标签反
-	 * 
-	 * @param value
-	 * @return
-	 */
-	public static String htmlspecialchars(String value) {
-		if (matches(value, "(&amp;|&quot;|&lt;|&gt;)")) {
-			value = value.replaceAll("&amp;", "&");
-			value = value.replaceAll("&quot;", "\"");
-			value = value.replaceAll("&lt;", "<");
-			value = value.replaceAll("&gt;", ">");
-		}
-		return value;
-	}
-
-	public static boolean matches(String content, String regex) {
-		boolean flag = false;
-		try {
-			flag = new Perl5Matcher().contains(content,
-					new Perl5Compiler().compile(regex));
-		} catch (MalformedPatternException e) {
-		}
-		return flag;
-	}
 
 	public static String combinatorial(String str) {
 		if (null == str)

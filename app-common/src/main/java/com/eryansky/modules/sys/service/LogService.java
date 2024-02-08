@@ -17,8 +17,6 @@ import com.eryansky.core.orm.mybatis.service.CrudService;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.modules.sys.dao.LogDao;
 import com.eryansky.modules.sys.mapper.Log;
-import com.eryansky.modules.sys.mapper.Organ;
-import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Maps;
 import org.springframework.stereotype.Service;
@@ -295,17 +293,10 @@ public class LogService extends CrudService<LogDao, Log> {
      *
      * @return
      */
-    public List<Map<String, Object>> getDayLoginStatistics(String startTime, String endTime) {
+    public List<Map<String, Object>> findDayLoginStatistics(Date startTime, Date endTime) {
         Parameter parameter = new Parameter();
-        if (StringUtils.isNotBlank(startTime)) {
-            startTime += " 00:00:00";
-            parameter.put("startTime", startTime);
-        }
-        if (StringUtils.isNotBlank(endTime)) {
-            endTime += " 23:59:59";
-            parameter.put("endTime", endTime);
-        }
-//        parameter.put(BaseInterceptor.PAGE,pg);
+        parameter.put("startTime", null != startTime ? DateUtils.getDateStart(startTime):startTime);
+        parameter.put("endTime", null != endTime ? DateUtils.getDateEnd(endTime):endTime);
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
         List<Map<String, Object>> list = dao.getDayLoginStatistics(parameter);
         return list;

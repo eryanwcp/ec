@@ -2,8 +2,6 @@ package com.eryansky.configure.web;
 
 import com.eryansky.core.cms.CKFinderConnectorServlet;
 import com.eryansky.core.cms.CKFinderFilesServlet;
-import com.eryansky.core.web.servlet.DownloadChartServlet;
-import com.eryansky.core.web.servlet.StaticContentServlet;
 import com.eryansky.common.web.servlet.ValidateCodeServlet;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -45,19 +43,6 @@ public class ServletConfiguration {
 //        bean.addInitParameter("cacheFileData","true");
 //        return bean;
 //    }
-
-
-    /**
-     * HightChart download
-     * @return
-     */
-    @Bean
-    public ServletRegistrationBean<DownloadChartServlet> getDownloadChartServlet() {
-        DownloadChartServlet servlet = new DownloadChartServlet();
-        ServletRegistrationBean<DownloadChartServlet> bean = new ServletRegistrationBean<>(servlet);
-        bean.addUrlMappings("/servlet/DownloadChartServlet");
-        return bean;
-    }
 
 
     /**

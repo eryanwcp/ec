@@ -1,17 +1,13 @@
 package com.eryansky.modules.sys.web;
 
 import com.eryansky.common.model.Datagrid;
-import com.eryansky.common.model.Result;
 import com.eryansky.common.orm.Page;
-import com.eryansky.common.utils.DateUtils;
-import com.eryansky.common.utils.PrettyMemoryUtils;
 import com.eryansky.common.utils.StringUtils;
-import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.web.springmvc.SimpleController;
+import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.excels.CsvUtils;
 import com.eryansky.core.security.annotation.RequiresPermissions;
-import com.eryansky.modules.disk.mapper.File;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.core.excels.ExcelUtils;
 import com.eryansky.core.excels.JsGridReportBase;
@@ -33,7 +29,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -64,7 +59,7 @@ public class LogReportController extends SimpleController {
     @RequiresPermissions(value = "sys:log:loginStatistics")
     @PostMapping(value = {"loginStatisticsData"})
     @ResponseBody
-    public Datagrid<Map<String, Object>> datagrid(String name, String startTime, String endTime, HttpServletRequest request) {
+    public Datagrid<Map<String, Object>> loginStatisticsData(String name, String startTime, String endTime, HttpServletRequest request) {
         Page<Map<String, Object>> page = new Page<>(request);
         page = logService.getLoginStatistics(page, name, startTime, endTime);
         Datagrid<Map<String, Object>> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
@@ -119,33 +114,41 @@ public class LogReportController extends SimpleController {
      */
     @Logging(value = "日志统计-每日登陆次数分析", logType = LogType.access)
     @RequiresPermissions(value = "sys:log:dayLoginStatistics")
-    @GetMapping(value = {"dayLoginStatistics"})
-    public String dayLoginStatistics() {
-        return "modules/sys/log-dayLoginStatistics";
-    }
-
-    /**
-     * 每日登陆分析数据
-     *
-     * @param startTime
-     * @param endTime
-     * @return
-     * @throws Exception
-     */
-    @RequiresPermissions(value = "sys:log:dayLoginStatistics")
-    @PostMapping(value = {"dayLoginStatisticsData"})
-    @ResponseBody
-    public Result dayLoginStatisticsData(String startTime, String endTime) throws Exception {
-        String _startTime = StringUtils.isBlank(startTime) ? DateUtils.formatDate(AppDateUtils.getCurrentYearStartTime()):startTime;
-        List<Map<String, Object>> list = logService.getDayLoginStatistics(_startTime, endTime);
-        Date date = null;
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        for (Map<String, Object> map : list) {
-            date = simpleDateFormat.parse(map.get("loginDate").toString());
-            long timeStemp = date.getTime();
-            map.put("loginDate", timeStemp);
+    @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"dayLoginStatistics"})
+    public String dayLoginStatistics(@RequestParam(value = "export",defaultValue = "false") Boolean export,
+                                     Date startTime,
+                                     Date endTime,
+                                     Model uiModel,
+                                     HttpServletRequest request,
+                                     HttpServletResponse response) {
+        Page<Map<String, Object>> page = new Page<>(request,response);
+        Date _startTime = null == startTime ? AppDateUtils.getCurrentYearStartTime():startTime;
+        if(WebUtils.isAjaxRequest(request) || export){
+            if(export){
+                page.setPageSize(Page.PAGESIZE_ALL);
+            }
+            List<Map<String,Object>> list = logService.findDayLoginStatistics(_startTime, endTime);
+            page.setResult(list);
+            page.setTotalCount(list.size());
+            if(export){
+                String title = "每日登陆次数分析";
+                String[] hearders = new String[] {"日期", "访问量",};//表头数组
+                String[] fields = new String[] {"loginDate", "count"};//对象属性数组
+                TableData td = ExcelUtils.createTableData(page.getResult(), ExcelUtils.createTableHeader(hearders,0),fields);
+                try {
+                    JsGridReportBase report = new JsGridReportBase(request, response);
+                    report.exportToExcel(title, SecurityUtils.getCurrentUserName(), td);
+                } catch (Exception e) {
+                    logger.error(e.getMessage(),e);
+                }
+                return null;
+            }
+            return renderString(response,page);
         }
-        return Result.successResult().setObj(list);
+        uiModel.addAttribute("page",page);
+        uiModel.addAttribute("startTime",_startTime);
+        uiModel.addAttribute("endTime",endTime);
+        return "modules/sys/log-dayLoginStatistics";
     }
 
     /**

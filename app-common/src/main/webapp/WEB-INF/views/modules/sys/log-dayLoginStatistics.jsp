@@ -4,97 +4,118 @@
 <head>
     <title>每日登陆次数分析</title>
     <meta name="decorator" content="default_sys"/>
-    <%@ include file="/common/highstock.jsp"%>
+    <!-- bootstrap条件框的收缩和展开 -->
+    <link rel="stylesheet" href="${ctxStatic}/app/modules/sys/css/bootstrap_query_fold.min.css">
     <script type="text/javascript">
-        $(function () {
-            GetseriesValue();  //获取数据源信息
+        $(function(){
+            loadData();
+            $("#btnSubmit").click(function(){
+                $("#pageNo").val(1);
+                loadData();
+            });
+
+            $("#btnReset").click(function(){
+                $('#searchForm').find("input[type=hidden]").val("");
+                $('#searchForm').find("select").val(null).trigger("change");
+            });
+
+            $("#btnExport").click(function(){
+                var param = $.serializeObject($("#searchForm"));
+                $('#annexFrame').attr('src', '${ctxAdmin}/sys/log/report/dayLoginStatistics?export=true&'+ $.param(param));
+            });
         });
-
-        function GetseriesValue(){
-
+        function loadData(){
+            var queryParam = $.serializeObject($("#searchForm"));
+            $("#btnSubmit").attr("disabled",true);
             $.ajax({
-                url: ctxAdmin + '/sys/log/report/dayLoginStatisticsData',
+                url: ctxAdmin + '/sys/log/report/dayLoginStatistics',
                 type: 'post',
-                dataType:'json',
+                dataType: "json",
+                cache:false,
+                data:queryParam,
+                beforeSend: function (jqXHR, settings) {
+                    $("#list").html("<div style='padding: 10px 30px;text-align:center;font-size: 16px;'><img src='${ctxStatic}/js/easyui/themes/bootstrap/images/loading.gif' />数据加载中...</div>");
+                },
                 success: function (data) {
-                    var a = data["obj"];
-                    var jsonArray=[];
-                    for(var o in a){
-                        jsonArray.push([a[o].loginDate,a[o].count]);
+                    $("#btnSubmit").attr("disabled",false);
+                    if (data['totalCount'] > 0) {
+                        var html = Mustache.render($("#list_template").html(), data);
+                        $("#list").html(html);
+                        $(".pagination").append(data['html']);
+                    } else {
+                        $("#list").html("<div style='color: red;padding: 10px 30px;text-align:center;font-size: 16px;'>查无数据</div>");
                     }
-                    GetData(jsonArray);
                 }
             });
         }
 
-        function GetData(data) {
-            Highcharts.setOptions({
-                lang: {
-                    rangeSelectorFrom: '从',
-                    rangeSelectorTo: '到',
-                    rangeSelectorZoom:'区域'
-                }
-            });
-            $('#container').highcharts('StockChart',{
-                rangeSelector: {
-                    selected: 5,
-                    enabled:true,
-                    inputEnabled:true,
-                    inputDateFormat : '%Y-%m-%d',
-                    buttons: [{
-                        type: 'day',
-                        count: 7,
-                        text: '周'
-                    }, {
-                        type: 'month',
-                        count: 1,
-                        text: '月'
-                    }, {
-                        type: 'month',
-                        count: 3,
-                        text: '季度'
-                    }, {
-                        type: 'all',
-                        text: '所有'
-                    }]
-                },
-                title: {
-                    text: '每日登陆次数分析'
-                },
-                series: [{
-                    name: '人次',
-                    data: data,
-                    tooltip: {
-                        valueDecimals: 2
-                    }
-                }],
-                xAxis:{
-                    type: 'datetime',
-                    dateTimeLabelFormats: {
-                        day: '%Y-%m-%d'
-                    },
-                    title : {
-                        text:'日期'
-                    }
-                },
-                yAxis:{
-                    title:{
-                        text:'人次'
-                    }
-                },
-                tooltip:{
-                    formatter: function() {
-                        return "时间：" + Highcharts.dateFormat('%Y-%m-%d', this.x)  + "<br>"
-                                + "人次：" +this.y;
-                    }
-                }
-            });
+        function page(n,s){
+            $("#pageNo").val(n);
+            $("#pageSize").val(s);
+            loadData();
+            return false;
         }
+    </script>
+    <script type="text/template" id="list_template">
+        <table id="contentTable" class="table table-striped table-bordered table-condensed">
+            <thead>
+            <tr>
+                <th>日期</th>
+                <th>访问量</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{#result}}
+            <tr>
+                <td>{{loginDate}}</td>
+                <td>{{count}}</td>
+            </tr>
+            {{/result}}
+            </tbody>
+        </table>
+        <div class="page pagination"></div>
     </script>
 </head>
 <body>
-
-    <div id="container" style="min-width:400px;height:400px"></div>
+<div class="accordion" id="form_accordion">
+    <div class="accordion-group">
+        <div class="accordion-heading">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#form_accordion" href="#collapseOne">
+                <i class="icon-filter"></i>
+            </a>
+        </div>
+        <div id="collapseOne" class="accordion-body collapse in">
+            <div class="accordion-inner">
+                <form id="searchForm">
+                    <input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
+                    <input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
+                    <div class="row-fluid">
+                        <div class="span4">
+                            <div class="span3"><label>时间：</label></div>
+                            <div class="span9">
+                                <input  name="startTime" type="text" readonly="readonly" maxlength="10" class="input-small Wdate"
+                                        value="<fmt:formatDate value="${startTime}" pattern="yyyy-MM-dd"/>" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});"/>
+                                ~ <input  name="endTime" type="text" readonly="readonly" maxlength="10" class="input-small Wdate"
+                                          value="<fmt:formatDate value="${endTime}" pattern="yyyy-MM-dd"/>" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});"/>&nbsp;&nbsp;
+                            </div>
+                        </div>
+                        <div class="span4">
+                            <div class="span3"></div>
+                            <div class="span9">
+                                <input id="btnSubmit" class="btn btn-primary" type="button" value="查 询"/>&nbsp;&nbsp;
+                                <input id="btnReset" class="btn btn-warning" type="reset" value="重 置"/>&nbsp;&nbsp;
+                                <button id="btnExport" type="button" class="btn btn-primary" >导 出</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<tags:message content="${message}"/>
+<div id="list"></div>
+<iframe id="annexFrame" src="" frameborder="no" style="padding: 0;border: 0;width: 100%;height: 50px;display: none;"></iframe>
 </body>
 </html>
 
