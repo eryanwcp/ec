@@ -205,7 +205,7 @@ public class LogReportController extends SimpleController {
         page = logService.getModuleStatistics(page.pageSize(Page.PAGESIZE_ALL), userId, organId, onlyCompany, startTime, endTime, postCode);
         List<Map<String, Object>> result = page.getResult();
         String[] hearders = new String[]{"模块", "访问次数"};//表头数组
-        String[] fields = new String[]{"module", "moduleCount"};//People对象属性数组
+        String[] fields = new String[]{"module", "moduleCount"};//对象属性数组
 
         if (page.getResult().size() < 65531) {
             //导出Excel
