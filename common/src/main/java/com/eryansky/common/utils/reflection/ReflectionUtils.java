@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.eryansky.common.utils.StringUtils;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -439,11 +439,11 @@ public class ReflectionUtils {
 
         Field[] fields = targetClass.getDeclaredFields();
         // 获取字段中的注解
-        CollectionUtils.addAll(result, getAnnotations(fields, annotationClass).iterator());
+        CollectionUtils.addAll(result, getAnnotations(fields, annotationClass));
 
         Method[] methods = targetClass.getDeclaredMethods();
         // 获取方法中的注解
-        CollectionUtils.addAll(result, getAnnotations(methods, annotationClass).iterator());
+        CollectionUtils.addAll(result, getAnnotations(methods, annotationClass));
 
         for (Class<?> superClass = targetClass.getSuperclass(); superClass == null
                 || superClass == Object.class; superClass = superClass

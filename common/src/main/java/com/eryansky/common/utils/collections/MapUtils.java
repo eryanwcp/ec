@@ -121,7 +121,7 @@ public class MapUtils{
      * @return
      */
     public static <V> String getKeyByValue(Map<String, V> map, V value) {
-        if (org.apache.commons.collections.MapUtils.isEmpty(map)) {
+        if (org.apache.commons.collections4.MapUtils.isEmpty(map)) {
             return null;
         }
 

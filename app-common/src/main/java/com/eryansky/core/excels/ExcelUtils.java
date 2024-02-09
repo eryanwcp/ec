@@ -11,7 +11,7 @@ import com.google.common.collect.Maps;
 import delight.rhinosandox.RhinoSandbox;
 import delight.rhinosandox.RhinoSandboxes;
 import org.apache.commons.beanutils.PropertyUtilsBean;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
@@ -32,6 +32,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -1573,7 +1575,7 @@ public class ExcelUtils {
                     Sheet sheet = workbook.createSheet(sheetInfo.getSheetName());
                     write2Sheet(sheet, sheetInfo.getHeaders(), sheetInfo.getDataset(), pattern);
                 }
-                try (OutputStream out = new FileOutputStream(filePath)) {
+                try (OutputStream out = Files.newOutputStream(Paths.get(filePath))) {
                     workbook.write(out);
                 }
             }

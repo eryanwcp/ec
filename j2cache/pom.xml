@@ -15,11 +15,10 @@
     <properties>
         <caffeine.version>2.9.3</caffeine.version>
         <jedis.version>2.10.2</jedis.version>
-        <lettuce.version>6.2.3.RELEASE</lettuce.version>
+        <lettuce.version>6.2.7.RELEASE</lettuce.version>
         <objenesis.version>3.2</objenesis.version>
         <fst.version>2.57</fst.version>
-        <snappy.version>1.1.10.4</snappy.version>
-        <jline.version>2.14.6</jline.version>
+        <snappy.version>1.1.10.5</snappy.version>
         <guava.version>33.0.0-jre</guava.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
