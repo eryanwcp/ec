@@ -288,8 +288,7 @@
                 DATE_FORMAT(a.create_time, '%Y-%m-%d')
             </otherwise>
         </choose>
-        ORDER BY
-        1 ASC
+        ORDER BY 1 DESC
     </select>
 
     <!--查询员工登录统计信息-->
