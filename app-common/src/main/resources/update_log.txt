@@ -1,6 +1,6 @@
 ﻿20240218
 V4.2.20231124.27
-1、去除部分依赖HightChart、Hightstock、Hightmaps等、去除fop。
+1、去除部分依赖Highcharts、Hightstock、Hightmaps等、去除fop。
 
 20240104
 V4.2.20231124.12

@@ -4,7 +4,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>页面访问出错</title>
-    <script src="${ctxStatic}/js/jquery/jquery.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/jquery/jquery-1.12.4.min.js" type="text/javascript"></script>
+    <script src="${ctx}/static/js/jquery/jquery-migrate-1.4.1.min.js" type="text/javascript"></script>
 </head>
 <%
     Throwable ex = null;
