@@ -142,5 +142,13 @@
                 <input type="radio" name="status" style="width: 20px;" value="3" /> 停用
             </label>
         </div>
+        <div>
+            <label>信息分编码：</label>
+            <input type="text" name="bizCode"  value="${model.bizCode}"  class="easyui-validatebox textbox"/>
+        </div>
+        <div>
+            <label>自定义参数：</label>
+            <textarea name="extendAttr" rows="4" class="easyui-textbox" style="width:260px;height:75px;">${model.extendAttr}</textarea>
+        </div>
     </form>
 </div>

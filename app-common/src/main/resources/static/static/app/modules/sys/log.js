@@ -45,7 +45,10 @@ $(function () {
             {field: 'actionTime', title: '操作耗时(ms)', width: 100},
             {field: 'longitude', title: '经度', width: 100, hidden: true},
             {field: 'latitude', title: '纬度', width: 100, hidden: true},
-            {field: 'remark', title: '备注', width: 260, hidden: true}
+            {field: 'remark', title: '备注', width: 260, hidden: true},
+            {field: 'extendAttr', title: '自定义参数', width: 200,hidden: true,formatter: function (value, rowData, rowIndex) {
+                    return value ? JSON.stringify(value) : value;
+                }}
         ]],
         toolbar: [
             {

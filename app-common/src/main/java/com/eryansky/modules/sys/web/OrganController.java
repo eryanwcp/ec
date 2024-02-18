@@ -5,10 +5,12 @@
  */
 package com.eryansky.modules.sys.web;
 
+import com.eryansky.client.common.vo.ExtendAttr;
 import com.eryansky.common.exception.ActionException;
 import com.eryansky.common.model.Combobox;
 import com.eryansky.common.model.Result;
 import com.eryansky.common.model.TreeNode;
+import com.eryansky.common.utils.DateUtils;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SimpleController;
@@ -33,10 +35,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
+import java.beans.PropertyEditorSupport;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -110,6 +114,7 @@ public class OrganController extends SimpleController {
         ModelAndView modelAndView = new ModelAndView("modules/sys/organ-input");
         modelAndView.addObject("parentId", parentId);
         modelAndView.addObject("model", model);
+
         return modelAndView;
     }
 
@@ -160,6 +165,17 @@ public class OrganController extends SimpleController {
             treeNodes.add(parentTreeNode.setState(TreeNode.STATE_OPEN));
         }
         return ListUtils.union(titleList, treeNodes);
+    }
+
+    @Override
+    protected void initBinder(WebDataBinder binder) {
+        super.initBinder(binder);
+        binder.registerCustomEditor(ExtendAttr.class, new PropertyEditorSupport() {
+            @Override
+            public void setAsText(String text) {
+                setValue(JsonMapper.getInstance().fromJson(text,ExtendAttr.class));
+            }
+        });
     }
 
     /**

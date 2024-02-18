@@ -72,7 +72,10 @@ $(function () {
             {field: 'sort', title: '排序', align: 'right', width: 60, sortable: true},
             {field: 'statusView', title: '状态', align: 'center', width: 60},
             {field: 'remark', title: '备注', width: 260},
-            {field: 'extendAttr', title: '自定义参数', width: 200,hidden: true},
+            {field: 'bizCode', title: '信息分类编码', width: 120, hidden: true, sortable: true},
+            {field: 'extendAttr', title: '自定义参数', width: 200,hidden: true,formatter: function (value, rowData, rowIndex) {
+                    return value ? JSON.stringify(value) : value;
+            }},
             {field: 'updateTime', title: '更新时间', width: 146}
         ]],
         toolbar: toolbar,

@@ -69,7 +69,7 @@
     <div class="control-group">
         <label class="control-label">当前最大值：</label>
         <div class="controls">
-            <textarea id="maxSerial" name="_maxSerial" rows="4" maxlength="4096" class="input-xxlarge">${model.maxSerial}</textarea>
+            <textarea name="maxSerial" rows="4" class="input-xxlarge">${model.maxSerial}</textarea>
         </div>
     </div>
     <div class="control-group">

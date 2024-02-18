@@ -290,7 +290,10 @@ $(function () {
                         return value;
                     }
                 },
-                {field: 'extendAttr', title: '自定义参数', width: 200,hidden: true},
+                {field: 'bizCode', title: '信息分类编码', width: 120, hidden: true, sortable: true},
+                {field: 'extendAttr', title: '自定义参数', width: 200,hidden: true,formatter: function (value, rowData, rowIndex) {
+                        return value ? JSON.stringify(value) : value;
+                }},
                 {field: 'updateTime', title: '更新时间', width: 146},
                 {
                     field: 'operater', title: '操作', width: 260, formatter: function (value, rowData, rowIndex) {

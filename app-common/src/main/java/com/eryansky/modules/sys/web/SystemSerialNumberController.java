@@ -30,10 +30,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.util.HtmlUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 import java.util.List;
 
@@ -64,7 +64,7 @@ public class SystemSerialNumberController extends SimpleController {
                        @RequestParam(value = "export", defaultValue = "false") Boolean export,
                        @RequestParam(value = "exportType", defaultValue = "xls") String exportType,
                        HttpServletRequest request, HttpServletResponse response, Model uiModel) {
-        Page<SystemSerialNumber> page = new Page<SystemSerialNumber>(request, response);
+        Page<SystemSerialNumber> page = new Page<>(request, response);
         if (WebUtils.isAjaxRequest(request) || export) {
             if (export) {
                 page.setPageSize(Page.PAGESIZE_ALL);
@@ -113,22 +113,23 @@ public class SystemSerialNumberController extends SimpleController {
         return "modules/sys/systemSerialNumberForm";
     }
 
-
     @Override
     protected void initBinder(WebDataBinder binder) {
-        super.defaultWebDataBinder(binder);
-        super.setAllowedFields(binder);
+        super.initBinder(binder);
+        binder.registerCustomEditor(MaxSerial.class, new PropertyEditorSupport() {
+            @Override
+            public void setAsText(String text) {
+                setValue(JsonMapper.getInstance().fromJson(text,MaxSerial.class));
+            }
+        });
     }
 
     @RequiresPermissions("sys:systemSerialNumber:edit")
     @PostMapping(value = "save")
-    public String save(@ModelAttribute("model") SystemSerialNumber model,
-                       String _maxSerial, Model uiModel, RedirectAttributes redirectAttributes) {
+    public String save(@ModelAttribute("model") SystemSerialNumber model, Model uiModel, RedirectAttributes redirectAttributes) {
         if (!beanValidator(uiModel, model)) {
             return form(model, uiModel);
         }
-        MaxSerial maxSerial = (MaxSerial) JsonMapper.fromJsonString(HtmlUtils.htmlUnescape(_maxSerial), MaxSerial.class);
-        model.setMaxSerial(maxSerial);
         systemSerialNumberService.save(model);
         addMessage(redirectAttributes, "保存'" + model.getModuleName() + "'成功");
         return "redirect:" + AppConstants.getAdminPath() + "/sys/systemSerialNumber";

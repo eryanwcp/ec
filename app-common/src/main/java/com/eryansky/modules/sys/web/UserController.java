@@ -5,6 +5,7 @@
  */
 package com.eryansky.modules.sys.web;
 
+import com.eryansky.client.common.vo.ExtendAttr;
 import com.eryansky.common.exception.ActionException;
 import com.eryansky.common.model.*;
 import com.eryansky.common.orm.Page;
@@ -45,12 +46,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -65,7 +68,6 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping(value = "${adminPath}/sys/user")
 public class UserController extends SimpleController {
-
 
     @Autowired
     private UserService userService;
@@ -163,6 +165,17 @@ public class UserController extends SimpleController {
         return cList;
     }
 
+
+    @Override
+    protected void initBinder(WebDataBinder binder) {
+        super.initBinder(binder);
+        binder.registerCustomEditor(ExtendAttr.class, new PropertyEditorSupport() {
+            @Override
+            public void setAsText(String text) {
+                setValue(JsonMapper.getInstance().fromJson(text,ExtendAttr.class));
+            }
+        });
+    }
 
     /**
      * 保存.

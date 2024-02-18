@@ -5,6 +5,8 @@
  */
 package com.eryansky.client.common.vo;
 
+import com.eryansky.common.utils.mapper.JsonMapper;
+
 import java.util.HashMap;
 
 /**
@@ -13,6 +15,8 @@ import java.util.HashMap;
  */
 public class ExtendAttr extends HashMap<String,Object> {
 
-
-
+    @Override
+    public String toString() {
+        return JsonMapper.toJsonString(this);
+    }
 }
