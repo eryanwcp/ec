@@ -12,13 +12,11 @@ import com.eryansky.j2cache.lock.LockInsideExecutedException;
 import com.eryansky.j2cache.lock.LockRetryFrequency;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import com.eryansky.j2cache.Level2Cache;
-import org.springframework.data.redis.core.types.Expiration;
 import org.springframework.integration.redis.util.RedisLockRegistry;
 
 /**
@@ -179,7 +177,6 @@ public class SpringRedisCache implements Level2Cache {
 				try {
 					return lockCallback.handleObtainLock();
 				} catch (Exception e) {
-					log.error(e.getMessage(),e);
 					LockInsideExecutedException ie = new LockInsideExecutedException(e);
 					return lockCallback.handleException(ie);
 				} finally {

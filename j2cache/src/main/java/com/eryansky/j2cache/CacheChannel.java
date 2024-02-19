@@ -1037,7 +1037,6 @@ public abstract class CacheChannel implements Closeable , AutoCloseable {
 					try {
 						return lockCallback.handleObtainLock();
 					} catch (Exception e) {
-						logger.error(e.getMessage(),e);
 						LockInsideExecutedException ie = new LockInsideExecutedException(e.getMessage(),e);
 						return lockCallback.handleException(ie);
 					} finally {

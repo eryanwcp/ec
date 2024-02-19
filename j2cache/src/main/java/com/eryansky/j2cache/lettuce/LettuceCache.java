@@ -142,7 +142,6 @@ public abstract class LettuceCache implements Level2Cache {
                         cmd.expire(region, keyExpireSeconds);
                         return lockCallback.handleObtainLock();
                     } catch (Exception e) {
-                        logger.error(e.getMessage(),e);
                         LockInsideExecutedException ie = new LockInsideExecutedException(e);
                         return lockCallback.handleException(ie);
                     } finally {
@@ -166,7 +165,6 @@ public abstract class LettuceCache implements Level2Cache {
                         cmd.expire(region, keyExpireSeconds);
                         return lockCallback.handleObtainLock();
                     } catch (Exception e) {
-                        logger.error(e.getMessage(),e);
                         LockInsideExecutedException ie = new LockInsideExecutedException(e);
                         return lockCallback.handleException(ie);
                     } finally {

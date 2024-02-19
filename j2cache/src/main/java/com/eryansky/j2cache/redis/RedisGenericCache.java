@@ -312,7 +312,6 @@ public class RedisGenericCache implements Level2Cache {
                         client.get().expireAt(region.getBytes(),expireSecond);
                         return lockCallback.handleObtainLock();
                     } catch (Exception e) {
-                        log.error(e.getMessage(),e);
                         LockInsideExecutedException ie = new LockInsideExecutedException(e);
                         return lockCallback.handleException(ie);
                     } finally {

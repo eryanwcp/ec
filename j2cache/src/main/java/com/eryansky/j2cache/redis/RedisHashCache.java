@@ -220,7 +220,6 @@ public class RedisHashCache implements Level2Cache {
                         cmd.expireAt(regionBytes,expireSecond);
                         return lockCallback.handleObtainLock();
                     } catch (Exception e) {
-                        log.error(e.getMessage(),e);
                         LockInsideExecutedException ie = new LockInsideExecutedException(e);
                         return lockCallback.handleException(ie);
                     } finally {
