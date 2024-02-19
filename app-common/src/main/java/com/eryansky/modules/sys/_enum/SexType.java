@@ -24,9 +24,9 @@ public enum SexType implements IGenericEnum<SexType> {
      */
     boy("1", "男"),
     /**
-     * 保密(2)
+     * 未知(2)
      */
-    secrecy("2", "保密");
+    secrecy("2", "未知");
 
     /**
      * 值 String型
