@@ -29,7 +29,7 @@ public class QYUserOfflineResponse extends BaseResponse {
         this.result = result;
     }
 
-    // 成员内部类
+
     public class QYUserOfflineResult {
         private String userid;
         private Integer errcode;
