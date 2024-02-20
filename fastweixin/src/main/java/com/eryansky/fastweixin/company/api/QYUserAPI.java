@@ -8,8 +8,10 @@ import com.eryansky.fastweixin.util.StrUtil;
 import com.eryansky.fastweixin.company.api.entity.QYUser;
 import com.eryansky.fastweixin.company.api.enums.QYResultType;
 import com.eryansky.fastweixin.util.BeanUtil;
+import com.google.common.collect.Lists;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -120,6 +122,35 @@ public class QYUserAPI extends QYBaseAPI {
         BaseResponse r = executeGet(url);
         String resultJson = isSuccess(r.getErrcode()) ? r.getErrmsg() : r.toJsonString();
         response = JSONUtil.toBean(resultJson, GetQYUserInfo4DepartmentResponse.class);
+        return response;
+    }
+
+    /**
+     * 用户踢下线
+     * @param userid 成员UserID。对应管理端的账号
+     * @param msg 用户踢下线提示语
+     * @return
+     */
+    public QYUserOfflineResponse offline(String userid,String msg){
+        return offline(Lists.newArrayList(userid),msg);
+    }
+
+    /**
+     * 用户踢下线
+     * @param userids 成员UserID。对应管理端的账号
+     * @param msg 用户踢下线提示语
+     * @return
+     */
+    public QYUserOfflineResponse offline(List<String> userids, String msg){
+        BeanUtil.requireNonNull(userids, "userids is null");
+        QYUserOfflineResponse response;
+        String url = BASE_API_URL + "cgi-bin/user/offline?access_token=#";
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("userid_list", userids);
+        params.put("msg", msg);
+        BaseResponse r = executePost(url, JSONUtil.toJson(params));
+        String resultJson = isSuccess(r.getErrcode()) ? r.getErrmsg() : r.toJsonString();
+        response = JSONUtil.toBean(resultJson, QYUserOfflineResponse.class);
         return response;
     }
 
