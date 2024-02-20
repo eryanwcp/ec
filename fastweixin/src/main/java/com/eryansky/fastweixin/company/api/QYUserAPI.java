@@ -126,7 +126,7 @@ public class QYUserAPI extends QYBaseAPI {
     }
 
     /**
-     * 用户踢下线
+     * 用户踢下线 (仅限政务微信)
      * @param userid 成员UserID。对应管理端的账号
      * @param msg 用户踢下线提示语
      * @return
@@ -136,7 +136,7 @@ public class QYUserAPI extends QYBaseAPI {
     }
 
     /**
-     * 用户踢下线
+     * 用户踢下线 (仅限政务微信)
      * @param userids 成员UserID。对应管理端的账号
      * @param msg 用户踢下线提示语
      * @return
