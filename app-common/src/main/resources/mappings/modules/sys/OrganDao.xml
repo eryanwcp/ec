@@ -790,28 +790,42 @@
         a.PARENT_IDS AS "parentIds",
         a.AREA_ID AS "areaId",
         a.REMARK AS "remark",
-        a.COMPANY_ID AS "companyId",
-        a.COMPANY_CODE AS "companyCode",
-        a.HOME_COMPANY_ID AS "homeCompanyId",
-        a.HOME_COMPANY_CODE AS "homeCompanyCode",
-        a.TREE_LEVEL AS "treeLevel"
+        a.company_id AS "companyId",
+        a.company_code AS "companyCode",
+        a.company_biz_code AS "companyBizCode",
+        a.home_company_id AS "homeCompanyId",
+        a.home_company_code AS "homeCompanyCode",
+        a.home_company_biz_code AS "homeCompanyBizCode",
+        a.tree_level AS "treeLevel"
     </sql>
 
-    <select id="getOrganExtend" resultType="OrganExtend">
+    <sql id="organExtendJoins">
+        LEFT JOIN t_sys_organ_extend p ON p.id = a.parent_id
+    </sql>
+
+    <select id="getOrganExtendByOrganId" resultType="OrganExtend">
         SELECT
-        <include refid="organExtendColumns"/>
+        <include refid="organExtendColumns"/>,
+            p.code AS "parentCode",
+            p.bizCode AS "parentBizCode",
+            p.name AS "parentName"
         FROM t_sys_organ_extend a
+        <include refid="organExtendJoins"/>
         WHERE a.id = #{id}
     </select>
 
     <select id="getOrganExtendByCode" resultType="OrganExtend">
         SELECT
-        <include refid="organExtendColumns"/>
+        <include refid="organExtendColumns"/>,
+        p.code AS "parentCode",
+        p.bizCode AS "parentBizCode",
+        p.name AS "parentName"
         FROM t_sys_organ_extend a
+        <include refid="organExtendJoins"/>
         WHERE a.code = #{code} AND a.status = #{status}
     </select>
 
-    <select id="getOrganCompany" resultType="OrganExtend">
+    <select id="getCompanyByOrganId" resultType="OrganExtend">
         SELECT
         <include refid="organExtendColumns"/>
         FROM t_sys_organ_extend e
@@ -819,19 +833,35 @@
         WHERE e.id = #{id}
     </select>
 
+    <select id="getHomeCompanyByOrganId" resultType="OrganExtend">
+        SELECT
+        <include refid="organExtendColumns"/>
+        FROM t_sys_organ_extend e
+        LEFT JOIN t_sys_organ_extend a ON a.id = e.home_company_id
+        WHERE e.id = #{id}
+    </select>
+
 
     <select id="getOrganExtendByUserId" resultType="OrganExtend">
         SELECT
-        <include refid="organExtendColumns"/>
+        <include refid="organExtendColumns"/>,
+        p.code AS "parentCode",
+        p.bizCode AS "parentBizCode",
+        p.name AS "parentName"
         FROM t_sys_organ_extend a
+        <include refid="organExtendJoins"/>
         LEFT JOIN t_sys_user u ON u.default_organ_id = a.id
         WHERE u.id = #{userId}
     </select>
 
     <select id="getOrganExtendByUserLoginName" resultType="OrganExtend">
         SELECT
-        <include refid="organExtendColumns"/>
+        <include refid="organExtendColumns"/>,
+        p.code AS "parentCode",
+        p.bizCode AS "parentBizCode",
+        p.name AS "parentName"
         FROM t_sys_organ_extend a
+        <include refid="organExtendJoins"/>
         LEFT JOIN t_sys_user u ON u.default_organ_id = a.id
         <where>
             <if test="status != null and status !=''">
@@ -862,12 +892,19 @@
 
     <select id="findOrganExtends" resultType="OrganExtend">
         SELECT
-        <include refid="organExtendColumns"/>
+        <include refid="organExtendColumns"/>,
+        p.code AS "parentCode",
+        p.bizCode AS "parentBizCode",
+        p.name AS "parentName"
         FROM t_sys_organ_extend a
+        <include refid="organExtendJoins"/>
         <where>
             a.status = #{status}
             <if test="types != null and types.size() !=0">
                 AND a.type IN <foreach collection="types" item="item" open="(" separator="," close=")">#{item}</foreach>
+            </if>
+            <if test="treeLevel != null">
+                AND a.tree_level = #{treeLevel}
             </if>
         </where>
         ORDER BY a.sort ASC
@@ -877,7 +914,7 @@
         SELECT
         <include refid="organExtendColumns"/>
         FROM t_sys_organ_extend a
-        WHERE a.status = '0' AND a.company_id = #{organId} AND a.type = '1'
+        WHERE a.status = '0' AND a.company_id = #{companyId} AND a.type = '1'
         ORDER BY a.sort ASC
     </select>
 
@@ -886,7 +923,7 @@
         SELECT
         a.id
         FROM t_sys_organ_extend a
-        WHERE a.status = '0' AND a.company_id = #{organId} AND a.type = '1'
+        WHERE a.status = '0' AND a.company_id = #{companyId} AND a.type = '1'
         ORDER BY a.sort ASC
     </select>
 
@@ -895,7 +932,7 @@
         SELECT
         <include refid="organExtendColumns"/>
         FROM t_sys_organ_extend a
-        WHERE a.status = '0' AND a.company_id = #{organId} AND a.type IN ('1','2')
+        WHERE a.status = '0' AND a.company_id = #{companyId} AND a.type IN ('1','2')
         ORDER BY a.sort ASC
     </select>
 
@@ -903,7 +940,7 @@
         SELECT
         a.id
         FROM t_sys_organ_extend a
-        WHERE a.status = '0' AND a.company_id = #{organId} AND a.type IN ('1','2')
+        WHERE a.status = '0' AND a.company_id = #{companyId} AND a.type IN ('1','2')
         ORDER BY a.sort ASC
     </select>
 

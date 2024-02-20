@@ -1,4 +1,72 @@
-﻿20240218
+﻿20270220
+V4.2.20231124.32
+1、机构扩展增加信息分类编码
+
+ALTER TABLE t_sys_organ_extend ADD COLUMN parent_code varchar(64) COMMENT '上级编码';
+ALTER TABLE t_sys_organ_extend ADD COLUMN parent_biz_code varchar(64) COMMENT '上级信息分类编码';
+ALTER TABLE t_sys_organ_extend ADD COLUMN company_biz_code varchar(64) COMMENT '单位信息分类编码';
+ALTER TABLE t_sys_organ_extend ADD COLUMN home_company_biz_code varchar(64) COMMENT '上级单位信息分类编码';
+
+SET GLOBAL log_bin_trust_function_creators = 1;
+
+DROP FUNCTION IF EXISTS `getOrganCompanyBizCode`;
+delimiter ;;
+CREATE DEFINER=`root`@`%` FUNCTION `getOrganCompanyBizCode`(rootId varchar(64)) RETURNS varchar(64) CHARSET utf8mb4
+BEGIN
+DECLARE pId varchar(64) default '';
+DECLARE str varchar(36) default rootId;
+DECLARE type varchar(36) default '';
+DECLARE code varchar(64) default '';
+
+WHILE rootId IS NOT NULL DO
+	SET pId =(SELECT t.parent_id FROM t_sys_organ t WHERE t.id = rootId);
+	SET type =(SELECT t.type FROM t_sys_organ t WHERE t.id = rootId);
+	SET code =(SELECT t.biz_code FROM t_sys_organ t WHERE t.id = rootId);
+
+	IF type = '0' THEN
+		SET str = code;
+		SET rootId = null;
+	ELSE
+		SET rootId = pId;
+	END IF;
+
+END WHILE;
+RETURN str;
+END
+;;
+delimiter ;
+
+
+DROP FUNCTION IF EXISTS `getOrganCompanyBizCode`;
+delimiter ;;
+CREATE DEFINER=`root`@`%` FUNCTION `getOrganCompanyBizCode`(rootId varchar(64)) RETURNS varchar(64) CHARSET utf8mb4
+BEGIN
+DECLARE pId varchar(64) default '';
+DECLARE str varchar(36) default rootId;
+DECLARE type varchar(36) default '';
+DECLARE code varchar(64) default '';
+
+WHILE rootId IS NOT NULL DO
+	SET pId =(SELECT t.parent_id FROM t_sys_organ t WHERE t.id = rootId);
+	SET type =(SELECT t.type FROM t_sys_organ t WHERE t.id = rootId);
+	SET code =(SELECT t.biz_code FROM t_sys_organ t WHERE t.id = rootId);
+
+	IF type = '0' THEN
+		SET str = code;
+		SET rootId = null;
+	ELSE
+		SET rootId = pId;
+	END IF;
+
+END WHILE;
+RETURN str;
+END
+;;
+delimiter ;
+
+
+
+20240218
 V4.2.20231124.27
 1、去除部分依赖Highcharts、Hightstock、Hightmaps等、去除fop。
 
@@ -18,6 +86,8 @@ ALTER TABLE t_sys_organ ADD COLUMN biz_code varchar(64) COMMENT '信息分类编
 ALTER TABLE t_sys_organ ADD COLUMN extend_attr text COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}';
 ALTER TABLE t_sys_organ_extend ADD COLUMN biz_code varchar(64) COMMENT '信息分类编码';
 ALTER TABLE t_sys_organ_extend ADD COLUMN extend_attr text COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}';
+
+
 
 ALTER TABLE t_sys_log ADD COLUMN extend_attr text COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}';
 ALTER TABLE t_sys_log_history ADD COLUMN extend_attr text COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}';

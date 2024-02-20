@@ -16,6 +16,7 @@
 		short_name,
 		type,
 		code,
+		biz_code,
 		sys_code,
 		address,
 		mobile,
@@ -31,8 +32,10 @@
 		remark,
 		company_id,
 		company_code,
+		company_biz_code,
 		home_company_id,
 		home_company_code,
+		home_company_biz_code,
 		tree_level
 # 		is_leaf
 		) SELECT id,
@@ -46,6 +49,7 @@
 		short_name,
 		type,
 		code,
+		biz_code,
 		sys_code,
 		address,
 		mobile,
@@ -63,15 +67,19 @@
 			<when test="id != null and companyId != null and homeCompanyId !=null">
 				#{companyId},
 				#{companyCode},
+				#{companyBizCode},
 				#{homeCompanyId},
 				#{homeCompanyCode},
+				#{homeCompanyBizCode},
 				#{treeLevel}
 			</when>
 			<otherwise>
 				getOrganCompanyId(ID),
 				getOrganCompanyCode(ID),
+				getOrganCompanyBizCode(ID),
 				getOrganHomeCompanyId(ID),
 				getOrganHomeCompanyCode(ID),
+				getOrganHomeCompanyBizCode(ID),
 				(length(t_sys_organ.PARENT_IDS) - length(replace(t_sys_organ.PARENT_IDS,',','')))
 			</otherwise>
 		</choose>

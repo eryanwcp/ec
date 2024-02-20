@@ -6,7 +6,6 @@
 package com.eryansky.modules.sys.service;
 
 import com.eryansky.common.exception.ServiceException;
-import com.eryansky.common.model.Result;
 import com.eryansky.common.model.TreeNode;
 import com.eryansky.common.orm._enum.StatusState;
 import com.eryansky.common.orm.model.Parameter;
@@ -19,7 +18,6 @@ import com.eryansky.modules.sys._enum.OrganType;
 import com.eryansky.modules.sys._enum.SexType;
 import com.eryansky.modules.sys.mapper.OrganExtend;
 import com.eryansky.modules.sys.mapper.User;
-import com.eryansky.modules.sys.utils.OrganUtils;
 import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.AppUtils;
 import com.eryansky.utils.CacheConstants;
@@ -1113,7 +1111,7 @@ public class OrganService extends TreeService<OrganDao, Organ> {
         Parameter parameter = Parameter.newParameter();
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put("id", organId);
-        return dao.getOrganExtend(parameter);
+        return dao.getOrganExtendByOrganId(parameter);
     }
 
     /**
@@ -1138,15 +1136,32 @@ public class OrganService extends TreeService<OrganDao, Organ> {
      * @param organId
      * @return
      */
-    public OrganExtend getOrganCompany(String organId) {
+    public OrganExtend getCompanyOrganExtendByOrganId(String organId) {
         if (StringUtils.isBlank(organId)) {
             return null;
         }
         Parameter parameter = Parameter.newParameter();
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put("id", organId);
-        return dao.getOrganCompany(parameter);
+        return dao.getCompanyByOrganId(parameter);
     }
+
+    /**
+     * 根据机构ID查找
+     *
+     * @param organId
+     * @return
+     */
+    public OrganExtend getHomeCompanyOrganExtendByOrganId(String organId) {
+        if (StringUtils.isBlank(organId)) {
+            return null;
+        }
+        Parameter parameter = Parameter.newParameter();
+        parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
+        parameter.put("id", organId);
+        return dao.getHomeCompanyByOrganId(parameter);
+    }
+
 
     /**
      * 根据用户ID查找
@@ -1208,10 +1223,19 @@ public class OrganService extends TreeService<OrganDao, Organ> {
      * @return
      */
     public List<OrganExtend> findCompanyOrganExtends() {
+        return findOrganExtends(Lists.newArrayList(OrganType.organ.getValue()),null);
+    }
+
+    /**
+     * 查找所有单位
+     *
+     * @return
+     */
+    public List<OrganExtend> findOrganExtends(List<String> types,Integer treeLevel) {
         Parameter parameter = Parameter.newParameter();
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
-        List<String> types = Lists.newArrayList(OrganType.organ.getValue());
         parameter.put("types", types);
+        parameter.put("treeLevel", treeLevel);
         return dao.findOrganExtends(parameter);
     }
 
@@ -1219,13 +1243,13 @@ public class OrganService extends TreeService<OrganDao, Organ> {
     /**
      * 查找机构下直属部门
      *
-     * @param organId
+     * @param companyId
      * @return
      */
-    public List<OrganExtend> findDepartmentOrganExtendsByCompanyId(String organId) {
+    public List<OrganExtend> findDepartmentOrganExtendsByCompanyId(String companyId) {
         Parameter parameter = Parameter.newParameter();
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
-        parameter.put("organId", organId);
+        parameter.put("companyId", companyId);
         return dao.findDepartmentOrganExtendsByCompanyId(parameter);
     }
 
@@ -1233,13 +1257,13 @@ public class OrganService extends TreeService<OrganDao, Organ> {
     /**
      * 查找机构下直属部门ID
      *
-     * @param organId
+     * @param companyId
      * @return
      */
-    public List<String> findDepartmentOrganIdsByCompanyId(String organId) {
+    public List<String> findDepartmentOrganIdsByCompanyId(String companyId) {
         Parameter parameter = Parameter.newParameter();
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
-        parameter.put("organId", organId);
+        parameter.put("companyId", companyId);
         return dao.findDepartmentOrganIdsByCompanyId(parameter);
     }
 
@@ -1247,13 +1271,13 @@ public class OrganService extends TreeService<OrganDao, Organ> {
     /**
      * 查找机构下直属部门以及小组
      *
-     * @param organId
+     * @param companyId
      * @return
      */
-    public List<OrganExtend> findDepartmentAndGroupOrganExtendsByCompanyId(String organId) {
+    public List<OrganExtend> findDepartmentAndGroupOrganExtendsByCompanyId(String companyId) {
         Parameter parameter = Parameter.newParameter();
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
-        parameter.put("organId", organId);
+        parameter.put("companyId", companyId);
         return dao.findDepartmentAndGroupOrganExtendsByCompanyId(parameter);
     }
 
@@ -1261,13 +1285,13 @@ public class OrganService extends TreeService<OrganDao, Organ> {
     /**
      * 查找机构下直属部门以及小组IDS
      *
-     * @param organId
+     * @param companyId
      * @return
      */
-    public List<String> findDepartmentAndGroupOrganIdsByCompanyId(String organId) {
+    public List<String> findDepartmentAndGroupOrganIdsByCompanyId(String companyId) {
         Parameter parameter = Parameter.newParameter();
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
-        parameter.put("organId", organId);
+        parameter.put("companyId", companyId);
         return dao.findDepartmentAndGroupOrganIdsByCompanyId(parameter);
     }
 

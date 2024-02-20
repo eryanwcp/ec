@@ -166,7 +166,7 @@ public abstract class BaseService {
                 sqlString.append(" AND " + where + ")");
             }else if (DataScope.COMPANY_AND_CHILD.getValue().equals(dataScopeString)) {
                 sqlString.append(" AND EXISTS (SELECT 1 FROM t_sys_organ");
-                OrganExtend company = OrganUtils.getOrganCompany(user.getId());
+                OrganExtend company = OrganUtils.getCompanyOrganExtendByOrganId(user.getId());
                 sqlString.append(" WHERE (id = '" + company.getId() + "'");
                 sqlString.append(" OR parent_ids LIKE '" + company.getParentIds() + company.getId() + ",%')");
                 sqlString.append(" AND " + where + ")");

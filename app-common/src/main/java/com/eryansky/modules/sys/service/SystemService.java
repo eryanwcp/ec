@@ -90,8 +90,10 @@ public class SystemService extends BaseService {
                 Organ homeCompany = OrganUtils.getHomeCompanyByRecursive(organ.getId());
                 parameter.put("companyId", company.getId());
                 parameter.put("companyCode", company.getCode());
+                parameter.put("companyBizCode", company.getBizCode());
                 parameter.put("homeCompanyId", homeCompany.getId());
                 parameter.put("homeCompanyCode", homeCompany.getCode());
+                parameter.put("homeCompanyBizCode", homeCompany.getBizCode());
                 Integer level = StringUtils.isNotBlank(organ.getParentIds()) ? organ.getParentIds().split(",").length : null;
                 parameter.put("treeLevel", level);
                 Integer childCount = organService.findChildCount(organ.getId());

@@ -11,7 +11,6 @@ import com.eryansky.common.orm.mybatis.MyBatisDao;
 import com.eryansky.core.orm.mybatis.dao.TreeDao;
 import com.eryansky.modules.sys.mapper.Organ;
 import com.eryansky.modules.sys.mapper.OrganExtend;
-import com.eryansky.modules.sys.mapper.User;
 
 import java.util.List;
 
@@ -96,11 +95,13 @@ public interface OrganDao extends TreeDao<Organ> {
 
 //    机构扩展表信息
 
-    OrganExtend getOrganExtend(Parameter parameter);
+    OrganExtend getOrganExtendByOrganId(Parameter parameter);
 
     OrganExtend getOrganExtendByCode(Parameter parameter);
 
-    OrganExtend getOrganCompany(Parameter parameter);
+    OrganExtend getCompanyByOrganId(Parameter parameter);
+
+    OrganExtend getHomeCompanyByOrganId(Parameter parameter);
 
     OrganExtend getOrganExtendByUserId(Parameter parameter);
 

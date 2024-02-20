@@ -22,12 +22,22 @@ public class OrganExtend extends Organ {
 
     private String parentId;
 
+    private String parentCode;
+
+    private String parentBizCode;
+    private String parentName;
+
     private String companyId;
     private String companyCode;
+
+    private String companyBizCode;
     private String companyName;
 
     private String homeCompanyId;
     private String homeCompanyCode;
+
+    private String homeCompanyBizCode;
+    private String homeCompanyName;
 
     private String isLeaf;
 
@@ -48,6 +58,30 @@ public class OrganExtend extends Organ {
         this.parentId = parentId;
     }
 
+    public String getParentCode() {
+        return parentCode;
+    }
+
+    public void setParentCode(String parentCode) {
+        this.parentCode = parentCode;
+    }
+
+    public String getParentBizCode() {
+        return parentBizCode;
+    }
+
+    public void setParentBizCode(String parentBizCode) {
+        this.parentBizCode = parentBizCode;
+    }
+
+    public String getParentName() {
+        return parentName;
+    }
+
+    public void setParentName(String parentName) {
+        this.parentName = parentName;
+    }
+
     public String getCompanyId() {
         return companyId;
     }
@@ -62,6 +96,14 @@ public class OrganExtend extends Organ {
 
     public void setCompanyCode(String companyCode) {
         this.companyCode = companyCode;
+    }
+
+    public String getCompanyBizCode() {
+        return companyBizCode;
+    }
+
+    public void setCompanyBizCode(String companyBizCode) {
+        this.companyBizCode = companyBizCode;
     }
 
     public String getCompanyName() {
@@ -86,6 +128,22 @@ public class OrganExtend extends Organ {
 
     public void setHomeCompanyCode(String homeCompanyCode) {
         this.homeCompanyCode = homeCompanyCode;
+    }
+
+    public String getHomeCompanyBizCode() {
+        return homeCompanyBizCode;
+    }
+
+    public void setHomeCompanyBizCode(String homeCompanyBizCode) {
+        this.homeCompanyBizCode = homeCompanyBizCode;
+    }
+
+    public String getHomeCompanyName() {
+        return homeCompanyName;
+    }
+
+    public void setHomeCompanyName(String homeCompanyName) {
+        this.homeCompanyName = homeCompanyName;
     }
 
     public String getIsLeaf() {

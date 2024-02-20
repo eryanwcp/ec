@@ -7,14 +7,11 @@ package com.eryansky.modules.sys.utils;
 
 import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.common.utils.StringUtils;
-import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.modules.sys._enum.OrganType;
 import com.eryansky.modules.sys.mapper.Area;
 import com.eryansky.modules.sys.mapper.Organ;
 import com.eryansky.modules.sys.mapper.OrganExtend;
 import com.eryansky.modules.sys.service.OrganService;
-
-import java.util.List;
 
 /**
  * @author Eryan
@@ -121,11 +118,24 @@ public class OrganUtils {
      * @param organId 机构ID
      * @return
      */
-    public static OrganExtend getOrganCompany(String organId) {
+    public static OrganExtend getCompanyOrganExtendByOrganId(String organId) {
         if (StringUtils.isBlank(organId)) {
             return null;
         }
-        return Static.organService.getOrganCompany(organId);
+        return Static.organService.getCompanyOrganExtendByOrganId(organId);
+    }
+
+    /**
+     * 根据机构ID查找
+     *
+     * @param organId 机构ID
+     * @return
+     */
+    public static OrganExtend getHomeCompanyOrganExtendByOrganId(String organId) {
+        if (StringUtils.isBlank(organId)) {
+            return null;
+        }
+        return Static.organService.getHomeCompanyOrganExtendByOrganId(organId);
     }
 
     /**
@@ -192,7 +202,7 @@ public class OrganUtils {
         if (StringUtils.isBlank(organId)) {
             return null;
         }
-        OrganExtend organExtend = getOrganCompany(organId);
+        OrganExtend organExtend = getCompanyOrganExtendByOrganId(organId);
         if (null != organExtend) {
             return organExtend.getId();
         }
@@ -209,7 +219,7 @@ public class OrganUtils {
         if (StringUtils.isBlank(organId)) {
             return null;
         }
-        OrganExtend organExtend = getOrganCompany(organId);
+        OrganExtend organExtend = getCompanyOrganExtendByOrganId(organId);
         if (null != organExtend) {
             return organExtend.getName();
         }
@@ -226,7 +236,7 @@ public class OrganUtils {
         if (StringUtils.isBlank(organId)) {
             return null;
         }
-        OrganExtend organExtend = getOrganCompany(organId);
+        OrganExtend organExtend = getCompanyOrganExtendByOrganId(organId);
         if (null != organExtend) {
             return organExtend.getShortName();
         }
