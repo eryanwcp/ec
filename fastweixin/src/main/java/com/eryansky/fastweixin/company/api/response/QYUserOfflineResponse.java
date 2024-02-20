@@ -12,33 +12,33 @@ import java.util.List;
  */
 public class QYUserOfflineResponse extends BaseResponse {
 
-    private List<OfflineResult> result = Lists.newArrayList();
+    private List<QYUserOfflineResult> result = Lists.newArrayList();
 
     public QYUserOfflineResponse() {
     }
 
-    public QYUserOfflineResponse(List<OfflineResult> result) {
+    public QYUserOfflineResponse(List<QYUserOfflineResult> result) {
         this.result = result;
     }
 
-    public List<OfflineResult> getResult() {
+    public List<QYUserOfflineResult> getResult() {
         return result;
     }
 
-    public void setResult(List<OfflineResult> result) {
+    public void setResult(List<QYUserOfflineResult> result) {
         this.result = result;
     }
 
     // 成员内部类
-    public class OfflineResult {
+    public class QYUserOfflineResult {
         private String userid;
         private Integer errcode;
         private String errmsg;
 
-        public OfflineResult() {
+        public QYUserOfflineResult() {
         }
 
-        public OfflineResult(String userid, Integer errcode, String errmsg) {
+        public QYUserOfflineResult(String userid, Integer errcode, String errmsg) {
             this.userid = userid;
             this.errcode = errcode;
             this.errmsg = errmsg;
