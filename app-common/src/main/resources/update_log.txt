@@ -37,21 +37,32 @@ END
 delimiter ;
 
 
-DROP FUNCTION IF EXISTS `getOrganCompanyBizCode`;
+DROP FUNCTION IF EXISTS `getOrganHomeCompanyBizCode`;
 delimiter ;;
-CREATE DEFINER=`root`@`%` FUNCTION `getOrganCompanyBizCode`(rootId varchar(64)) RETURNS varchar(64)
+CREATE DEFINER=`root`@`%` FUNCTION `getOrganHomeCompanyBizCode`(rootId varchar(64)) RETURNS varchar(64) CHARSET utf8mb4
+    COMMENT '查找所属单位（地市）机构信息分类编码'
 BEGIN
-DECLARE pId varchar(64) default '';
-DECLARE str varchar(36) default rootId;
+DECLARE pId varchar(36) default '';
+DECLARE str varchar(64) default rootId;
+DECLARE pType varchar(36) default '';
+DECLARE pCode varchar(64) default '';
+DECLARE ppCode varchar(64) default '';
+DECLARE code varchar(36) default '';
 DECLARE type varchar(36) default '';
-DECLARE code varchar(64) default '';
 
 WHILE rootId IS NOT NULL DO
-	SET pId =(SELECT t.parent_id FROM t_sys_organ t WHERE t.id = rootId);
-	SET type =(SELECT t.type FROM t_sys_organ t WHERE t.id = rootId);
 	SET code =(SELECT t.biz_code FROM t_sys_organ t WHERE t.id = rootId);
+	SET type =(SELECT t.type FROM t_sys_organ t WHERE t.id = rootId);
+	SET pId =(SELECT t.parent_id FROM t_sys_organ t WHERE t.id = rootId);
+	SET pType =(SELECT t.type FROM t_sys_organ t WHERE t.id = pId);
 
-	IF type = '0' THEN
+	SET pCode =(SELECT t.biz_code FROM t_sys_organ t WHERE t.id = pId);
+	SET ppCode =(SELECT p.biz_code FROM t_sys_organ t LEFT JOIN t_sys_organ p ON t.parent_id = p.id WHERE t.id = pId);
+
+	IF (pType = '0' AND ppCode = 'BA110360001') THEN
+		SET str = pCode;
+		SET rootId = null;
+	ELSEIF ((pType = '0' AND type = '0') OR pId IS NULL OR pId = '0') THEN
 		SET str = code;
 		SET rootId = null;
 	ELSE
