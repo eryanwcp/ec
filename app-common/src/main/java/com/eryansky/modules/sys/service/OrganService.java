@@ -1227,7 +1227,7 @@ public class OrganService extends TreeService<OrganDao, Organ> {
     }
 
     /**
-     * 查找所有单位
+     * 查找
      *
      * @return
      */

@@ -74,7 +74,7 @@ public class SystemAspect implements InitializingBean, DisposableBean {
                 parameter.put("treeLevel", level);
                 Integer childCount = organService.findChildCount(organ.getId());
                 parameter.put("isLeaf", null == childCount || childCount == 0);
-                systemService.syncOrganToExtend(parameter);
+                systemService.syncOrganToExtendAuto(parameter);
             } else if (returnObj instanceof Organ) {
                 Organ organ = (Organ) returnObj;
                 parameter.put("id", organ.getId());
@@ -89,10 +89,10 @@ public class SystemAspect implements InitializingBean, DisposableBean {
                 parameter.put("treeLevel", level);
                 Integer childCount = organService.findChildCount(organ.getId());
                 parameter.put("isLeaf", null == childCount || childCount == 0);
-                systemService.syncOrganToExtend(parameter);
+                systemService.syncOrganToExtendAuto(parameter);
             }
         } else {
-            systemService.syncOrganToExtend();
+            systemService.syncOrganToExtendAuto();
         }
 
     }
@@ -105,7 +105,7 @@ public class SystemAspect implements InitializingBean, DisposableBean {
      */
     @AfterReturning(value = "execution(* com.eryansky.modules.sys.service.OrganService.deleteOwnerAndChilds(..))")
     public void afterSyncOrganToExtend(JoinPoint joinPoint) {
-        systemService.syncOrganToExtend();
+        systemService.syncOrganToExtendAuto();
 
     }
 

@@ -11,7 +11,7 @@ SET GLOBAL log_bin_trust_function_creators = 1;
 
 DROP FUNCTION IF EXISTS `getOrganCompanyBizCode`;
 delimiter ;;
-CREATE DEFINER=`root`@`%` FUNCTION `getOrganCompanyBizCode`(rootId varchar(64)) RETURNS varchar(64) CHARSET utf8mb4
+CREATE DEFINER=`root`@`%` FUNCTION `getOrganCompanyBizCode`(rootId varchar(64)) RETURNS varchar(64)
 BEGIN
 DECLARE pId varchar(64) default '';
 DECLARE str varchar(36) default rootId;
@@ -39,7 +39,7 @@ delimiter ;
 
 DROP FUNCTION IF EXISTS `getOrganCompanyBizCode`;
 delimiter ;;
-CREATE DEFINER=`root`@`%` FUNCTION `getOrganCompanyBizCode`(rootId varchar(64)) RETURNS varchar(64) CHARSET utf8mb4
+CREATE DEFINER=`root`@`%` FUNCTION `getOrganCompanyBizCode`(rootId varchar(64)) RETURNS varchar(64)
 BEGIN
 DECLARE pId varchar(64) default '';
 DECLARE str varchar(36) default rootId;

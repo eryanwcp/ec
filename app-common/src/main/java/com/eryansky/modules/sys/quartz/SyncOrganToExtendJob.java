@@ -33,7 +33,7 @@ public class SyncOrganToExtendJob extends QuartzJobBean {
      */
     public void execute() {
         logger.info("定时任务...开始：同步organ扩展表");
-        systemService.syncOrganToExtend();
+        systemService.syncOrganToExtendAuto();
         logger.info("定时任务...结束：同步organ扩展表");
     }
 

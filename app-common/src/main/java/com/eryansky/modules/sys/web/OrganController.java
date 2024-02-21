@@ -10,7 +10,6 @@ import com.eryansky.common.exception.ActionException;
 import com.eryansky.common.model.Combobox;
 import com.eryansky.common.model.Result;
 import com.eryansky.common.model.TreeNode;
-import com.eryansky.common.utils.DateUtils;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SimpleController;
@@ -523,7 +522,7 @@ public class OrganController extends SimpleController {
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = "syncToExtend")
     public Result syncToExtend() {
         logger.info("定时任务...开始：同步organ扩展表");
-        systemService.syncOrganToExtend();
+        systemService.syncOrganToExtendAuto();
         logger.info("定时任务...结束：同步organ扩展表");
         return Result.successResult();
     }
