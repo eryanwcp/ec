@@ -8,7 +8,6 @@ package com.eryansky.modules.sys.dao;
 import com.eryansky.common.orm.model.Parameter;
 import com.eryansky.common.orm.mybatis.MyBatisDao;
 import com.eryansky.common.orm.persistence.BaseDao;
-import org.apache.ibatis.annotations.Param;
 
 /**
  * 系统DAO接口
@@ -26,6 +25,13 @@ public interface SystemDao extends BaseDao {
      * @return
      */
     int insertToOrganExtend(Parameter parameter);
+    /**
+     * organ表同步到扩展表 存储过程 批量处理
+     *
+     * @param parameter 参数
+     * @return
+     */
+    int insertToOrganExtendByFunction(Parameter parameter);
 
     /**
      * 删除organ扩展表数据

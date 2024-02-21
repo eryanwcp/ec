@@ -30,14 +30,16 @@
 		parent_ids,
 		area_id,
 		remark,
+		parent_code,
+		parent_biz_code,
 		company_id,
 		company_code,
 		company_biz_code,
 		home_company_id,
 		home_company_code,
 		home_company_biz_code,
-		tree_level
-# 		is_leaf
+		tree_level,
+ 		is_leaf
 		) SELECT id,
 		status,
 		version,
@@ -63,38 +65,100 @@
 		parent_ids,
 		area_id,
 		remark,
-		<choose>
-			<when test="id != null and companyId != null and homeCompanyId !=null">
-				#{companyId},
-				#{companyCode},
-				#{companyBizCode},
-				#{homeCompanyId},
-				#{homeCompanyCode},
-				#{homeCompanyBizCode},
-				#{treeLevel}
-			</when>
-			<otherwise>
-				getOrganCompanyId(ID),
-				getOrganCompanyCode(ID),
-				getOrganCompanyBizCode(ID),
-				getOrganHomeCompanyId(ID),
-				getOrganHomeCompanyCode(ID),
-				getOrganHomeCompanyBizCode(ID),
-				(length(t_sys_organ.PARENT_IDS) - length(replace(t_sys_organ.PARENT_IDS,',','')))
-			</otherwise>
-		</choose>
-<!--		,<choose>-->
-<!--			<when test="isLeaf != null and isLeaf !=''">-->
-<!--				#{isLeaf}-->
-<!--			</when>-->
-<!--			<otherwise>-->
-<!--				NULL-->
-<!--			</otherwise>-->
-<!--		</choose>-->
+		#{parentCode},
+		#{parentBizCode},
+		#{companyId},
+		#{companyId},
+		#{companyCode},
+		#{companyBizCode},
+		#{homeCompanyId},
+		#{homeCompanyCode},
+		#{homeCompanyBizCode},
+		#{treeLevel},
+		#{isLeaf}
 		FROM t_sys_organ
 		<where>
+			id = #{id}
+		</where>
+	</insert>
+
+
+	<!--	存储过程 批量处理-->
+	<insert id="insertToOrganExtendByFunction">
+		INSERT INTO t_sys_organ_extend (
+		id,
+		status,
+		version,
+		create_user,
+		create_time,
+		update_user,
+		update_time,
+		name,
+		short_name,
+		type,
+		code,
+		biz_code,
+		sys_code,
+		address,
+		mobile,
+		phone,
+		fax,
+		manager_user_id,
+		deputy_manager_user_id,
+		super_manager_user_id,
+		sort,
+		parent_id,
+		parent_ids,
+		area_id,
+		remark,
+		parent_code,
+		parent_biz_code,
+		company_id,
+		company_code,
+		company_biz_code,
+		home_company_id,
+		home_company_code,
+		home_company_biz_code,
+		tree_level
+		) SELECT a.id,
+				 a.status,
+				 a.version,
+				 a.create_user,
+				 a.create_time,
+				 a.update_user,
+				 a.update_time,
+				 a.name,
+				 a.short_name,
+				 a.type,
+				 a.code,
+				 a.biz_code,
+				 a.sys_code,
+				 a.address,
+				 a.mobile,
+				 a.phone,
+				 a.fax,
+				 a.manager_user_id,
+				 a.deputy_manager_user_id,
+				 a.super_manager_user_id,
+				 a.sort,
+				 a.parent_id,
+				 a.parent_ids,
+				 a.area_id,
+				 a.remark,
+				 P.code,
+				 p.biz_code,
+				 getOrganCompanyId(a.id),
+				 getOrganCompanyCode(a.id),
+				 getOrganCompanyBizCode(a.id),
+				 getOrganHomeCompanyId(a.id),
+				 getOrganHomeCompanyCode(a.id),
+				 getOrganHomeCompanyBizCode(a.id),
+				 (length(a.parent_ids) - length(replace(a.parent_ids,',','')))
+		FROM t_sys_organ a
+		LEFT JOIN t_sys_organ p ON p.id = a.parent_id
+		<where>
 			<if test="id != null and id != ''">
-				AND id = #{id}
+				AND a.id = #{id}
 			</if>
 		</where>
 	</insert>

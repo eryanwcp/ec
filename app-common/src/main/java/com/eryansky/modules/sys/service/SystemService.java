@@ -80,52 +80,79 @@ public class SystemService extends BaseService {
         String dbType = AppConstants.getJdbcType();
         if ("mysql".equalsIgnoreCase(dbType) || "mariadb".equalsIgnoreCase(dbType)) {
             try {
-                syncOrganToExtendAuto(null);//使用存储过程
+                syncOrganToExtendByFunction(null);//使用存储过程
             } catch (Exception e) {
                 logger.error(e.getMessage(),e);
-                syncOrganToExtendLocal();
+                syncOrganToExtend();
             }
         } else {
-            syncOrganToExtendLocal();
+            syncOrganToExtend();
         }
     }
 
-    private void syncOrganToExtendLocal() {
+    public void syncOrganToExtend() {
         List<Organ> list = organService.findAllWithDelete();
-        list.parallelStream().forEach(organ -> {
-            Parameter parameter = Parameter.newParameter();
-            parameter.put("id", organ.getId());
-            parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
-            Organ parent = null;
-            if(StringUtils.isNotBlank(organ.get_parentId())){
-                parent = OrganUtils.getOrgan(organ.get_parentId());
-            }
+        list.parallelStream().forEach(this::syncOrganToExtend);
+    }
 
-            Organ company = OrganUtils.getCompanyByRecursive(organ.getId());
-            Organ homeCompany = OrganUtils.getHomeCompanyByRecursive(organ.getId());
-            parameter.put("parentId", null != parent ? parent.getId():null);
-            parameter.put("parentCode", null != parent ? parent.getCode():null);
-            parameter.put("parentBizCode", null != parent ? parent.getBizCode():null);
-            parameter.put("companyId", company.getId());
-            parameter.put("companyCode", company.getCode());
-            parameter.put("companyBizCode", company.getBizCode());
-            parameter.put("homeCompanyId", homeCompany.getId());
-            parameter.put("homeCompanyCode", homeCompany.getCode());
-            parameter.put("homeCompanyBizCode", homeCompany.getBizCode());
-            Integer level = StringUtils.isNotBlank(organ.getParentIds()) ? organ.getParentIds().split(",").length : null;
-            parameter.put("treeLevel", level);
-            Integer childCount = organService.findChildCount(organ.getId());
-            parameter.put("isLeaf", null == childCount || childCount == 0);
-            syncOrganToExtendAuto(parameter);
-        });
+    public void syncOrganToExtendAuto(Organ organ) {
+        String dbType = AppConstants.getJdbcType();
+        if ("mysql".equalsIgnoreCase(dbType) || "mariadb".equalsIgnoreCase(dbType)) {
+            try {
+                Parameter parameter = Parameter.newParameter();
+                parameter.put("id", organ.getId());
+                syncOrganToExtendByFunction(parameter);//使用存储过程
+            } catch (Exception e) {
+                logger.error(e.getMessage(),e);
+                syncOrganToExtend(organ);
+            }
+        } else {
+            syncOrganToExtend(organ);
+        }
+    }
+
+
+    public void syncOrganToExtend(Organ organ) {
+        Parameter parameter = Parameter.newParameter();
+        parameter.put("id", organ.getId());
+        parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
+        Organ parent = null;
+        if(StringUtils.isNotBlank(organ.get_parentId())){
+            parent = OrganUtils.getOrgan(organ.get_parentId());
+        }
+
+        Organ company = OrganUtils.getCompanyByRecursive(organ.getId());
+        Organ homeCompany = OrganUtils.getHomeCompanyByRecursive(organ.getId());
+        parameter.put("parentId", null != parent ? parent.getId():null);
+        parameter.put("parentCode", null != parent ? parent.getCode():null);
+        parameter.put("parentBizCode", null != parent ? parent.getBizCode():null);
+        parameter.put("companyId", company.getId());
+        parameter.put("companyCode", company.getCode());
+        parameter.put("companyBizCode", company.getBizCode());
+        parameter.put("homeCompanyId", homeCompany.getId());
+        parameter.put("homeCompanyCode", homeCompany.getCode());
+        parameter.put("homeCompanyBizCode", homeCompany.getBizCode());
+        Integer level = StringUtils.isNotBlank(organ.getParentIds()) ? organ.getParentIds().split(",").length : null;
+        parameter.put("treeLevel", level);
+        Integer childCount = organService.findChildCount(organ.getId());
+        parameter.put("isLeaf", null == childCount || childCount == 0);
+        syncOrganToExtend(parameter);
     }
 
     /**
      * 同步数据到organ表
      */
-    public void syncOrganToExtendAuto(Parameter parameter) {
+    private void syncOrganToExtend(Parameter parameter) {
         deleteOrganExtend(parameter);
         insertToOrganExtend(parameter);
+    }
+
+    /**
+     * 同步数据到organ表 存储过程
+     */
+    private void syncOrganToExtendByFunction(Parameter parameter) {
+        deleteOrganExtend(parameter);
+        syncOrganToExtendByFunction(parameter);
     }
 
 }
