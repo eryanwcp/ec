@@ -807,7 +807,7 @@
         SELECT
         <include refid="organExtendColumns"/>,
             p.code AS "parentCode",
-            p.bizCode AS "parentBizCode",
+            p.biz_code AS "parentBizCode",
             p.name AS "parentName"
         FROM t_sys_organ_extend a
         <include refid="organExtendJoins"/>
@@ -818,7 +818,7 @@
         SELECT
         <include refid="organExtendColumns"/>,
         p.code AS "parentCode",
-        p.bizCode AS "parentBizCode",
+        p.biz_code AS "parentBizCode",
         p.name AS "parentName"
         FROM t_sys_organ_extend a
         <include refid="organExtendJoins"/>
@@ -846,7 +846,7 @@
         SELECT
         <include refid="organExtendColumns"/>,
         p.code AS "parentCode",
-        p.bizCode AS "parentBizCode",
+        p.biz_code AS "parentBizCode",
         p.name AS "parentName"
         FROM t_sys_organ_extend a
         <include refid="organExtendJoins"/>
@@ -858,7 +858,7 @@
         SELECT
         <include refid="organExtendColumns"/>,
         p.code AS "parentCode",
-        p.bizCode AS "parentBizCode",
+        p.biz_code AS "parentBizCode",
         p.name AS "parentName"
         FROM t_sys_organ_extend a
         <include refid="organExtendJoins"/>
@@ -894,7 +894,7 @@
         SELECT
         <include refid="organExtendColumns"/>,
         p.code AS "parentCode",
-        p.bizCode AS "parentBizCode",
+        p.biz_code AS "parentBizCode",
         p.name AS "parentName"
         FROM t_sys_organ_extend a
         <include refid="organExtendJoins"/>
