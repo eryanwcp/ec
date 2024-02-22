@@ -33,8 +33,7 @@ $(function () {
         columns: [[{
             title: 'ID',
             field: 'id',
-            width: 260,
-            hidden: true, formatter: function (value, rowData, rowIndex) {
+            width: 260,formatter: function (value, rowData, rowIndex) {
                 return "<a target='_blank' href='" + ctxAdmin + "/sys/session/detail?id=" + rowData['id'] + "'>" + value + "</a>";
             }
         }, {

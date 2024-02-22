@@ -122,12 +122,12 @@ function listUser(contactGroupId){
         queryParams:{id:contactGroupId},//联系人组ID
         frozenColumns:[[
             {field:'ck',checkbox:true},
+            {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
             {field:'name',title:'姓名',width:120},
             {field:'loginName',title:'登录名',width:120,hidden:true},
             {field:'sexView',title:'性别',width:60}
         ]],
         columns:[[
-            {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
             {field:'organNames',title:'部门',width:200},
             {field:'mobilephone',title:'手机号',width:120},
             {field:'tel',title:'电话',width:120},

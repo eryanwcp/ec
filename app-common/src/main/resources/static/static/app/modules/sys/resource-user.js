@@ -18,13 +18,13 @@ $(function () {
         frozenColumns: [
             [
                 {field: 'ck', checkbox: true},
+                {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
                 {field: 'name', title: '姓名',width: 100,sortable: true},
                 {field: 'loginName', title: '登录名', width: 120, sortable: true}
             ]
         ],
         columns: [
             [
-                {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
                 {field: 'sexView', title: '性别', width: 60, align: 'center', sortable: true},
                 {field: 'code', title: '员工编号', width: 160, sortable: true, hidden: true},
                 {field: 'bizCode', title: '信息分类编码', width: 160,sortable: true},

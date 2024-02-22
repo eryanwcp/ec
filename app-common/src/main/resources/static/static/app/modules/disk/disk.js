@@ -39,10 +39,9 @@ function loadFileDatagrid() {
         rownumbers: true,          //显示行数
         pageSize: 20,
         pageList: [10, 20, 50, 500, 9999],
-        frozenColumns: [[{
-            field: 'ck',
-            checkbox: true
-        },
+        frozenColumns: [[
+            {field: 'ck', checkbox: true },
+            {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
             {
                 field: 'name',
                 title: '文件名',
@@ -64,29 +63,23 @@ function loadFileDatagrid() {
                     }
                 }
             }]],
-        columns: [[{
-            field: 'id',
-            title: '主键',
-            hidden: true,
-            sortable: true,
-            width: 260
-        },
+        columns: [[
             {
                 field: 'prettyFileSize',
                 title: '文件大小',
                 sortable: true,
                 align: 'right',
-                width: 110
+                width: 120
             },
             {
                 field: 'userName',
                 title: '上传人',
-                width: 100
+                width: 120
             }, {
                 field: 'updateTime',
                 title: '更新时间',
                 sortable: true,
-                width: 200
+                width: 146
             },
             {
                 field: 'operate',

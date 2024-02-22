@@ -99,10 +99,10 @@ $(function () {
         collapsible: true,
         frozenColumns: [[
             {field: 'ck', checkbox: true},
+            {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
             {field: 'name', title: '岗位名称', width: 200, sortable: true}
         ]],
         columns: [[
-            {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
             {field: 'code', title: '岗位编码', width: 200, sortable: true},
             {field: 'organName', title: '所属机构', width: 200, hidden: false},
             {field: 'sort', title: '排序号', align: "right", width: 100, sortable: true},

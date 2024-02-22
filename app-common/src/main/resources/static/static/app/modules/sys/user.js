@@ -238,6 +238,7 @@ $(function () {
         frozenColumns: [
             [
                 {field: 'ck', checkbox: true},
+                {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
                 {
                     field: 'loginName', title: '登录名', width: 120, sortable: true,
                     formatter: function (value, rowData, rowIndex) {
@@ -261,16 +262,14 @@ $(function () {
         ],
         columns: [
             [
-                {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
-                {field: 'code', title: '员工编号', width: 160, sortable: true, hidden: true},
                 {field: 'position', title: '职务', width: 120, sortable: true},
+                {field: 'code', title: '员工编号', width: 160, sortable: true, hidden: true},
                 {field: 'bizCode', title: '信息分类编码', width: 160,  sortable: true},
                 {field: 'defaultOrganName', title: '部门', width: 160, sortable: true},
                 {field: 'companyName', title: '单位', width: 200, sortable: true, hidden: true},
-                {field: 'id', title: '主键', hidden: true, sortable: true, align: 'right', width: 80},
-                {field: 'mobileSensitive', title: '手机号', width: 100},
-                {field: 'mobile', title: '真实手机号', width: 100, hidden: true},
-                {field: 'tel', title: '办公电话', width: 100},
+                {field: 'mobileSensitive', title: '手机号', width: 120},
+                {field: 'mobile', title: '真实手机号', width: 120, hidden: true},
+                {field: 'tel', title: '办公电话', width: 120},
                 {field: 'qq', title: 'QQ', width: 100, hidden: true},
                 {field: 'email', title: '公司邮箱', width: 160},
                 {field: 'personEmail', title: '个人邮箱', width: 160},

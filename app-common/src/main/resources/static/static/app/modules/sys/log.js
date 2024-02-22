@@ -22,10 +22,10 @@ $(function () {
         idField: 'id',
         frozenColumns: [[
             {field: 'ck', checkbox: true, width: 60},
+            {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
             {field: 'typeView', title: '日志类型', width: 80}
         ]],
         columns: [[
-            {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
             {
                 field: 'title', title: '标题', width: 200, hidden: false, formatter: function (value, rowData, rowIndex) {
                     return "<a target='_blank' href='" + ctxAdmin + "/sys/log/detail?id=" + rowData['id'] + "'>" + rowData['title'] + "</a>";
