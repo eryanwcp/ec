@@ -23,12 +23,12 @@ function initPostUserDatagrid() {
         frozenColumns: [
             [
                 {field: 'ck', checkbox: true},
-                {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
                 {field: 'name', title: '姓名', width: 120}
             ]
         ],
         columns: [
             [
+                {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
                 {field: 'sexView', title: '性别', width: 60, hidden: true, sortable: true},
                 {field: 'loginName', title: '账号', width: 120, hidden: true, sortable: true},
                 {field: 'code', title: '编码', width: 160, hidden: true, sortable: true},

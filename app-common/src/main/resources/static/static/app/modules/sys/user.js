@@ -238,7 +238,6 @@ $(function () {
         frozenColumns: [
             [
                 {field: 'ck', checkbox: true},
-                {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
                 {
                     field: 'loginName', title: '登录名', width: 120, sortable: true,
                     formatter: function (value, rowData, rowIndex) {
@@ -262,6 +261,7 @@ $(function () {
         ],
         columns: [
             [
+                {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
                 {field: 'position', title: '职务', width: 120, sortable: true},
                 {field: 'code', title: '员工编号', width: 160, sortable: true, hidden: true},
                 {field: 'bizCode', title: '信息分类编码', width: 160,  sortable: true},
@@ -273,7 +273,7 @@ $(function () {
                 {field: 'qq', title: 'QQ', width: 100, hidden: true},
                 {field: 'email', title: '公司邮箱', width: 160},
                 {field: 'personEmail', title: '个人邮箱', width: 160},
-                {field: 'defaultOrganId', title: '默认机构ID', width: 80, hidden: true},
+                {field: 'defaultOrganId', title: '默认机构ID', width: 260, hidden: true},
                 {field: 'sexView', title: '性别', width: 60, align: 'center', sortable: true},
                 {field: 'birthday', title: '出生日期', width: 120, hidden: true, sortable: true},
                 {field: 'address', title: '地址', width: 200},

@@ -76,7 +76,6 @@ function dictionaryItemDatagrid() {
         idField: 'id',
         frozenColumns: [[
             {field: 'ck', checkbox: true, width: 60},
-            {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
             {
                 field: 'dictionaryId',
                 title: '数据字典',
@@ -131,6 +130,7 @@ function dictionaryItemDatagrid() {
             }
         ]],
         columns: [[
+                {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
                 {field: 'parentId',
                 title: '上级节点',
                 width: 200,

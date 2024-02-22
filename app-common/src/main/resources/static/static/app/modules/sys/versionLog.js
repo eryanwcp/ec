@@ -26,7 +26,6 @@ function initDatagrid() {
         idField: 'id',
         frozenColumns: [[
             {field: 'ck', checkbox: true, width: 60},
-            {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
             {field: 'app', title: 'APP', width: 80},
             {
                 field: 'versionName', title: '版本号', width: 120,
@@ -36,6 +35,7 @@ function initDatagrid() {
             }
         ]],
         columns: [[
+            {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
             {field: 'versionCode', title: '内部版本号', width: 100, align: 'right'},
             {field: 'versionLogTypeView', title: '类型', width: 120},
             {field: 'remark', title: '更新说明', width: 360},

@@ -41,7 +41,6 @@ function loadFileDatagrid() {
         pageList: [10, 20, 50, 500, 9999],
         frozenColumns: [[
             {field: 'ck', checkbox: true },
-            {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
             {
                 field: 'name',
                 title: '文件名',
@@ -64,6 +63,7 @@ function loadFileDatagrid() {
                 }
             }]],
         columns: [[
+            {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
             {
                 field: 'prettyFileSize',
                 title: '文件大小',

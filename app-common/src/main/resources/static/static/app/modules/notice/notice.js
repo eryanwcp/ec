@@ -100,7 +100,6 @@ function initReadDatagrid() {
         selectOnCheck: false,
         idField: 'id',
         frozenColumns: [[{field: 'ck', checkbox: true},
-            {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
             {
                 field: 'title', title: '标题', width: 360,
                 formatter: function (value, rowData, rowIndex) {
@@ -108,10 +107,12 @@ function initReadDatagrid() {
                 }
             }
         ]],
-        columns: [[{
+        columns: [[
+            {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
+            {
             field: 'publishUserName',
             title: '发布人',
-            width: 100
+            width: 120
         }, {
             field: 'publishTime',
             title: '发布时间',

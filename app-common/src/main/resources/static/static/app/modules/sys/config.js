@@ -17,13 +17,13 @@ $(function () {
         frozenColumns: [
             [
                 {field: 'ck', checkbox: true},
-                {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
                 {field: 'code', title: '属性名称', width: 200, sortable: true},
                 {field: 'value', title: '属性值', width: 360}
             ]
         ],
         columns: [
             [
+                {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
                 {field: 'remark', title: '备注', width: 200}
             ]
         ],

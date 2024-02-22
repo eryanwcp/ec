@@ -56,11 +56,11 @@ $(function () {
         idField: 'id',
         treeField: "name",
         frozenColumns: [[
-            {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
             {field: 'name', title: '机构名称', width: 300}
         ]],
         columns: [[
-            {field: 'areaId', title: '区域ID', width: 120, hidden: true, sortable: true},
+            {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
+            {field: 'areaId', title: '区域ID', width: 260, hidden: true, sortable: true},
             {field: 'sysCode', title: '系统编码', width: 160, sortable: true, hidden: true},
             {field: 'code', title: '编码', width: 160, sortable: true},
             {field: 'bizCode', title: '信息分类编码', width: 160, sortable: true},
