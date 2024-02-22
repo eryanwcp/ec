@@ -64,6 +64,10 @@ $(function () {
             width: 200
         }, {
             title: '手机号',
+            field: 'mobileSensitive',
+            width: 120
+        }, {
+            title: '手机号',
             field: 'mobile',
             width: 120,
             hidden: true
@@ -82,15 +86,13 @@ $(function () {
         }, {
             title: '设备类型',
             field: 'systemDeviceType',
-            width: 120,
-            hidden: true
+            width: 120
         }, {
             title: '设备编码',
             field: 'deviceCode',
-            width: 200,
-            hidden: true
+            width: 200
         }, {
-            title: 'APP客户端版本',
+            title: '客户端版本',
             field: 'appVersion',
             width: 120,
             hidden: true

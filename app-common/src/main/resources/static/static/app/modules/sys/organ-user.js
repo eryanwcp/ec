@@ -25,8 +25,12 @@ function loadManagerUser() {
         columns: [[
             {field: 'id', title: '主键ID', width: 100, hidden: 'true'},
             {field: 'name', title: '姓名', width: 60, sortable: true},
+            {field: 'loginName', title: '账号', width: 60, hidden: true, sortable: true},
+            {field: 'code', title: '编码', width: 100, hidden: true, sortable: true},
+            {field: 'bizCode', title: '信息分类编码', width: 100, hidden: true, sortable: true},
             {field: 'sexView', title: '性别', width: 50},
-            {field: 'defaultOrganName', title: '机构', width: 120, sortable: true}
+            {field: 'defaultOrganName', title: '部分', width: 120, sortable: true},
+            {field: 'companyName', title: '单位', width: 120, sortable: true}
         ]]
     });
     if (managerUserId) {

@@ -450,6 +450,9 @@
             <if test="code != null and code !=''">
                 AND a.code = #{code}
             </if>
+            <if test="bizCode != null and bizCode !=''">
+                AND a.biz_code = #{bizCode}
+            </if>
             <if test="type != null and type !=''">
                 AND a.type = #{type}
             </if>
@@ -465,14 +468,9 @@
         <where>
             <if test="query != null and query !=''">
                 AND (
-                a.name LIKE
-                <choose>
-                    <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
-                    <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
-                    <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
-                    <otherwise>'%'+#{query}+'%'</otherwise>
-                </choose>
-                OR a.code LIKE
+                a.code = #{query}
+                OR a.biz_code = #{query}
+                OR a.name LIKE
                 <choose>
                     <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
                     <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>

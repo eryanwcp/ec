@@ -59,8 +59,6 @@ public class OrganController extends SimpleController {
     @Autowired
     private UserService userService;
     @Autowired
-    private PostService postService;
-    @Autowired
     private AreaService areaService;
     @Autowired
     private SystemService systemService;
@@ -231,7 +229,7 @@ public class OrganController extends SimpleController {
     public String user(@ModelAttribute("model") Organ model, Model uiModel) {
         List<User> organUsers = userService.findOrganUsers(model.getId());
         String organUserCombogridData = JsonMapper.getInstance().toJson(organUsers, User.class,
-                new String[]{"id", "name", "sexView", "defaultOrganName"});
+                new String[]{"id", "name","loginName","code","bizCode", "sexView", "defaultOrganName", "companyName"});
         logger.debug(organUserCombogridData);
         uiModel.addAttribute("organUserCombogridData", organUserCombogridData);
         uiModel.addAttribute("model", model);

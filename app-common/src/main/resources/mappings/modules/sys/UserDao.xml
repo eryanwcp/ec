@@ -334,13 +334,10 @@
             a.status = #{status}
             <if test="query != null and query !=''">
                 AND (
-                a.login_name LIKE
-                <choose>
-                    <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
-                    <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
-                    <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
-                    <otherwise>'%'+#{query}+'%'</otherwise>
-                </choose>
+                a.login_name = #{query}
+                OR a.mobile = #{query}
+                OR a.code = #{query}
+                OR a.biz_code = #{query}
                 OR a.name LIKE
                 <choose>
                     <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
@@ -409,21 +406,11 @@
             )
             <if test="query != null and query !=''">
                 AND (
-                a.login_name LIKE
-                <choose>
-                    <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
-                    <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
-                    <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
-                    <otherwise>'%'+#{query}+'%'</otherwise>
-                </choose>
+                a.login_name = #{query}
+                OR a.mobile = #{query}
+                OR a.code = #{query}
+                OR a.biz_code = #{query}
                 OR a.name LIKE
-                <choose>
-                    <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
-                    <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
-                    <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
-                    <otherwise>'%'+#{query}+'%'</otherwise>
-                </choose>
-                OR a.code LIKE
                 <choose>
                     <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
                     <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
@@ -470,13 +457,10 @@
             AND a.status = '0'
             <if test="query != null and query !=''">
                 AND (
-                a.login_name LIKE
-                <choose>
-                    <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
-                    <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
-                    <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
-                    <otherwise>'%'+#{query}+'%'</otherwise>
-                </choose>
+                a.login_name = #{query}
+                OR a.mobile = #{query}
+                OR a.code = #{query}
+                OR a.biz_code = #{query}
                 OR a.name LIKE
                 <choose>
                     <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
@@ -546,13 +530,10 @@
             )
             <if test="query != null and query !=''">
                 AND (
-                    a.login_name LIKE
-                <choose>
-                    <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
-                    <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
-                    <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
-                    <otherwise>'%'+#{query}+'%'</otherwise>
-                </choose>
+                    a.login_name = #{query}
+                    OR a.mobile = #{query}
+                    OR a.code = #{query}
+                    OR a.biz_code = #{query}
                     OR a.name LIKE
                 <choose>
                     <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
@@ -880,6 +861,8 @@
                 AND (
                 a.login_name = #{query}
                 OR a.mobile = #{query}
+                OR a.code = #{query}
+                OR a.biz_code = #{query}
                 OR a.name LIKE
                 <choose>
                     <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
@@ -922,6 +905,8 @@
                 AND (
                 a.login_name = #{query}
                 OR a.mobile = #{query}
+                OR a.code = #{query}
+                OR a.biz_code = #{query}
                 OR a.name LIKE
                 <choose>
                     <when test="dbName == 'db2'">'%'||#{query}||'%'</when>

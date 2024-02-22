@@ -6,7 +6,6 @@
 package com.eryansky.modules.sys.web;
 
 import com.eryansky.client.common.vo.ExtendAttr;
-import com.eryansky.common.exception.ActionException;
 import com.eryansky.common.model.*;
 import com.eryansky.common.orm.Page;
 import com.eryansky.common.utils.StringUtils;
@@ -79,8 +78,6 @@ public class UserController extends SimpleController {
     private RoleService roleService;
     @Autowired
     private ResourceService resourceService;
-    @Autowired
-    private UserPasswordService userPasswordService;
 
     @ModelAttribute("model")
     public User get(@RequestParam(required = false) String id) {
@@ -490,7 +487,7 @@ public class UserController extends SimpleController {
 
 
         String json = JsonMapper.getInstance().toJson(list, User.class,
-                new String[]{"id", "name", "defaultOrganName"});
+                new String[]{"id", "loginName","code","bizCode", "name", "sexView", "defaultOrganName", "companyName"});
         return json;
     }
 
@@ -512,7 +509,7 @@ public class UserController extends SimpleController {
                            String query) {
         List<User> list = userService.findWithInclude(includeUserIds, query);
         String json = JsonMapper.getInstance().toJson(list, User.class,
-                new String[]{"id", "name", "defaultOrganName"});
+                new String[]{"id", "loginName","code","bizCode", "name", "sexView", "defaultOrganName", "companyName"});
         return json;
     }
 
@@ -528,7 +525,7 @@ public class UserController extends SimpleController {
         List<User> users = userService.findOrganUsers(organId);
         Datagrid dg = new Datagrid(users.size(), users);
         return JsonMapper.getInstance().toJson(dg, User.class,
-                new String[]{"id", "loginName", "name", "sexView", "defaultOrganName"});
+                new String[]{"id", "loginName","code","bizCode", "name", "sexView", "defaultOrganName", "companyName"});
     }
 
 
@@ -765,7 +762,7 @@ public class UserController extends SimpleController {
         modelAndView.addObject("cascade", cascade);
         modelAndView.addObject("userDatagridData",
                 JsonMapper.getInstance().toJson(new Datagrid(users.size(), users), User.class,
-                        new String[]{"id", "name", "sexView", "defaultOrganName"}));
+                        new String[]{"id","loginName", "name","code","bizCode", "sexView", "defaultOrganName"}));
         return modelAndView;
     }
 
@@ -788,7 +785,7 @@ public class UserController extends SimpleController {
         Page<User> page = new Page<>(SpringMVCHolder.getRequest());
         page = userService.findUserPageByOrgan(page, organId, query, excludeUserIds);
         Datagrid<User> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
-        return JsonMapper.getInstance().toJson(dg, User.class, new String[]{"id", "loginName", "name", "sexView", "sort","defaultOrganName","companyName"});
+        return JsonMapper.getInstance().toJson(dg, User.class, new String[]{"id", "loginName", "name", "code", "bizCode", "sexView", "sort","defaultOrganName","companyName"});
     }
 
 
