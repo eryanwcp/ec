@@ -33,7 +33,7 @@
         <div onclick="del();" data-options="iconCls:'easyui-icon-remove'">删除</div>
     </e:hasPermission>
     <e:hasPermission name="sys:user:password:edit">
-        <div onclick="editPassword();" data-options="iconCls:'eu-icon-lock'">修改密码</div>
+        <div onclick="editPassword();" data-options="iconCls:'eu-icon-lock'">设置密码</div>
     </e:hasPermission>
     <e:hasPermission name="sys:user:organ:edit">
         <div onclick="editUserOrgan();" data-options="iconCls:'eu-icon-group'">设置机构</div>
