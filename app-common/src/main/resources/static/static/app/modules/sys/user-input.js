@@ -13,15 +13,8 @@ $(function () {
     if (modelId === "") {  //新增
         setSortValue();
         $("input[name=status]:eq(0)").prop("checked", 'checked');//状态 初始化值
-
-        $('#password_div').css('display', 'block');
-        $('#repassword_div').css('display', 'block');
     } else {
         $('input[name=status][value=' + modelStatus + ']').prop("checked", 'checked');
-        $('#password_div').css('display', 'none');
-        $('#repassword_div').css('display', 'none');
-        $('#password_div input').removeAttr('class');
-        $('#repassword_div input').removeAttr('class');
     }
 });
 

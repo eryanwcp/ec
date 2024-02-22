@@ -51,38 +51,39 @@
                    data-options="required:true,missingMessage:'请输入登录名.',validType:['minLength[1]']"/>
         </div>
         <div>
+            <label>姓名：</label>
+            <input name="name" type="text" maxLength="12" value="${model.name}" class="easyui-validatebox textbox"
+                   data-options="required:true,missingMessage:'请输入登录名.',validType:['length[2,12]']" />
+        </div>
+        <div>
             <label>员工编号：</label>
-            <input type="text" id="code" name="code" maxLength="36" value="${model.code}"
+            <input type="text" id="code" name="code" maxLength="64" value="${model.code}"
                    class="easyui-validatebox textbox"/>
         </div>
         <div>
             <label>信息分类编码：</label>
-            <input type="text" name="bizCode"  value="${model.bizCode}"  class="easyui-validatebox textbox"/>
+            <input type="text" name="bizCode"  value="${model.bizCode}" maxLength="64" class="easyui-validatebox textbox"/>
         </div>
         <div>
             <label>职务：</label>
             <input type="text" id="position" name="position" maxLength="64" value="${model.position}"
                    class="easyui-validatebox textbox"/>
         </div>
-        <div id="password_div">
-            <label>密码：</label>
-            <input type="password" id="password"
-                   name="password" class="easyui-validatebox textbox" maxLength="36" value="${model.password}"
-                   data-options="required:true,missingMessage:'请输入密码.',validType:['minLength[1]']">
-        </div>
-        <div id="repassword_div">
-            <label>确认密码：</label>
-            <input type="password" id="repassword"
-                   name="repassword" class="easyui-validatebox textbox" required="true"
-                   missingMessage="请再次填写密码." validType="equalTo['#password']"
-                   invalidMessage="两次输入密码不匹配.">
-        </div>
-
-        <div>
-            <label>姓名：</label>
-            <input name="name" type="text" maxLength="12" value="${model.name}" class="easyui-validatebox textbox"
-                   data-options="required:true,missingMessage:'请输入登录名.',validType:['length[2,12]']" />
-        </div>
+        <c:if test="${empty model.id}">
+            <div>
+                <label>密码：</label>
+                <input type="password" id="password"
+                       name="password" class="easyui-validatebox textbox" maxLength="36" value=""
+                       data-options="required:true,missingMessage:'请输入密码.',validType:['minLength[1]']">
+            </div>
+            <div>
+                <label>确认密码：</label>
+                <input type="password" id="repassword"
+                       name="repassword" class="easyui-validatebox textbox" required="true"
+                       missingMessage="请再次填写密码." validType="equalTo['#password']"
+                       invalidMessage="两次输入密码不匹配.">
+            </div>
+        </c:if>
         <div>
             <label>头像：</label>
             <div id="image_div" style="margin-left: 96px;">
@@ -104,24 +105,25 @@
             <input id="birthday" name="birthday" value="${birthdayStr}"  type="text" class="easyui-my97" />
         </div>
         <div>
-            <label>公司邮箱：</label>
-            <input name="email" type="text" value="${model.email}"  class="easyui-validatebox textbox" validType="email" maxLength="64" />
+            <label>手机号：</label>
+            <input name="mobile" type="text" value="${model.mobile}" class="easyui-validatebox textbox" validType="mobile">
         </div>
         <div>
             <label>办公电话：</label>
             <input name="tel" type="text"  value="${model.tel}"  class="easyui-validatebox textbox" validType="phone">
         </div>
+
         <div>
-            <label>手机号：</label>
-            <input name="mobile" type="text" value="${model.mobile}" class="easyui-validatebox textbox" validType="mobile">
-        </div>
-        <div>
-            <label>QQ：</label>
-            <input name="qq" type="text" value="${model.qq}" class="easyui-numberbox textbox" validType="QQ" maxLength="64" style="height: 28px;" />
+            <label>公司邮箱：</label>
+            <input name="email" type="text" value="${model.email}"  class="easyui-validatebox textbox" validType="email" maxLength="64" />
         </div>
         <div>
             <label>个人邮箱：</label>
             <input name="personEmail" type="text" value="${model.personEmail}" class="easyui-validatebox textbox" validType="email" maxLength="64" />
+        </div>
+        <div>
+            <label>QQ：</label>
+            <input name="qq" type="text" value="${model.qq}" class="easyui-numberbox textbox" validType="QQ" maxLength="64" style="height: 28px;" />
         </div>
         <div>
             <label>地址：</label>

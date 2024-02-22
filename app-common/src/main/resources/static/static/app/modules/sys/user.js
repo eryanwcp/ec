@@ -129,7 +129,7 @@ $(function () {
 
     if(hasPermissionUserPasswordEdit){
         toolbar = toolbar.concat([ {
-            text: '修改密码',
+            text: '设置密码',
             iconCls: 'eu-icon-lock',
             handler: function () {
                 editPassword()
