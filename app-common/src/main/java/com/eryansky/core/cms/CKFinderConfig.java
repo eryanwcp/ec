@@ -41,9 +41,8 @@ public class CKFinderConfig extends Configuration {
 			String _sessionId = CookieUtils.getCookie(SpringMVCHolder.getRequest(),SESSION_ID);
 			sessionInfo = SecurityUtils.getSessionInfo(StringUtils.substringBefore(_sessionId,"."));
 			//更新真实的SessionID
-			if (sessionInfo != null && _sessionId != null && !sessionInfo.getSessionId().equals(_sessionId)) {
+			if (sessionInfo != null && _sessionId != null && !sessionInfo.getId().equals(_sessionId)) {
 				sessionInfo.setId(_sessionId);
-				sessionInfo.setSessionId(_sessionId);
 				SecurityUtils.refreshSessionInfo(sessionInfo);
 			}
 		}

@@ -125,9 +125,8 @@ public class SessionController extends SimpleController {
         SessionInfo sessionInfo = SecurityUtils.getSessionInfoByTokenOrRefreshToken(token);
         String _sessionId = StringUtils.isNotBlank(sessionId) ? sessionId:request.getSession().getId();
         //更新真实的SessionID
-        if (sessionInfo != null && _sessionId != null && !sessionInfo.getSessionId().equals(_sessionId)) {
+        if (sessionInfo != null && _sessionId != null && !sessionInfo.getId().equals(_sessionId)) {
             sessionInfo.setId(_sessionId);
-            sessionInfo.setSessionId(_sessionId);
             SecurityUtils.refreshSessionInfo(sessionInfo);
         }
         return Result.successResult().setData(sessionInfo);

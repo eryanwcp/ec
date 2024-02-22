@@ -404,6 +404,7 @@ public class SecurityUtils {
         sessionInfo.setName(user.getName());
         sessionInfo.setLoginName(user.getLoginName());
         sessionInfo.setCode(user.getCode());
+        sessionInfo.setBizCode(user.getBizCode());
         sessionInfo.setUserType(user.getUserType());
         sessionInfo.setAvatar(user.getPhotoUrl());
         sessionInfo.setGender(user.getSex());
@@ -417,11 +418,14 @@ public class SecurityUtils {
         }
         sessionInfo.setLoginOrganId(organExtend.getId());
         sessionInfo.setLoginOrganSysCode(organExtend.getSysCode());
+        sessionInfo.setLoginOrganBizCode(organExtend.getBizCode());
         sessionInfo.setLoginOrganName(organExtend.getName());
         sessionInfo.setLoginCompanyId(organExtend.getCompanyId());
         sessionInfo.setLoginCompanyCode(organExtend.getCompanyCode());
+        sessionInfo.setLoginCompanyBizCode(organExtend.getCompanyBizCode());
         sessionInfo.setLoginHomeCompanyId(organExtend.getHomeCompanyId());
         sessionInfo.setLoginHomeCompanyCode(organExtend.getHomeCompanyCode());
+        sessionInfo.setLoginHomeCompanyBizCode(organExtend.getHomeCompanyBizCode());
         OrganExtend companyOrganExtend = OrganUtils.getOrganExtend(organExtend.getCompanyId());
         sessionInfo.setLoginCompanyLevel(null != companyOrganExtend ? companyOrganExtend.getTreeLevel() : null);
         return sessionInfo;
@@ -465,14 +469,12 @@ public class SecurityUtils {
         String accuracy_s = WebUtils.getParameter(request, "accuracy");
         sessionInfo.setLongitude(StringUtils.isBlank(longitude_s) ? null : BigDecimal.valueOf(Double.valueOf(longitude_s)));
         sessionInfo.setLatitude(StringUtils.isBlank(latitude_s) ? null : BigDecimal.valueOf(Double.valueOf(latitude_s)));
-        sessionInfo.setAccuracy(StringUtils.isBlank(accuracy_s) ? null : BigDecimal.valueOf(Double.valueOf(accuracy_s)));
         String appVersion_s = WebUtils.getParameter(request, "appVersion");
         String deviceCode_s = WebUtils.getParameter(request, "deviceCode");
         String platform_s = WebUtils.getParameter(request, "platform");
         sessionInfo.setAppVersion(appVersion_s);
         sessionInfo.setDeviceCode(deviceCode_s);
         sessionInfo.setDeviceType(StringUtils.isNotBlank(platform_s) ? platform_s:UserAgentUtils.getDeviceType(request).toString());
-        sessionInfo.setSessionId(sessionId);
         setOrRefreshSessionInfoToken(sessionInfo,user.getPassword());
         sessionInfo.setId(SecurityUtils.getNoSuffixSessionId(session));
 //        sessionInfo.addIfNotExistLoginName(sessionInfo.getLoginName());
@@ -520,7 +522,6 @@ public class SecurityUtils {
             logger.debug("putUserToSession:{}", sessionId);
         }
         SessionInfo sessionInfo = userToSessionInfo(user);
-        sessionInfo.setSessionId(sessionId);
         sessionInfo.setId(sessionId);
 
         sessionInfo.setSystemDeviceType(DeviceType.PC.getDescription());
@@ -544,7 +545,7 @@ public class SecurityUtils {
         if (null == sessionInfo) {
             return null;
         }
-        return putUserToSession(sessionInfo.getSessionId(), getCurrentUser());
+        return putUserToSession(sessionInfo.getId(), getCurrentUser());
     }
 
     /**
@@ -555,7 +556,7 @@ public class SecurityUtils {
     public static void reloadSession(String userId) {
         List<SessionInfo> sessionInfos = findSessionInfoByUserId(userId);
         sessionInfos.forEach(sessionInfo -> {
-            putUserToSession(sessionInfo.getSessionId(), UserUtils.getUser(sessionInfo.getUserId()));
+            putUserToSession(sessionInfo.getId(), UserUtils.getUser(sessionInfo.getUserId()));
         });
     }
 
@@ -1082,7 +1083,7 @@ public class SecurityUtils {
      */
     public static void syncExtendSession(SessionInfo sessionInfo) {
         Collection<String> sessionInfoIds = Static.applicationSessionContext.findSessionExtendKes();
-        sessionInfoIds.parallelStream().filter(v -> sessionInfo.getId().equals(getExtendSessionId(v))).forEach(v -> addExtendSession(v, sessionInfo.getSessionId()));
+        sessionInfoIds.parallelStream().filter(v -> sessionInfo.getId().equals(getExtendSessionId(v))).forEach(v -> addExtendSession(v, sessionInfo.getId()));
     }
 
 

@@ -30,10 +30,6 @@ public class SessionInfo implements Serializable {
      */
     private String id;
     /**
-     * sessionID
-     */
-    private String sessionId;
-    /**
      * 服务主机
      */
     private String host;
@@ -46,9 +42,13 @@ public class SessionInfo implements Serializable {
      */
     private String loginName;
     /**
-     * 员工编号
+     * 编号
      */
     private String code;
+    /**
+     * 信息分类编码
+     */
+    private String bizCode;
     /**
      * 手机号
      */
@@ -82,6 +82,14 @@ public class SessionInfo implements Serializable {
      */
     private String deviceType;
     /**
+     * 登录的设备编号
+     */
+    private String deviceCode;
+    /**
+     * 登录的设备名称
+     */
+    private String deviceName;
+    /**
      * 客户端（浏览器）类型 {@link eu.bitwalker.useragentutils.Browser}
      */
     private String browserType;
@@ -102,6 +110,10 @@ public class SessionInfo implements Serializable {
      */
     private String loginOrganSysCode;
     /**
+     * 系统登录部门信息分类编码
+     */
+    private String loginOrganBizCode;
+    /**
      * 机构ID
      */
     private String loginCompanyId;
@@ -109,6 +121,10 @@ public class SessionInfo implements Serializable {
      * 登录所在机构
      */
     private String loginCompanyCode;
+    /**
+     * 登录所在机构信息分类编码
+     */
+    private String loginCompanyBizCode;
     /**
      * 所在公司机构层级
      */
@@ -121,6 +137,10 @@ public class SessionInfo implements Serializable {
      * 上级机构编码
      */
     private String loginHomeCompanyCode;
+    /**
+     * 上级机构信息分类编码
+     */
+    private String loginHomeCompanyBizCode;
     /**
      * 系统登录部门名称
      */
@@ -151,10 +171,6 @@ public class SessionInfo implements Serializable {
      */
     private BigDecimal latitude;
     /**
-     * 精确度
-     */
-    private BigDecimal accuracy;
-    /**
      * 授权角色
      */
     private List<PermissonRole> permissonRoles = new ArrayList<>(0);
@@ -164,17 +180,17 @@ public class SessionInfo implements Serializable {
     private List<Permisson> permissons = new ArrayList<Permisson>(0);
 
     /**
-     * APP客户端版本
+     * 客户端版本
      */
     private String appVersion;
-    /**
-     * 登录的设备编号
-     */
-    private String deviceCode;
+
     /**
      * 所属区域
      */
     private String areaCode;
+    /**
+     * 开放ID
+     */
     private String openId;
     /**
      * token
@@ -184,7 +200,13 @@ public class SessionInfo implements Serializable {
      * 刷新Token
      */
     private String refreshToken;
+    /**
+     * 头像
+     */
     private String avatar;
+    /**
+     * 性别
+     */
     private String gender;
 
     /**
@@ -213,21 +235,6 @@ public class SessionInfo implements Serializable {
     }
 
     /**
-     * sessionID
-     */
-    public String getSessionId() {
-        return sessionId;
-    }
-
-    /**
-     * 设置 sessionID
-     */
-    public SessionInfo setSessionId(String sessionId) {
-        this.sessionId = sessionId;
-        return this;
-    }
-
-    /**
      * 服务主机
      */
     public String getHost() {
@@ -236,6 +243,7 @@ public class SessionInfo implements Serializable {
 
     /**
      * 设置 服务主机
+     *
      * @param host
      */
     public SessionInfo setHost(String host) {
@@ -279,6 +287,15 @@ public class SessionInfo implements Serializable {
 
     public SessionInfo setCode(String code) {
         this.code = code;
+        return this;
+    }
+
+    public String getBizCode() {
+        return bizCode;
+    }
+
+    public SessionInfo setBizCode(String bizCode) {
+        this.bizCode = bizCode;
         return this;
     }
 
@@ -461,15 +478,6 @@ public class SessionInfo implements Serializable {
         return this;
     }
 
-    public BigDecimal getAccuracy() {
-        return accuracy;
-    }
-
-    public SessionInfo setAccuracy(BigDecimal accuracy) {
-        this.accuracy = accuracy;
-        return this;
-    }
-
 
     public String getLoginOrganId() {
         return loginOrganId;
@@ -490,6 +498,15 @@ public class SessionInfo implements Serializable {
         return this;
     }
 
+    public String getLoginOrganBizCode() {
+        return loginOrganBizCode;
+    }
+
+    public SessionInfo setLoginOrganBizCode(String loginOrganBizCode) {
+        this.loginOrganBizCode = loginOrganBizCode;
+        return this;
+    }
+
     public String getLoginCompanyId() {
         return loginCompanyId;
     }
@@ -505,6 +522,15 @@ public class SessionInfo implements Serializable {
 
     public SessionInfo setLoginCompanyCode(String loginCompanyCode) {
         this.loginCompanyCode = loginCompanyCode;
+        return this;
+    }
+
+    public String getLoginCompanyBizCode() {
+        return loginCompanyBizCode;
+    }
+
+    public SessionInfo setLoginCompanyBizCode(String loginCompanyBizCode) {
+        this.loginCompanyBizCode = loginCompanyBizCode;
         return this;
     }
 
@@ -532,6 +558,15 @@ public class SessionInfo implements Serializable {
 
     public SessionInfo setLoginHomeCompanyCode(String loginHomeCompanyCode) {
         this.loginHomeCompanyCode = loginHomeCompanyCode;
+        return this;
+    }
+
+    public String getLoginHomeCompanyBizCode() {
+        return loginHomeCompanyBizCode;
+    }
+
+    public SessionInfo setLoginHomeCompanyBizCode(String loginHomeCompanyBizCode) {
+        this.loginHomeCompanyBizCode = loginHomeCompanyBizCode;
         return this;
     }
 
@@ -616,7 +651,7 @@ public class SessionInfo implements Serializable {
         try {
             _deviceType = DeviceType.valueOf(deviceType);
         } catch (IllegalArgumentException e) {
-            return "iOS".equalsIgnoreCase(deviceType)|| "android".equals(deviceType);
+            return "iOS".equalsIgnoreCase(deviceType) || "android".equals(deviceType);
         }
         return DeviceType.MOBILE.equals(_deviceType) || DeviceType.TABLET.equals(_deviceType);
     }
@@ -640,22 +675,20 @@ public class SessionInfo implements Serializable {
         return this;
     }
 
-    @Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this);
+    public String getDeviceName() {
+        return deviceName;
     }
 
-    public boolean isAuthenticated() {
-        return true;
+    public SessionInfo setDeviceName(String deviceName) {
+        this.deviceName = deviceName;
+        return this;
     }
 
-    public String getPrincipal() {
-        return name;
-    }
 
     /**
      * 添加自定义属性
-     * @param key key
+     *
+     * @param key    key
      * @param object 值
      * @return
      */
@@ -666,6 +699,7 @@ public class SessionInfo implements Serializable {
 
     /**
      * 返回自定义属性
+     *
      * @param key
      * @param <T>
      * @return
@@ -738,6 +772,20 @@ public class SessionInfo implements Serializable {
     public SessionInfo setGender(String gender) {
         this.gender = gender;
         return this;
+    }
+
+
+    public boolean isAuthenticated() {
+        return true;
+    }
+
+    public String getPrincipal() {
+        return name;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 
     @Override

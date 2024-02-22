@@ -147,7 +147,7 @@ public class UserMobileController extends SimpleController {
         }
         //注销当前会话信息
         if(null != sessionInfo){
-            SecurityUtils.offLine(sessionInfo.getSessionId());
+            SecurityUtils.offLine(sessionInfo.getId());
         }
         return Result.successResult();
     }
