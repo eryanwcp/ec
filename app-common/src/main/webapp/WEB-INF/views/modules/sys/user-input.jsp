@@ -57,6 +57,10 @@
                    class="easyui-validatebox textbox"/>
         </div>
         <div>
+            <label>信息分类编码：</label>
+            <input type="text" name="bizCode"  value="${model.bizCode}"  class="easyui-validatebox textbox"/>
+        </div>
+        <div>
             <label>职务：</label>
             <input type="text" id="position" name="position" maxLength="64" value="${model.position}"
                    class="easyui-validatebox textbox"/>
@@ -141,10 +145,6 @@
             <label style="text-align: left;width: 60px;">
                 <input type="radio" name="status" style="width: 20px;" value="3" /> 停用
             </label>
-        </div>
-        <div>
-            <label>信息分类编码：</label>
-            <input type="text" name="bizCode"  value="${model.bizCode}"  class="easyui-validatebox textbox"/>
         </div>
         <div>
             <label>自定义参数：</label>
