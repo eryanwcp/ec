@@ -1,5 +1,4 @@
 var modelIsReply = modelIsReply;
-var jsessionid = jsessionid;
 var modelFileIds = modelFileIds;
 var fileSizeLimit = fileSizeLimit;
 

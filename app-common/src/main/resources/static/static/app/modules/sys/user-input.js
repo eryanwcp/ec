@@ -1,6 +1,5 @@
 var modelId = modelId;
 var modelStatus = modelStatus;
-var jsessionid = jsessionid;
 
 var organs_combotree;
 $(function () {

@@ -7,7 +7,6 @@ var modelFileIds = modelFileIds;
 var noticeReceiveUserIds = noticeReceiveUserIds;
 var noticeReceiveOrganIds = noticeReceiveOrganIds;
 var noticeReceiveContactGroupIds = noticeReceiveContactGroupIds;
-var jsessionid = jsessionid;
 var fileSizeLimit = fileSizeLimit;
 
 var $form_noticeUser_MultiSelect = undefined;

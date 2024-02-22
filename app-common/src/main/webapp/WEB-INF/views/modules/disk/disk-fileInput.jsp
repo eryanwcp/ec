@@ -2,7 +2,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 <script type="text/javascript">
     var folderId = "${model.id}";
-    var sessionId = "${sessionInfo.sessionId}";
     var categorys_combotree;
     var fileSizeLimit = '<%=AppConstants.getDiskMaxUploadSize()%>';//附件上传大小限制
     $(function(){

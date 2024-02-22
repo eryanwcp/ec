@@ -4,7 +4,6 @@
 <script type="text/javascript">
     var modelIsReply = '${model.isReply}';
     var modelFileIds = ${fns:toJson(fileIds)};
-    var jsessionid = '${sessionInfo.sessionId}';
     var fileSizeLimit = '<%=AppConstants.getNoticeMaxUploadSize()%>';//附件上传大小限制
 </script>
 <script type="text/javascript" src="${ctxStatic}/app/modules/notice/notice-reply-input${yuicompressor}.js?_=${sysInitTime}" charset="utf-8"></script>

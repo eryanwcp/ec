@@ -23,7 +23,6 @@
 <script type="text/javascript">
     var modelId = '${model.id}';
     var modelStatus = '${model.status}';
-    var jsessionid = '${sessionInfo.sessionId}';
     var fileSizeLimit = '<%=AppConstants.getDiskMaxUploadSize()%>';
 </script>
 <script type="text/javascript" src="${ctxStatic}/app/modules/sys/user-input${yuicompressor}.js?_=${sysInitTime}" charset="utf-8"></script>

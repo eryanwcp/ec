@@ -11,7 +11,6 @@
     var noticeReceiveUserIds =  ${fns:toJson(receiveUserIds)};
     var noticeReceiveOrganIds = ${fns:toJson(receiveOrganIds)};
     var noticeReceiveContactGroupIds = ${fns:toJson(receiveContactGroupIds)};
-    var jsessionid = '${sessionInfo.sessionId}';
     var fileSizeLimit = '<%=AppConstants.getNoticeMaxUploadSize()%>';//附件上传大小限制
 </script>
 <script type="text/javascript" src="${ctxStatic}/app/modules/notice/notice-input${yuicompressor}.js?_=${sysInitTime}" charset="utf-8"></script>
