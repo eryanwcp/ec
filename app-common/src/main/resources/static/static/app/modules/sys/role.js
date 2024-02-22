@@ -105,7 +105,7 @@ $(function () {
         ],
         columns: [
             [
-                {field: 'id', title: '主键', hidden: true, sortable: true,  width: 200},
+                {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
                 {field: 'roleTypeView', title: '权限类型', width: 100},
                 {field: 'isSystemView', title: '系统角色', width: 60},
                 {field: 'organName', title: '所属机构', width: 200},

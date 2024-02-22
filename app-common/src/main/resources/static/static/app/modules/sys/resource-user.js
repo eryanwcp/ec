@@ -24,7 +24,7 @@ $(function () {
         ],
         columns: [
             [
-                {field: 'id', title: '主键', hidden: true, sortable: true, width: 200},
+                {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
                 {field: 'sexView', title: '性别', width: 60, align: 'center', sortable: true},
                 {field: 'code', title: '员工编号', width: 160, sortable: true, hidden: true},
                 {field: 'bizCode', title: '信息分类编码', width: 160,sortable: true},

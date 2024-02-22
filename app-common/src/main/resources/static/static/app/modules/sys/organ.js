@@ -59,7 +59,7 @@ $(function () {
             {field: 'name', title: '机构名称', width: 300}
         ]],
         columns: [[
-            {field: 'id', title: '主键',  width: 200,sortable: true, hidden: true},
+            {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
             {field: 'areaId', title: '区域ID', width: 120, hidden: true, sortable: true},
             {field: 'sysCode', title: '系统编码', width: 160, sortable: true, hidden: true},
             {field: 'code', title: '编码', width: 160, sortable: true},

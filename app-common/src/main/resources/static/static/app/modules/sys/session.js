@@ -33,15 +33,15 @@ $(function () {
         columns: [[{
             title: 'ID',
             field: 'id',
-            width: 300,
+            width: 260,
             hidden: true, formatter: function (value, rowData, rowIndex) {
                 return "<a target='_blank' href='" + ctxAdmin + "/sys/session/detail?id=" + rowData['id'] + "'>" + value + "</a>";
             }
         }, {
             title: 'SessionID',
             field: 'sessionId',
-            width: 200,
-            hidden: false, formatter: function (value, rowData, rowIndex) {
+            width: 260,
+            hidden: true, formatter: function (value, rowData, rowIndex) {
                 return "<a target='_blank' href='" + ctxAdmin + "/sys/session/detail?id=" + rowData['id'] + "'>" + value + "</a>";
             }
         }, {

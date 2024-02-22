@@ -23,7 +23,7 @@ function loadManagerUser() {
         collapsible: false,//是否可折叠的
         method: 'post',
         columns: [[
-            {field: 'id', title: '主键', hidden: true, sortable: true, width: 200},
+            {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
             {field: 'name', title: '姓名', width: 100, sortable: true},
             {field: 'sexView', title: '性别', width: 60, hidden: true, sortable: true},
             {field: 'loginName', title: '账号', width: 120, hidden: true, sortable: true},

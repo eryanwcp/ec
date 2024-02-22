@@ -21,7 +21,7 @@ $(function () {
             {field: 'code', title: '资源编码', width: 260}
         ]],
         columns: [[
-            {field: 'id', title: '主键', hidden: true, sortable: true, align: 'right', width: 80},
+            {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
             {field: 'url', title: '链接地址', width: 260},
             {field: 'markUrl', title: '标识地址', width: 260},
             {field: 'sort', title: '排序', align: 'right', width: 60, sortable: true},

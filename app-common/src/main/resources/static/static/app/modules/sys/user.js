@@ -261,7 +261,7 @@ $(function () {
         ],
         columns: [
             [
-                {field: 'id', title: '主键',  width: 200,sortable: true, hidden: true},
+                {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
                 {field: 'code', title: '员工编号', width: 160, sortable: true, hidden: true},
                 {field: 'position', title: '职务', width: 120, sortable: true},
                 {field: 'bizCode', title: '信息分类编码', width: 160,  sortable: true},
