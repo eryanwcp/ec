@@ -38,7 +38,7 @@ $(function () {
                 {field: 'birthday', title: '出生日期', width: 80, sortable: true},
                 {field: 'address', title: '地址', width: 200},
                 {field: 'remark', title: '备注', width: 200},
-                {field: 'sort', title: '排序', width: 60, sortable: true},
+                {field: 'sort', title: '排序', width: 60, align: 'right', sortable: true},
                 {
                     field: 'statusView',
                     title: '状态',

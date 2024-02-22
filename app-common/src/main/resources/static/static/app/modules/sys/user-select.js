@@ -53,7 +53,7 @@ function userDatagrid() {
             {field: 'sexView', title: '性别', width: 60, hidden: true, sortable: true},
             {field: 'loginName', title: '账号', width: 60, hidden: true, sortable: true},
             {field: 'mobileSensitive', title: '手机号', width: 100, hidden: true, sortable: true},
-            {field: 'sort', title: '排序号', width: 60, hidden: true, sortable: true},
+            {field: 'sort', title: '排序号', align: 'right', width: 60, hidden: true, sortable: true},
             {field: 'defaultOrganName', title: '部门', width: 200, sortable: true},
             {field: 'companyName', title: '单位', width: 200, sortable: true},
             {field: 'homeCompanyName', title: '上级单位', width: 200, sortable: true}
