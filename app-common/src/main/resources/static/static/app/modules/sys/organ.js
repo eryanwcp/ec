@@ -64,6 +64,8 @@ $(function () {
             {field: 'managerUserName', title: '主管', width: 120, sortable: true},
             {field: 'superManagerUserName', title: '分管领导', width: 120, sortable: true},
             {field: 'code', title: '编码', width: 120, sortable: true},
+            {field: 'sysCode', title: '系统编码', width: 120, hidden: true, sortable: true},
+            {field: 'bizCode', title: '信息分类编码', width: 120, sortable: true},
             {field: 'address', title: '地址', width: 120, hidden: true},
             {field: 'mobile', title: '手机号', width: 120, sortable: true, hidden: true},
             {field: 'phone', title: '电话号码', width: 120, sortable: true, hidden: true},
@@ -72,7 +74,6 @@ $(function () {
             {field: 'sort', title: '排序', align: 'right', width: 60, sortable: true},
             {field: 'statusView', title: '状态', align: 'center', width: 60},
             {field: 'remark', title: '备注', width: 260},
-            {field: 'bizCode', title: '信息分类编码', width: 120, hidden: true, sortable: true},
             {field: 'extendAttr', title: '自定义参数', width: 200,hidden: true,formatter: function (value, rowData, rowIndex) {
                     return value ? JSON.stringify(value) : value;
             }},

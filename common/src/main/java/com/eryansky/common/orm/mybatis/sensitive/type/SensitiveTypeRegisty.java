@@ -22,6 +22,7 @@ public class SensitiveTypeRegisty {
         HANDLER_REGISTY.put(SensitiveType.CHINESE_NAME, new NameSensitiveHandler());
         HANDLER_REGISTY.put(SensitiveType.ID_CARD, new IDCardSensitiveHandler());
         HANDLER_REGISTY.put(SensitiveType.MOBILE_PHONE, new MobilePhoneSensitiveHandler());
+        HANDLER_REGISTY.put(SensitiveType.MOBILE_OR_FIXED_PHONE, new MobileOrFixexPhoneSensitiveHandler());
         HANDLER_REGISTY.put(SensitiveType.ADDRESS, new AddressSensitiveHandler());
         HANDLER_REGISTY.put(SensitiveType.EMAIL, new EmailSensitiveHandler());
         HANDLER_REGISTY.put(SensitiveType.BANK_CARD, new BandCardSensitiveHandler());

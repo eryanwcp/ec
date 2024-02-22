@@ -261,7 +261,8 @@ $(function () {
         ],
         columns: [
             [
-                {field: 'code', title: '员工编号', width: 80, hidden: true, sortable: true},
+                {field: 'code', title: '员工编号', width: 120, sortable: true},
+                {field: 'bizCode', title: '信息分类编码', width: 120,  sortable: true},
                 {field: 'position', title: '职务', width: 200, sortable: true},
                 {field: 'id', title: '主键', hidden: true, sortable: true, align: 'right', width: 80},
                 {field: 'tel', title: '办公电话', width: 100},
@@ -277,7 +278,7 @@ $(function () {
                 {field: 'birthday', title: '出生日期', width: 80, sortable: true},
                 {field: 'address', title: '地址', width: 200},
                 {field: 'remark', title: '备注', width: 200},
-                {field: 'sort', title: '排序', width: 60, sortable: true},
+                {field: 'sort', title: '排序', width: 60, align: 'right',sortable: true},
                 {
                     field: 'statusView',
                     title: '状态',
@@ -290,7 +291,6 @@ $(function () {
                         return value;
                     }
                 },
-                {field: 'bizCode', title: '信息分类编码', width: 120, hidden: true, sortable: true},
                 {field: 'extendAttr', title: '自定义参数', width: 200,hidden: true,formatter: function (value, rowData, rowIndex) {
                         return value ? JSON.stringify(value) : value;
                 }},

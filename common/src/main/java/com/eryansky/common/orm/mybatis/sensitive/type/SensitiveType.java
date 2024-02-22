@@ -28,9 +28,10 @@ public enum SensitiveType {
      */
     FIXED_PHONE,
     /**
-     * 手机号
+     * 手机号或座机号
      */
     MOBILE_PHONE,
+    MOBILE_OR_FIXED_PHONE,
     /**
      * 地址
      */
