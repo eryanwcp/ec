@@ -38,7 +38,7 @@
                    data-options="min:1,max:99999999,size:9,maxlength:9,height:28" />
         </div>
         <div>
-            <label style="vertical-align: top;">描述：</label>
+            <label style="vertical-align: top;">备注：</label>
             <input name="remark" maxLength="255" value="${model.remark}"
                    class="easyui-textbox" maxLength="2000"  data-options="multiline:true" style="width:260px;height:75px;">
         </div>

@@ -49,12 +49,12 @@ function userDatagrid() {
         autoRowHeight: false,
         frozenColumns: [frozenColumns],
         columns: [[
-            {field: 'id', title: '主键', hidden: true, sortable: true, width: 80},
+            {field: 'id', title: '主键',  width: 200,sortable: true, hidden: true},
             {field: 'sexView', title: '性别', width: 60, hidden: true, sortable: true},
-            {field: 'loginName', title: '账号', width: 100, hidden: true, sortable: true},
-            {field: 'code', title: '编码', width: 100, hidden: true, sortable: true},
-            {field: 'bizCode', title: '信息分类编码', width: 100, hidden: true, sortable: true},
-            {field: 'mobile', title: '手机号', width: 100, hidden: true, sortable: true},
+            {field: 'loginName', title: '账号', width: 120, hidden: true, sortable: true},
+            {field: 'code', title: '编码', width: 160, hidden: true, sortable: true},
+            {field: 'bizCode', title: '信息分类编码', width: 160, hidden: true, sortable: true},
+            {field: 'mobile', title: '手机号', width: 120, hidden: true, sortable: true},
             {field: 'sort', title: '排序号', align: 'right', width: 60, hidden: true, sortable: true},
             {field: 'defaultOrganName', title: '部门', width: 200, sortable: true},
             {field: 'companyName', title: '单位', width: 200, sortable: true}

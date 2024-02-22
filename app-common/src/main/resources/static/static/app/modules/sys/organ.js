@@ -56,15 +56,14 @@ $(function () {
         idField: 'id',
         treeField: "name",
         frozenColumns: [[
-            {field: 'name', title: '机构名称', width: 300},
-            {field: 'sysCode', title: '系统编码', width: 120, hidden: true}
+            {field: 'name', title: '机构名称', width: 300}
         ]],
         columns: [[
-            {field: 'id', title: '主键', hidden: true, sortable: true, width: 80},
+            {field: 'id', title: '主键',  width: 200,sortable: true, hidden: true},
             {field: 'areaId', title: '区域ID', width: 120, hidden: true, sortable: true},
-            {field: 'sysCode', title: '系统编码', width: 120, hidden: true, sortable: true},
-            {field: 'code', title: '编码', width: 120, sortable: true},
-            {field: 'bizCode', title: '信息分类编码', width: 120, sortable: true},
+            {field: 'sysCode', title: '系统编码', width: 160, sortable: true, hidden: true},
+            {field: 'code', title: '编码', width: 160, sortable: true},
+            {field: 'bizCode', title: '信息分类编码', width: 160, sortable: true},
             {field: 'managerUserName', title: '主管', width: 120, sortable: true},
             {field: 'superManagerUserName', title: '分管领导', width: 120, sortable: true},
             {field: 'address', title: '地址', width: 120, hidden: true},

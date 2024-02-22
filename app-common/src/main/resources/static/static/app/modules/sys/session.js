@@ -33,14 +33,14 @@ $(function () {
         columns: [[{
             title: 'ID',
             field: 'id',
-            width: 360,
+            width: 300,
             hidden: true, formatter: function (value, rowData, rowIndex) {
                 return "<a target='_blank' href='" + ctxAdmin + "/sys/session/detail?id=" + rowData['id'] + "'>" + value + "</a>";
             }
         }, {
             title: 'SessionID',
             field: 'sessionId',
-            width: 360,
+            width: 300,
             hidden: false, formatter: function (value, rowData, rowIndex) {
                 return "<a target='_blank' href='" + ctxAdmin + "/sys/session/detail?id=" + rowData['id'] + "'>" + value + "</a>";
             }
@@ -57,17 +57,17 @@ $(function () {
         }, {
             title: '姓名',
             field: 'name',
-            width: 200
+            width: 160
         }, {
             title: '登录名',
             field: 'loginName',
-            width: 200
+            width: 160
         }, {
             title: '手机号',
             field: 'mobileSensitive',
             width: 120
         }, {
-            title: '手机号',
+            title: '真实手机号',
             field: 'mobile',
             width: 120,
             hidden: true
@@ -86,7 +86,7 @@ $(function () {
         }, {
             title: '设备类型',
             field: 'systemDeviceType',
-            width: 120
+            width: 100
         }, {
             title: '设备编码',
             field: 'deviceCode',

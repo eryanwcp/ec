@@ -23,14 +23,16 @@ function loadManagerUser() {
         collapsible: false,//是否可折叠的
         method: 'post',
         columns: [[
-            {field: 'id', title: '主键ID', width: 100, hidden: 'true'},
-            {field: 'name', title: '姓名', width: 60, sortable: true},
-            {field: 'loginName', title: '账号', width: 60, hidden: true, sortable: true},
-            {field: 'code', title: '编码', width: 100, hidden: true, sortable: true},
-            {field: 'bizCode', title: '信息分类编码', width: 100, hidden: true, sortable: true},
-            {field: 'sexView', title: '性别', width: 50},
-            {field: 'defaultOrganName', title: '部分', width: 120, sortable: true},
-            {field: 'companyName', title: '单位', width: 120, sortable: true}
+            {field: 'id', title: '主键', hidden: true, sortable: true, width: 200},
+            {field: 'name', title: '姓名', width: 100, sortable: true},
+            {field: 'sexView', title: '性别', width: 60, hidden: true, sortable: true},
+            {field: 'loginName', title: '账号', width: 120, hidden: true, sortable: true},
+            {field: 'code', title: '编码', width: 160, hidden: true, sortable: true},
+            {field: 'bizCode', title: '信息分类编码', width: 160, hidden: true, sortable: true},
+            {field: 'mobile', title: '手机号', width: 120, hidden: true, sortable: true},
+            {field: 'sort', title: '排序号', width: 60, align: 'right', hidden: true, sortable: true},
+            {field: 'defaultOrganName', title: '部门', width: 200, sortable: true},
+            {field: 'companyName', title: '单位', width: 200, sortable: true}
         ]]
     });
     if (managerUserId) {
