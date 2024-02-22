@@ -69,8 +69,7 @@ function loadFileDatagrid() {
             title: '主键',
             hidden: true,
             sortable: true,
-            align: 'right',
-            width: 80
+            width: 200
         },
             {
                 field: 'prettyFileSize',

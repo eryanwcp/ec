@@ -35,7 +35,7 @@ function initDatagrid() {
             }
         ]],
         columns: [[
-            {field: 'id', title: '主键', hidden: true, width: 120},
+            {field: 'id', title: '主键', hidden: true, width: 200},
             {field: 'versionCode', title: '内部版本号', width: 100, align: 'right'},
             {field: 'versionLogTypeView', title: '类型', width: 120},
             {field: 'remark', title: '更新说明', width: 360},

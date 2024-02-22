@@ -129,7 +129,7 @@ function dictionaryItemDatagrid() {
             }
         ]],
         columns: [[
-            {field: 'id', title: '主键', hidden: true, sortable: true, align: 'right', width: 80}, {
+            {field: 'id', title: '主键', hidden: true, sortable: true, width: 200}, {
                 field: 'parentId',
                 title: '上级节点',
                 width: 200,

@@ -112,8 +112,7 @@ function initReadDatagrid() {
             title: '主键',
             hidden: true,
             sortable: true,
-            align: 'right',
-            width: 80
+            width: 200
         }, {
             field: 'publishUserName',
             title: '发布人',

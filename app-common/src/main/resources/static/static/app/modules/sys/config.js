@@ -23,7 +23,7 @@ $(function () {
         ],
         columns: [
             [
-                {field: 'id', title: '主键', hidden: true, sortable: true, width: 80},
+                {field: 'id', title: '主键', hidden: true, sortable: true, width: 200},
                 {field: 'remark', title: '备注', width: 200}
             ]
         ],

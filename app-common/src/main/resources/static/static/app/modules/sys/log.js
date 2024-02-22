@@ -25,7 +25,7 @@ $(function () {
             {field: 'typeView', title: '日志类型', width: 80}
         ]],
         columns: [[
-            {field: 'id', title: '主键', hidden: true, sortable: true, width: 100},
+            {field: 'id', title: '主键', hidden: true, sortable: true, width: 200},
             {
                 field: 'title', title: '标题', width: 200, hidden: false, formatter: function (value, rowData, rowIndex) {
                     return "<a target='_blank' href='" + ctxAdmin + "/sys/log/detail?id=" + rowData['id'] + "'>" + rowData['title'] + "</a>";

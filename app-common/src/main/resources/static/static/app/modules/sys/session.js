@@ -40,7 +40,7 @@ $(function () {
         }, {
             title: 'SessionID',
             field: 'sessionId',
-            width: 300,
+            width: 200,
             hidden: false, formatter: function (value, rowData, rowIndex) {
                 return "<a target='_blank' href='" + ctxAdmin + "/sys/session/detail?id=" + rowData['id'] + "'>" + value + "</a>";
             }

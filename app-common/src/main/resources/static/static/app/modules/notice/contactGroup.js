@@ -127,7 +127,7 @@ function listUser(contactGroupId){
             {field:'sexView',title:'性别',width:60}
         ]],
         columns:[[
-            {field:'id',title:'主键',hidden:true,sortable:true,align:'right',width:80} ,
+            {field:'id',title:'主键',hidden:true,sortable:true,width:200} ,
             {field:'organNames',title:'部门',width:200},
             {field:'mobilephone',title:'手机号',width:120},
             {field:'tel',title:'电话',width:120},
