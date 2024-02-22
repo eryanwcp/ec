@@ -143,7 +143,7 @@
             </label>
         </div>
         <div>
-            <label>信息分编码：</label>
+            <label>信息分类编码：</label>
             <input type="text" name="bizCode"  value="${model.bizCode}"  class="easyui-validatebox textbox"/>
         </div>
         <div>
