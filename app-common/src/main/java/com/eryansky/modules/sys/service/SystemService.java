@@ -38,9 +38,8 @@ public class SystemService extends BaseService {
      *
      * @return
      */
-    @Deprecated
     public int insertToOrganExtend() {
-        return insertToOrganExtend(null);
+        return insertToOrganExtend(Parameter.newParameter());
     }
 
     /**
@@ -56,11 +55,10 @@ public class SystemService extends BaseService {
     /**
      * organ表同步到扩展表
      *
-     * @param parameter 参数
      * @return
      */
     public int insertToOrganExtendByFunction() {
-        return insertToOrganExtendByFunction(null);
+        return insertToOrganExtendByFunction(Parameter.newParameter());
     }
 
 
@@ -79,9 +77,8 @@ public class SystemService extends BaseService {
      *
      * @return
      */
-    @Deprecated
     public int deleteOrganExtend() {
-        return deleteOrganExtend(null);
+        return deleteOrganExtend(Parameter.newParameter());
     }
 
     /**
@@ -101,7 +98,9 @@ public class SystemService extends BaseService {
         String dbType = AppConstants.getJdbcType();
         if ("mysql".equalsIgnoreCase(dbType) || "mariadb".equalsIgnoreCase(dbType)) {
             try {
-                syncOrganToExtendByFunction(null);//使用存储过程
+                Parameter parameter = Parameter.newParameter();
+                deleteOrganExtend(parameter);
+                insertToOrganExtendByFunction(parameter);//使用存储过程
             } catch (Exception e) {
                 logger.error(e.getMessage(),e);
                 syncOrganToExtend();
@@ -111,10 +110,7 @@ public class SystemService extends BaseService {
         }
     }
 
-    public void syncOrganToExtend() {
-        List<Organ> list = organService.findAllWithDelete();
-        list.parallelStream().forEach(this::syncOrganToExtend);
-    }
+
 
     public void syncOrganToExtendAuto(Organ organ) {
         String dbType = AppConstants.getJdbcType();
@@ -122,7 +118,8 @@ public class SystemService extends BaseService {
             try {
                 Parameter parameter = Parameter.newParameter();
                 parameter.put("id", organ.getId());
-                syncOrganToExtendByFunction(parameter);//使用存储过程
+                deleteOrganExtend(parameter);
+                insertToOrganExtendByFunction(parameter);//使用存储过程
             } catch (Exception e) {
                 logger.error(e.getMessage(),e);
                 syncOrganToExtend(organ);
@@ -132,6 +129,10 @@ public class SystemService extends BaseService {
         }
     }
 
+    public void syncOrganToExtend() {
+        List<Organ> list = organService.findAllWithDelete();
+        list.parallelStream().forEach(this::syncOrganToExtend);
+    }
 
     public void syncOrganToExtend(Organ organ) {
         Parameter parameter = Parameter.newParameter();
@@ -157,23 +158,8 @@ public class SystemService extends BaseService {
         parameter.put("treeLevel", level);
         Integer childCount = organService.findChildCount(organ.getId());
         parameter.put("isLeaf", null == childCount || childCount == 0);
-        syncOrganToExtend(parameter);
-    }
-
-    /**
-     * 同步数据到organ表
-     */
-    private void syncOrganToExtend(Parameter parameter) {
         deleteOrganExtend(parameter);
         insertToOrganExtend(parameter);
-    }
-
-    /**
-     * 同步数据到organ表 存储过程
-     */
-    private void syncOrganToExtendByFunction(Parameter parameter) {
-        deleteOrganExtend(parameter);
-        insertToOrganExtendByFunction(parameter);
     }
 
 }
