@@ -92,7 +92,7 @@ public class SystemService extends BaseService {
     }
 
     /**
-     * 同步数据到t_sys_organ_extend表
+     * 同步数据到t_sys_organ_extend表 批量
      */
     public void syncOrganToExtendAuto() {
         String dbType = AppConstants.getJdbcType();
@@ -111,7 +111,10 @@ public class SystemService extends BaseService {
     }
 
 
-
+    /**
+     * 同步数据到t_sys_organ_extend表 单个
+     * @param organ
+     */
     public void syncOrganToExtendAuto(Organ organ) {
         String dbType = AppConstants.getJdbcType();
         if ("mysql".equalsIgnoreCase(dbType) || "mariadb".equalsIgnoreCase(dbType)) {
