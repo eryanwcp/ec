@@ -54,6 +54,27 @@ public class SystemService extends BaseService {
     }
 
     /**
+     * organ表同步到扩展表
+     *
+     * @param parameter 参数
+     * @return
+     */
+    public int insertToOrganExtendByFunction() {
+        return insertToOrganExtendByFunction(null);
+    }
+
+
+    /**
+     * organ表同步到扩展表
+     *
+     * @param parameter 参数
+     * @return
+     */
+    public int insertToOrganExtendByFunction(Parameter parameter) {
+        return systemDao.insertToOrganExtendByFunction(parameter);
+    }
+
+    /**
      * 删除t_sys_organ_extend扩展表数据
      *
      * @return
@@ -152,7 +173,7 @@ public class SystemService extends BaseService {
      */
     private void syncOrganToExtendByFunction(Parameter parameter) {
         deleteOrganExtend(parameter);
-        syncOrganToExtendByFunction(parameter);
+        insertToOrganExtendByFunction(parameter);
     }
 
 }
