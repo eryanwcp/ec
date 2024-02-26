@@ -44,7 +44,12 @@ public class SerializationUtils {
             if ("java".equals(ser)) {
                 g_serializer = new JavaSerializer();
             } else if ("fst".equals(ser)) {
-                g_serializer = new FSTSerializer();
+                try {
+                    g_serializer = new FSTSerializer();
+                } catch (Exception e) {
+                    log.error(e.getMessage(),e);
+                    g_serializer = new JavaSerializer();
+                }
             } else if("fst-snappy".equals(ser)){
                 g_serializer=new FstSnappySerializer();
             } else if ("json".equals(ser)) {
