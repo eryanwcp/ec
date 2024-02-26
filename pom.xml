@@ -192,6 +192,10 @@
                     <groupId>commons-dbcp</groupId>
                     <artifactId>commons-dbcp</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>com.github.waffle</groupId>
+                    <artifactId>waffle-jna</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
