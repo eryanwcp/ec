@@ -126,12 +126,17 @@ public class J2CacheSpringRedisAutoConfiguration {
 		case "sharded":
 			try {
 				for (String node : hosts.split(",")) {
-					connectionFactory = new JedisConnectionFactory(new JedisShardInfo(new URI(node)));
+					RedisClusterConfiguration c = new RedisClusterConfiguration();
+					c.setClusterNodes(nodes);
+					c.setMaxRedirects(MAX_ATTEMPTS);
+					c.setPassword(paw);
+					connectionFactory = new JedisConnectionFactory(c, config);
+//					connectionFactory = new JedisConnectionFactory(new JedisShardInfo(new URI(node)));
 					connectionFactory.setPoolConfig(config);
 					log.warn("Jedis mode [sharded] not recommended for use!!");
 					break;
 				}
-			} catch (URISyntaxException e) {
+			} catch (Exception e) {
 				throw new JedisConnectionException(e);
 			}
 			break;

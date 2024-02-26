@@ -6,8 +6,8 @@
 
 package com.eryansky.common.mail.auth;
 
-import javax.mail.Authenticator;
-import javax.mail.PasswordAuthentication;
+import jakarta.mail.Authenticator;
+import jakarta.mail.PasswordAuthentication;
 
 /**
  * 简单的用户名/密码认证方式

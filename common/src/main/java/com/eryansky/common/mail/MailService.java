@@ -13,9 +13,8 @@ import com.eryansky.common.mail.entity.Mail;
 import com.eryansky.common.mail.event.SubscriptionListener;
 import com.eryansky.common.mail.receiver.Receiver;
 import com.eryansky.common.mail.sender.Sender;
-
-import javax.mail.Message;
-import javax.mail.SendFailedException;
+import jakarta.mail.Message;
+import jakarta.mail.SendFailedException;
 import java.util.*;
 
 /**

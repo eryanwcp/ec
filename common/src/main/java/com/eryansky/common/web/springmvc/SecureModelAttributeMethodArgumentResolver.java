@@ -9,7 +9,7 @@ import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.Map;
 
-import javax.servlet.ServletRequest;
+import jakarta.servlet.ServletRequest;
 
 import com.eryansky.common.utils.reflection.ReflectionUtils;
 import org.slf4j.Logger;

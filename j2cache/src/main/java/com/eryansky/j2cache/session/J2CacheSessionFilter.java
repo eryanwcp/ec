@@ -20,8 +20,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.*;
 

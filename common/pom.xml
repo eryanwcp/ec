@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.eryansky</groupId>
         <artifactId>ec-parent</artifactId>
-        <version>4.2.20231124.33</version>
+        <version>4.3.20240226.01</version>
     </parent>
 
     <artifactId>ec-common</artifactId>
@@ -30,7 +30,7 @@
         <pinyin4j.version>2.5.1</pinyin4j.version>
         <jsqlparser.version>4.6</jsqlparser.version>
         <cglib-nodep.version>3.3.0</cglib-nodep.version>
-        <slf4j.version>1.7.36</slf4j.version>
+        <slf4j.version>2.0.12</slf4j.version>
 
         <guava.version>33.0.0-jre</guava.version>
         <dozer.version>6.5.2</dozer.version>
@@ -65,6 +65,11 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-email</artifactId>
             <version>${commons-email.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>jakarta.mail</artifactId>
+            <version>2.0.1</version>
         </dependency>
         <dependency>
             <groupId>commons-beanutils</groupId>
@@ -205,20 +210,20 @@
         </dependency>
         <!-- https://mvnrepository.com/artifact/javax.xml.ws/jaxws-api -->
         <dependency>
-            <groupId>javax.xml.ws</groupId>
-            <artifactId>jaxws-api</artifactId>
-            <version>2.3.1</version>
+            <groupId>jakarta.xml.ws</groupId>
+            <artifactId>jakarta.xml.ws-api</artifactId>
+            <version>4.0.1</version>
         </dependency>
         <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>2.4.0-b180830.0359</version>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>4.0.1</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/javax.jws/javax.jws-api -->
         <dependency>
-            <groupId>javax.jws</groupId>
-            <artifactId>javax.jws-api</artifactId>
-            <version>1.1</version>
+            <groupId>jakarta.jws</groupId>
+            <artifactId>jakarta.jws-api</artifactId>
+            <version>3.0.0</version>
         </dependency>
 
         <dependency>

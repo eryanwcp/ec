@@ -14,7 +14,7 @@ import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.utils.AppConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
 import java.util.Map;
 

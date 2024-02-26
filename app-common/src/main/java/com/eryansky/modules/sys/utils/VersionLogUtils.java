@@ -14,7 +14,7 @@ import com.eryansky.modules.sys.service.VersionLogService;
 import com.eryansky.utils.AppUtils;
 import eu.bitwalker.useragentutils.OperatingSystem;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import static com.eryansky.utils.AppUtils.likeIOS;
 

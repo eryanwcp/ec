@@ -10,7 +10,7 @@ import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.encode.EncodeUtils;
 import com.google.common.net.InetAddresses;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;

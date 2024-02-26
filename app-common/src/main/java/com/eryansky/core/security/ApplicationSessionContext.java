@@ -3,7 +3,7 @@ package com.eryansky.core.security;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.utils.CacheUtils;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;

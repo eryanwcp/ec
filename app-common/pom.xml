@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.eryansky</groupId>
         <artifactId>ec-parent</artifactId>
-        <version>4.2.20231124.33</version>
+        <version>4.3.20240226.01</version>
     </parent>
     <artifactId>ec-app-common</artifactId>
     <version>${ec-app-common.version}</version>
@@ -19,12 +19,11 @@
         <xwpf.version>2.0.4</xwpf.version>
         <bsh.version>2.0b6</bsh.version>
 
-        <sitemesh.version>2.5.0</sitemesh.version>
+        <sitemesh.version>3.2.0-M2</sitemesh.version>
         <commons-csv.version>1.10.0</commons-csv.version>
         <commons-dbutils.version>1.8.1</commons-dbutils.version>
         <commons-cli.version>1.6.0</commons-cli.version>
         <fop.version>2.9</fop.version>
-        <ckfinder.version>2.3</ckfinder.version>
         <jwt.version>4.4.0</jwt.version>
         <guava.version>33.0.0-jre</guava.version>
 
@@ -42,7 +41,7 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>opensymphony</groupId>
+            <groupId>org.sitemesh</groupId>
             <artifactId>sitemesh</artifactId>
             <version>${sitemesh.version}</version>
         </dependency>
@@ -161,36 +160,6 @@
         </dependency>
 
 
-        <!-- CKFinder begin -->
-        <dependency>
-            <groupId>net.coobird</groupId>
-            <artifactId>thumbnailator</artifactId>
-            <version>0.4.19</version>
-        </dependency>
-        <!-- <dependency>
-             <groupId>com.ckfinder</groupId>
-             <artifactId>apache-ant-zip</artifactId>
-             <version>${ckfinder.version}</version>
-         </dependency>-->
-        <dependency>
-            <groupId>com.ckfinder</groupId>
-            <artifactId>ckfinder</artifactId>
-            <version>${ckfinder.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.ckfinder</groupId>
-            <artifactId>ckfinderplugin-fileeditor</artifactId>
-            <version>${ckfinder.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.ckfinder</groupId>
-            <artifactId>ckfinderplugin-imageresize</artifactId>
-            <version>${ckfinder.version}</version>
-        </dependency>
-        <!-- CKFinder end -->
-
-
-
         <!-- https://mvnrepository.com/artifact/com.auth0/java-jwt -->
         <dependency>
             <groupId>com.auth0</groupId>
@@ -221,10 +190,6 @@
                     <exclude>static/static/js/bootstrap/2.3.2/docs/**</exclude>
                     <exclude>static/static/js/bootstrap/3.2.0/**</exclude>
                     <exclude>static/static/js/bootstrap/img/**</exclude>
-                    <exclude>static/static/js/ckeditor/_samples/**</exclude>
-                    <exclude>static/static/js/ckeditor/_source/**</exclude>
-                    <exclude>static/static/js/ckfinder/_samples/**</exclude>
-                    <exclude>static/static/js/ckfinder/help/**</exclude>
                     <exclude>static/static/js/easyui/src/**</exclude>
                     <exclude>static/static/js/easyui/**/*.html</exclude>
                     <exclude>static/static/js/easyui/**/*.json</exclude>

@@ -10,13 +10,13 @@ import com.eryansky.common.mail.config.ServerConfig;
 import com.eryansky.common.mail.entity.Account;
 import com.eryansky.common.mail.exception.NotSupportedException;
 
-import javax.mail.Folder;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Store;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeUtility;
+import jakarta.mail.Folder;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Session;
+import jakarta.mail.Store;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeUtility;
 import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 

@@ -10,9 +10,9 @@ import com.eryansky.common.mail.auth.SimpleAuthenticator;
 import com.eryansky.common.mail.config.ServerConfig;
 import com.eryansky.common.mail.entity.Account;
 
-import javax.mail.Message;
-import javax.mail.SendFailedException;
-import javax.mail.Session;
+import jakarta.mail.Message;
+import jakarta.mail.SendFailedException;
+import jakarta.mail.Session;
 import java.util.Properties;
 
 /**

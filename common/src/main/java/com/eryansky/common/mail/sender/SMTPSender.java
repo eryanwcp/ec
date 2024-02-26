@@ -8,8 +8,8 @@ package com.eryansky.common.mail.sender;
 
 import com.sun.mail.smtp.SMTPTransport;
 
-import javax.mail.Message;
-import javax.mail.SendFailedException;
+import jakarta.mail.Message;
+import jakarta.mail.SendFailedException;
 
 /**
  * 实现使用SMTP协议发送邮件

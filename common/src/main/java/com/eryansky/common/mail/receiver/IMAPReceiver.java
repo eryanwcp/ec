@@ -11,10 +11,10 @@ import com.sun.mail.imap.IMAPStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.mail.*;
-import javax.mail.Flags.Flag;
-import javax.mail.internet.MimeMessage;
-import javax.mail.search.FlagTerm;
+import jakarta.mail.*;
+import jakarta.mail.Flags.Flag;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.search.FlagTerm;
 
 /**
  * 实现使用IMAP协议接收邮件

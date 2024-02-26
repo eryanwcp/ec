@@ -2,7 +2,7 @@ package com.eryansky.server.impl;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 import com.eryansky.common.utils.DateUtils;
 import com.eryansky.common.utils.StringUtils;

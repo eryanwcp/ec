@@ -5,6 +5,7 @@
  */
 package com.eryansky.common.orm.mybatis;
 
+import com.eryansky.common.exception.SystemException;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
@@ -20,7 +21,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.core.NestedIOException;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -150,7 +150,7 @@ public class MultiSqlSessionFactoryMapperLoader implements DisposableBean, Initi
 									configuration, resource.toString(), configuration.getSqlFragments());
 							xmlMapperBuilder.parse();
 						} catch (Exception e) {
-							throw new NestedIOException("Failed to parse mapping resource: '" + resource + "'", e);
+							throw new SystemException("Failed to parse mapping resource: '" + resource + "'", e);
 						} finally {
 							ErrorContext.instance().reset();
 						}

@@ -5,6 +5,7 @@
  */
 package com.eryansky.common.orm.mybatis;
 
+import com.eryansky.common.exception.SystemException;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.session.Configuration;
@@ -18,7 +19,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.core.NestedIOException;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -129,7 +129,7 @@ public class MapperLoader implements DisposableBean, InitializingBean, Applicati
 								configuration, mapperLocationResources[i].toString(), configuration.getSqlFragments());
 						xmlMapperBuilder.parse();
 					} catch (Exception e) {
-						throw new NestedIOException("Failed to parse mapping resource: '" + mapperLocationResources[i] + "'", e);
+						throw new SystemException("Failed to parse mapping resource: '" + mapperLocationResources[i] + "'", e);
 					} finally {
 						ErrorContext.instance().reset();
 					}

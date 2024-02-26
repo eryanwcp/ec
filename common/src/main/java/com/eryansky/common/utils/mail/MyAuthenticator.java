@@ -5,8 +5,8 @@
  */
 package com.eryansky.common.utils.mail;
 
-import javax.mail.Authenticator;
-import javax.mail.PasswordAuthentication;
+import jakarta.mail.Authenticator;
+import jakarta.mail.PasswordAuthentication;
 
 /**
  * 如果需要身份认证，则创建一个密码验证器

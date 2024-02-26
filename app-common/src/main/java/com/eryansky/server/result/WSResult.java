@@ -8,7 +8,7 @@ package com.eryansky.server.result;
 import com.eryansky.common.utils.reflection.ReflectionUtils;
 import com.eryansky.server.WsConstants;
 
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlType;
 
 
 /**

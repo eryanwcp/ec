@@ -3,7 +3,6 @@ package com.eryansky.configure.web;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.web.filter.CustomHttpServletRequestFilter;
 import com.eryansky.common.web.filter.XssFilter;
-import com.eryansky.core.web.filter.MySiteMeshFilter;
 import com.eryansky.core.web.interceptor.ExceptionInterceptor;
 import com.eryansky.core.web.filter.ChinesePathFilter;
 import com.eryansky.utils.AppConstants;
@@ -28,23 +27,6 @@ import java.util.List;
  */
 @Configuration
 public class FilterConfiguration {
-
-
-
-    /**
-     * SiteMesh自定义Filter
-     *
-     * @return
-     */
-    @Bean
-    public FilterRegistrationBean<MySiteMeshFilter> mySiteMeshFilterFilterRegistrationBean() {
-        MySiteMeshFilter filter = new MySiteMeshFilter();
-        FilterRegistrationBean<MySiteMeshFilter> bean = new FilterRegistrationBean<>(filter);
-        bean.addInitParameter("blackListURL", "/static/**;/api/**;/rest/**");
-        bean.addInitParameter("whiteListURL", "/**");
-        bean.setOrder(Ordered.HIGHEST_PRECEDENCE + 300);
-        return bean;
-    }
 
 
     /**

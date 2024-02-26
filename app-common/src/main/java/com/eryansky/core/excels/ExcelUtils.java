@@ -24,7 +24,7 @@ import javax.script.CompiledScript;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.beans.PropertyDescriptor;
 import java.io.*;
 import java.lang.reflect.Field;

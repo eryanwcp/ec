@@ -8,7 +8,8 @@ package com.eryansky.utils;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.security.SecurityUtils;
-import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
+import org.springframework.core.DefaultParameterNameDiscoverer;
+import org.springframework.core.StandardReflectionParameterNameDiscoverer;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
@@ -34,7 +35,7 @@ public class SpringUtils {
     public static String parseSpel(String str, Method method, Object[] args) {
         try {
             //获取被拦截方法参数名列表(使用Spring支持类库)
-            LocalVariableTableParameterNameDiscoverer u = new LocalVariableTableParameterNameDiscoverer();
+            DefaultParameterNameDiscoverer u = new DefaultParameterNameDiscoverer();
             String[] paraNameArr = u.getParameterNames(method);
 
             //使用SPEL进行key的解析

@@ -10,14 +10,13 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.servlet.*;
+import jakarta.servlet.*;
 import java.io.IOException;
 
-@Configuration
-@ConditionalOnWebApplication
-@AutoConfigureAfter(DruidDataSourceAutoConfigure.class)
-@ConditionalOnProperty(name = "spring.datasource.druid.stat-view-servlet.enabled",
-        havingValue = "true", matchIfMissing = true)
+//@Configuration
+//@ConditionalOnWebApplication
+//@AutoConfigureAfter(DruidDataSourceAutoConfigure.class)
+//@ConditionalOnProperty(name = "spring.datasource.druid.stat-view-servlet.enabled", havingValue = "true", matchIfMissing = true)
 public class DruidConfigurer {
 
     /**

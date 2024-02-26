@@ -5,7 +5,7 @@
 
     <groupId>com.eryansky</groupId>
     <artifactId>ec-parent</artifactId>
-    <version>4.2.20231124.33</version>
+    <version>4.3.20240226.01</version>
     <modules>
         <module>common</module>
         <module>j2cache</module>
@@ -34,16 +34,16 @@
         <java.version>1.8</java.version>
         <tomcat-plugin.version>2.2</tomcat-plugin.version>
 
-        <spring-boot.version>2.7.18</spring-boot.version>
-        <spring-integration-redis.version>5.5.20</spring-integration-redis.version>
+        <spring-boot.version>3.2.3</spring-boot.version>
+        <spring-integration-redis.version>6.2.2</spring-integration-redis.version>
         <logback.version>7.4</logback.version>
         <byte-buddy.version>1.14.2</byte-buddy.version>
 
-        <tomcat.version>9.0.83</tomcat.version>
+        <tomcat.version>10.1.19</tomcat.version>
 
-        <mybatis-spring-boot.version>2.3.2</mybatis-spring-boot.version>
+        <mybatis-spring-boot.version>3.0.3</mybatis-spring-boot.version>
         <commons-pool2.version>2.12.0</commons-pool2.version>
-        <druid-version>1.2.11</druid-version>
+        <druid-version>1.2.21</druid-version>
         <mariadb.driver.version>3.1.4</mariadb.driver.version>
         <oracle.driver.version>12.1.0.1-atlassian-hosted</oracle.driver.version>
         <db2.driver.version>10.1</db2.driver.version>
@@ -53,14 +53,14 @@
         <commons-codec.version>1.16.0</commons-codec.version>
 
 
-        <ec-common.version>4.2.20231124.33</ec-common.version>
-        <ec-app-common.version>4.2.20231124.33</ec-app-common.version>
-        <ec-client-common.version>4.2.20231124.33</ec-client-common.version>
-        <ec-j2cache.version>4.2.20231124.33</ec-j2cache.version>
-        <ec-j2cache-spring-boot-starter.version>4.2.20231124.33</ec-j2cache-spring-boot-starter.version>
-        <ec-fastweixin.version>4.2.20231124.33</ec-fastweixin.version>
+        <ec-common.version>4.3.20240226.01</ec-common.version>
+        <ec-app-common.version>4.3.20240226.01</ec-app-common.version>
+        <ec-client-common.version>4.3.20240226.01</ec-client-common.version>
+        <ec-j2cache.version>4.3.20240226.01</ec-j2cache.version>
+        <ec-j2cache-spring-boot-starter.version>4.3.20240226.01</ec-j2cache-spring-boot-starter.version>
+        <ec-fastweixin.version>4.3.20240226.01</ec-fastweixin.version>
 
-        <jackson.version>2.15.2</jackson.version>
+        <jackson.version>2.15.4</jackson.version>
     </properties>
 
 
@@ -73,14 +73,12 @@
         <dependency>
             <groupId>org.glassfish.web</groupId>
             <artifactId>jakarta.servlet.jsp.jstl</artifactId>
-            <version>1.2.6</version>
-<!--            <version>2.0.0</version>-->
-            <exclusions>
-                <exclusion>
-                    <groupId>jakarta.el</groupId>
-                    <artifactId>jakarta.el-api</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>3.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.0.0</version>
         </dependency>
 
         <dependency>
@@ -230,9 +228,9 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.10.2</version>
             <scope>test</scope>
         </dependency>
 
@@ -297,14 +295,8 @@
 
         <dependency>
             <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-ui</artifactId>
-            <version>1.7.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-lang3</artifactId>
-                </exclusion>
-            </exclusions>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.3.0</version>
         </dependency>
     </dependencies>
 
@@ -338,9 +330,16 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.1.2</version>
+                <version>3.2.5</version>
                 <configuration>
-                    <skip>true</skip>
+<!--                    <skip>true</skip>-->
+                    <argLine>--add-opens=java.base/java.lang=ALL-UNNAMED
+                        --add-opens=java.base/java.math=ALL-UNNAMED
+                        --add-opens=java.base/java.util=ALL-UNNAMED
+                        --add-opens=java.base/java.util.concurrent=ALL-UNNAMED
+                        --add-opens=java.base/java.net=ALL-UNNAMED
+                        --add-opens=java.base/java.text=ALL-UNNAMED
+                        --add-opens=java.sql/java.sql=ALL-UNNAMED</argLine>
                 </configuration>
             </plugin>
         </plugins>

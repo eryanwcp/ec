@@ -10,7 +10,7 @@ import com.eryansky.common.utils.reflection.ReflectionUtils;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import org.hibernate.validator.constraints.Length;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * 树形Entity基类

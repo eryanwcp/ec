@@ -10,9 +10,9 @@ import com.eryansky.common.mail.entity.Account;
 import com.eryansky.common.mail.exception.NotSupportedException;
 import com.eryansky.common.mail.receiver.Receiver;
 
-import javax.mail.Message;
-import javax.mail.event.MessageCountEvent;
-import javax.mail.event.MessageCountListener;
+import jakarta.mail.Message;
+import jakarta.mail.event.MessageCountEvent;
+import jakarta.mail.event.MessageCountListener;
 
 /**
  * 实现新邮件提醒的核心类 (示例程序)

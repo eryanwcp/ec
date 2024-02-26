@@ -1,5 +1,5 @@
 ﻿20270220
-V4.2.20231124.33
+V4.3.20240226.01
 1、机构扩展增加信息分类编码
 
 ALTER TABLE t_sys_organ_extend ADD COLUMN parent_code varchar(64) COMMENT '上级编码';

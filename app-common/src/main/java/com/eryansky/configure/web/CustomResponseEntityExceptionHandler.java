@@ -1,10 +1,7 @@
 package com.eryansky.configure.web;
 
 import com.eryansky.common.utils.mapper.JsonMapper;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -20,8 +17,7 @@ import java.util.Set;
 public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
-    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex,
-                                                                         HttpHeaders headers, HttpStatus status, WebRequest request) {
+    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         String method = ex.getMethod();
         Set<HttpMethod> supportedHttpMethods = ex.getSupportedHttpMethods();
         String body = ((ServletWebRequest) request).getRequest().getRequestURI() + " 不支持的请求类型：" + method + "，支持的请求类型：" + JsonMapper.toJsonString(supportedHttpMethods);

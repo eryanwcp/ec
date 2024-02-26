@@ -17,9 +17,9 @@ import com.eryansky.utils.AppUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.http.HttpSessionEvent;
-import javax.xml.ws.Endpoint;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.http.HttpSessionEvent;
+import jakarta.xml.ws.Endpoint;
 
 /**
  * 系统初始化监听 继承默认系统启动监听器.

@@ -18,9 +18,8 @@ package com.eryansky.j2cache.session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionContext;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpSession;
 import java.util.*;
 
 /**
@@ -139,36 +138,6 @@ public class J2CacheSession implements HttpSession {
 
     public boolean isInvalid() {
         return invalid;
-    }
-
-    @Deprecated
-    @Override
-    public Object getValue(String name) {
-        return getAttribute(name);
-    }
-
-    @Deprecated
-    @Override
-    public void removeValue(String name) {
-        removeAttribute(name);
-    }
-
-    @Deprecated
-    @Override
-    public void putValue(String name, Object value) {
-        this.setAttribute(name, value);
-    }
-
-    @Deprecated
-    @Override
-    public String[] getValueNames() {
-        this.checkValid();
-        return Collections.list(session.getAttributes().keys()).stream().toArray(String[]::new);
-    }
-
-    @Deprecated
-    public HttpSessionContext getSessionContext() {
-        throw new UnsupportedOperationException();
     }
 
 }

@@ -9,11 +9,11 @@ package com.eryansky.common.mail.util;
 import com.eryansky.common.mail.entity.Account;
 import com.eryansky.common.mail.entity.TipMessage;
 
-import javax.mail.Address;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMultipart;
+import jakarta.mail.Address;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMultipart;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
