@@ -23,6 +23,7 @@ import org.springframework.core.Ordered;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
@@ -99,6 +100,11 @@ public class MvcConfigurer implements WebMvcConfigurer {
       registry.addInterceptor(new MobileInterceptor())
               .addPathPatterns("/**")
               .order(Ordered.HIGHEST_PRECEDENCE + 300);
+   }
+
+   @Override
+   public void configurePathMatch(PathMatchConfigurer configurer) {
+      configurer.setUseTrailingSlashMatch(true);
    }
 
    /**
