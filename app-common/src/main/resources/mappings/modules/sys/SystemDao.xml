@@ -68,7 +68,6 @@
 		#{parentCode},
 		#{parentBizCode},
 		#{companyId},
-		#{companyId},
 		#{companyCode},
 		#{companyBizCode},
 		#{homeCompanyId},
