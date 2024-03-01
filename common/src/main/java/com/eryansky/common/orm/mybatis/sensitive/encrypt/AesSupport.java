@@ -39,7 +39,7 @@ public class AesSupport implements IEncrypt {
      * 密钥, 256位32个字节
      */
     private String key;
-    private final SensitiveTypeHandler sensitiveTypeHandler = SensitiveTypeRegisty.get(SensitiveType.DEFAUL);
+    private final SensitiveTypeHandler sensitiveTypeHandler = SensitiveTypeRegisty.get(SensitiveType.DEFAULT);
 
     private SecretKeySpec secretKeySpec;
     /**

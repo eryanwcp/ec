@@ -14,7 +14,7 @@ public enum SensitiveType {
     /**
      * 默认脱敏方式
      */
-    DEFAUL,
+    DEFAULT,
     /**
      * 中文名
      */

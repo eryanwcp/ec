@@ -17,7 +17,7 @@ public class DafaultSensitiveHandler implements SensitiveTypeHandler {
 
     @Override
     public SensitiveType getSensitiveType() {
-        return SensitiveType.DEFAUL;
+        return SensitiveType.DEFAULT;
     }
 
     @Override

@@ -18,7 +18,7 @@ public class SensitiveTypeRegisty {
 
     static {
         HANDLER_REGISTY.put(SensitiveType.NONE, new NoneSensitiveHandler());
-        HANDLER_REGISTY.put(SensitiveType.DEFAUL, new DafaultSensitiveHandler());
+        HANDLER_REGISTY.put(SensitiveType.DEFAULT, new DafaultSensitiveHandler());
         HANDLER_REGISTY.put(SensitiveType.CHINESE_NAME, new NameSensitiveHandler());
         HANDLER_REGISTY.put(SensitiveType.ID_CARD, new IDCardSensitiveHandler());
         HANDLER_REGISTY.put(SensitiveType.MOBILE_PHONE, new MobilePhoneSensitiveHandler());
