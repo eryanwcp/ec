@@ -74,7 +74,7 @@
 		</c:forEach>
 	</select>
 	<label> <input id="showTotal" name="showTotal" type="checkbox" value="true">全部显示</label>&nbsp;
-	<label> <input id="pretty" name="pretty" type="checkbox" value="true" checked>彩色日志</label>&nbsp;
+	<label> <input id="pretty" name="pretty" type="checkbox" value="true" >彩色日志</label>&nbsp;
 	&nbsp;&nbsp;<input id="btnSubmit" class="btn btn-primary" type="button" value="刷新" onclick="reLoad();"/>&nbsp;&nbsp;
 	&nbsp;&nbsp;<input class="btn btn-primary" type="button" value="下载" onclick="_download();"/>&nbsp;&nbsp;
 </form:form>

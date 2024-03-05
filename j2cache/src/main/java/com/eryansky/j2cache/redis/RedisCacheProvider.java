@@ -16,11 +16,13 @@
 package com.eryansky.j2cache.redis;
 
 import com.eryansky.j2cache.*;
+import com.eryansky.j2cache.util.AesSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.*;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Properties;
@@ -69,6 +71,15 @@ public class RedisCacheProvider implements CacheProvider {
         String mode = props.getProperty("mode", "single");
         String clusterName = props.getProperty("cluster_name");
         String password = props.getProperty("password");
+        String password_encrypt = props.getProperty("passwordEncrypt");
+        boolean passwordEncrypt = Boolean.valueOf(password_encrypt);
+        if(passwordEncrypt){
+            try {
+                password = new AesSupport().decrypt(password);
+            } catch (NoSuchAlgorithmException e) {
+                log.error(e.getMessage(),e);
+            }
+        }
         int database = Integer.parseInt(props.getProperty("database", "0"));
         boolean ssl = Boolean.valueOf(props.getProperty("ssl", "false"));
 

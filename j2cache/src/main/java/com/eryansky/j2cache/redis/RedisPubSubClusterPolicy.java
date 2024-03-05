@@ -18,6 +18,7 @@ package com.eryansky.j2cache.redis;
 import com.eryansky.j2cache.CacheProviderHolder;
 import com.eryansky.j2cache.Command;
 import com.eryansky.j2cache.cluster.ClusterPolicy;
+import com.eryansky.j2cache.util.AesSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.*;
@@ -25,6 +26,7 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 import redis.clients.util.Pool;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Properties;
@@ -57,6 +59,15 @@ public class RedisPubSubClusterPolicy extends JedisPubSub implements ClusterPoli
         if(password != null && password.trim().length() == 0)
             password = null;
 
+        String password_encrypt = props.getProperty("passwordEncrypt");
+        boolean passwordEncrypt = Boolean.valueOf(password_encrypt);
+        if(passwordEncrypt){
+            try {
+                password = new AesSupport().decrypt(password);
+            } catch (NoSuchAlgorithmException e) {
+                log.error(e.getMessage(),e);
+            }
+        }
         int database = Integer.parseInt(props.getProperty("database", "0"));
         boolean ssl = Boolean.valueOf(props.getProperty("ssl", "false"));
 

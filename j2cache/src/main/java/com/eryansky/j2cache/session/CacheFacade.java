@@ -15,6 +15,7 @@
  */
 package com.eryansky.j2cache.session;
 
+import com.eryansky.j2cache.util.AesSupport;
 import com.eryansky.j2cache.util.IpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,7 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +49,7 @@ public class CacheFacade extends JedisPubSub implements Closeable, AutoCloseable
 
     private final boolean discardNonSerializable;
 
-    public CacheFacade(int maxSizeInMemory, int maxAge, Properties redisConf, boolean discardNonSerializable) {
+    public CacheFacade(int maxSizeInMemory, int maxAge, Properties redisConf, boolean discardNonSerializable)  {
         this.discardNonSerializable = discardNonSerializable;
         this.cache1 = new CaffeineCache(maxSizeInMemory, maxAge, this);
 
@@ -66,7 +68,17 @@ public class CacheFacade extends JedisPubSub implements Closeable, AutoCloseable
         mode = mode != null ? mode:"single";
         String clusterName = redisConf.getProperty("cluster_name");
         clusterName = clusterName != null ? clusterName:"j2cache-session";
+
         String password = redisConf.getProperty("password");
+        String password_encrypt = redisConf.getProperty("password_encrypt");
+        boolean passwordEncrypt = Boolean.valueOf(password_encrypt);
+        if(passwordEncrypt){
+            try {
+                password = new AesSupport().decrypt(password);
+            } catch (NoSuchAlgorithmException e) {
+                logger.error(e.getMessage(),e);
+            }
+        }
         String mDatabase = redisConf.getProperty("database");
         int database = mDatabase != null ? Integer.parseInt(mDatabase):0;
 
