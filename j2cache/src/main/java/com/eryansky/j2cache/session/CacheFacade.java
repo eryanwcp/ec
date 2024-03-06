@@ -19,6 +19,8 @@ import com.eryansky.j2cache.util.AesSupport;
 import com.eryansky.j2cache.util.IpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 import redis.clients.jedis.*;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
@@ -70,15 +72,6 @@ public class CacheFacade extends JedisPubSub implements Closeable, AutoCloseable
         clusterName = clusterName != null ? clusterName:"j2cache-session";
 
         String password = redisConf.getProperty("password");
-        String password_encrypt = redisConf.getProperty("passwordEncrypt");
-        boolean passwordEncrypt = Boolean.valueOf(password_encrypt);
-        if(passwordEncrypt){
-            try {
-                password = new AesSupport().decrypt(password);
-            } catch (NoSuchAlgorithmException e) {
-                logger.error(e.getMessage(),e);
-            }
-        }
         String mDatabase = redisConf.getProperty("database");
         int database = mDatabase != null ? Integer.parseInt(mDatabase):0;
 

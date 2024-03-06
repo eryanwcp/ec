@@ -21,6 +21,8 @@ import com.eryansky.j2cache.cluster.ClusterPolicy;
 import com.eryansky.j2cache.util.AesSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 import redis.clients.jedis.*;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 import redis.clients.util.Pool;
@@ -59,15 +61,6 @@ public class RedisPubSubClusterPolicy extends JedisPubSub implements ClusterPoli
         if(password != null && password.trim().length() == 0)
             password = null;
 
-        String password_encrypt = props.getProperty("passwordEncrypt");
-        boolean passwordEncrypt = Boolean.valueOf(password_encrypt);
-        if(passwordEncrypt){
-            try {
-                password = new AesSupport().decrypt(password);
-            } catch (NoSuchAlgorithmException e) {
-                log.error(e.getMessage(),e);
-            }
-        }
         int database = Integer.parseInt(props.getProperty("database", "0"));
         boolean ssl = Boolean.valueOf(props.getProperty("ssl", "false"));
 

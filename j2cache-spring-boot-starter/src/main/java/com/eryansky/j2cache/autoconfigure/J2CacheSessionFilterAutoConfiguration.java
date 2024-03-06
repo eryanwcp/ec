@@ -2,12 +2,17 @@ package com.eryansky.j2cache.autoconfigure;
 
 import com.eryansky.j2cache.properties.J2CacheSessionProperties;
 import com.eryansky.j2cache.session.J2CacheSessionFilter;
+import com.eryansky.j2cache.util.AesSupport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
+import org.springframework.util.ObjectUtils;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -20,6 +25,8 @@ import java.util.stream.Collectors;
 @ConditionalOnWebApplication
 @ConditionalOnProperty(name = "j2cache.session.filter.enabled", havingValue = "true")
 public class J2CacheSessionFilterAutoConfiguration {
+
+    private static final Logger logger = LoggerFactory.getLogger(J2CacheSessionFilterAutoConfiguration.class);
 
     @Bean
     public FilterRegistrationBean<J2CacheSessionFilter> j2CacheSessionFilter(J2CacheSessionProperties sessionProperties) {
@@ -47,6 +54,17 @@ public class J2CacheSessionFilterAutoConfiguration {
         map.put("redis.timeout",redisConfig.getTimeout());
         map.put("redis.password",redisConfig.getPassword());
         map.put("redis.passwordEncrypt",redisConfig.getPasswordEncrypt());
+
+        String password_encrypt = redisConfig.getPasswordEncrypt();
+        boolean passwordEncrypt = Boolean.parseBoolean(password_encrypt);
+        if(passwordEncrypt && !ObjectUtils.isEmpty(redisConfig.getPassword())){
+            try {
+                map.put("redis.password",new AesSupport().decrypt(redisConfig.getPassword()));
+            } catch (NoSuchAlgorithmException e) {
+                logger.error(e.getMessage(),e);
+            }
+        }
+
         map.put("redis.maxTotal",redisConfig.getMaxTotal());
         map.put("redis.maxIdle",redisConfig.getMaxIdle());
         map.put("redis.minIdle",redisConfig.getMinIdle());

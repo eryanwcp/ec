@@ -35,6 +35,8 @@ import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
@@ -105,25 +107,9 @@ public class LettuceCacheProvider extends RedisPubSubAdapter<String, String> imp
         String scheme = props.getProperty("scheme", "redis");
         String hosts = props.getProperty("hosts", "127.0.0.1:6379");
         String password = props.getProperty("password");
-        String password_encrypt = props.getProperty("passwordEncrypt");
-        boolean passwordEncrypt = Boolean.valueOf(password_encrypt);
-        if(passwordEncrypt){
-            try {
-                password = new AesSupport().decrypt(password);
-            } catch (NoSuchAlgorithmException e) {
-                log.error(e.getMessage(),e);
-            }
-        }
         int database = Integer.parseInt(props.getProperty("database", "0"));
         String sentinelMasterId = props.getProperty("sentinelMasterId");
-        String sentinelPassword = props.getProperty("sentinelPassword ");
-        if(passwordEncrypt){
-            try {
-                sentinelPassword = new AesSupport().decrypt(sentinelPassword);
-            } catch (NoSuchAlgorithmException e) {
-                log.error(e.getMessage(),e);
-            }
-        }
+        String sentinelPassword = props.getProperty("sentinelPassword");
         long clusterTopologyRefreshMs = Long.valueOf(props.getProperty("clusterTopologyRefresh", "3000"));
 
         if("redis-cluster".equalsIgnoreCase(scheme)) {
