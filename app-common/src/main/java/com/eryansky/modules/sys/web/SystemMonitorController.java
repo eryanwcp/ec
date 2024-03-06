@@ -320,10 +320,10 @@ public class SystemMonitorController extends SimpleController {
                                 .replaceAll("\t", "&nbsp;");
 
                         //处理等级
-                        line = line.replace("] DEBUG [", "<span style='color: blue;'>DEBUG</span>")
-                                .replace("] INFO [", "<span style='color: green;'>INFO</span>")
-                                .replace("] WARN [", "<span style='color: orange;'>WARN</span>")
-                                .replace("] ERROR [", "<span style='color: red;'>ERROR</span>");
+                        line = line.replace("] DEBUG", "] <span style='color: blue;'>DEBUG</span>")
+                                .replace("] INFO", "] <span style='color: green;'>INFO</span>")
+                                .replace("] WARN", "] <span style='color: orange;'>WARN</span>")
+                                .replace("] ERROR", "] <span style='color: red;'>ERROR</span>");
 
                         //处理类名
                         String[] split = line.split("] ");
