@@ -117,6 +117,13 @@ public class LettuceCacheProvider extends RedisPubSubAdapter<String, String> imp
         int database = Integer.parseInt(props.getProperty("database", "0"));
         String sentinelMasterId = props.getProperty("sentinelMasterId");
         String sentinelPassword = props.getProperty("sentinelPassword ");
+        if(passwordEncrypt){
+            try {
+                sentinelPassword = new AesSupport().decrypt(sentinelPassword);
+            } catch (NoSuchAlgorithmException e) {
+                log.error(e.getMessage(),e);
+            }
+        }
         long clusterTopologyRefreshMs = Long.valueOf(props.getProperty("clusterTopologyRefresh", "3000"));
 
         if("redis-cluster".equalsIgnoreCase(scheme)) {
