@@ -46,10 +46,11 @@ public class J2CacheSessionFilterAutoConfiguration {
         map.put("redis.database",redisConfig.getDatabase());
         map.put("redis.timeout",redisConfig.getTimeout());
         map.put("redis.password",redisConfig.getPassword());
+        map.put("redis.passwordEncrypt",redisConfig.getPasswordEncrypt());
         map.put("redis.maxTotal",redisConfig.getMaxTotal());
         map.put("redis.maxIdle",redisConfig.getMaxIdle());
         map.put("redis.minIdle",redisConfig.getMinIdle());
-        Map<String,String> param = map.entrySet().stream().filter(m->m.getValue() != null).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+        Map<String,String> param = map.entrySet().stream().filter(m->m.getValue() != null).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         bean.setInitParameters(param);
         Integer order = filterConfig.getOrder();
         bean.setOrder(order != null ? order:Ordered.HIGHEST_PRECEDENCE+30);
