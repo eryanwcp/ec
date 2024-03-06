@@ -70,7 +70,7 @@ public class CacheFacade extends JedisPubSub implements Closeable, AutoCloseable
         clusterName = clusterName != null ? clusterName:"j2cache-session";
 
         String password = redisConf.getProperty("password");
-        String password_encrypt = redisConf.getProperty("password_encrypt");
+        String password_encrypt = redisConf.getProperty("passwordEncrypt");
         boolean passwordEncrypt = Boolean.valueOf(password_encrypt);
         if(passwordEncrypt){
             try {
