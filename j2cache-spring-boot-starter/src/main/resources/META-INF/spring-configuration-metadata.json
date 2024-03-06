@@ -93,7 +93,8 @@
       "type": "java.lang.String"
     },{
       "name": "j2cache.session.redis.passwordEncrypt",
-      "type": "java.lang.String"
+      "type": "java.lang.Boolean",
+      "defaultValue": false
     },{
       "name": "j2cache.session.redis.database",
       "type": "java.lang.String",
