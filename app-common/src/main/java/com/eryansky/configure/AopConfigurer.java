@@ -47,7 +47,7 @@ public class AopConfigurer implements AsyncConfigurer {
         int initProcessors = processors < 4 ? processors : processors - 1;
         executor.setCorePoolSize(initProcessors);
         executor.setMaxPoolSize(initProcessors * 5);//最大线程数量
-        executor.setQueueCapacity(initProcessors * 100);//线程池的队列容量
+        executor.setQueueCapacity(initProcessors * 10000);//线程池的队列容量
         executor.setRejectedExecutionHandler((Runnable r, ThreadPoolExecutor exe) -> {
             StringBuffer msg = new StringBuffer();
             msg.append("当前任务线程池队列已满：").append(executor.getActiveCount()).append("/").append(executor.getCorePoolSize()).append("~").append(executor.getMaxPoolSize());
