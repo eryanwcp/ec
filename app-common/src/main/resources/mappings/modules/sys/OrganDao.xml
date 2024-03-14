@@ -823,6 +823,17 @@
         WHERE a.code = #{code} AND a.status = #{status}
     </select>
 
+    <select id="getOrganExtendByBizCode" resultType="OrganExtend">
+        SELECT
+        <include refid="organExtendColumns"/>,
+        p.code AS "parentCode",
+        p.biz_code AS "parentBizCode",
+        p.name AS "parentName"
+        FROM t_sys_organ_extend a
+        <include refid="organExtendJoins"/>
+        WHERE a.biz_code = #{bizCode} AND a.status = #{status}
+    </select>
+
     <select id="getCompanyByOrganId" resultType="OrganExtend">
         SELECT
         <include refid="organExtendColumns"/>

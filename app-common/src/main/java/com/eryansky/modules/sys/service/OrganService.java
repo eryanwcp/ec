@@ -1131,6 +1131,22 @@ public class OrganService extends TreeService<OrganDao, Organ> {
     }
 
     /**
+     * 根据机构信息分类编码查找
+     *
+     * @param bizCode 信息分类编码
+     * @return
+     */
+    public OrganExtend getOrganExtendByBizCode(String bizCode) {
+        if (StringUtils.isBlank(bizCode)) {
+            return null;
+        }
+        Parameter parameter = Parameter.newParameter();
+        parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
+        parameter.put("bizCode", bizCode);
+        return dao.getOrganExtendByBizCode(parameter);
+    }
+
+    /**
      * 根据机构ID查找
      *
      * @param organId
