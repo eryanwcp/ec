@@ -159,8 +159,8 @@ public class SystemService extends BaseService {
         parameter.put("homeCompanyBizCode", homeCompany.getBizCode());
         Integer level = StringUtils.isNotBlank(organ.getParentIds()) ? organ.getParentIds().split(",").length : null;
         parameter.put("treeLevel", level);
-        Integer childCount = organService.findChildCount(organ.getId());
-        parameter.put("isLeaf", null == childCount || childCount == 0);
+//        Integer childCount = organService.findChildCount(organ.getId());
+//        parameter.put("isLeaf", null == childCount || childCount == 0);
         deleteOrganExtend(parameter);
         insertToOrganExtend(parameter);
     }
