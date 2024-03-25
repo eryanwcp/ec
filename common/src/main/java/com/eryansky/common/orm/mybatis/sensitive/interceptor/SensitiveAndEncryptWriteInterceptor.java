@@ -39,15 +39,16 @@ public class SensitiveAndEncryptWriteInterceptor implements Interceptor {
     private static final String MAPPEDSTATEMENT = "delegate.mappedStatement";
     private static final String BOUND_SQL = "delegate.boundSql";
 
-    private final IEncrypt IEncrypt;
+    private Properties properties = new Properties();
+    private IEncrypt encrypt;
 
     public SensitiveAndEncryptWriteInterceptor() throws NoSuchAlgorithmException {
-        this.IEncrypt = new AesSupport();
+        this.encrypt = new AesSupport();
     }
 
-    public SensitiveAndEncryptWriteInterceptor(IEncrypt IEncrypt) {
-        Objects.requireNonNull(IEncrypt, "encrypt should not be null!");
-        this.IEncrypt = IEncrypt;
+    public SensitiveAndEncryptWriteInterceptor(IEncrypt encrypt) {
+        Objects.requireNonNull(encrypt, "encrypt should not be null!");
+        this.encrypt = encrypt;
     }
 
     @Override
@@ -105,7 +106,7 @@ public class SensitiveAndEncryptWriteInterceptor implements Interceptor {
         EncryptField encryptField = field.getAnnotation(EncryptField.class);
         Object newValue = value;
         if (encryptField != null && value != null) {
-            newValue = IEncrypt.encrypt(value.toString());
+            newValue = encrypt.encrypt(value.toString());
         }
         return newValue;
     }
@@ -164,6 +165,21 @@ public class SensitiveAndEncryptWriteInterceptor implements Interceptor {
 
     @Override
     public void setProperties(Properties properties) {
-        //do nothing
+        this.properties = properties;
+        String encryptValue = (String) properties.get("encrypt");
+        if (null != encryptValue) {
+            log.debug("properties-encrypt:" + encryptValue);
+            try {
+                Class clazz = Class.forName(encryptValue);
+                encrypt = (IEncrypt) clazz.newInstance();
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
     }
 }

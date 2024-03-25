@@ -51,13 +51,28 @@ public class AesSupport implements IEncrypt {
      */
     public static final String DEFAULT_IV = "ecececececececec";
 
+
+    private static class AesSupportHolder {
+        private static final AesSupport aesSupport = new AesSupport();
+    }
+    /**
+     * 创建只输出非Null且非Empty(如List.isEmpty)的属性到Json字符串的Mapper,建议在外部接口中使用.
+     */
+    public static AesSupport getInstance() {
+        return AesSupport.AesSupportHolder.aesSupport;
+    }
+
     static {
         gcMParameterSpec = new GCMParameterSpec(128, DEFAULT_IV.getBytes());
         java.security.Security.setProperty("crypto.policy", "unlimited");
     }
-    public AesSupport() throws NoSuchAlgorithmException {
-        this.key = DEFAULT_KEY;
-        this.secretKeySpec = getSecretKey(key);
+    public AesSupport() {
+        try {
+            this.key = DEFAULT_KEY;
+            this.secretKeySpec = getSecretKey(key);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public AesSupport(String key) throws NoSuchAlgorithmException {
