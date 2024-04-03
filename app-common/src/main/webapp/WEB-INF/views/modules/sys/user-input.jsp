@@ -149,7 +149,7 @@
         </div>
         <div>
             <label>自定义参数：</label>
-            <textarea name="extendAttr" rows="4" class="easyui-textbox" style="width:260px;height:75px;">${model.extendAttr}</textarea>
+            <input name="extendAttr" value="${model.extendAttr}"  class="easyui-textbox" data-options="multiline:true" style="width:260px;height:75px;" />
         </div>
     </form>
 </div>
