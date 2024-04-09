@@ -277,8 +277,8 @@ function ImageUploader($parent, options) {
         var scroll = document.documentElement.scrollTop || document.body.scrollTop || window.pageYOffset;
         var screen = window.screen.height;
         var top = scroll-(screen*0.1);
-        if(top < 10){
-            top = 10;
+        if(top < 0){
+            top = 0;
         }
         l.css({
             paddingTop: "5%",
