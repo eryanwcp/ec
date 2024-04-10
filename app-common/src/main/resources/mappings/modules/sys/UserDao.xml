@@ -290,9 +290,8 @@
         <include refid="userColumns"/>
         FROM t_sys_user a
         <if test="parentOrganId != null and parentOrganId !=''">
-            LEFT JOIN
+            LEFT JOIN t_sys_organ_extend o ON o.id = a.default_organ_id
         </if>
-
         <where>
             <if test="status != null and status !=''">
                 AND a.status = #{status}
