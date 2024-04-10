@@ -299,7 +299,34 @@
                     #{item}
                 </foreach>
             </if>
+            <if test="query != null and query !=''">
+                AND (
+                a.login_name = #{query}
+                OR a.mobile = #{query}
+                OR a.code = #{query}
+                OR a.biz_code = #{query}
+                OR a.name LIKE
+                <choose>
+                    <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+                    <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+                    <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+                    <otherwise>'%'+#{query}+'%'</otherwise>
+                </choose>
+                )
+            </if>
+            <if test="userType != null and userType !=''">
+                AND a.user_type = #{userType}
+            </if>
+
         </where>
+        <choose>
+            <when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
+                ORDER BY ${entityPage.orderBy} ${entityPage.order}
+            </when>
+            <otherwise>
+                ORDER BY a.sort ASC
+            </otherwise>
+        </choose>
     </select>
 
 
