@@ -603,6 +603,24 @@ public class UserService extends CrudService<UserDao, User> {
     }
 
     /**
+     * 根据密码查找.
+     *
+     * @param page 账号
+     * @param passwords 不安全密码（加密）
+     * @return
+     */
+    public Page<User> findByPasswords(Page<User> page,Collection<String> passwords) {
+        Assert.notEmpty(passwords, "参数[passwords]不能为空!");
+        Parameter parameter = new Parameter();
+        parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
+        parameter.put(BaseInterceptor.PAGE, page);
+        parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
+        parameter.put("passwords", passwords);
+        page.setResult(dao.findByPasswords(parameter));
+        return page;
+    }
+
+    /**
      * 根据手机号查找.
      * <br>注：排除已删除的对象
      *
