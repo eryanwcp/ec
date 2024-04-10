@@ -289,6 +289,10 @@
         SELECT
         <include refid="userColumns"/>
         FROM t_sys_user a
+        <if test="parentOrganId != null and parentOrganId !=''">
+            LEFT JOIN
+        </if>
+
         <where>
             <if test="status != null and status !=''">
                 AND a.status = #{status}
@@ -317,7 +321,15 @@
             <if test="userType != null and userType !=''">
                 AND a.user_type = #{userType}
             </if>
-
+            <if test="parentOrganId != null and parentOrganId !=''">
+                AND (o.id = #{parentOrganId} OR o.parent_id = #{parentOrganId} OR o.parent_ids LIKE
+                <choose>
+                    <when test="dbName == 'db2'">'%,'||#{parentOrganId}||',%'</when>
+                    <when test="dbName == 'mysql'">CONCAT('%,', #{parentOrganId}, ',%')</when>
+                    <when test="dbName == 'oracle'">'%,'||#{parentOrganId}||',%'</when>
+                    <otherwise>'%,'+#{parentOrganId}+',%'</otherwise>
+                </choose>)
+            </if>
         </where>
         <choose>
             <when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
@@ -920,7 +932,7 @@
                 AND p.code = #{postCode}
             </if>
             <if test="parentOrganId != null and parentOrganId !=''">
-                AND (o.id = #{parentOrganId} OR o.parent_id = #{parentOrganId} OR parent_ids LIKE
+                AND (o.id = #{parentOrganId} OR o.parent_id = #{parentOrganId} OR o.parent_ids LIKE
                 <choose>
                     <when test="dbName == 'db2'">'%,'||#{parentOrganId}||',%'</when>
                     <when test="dbName == 'mysql'">CONCAT('%,', #{parentOrganId}, ',%')</when>
