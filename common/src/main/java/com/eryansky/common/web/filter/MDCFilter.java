@@ -7,6 +7,7 @@ package com.eryansky.common.web.filter;
 
 import com.eryansky.common.utils.Identities;
 import com.eryansky.common.utils.net.IpUtils;
+import com.eryansky.common.web.utils.CookieUtils;
 import org.slf4j.MDC;
 
 import javax.servlet.FilterChain;
@@ -53,6 +54,9 @@ public class MDCFilter extends BaseFilter {
             if (requestId == null) {
                 requestId = request.getParameter(KEY_RID);
             }
+//            if (requestId == null) {
+//                requestId = CookieUtils.getCookie(request,"J2CACHE_SESSION_ID");
+//            }
             if (requestId == null) {
                 requestId = Identities.uuid2();
             }
@@ -61,12 +65,18 @@ public class MDCFilter extends BaseFilter {
 
             // 还有更加准确的方法
             String ip = IpUtils.getIpAddr0(request);
-            MDC.put(KEY_IP, ip);
+            MDC.put(KEY_IP, null != ip ? ip:IpUtils.getActivityLocalIp());
 
             String userPrincipalId = request.getHeader("UserPrincipalId");
             if (userPrincipalId == null) {
                 userPrincipalId = request.getParameter(KEY_UID);
             }
+            if (requestId == null) {
+                requestId = CookieUtils.getCookie(request,"J2CACHE_SESSION_ID");
+            }
+//            if (userPrincipalId == null) {
+//                userPrincipalId = request.getHeader("Authorization");
+//            }
             MDC.put(KEY_UID, userPrincipalId);
 
 
