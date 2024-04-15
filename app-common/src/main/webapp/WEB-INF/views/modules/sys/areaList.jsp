@@ -36,7 +36,6 @@
 			<th>信息分类编码</th>
 			<th>区域类型</th>
 			<th>备注</th>
-			<th>自定义参数</th>
 			<th>更新时间</th>
 			<e:hasPermission name="sys:area:edit"><th>操作</th></e:hasPermission></tr>
 		</thead>
@@ -49,7 +48,6 @@
 			<td>{{row.bizCode}}</td>
 			<td>{{row.typeView}}</td>
 			<td>{{row.remark}}</td>
-			<td>{{row.extendAttr}}</td>
 			<td>{{row.updateTime}}</td>
 			<e:hasPermission name="sys:area:edit"><td>
 				<a href="${ctxAdmin}/sys/area/form?id={{row.id}}">修改</a>
