@@ -52,6 +52,17 @@ public class AreaService extends TreeService<AreaDao, Area> {
         return dao.getByCode(code);
     }
 
+
+    /**
+     * 根据信息分类编码查找
+     *
+     * @param bizCode 息分类编码
+     * @return
+     */
+    public Area getByBizCode(String bizCode) {
+        return dao.getByBizCode(bizCode);
+    }
+
     /**
      * 查找区县及以上
      *

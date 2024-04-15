@@ -9,11 +9,11 @@ import com.eryansky.common.orm._enum.IGenericEnum;
 public enum AreaType implements IGenericEnum<AreaType> {
 
     COUNTRY("1", "国家"),
-    PROVINCE("2", "省份、直辖市"),
-    CITY("3", "地市"),
-    AREA("4", "区县"),
-    STREET("5", "乡镇"),
-    VILLAGE("6", "村庄"),
+    PROVINCE("2", "省（自治区、直辖市)"),
+    CITY("3", "地市级(地区、自治州)"),
+    AREA("4", "县级市(县、市辖区)"),
+    STREET("5", "镇(乡、街道)"),
+    VILLAGE("6", "村(社区)"),
     OTHER("9", "其它");
 
     /**

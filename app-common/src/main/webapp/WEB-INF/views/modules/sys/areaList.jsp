@@ -30,15 +30,27 @@
 	</ul>
 	<tags:message content="${message}"/>
 	<table id="treeTable" class="table table-striped table-bordered table-condensed">
-		<thead><tr><th>区域名称</th><th>区域编码</th><th>区域类型</th><th>备注</th><e:hasPermission name="sys:area:edit"><th>操作</th></e:hasPermission></tr></thead>
+		<thead><tr>
+			<th>区域名称</th>
+			<th>区域编码</th>
+			<th>信息分类编码</th>
+			<th>区域类型</th>
+			<th>备注</th>
+			<th>自定义参数</th>
+			<th>更新时间</th>
+			<e:hasPermission name="sys:area:edit"><th>操作</th></e:hasPermission></tr>
+		</thead>
 		<tbody id="treeTableList"></tbody>
 	</table>
 	<script type="text/template" id="treeTableTpl">
 		<tr id="{{row.id}}" pId="{{pid}}">
 			<td><a href="${ctxAdmin}/sys/area?parent.id={{row.id}}">{{row.name}}</a></td>
 			<td>{{row.code}}</td>
+			<td>{{row.bizCode}}</td>
 			<td>{{row.typeView}}</td>
 			<td>{{row.remark}}</td>
+			<td>{{row.extendAttr}}</td>
+			<td>{{row.updateTime}}</td>
 			<e:hasPermission name="sys:area:edit"><td>
 				<a href="${ctxAdmin}/sys/area/form?id={{row.id}}">修改</a>
 				<a href="${ctxAdmin}/sys/area/delete?id={{row.id}}" onclick="return confirmx('要删除该区域吗？', this.href)">删除</a>

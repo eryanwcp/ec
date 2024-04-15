@@ -20,6 +20,8 @@
 		a.name AS "name",
 		a.short_name AS "shortName",
 		a.code AS "code",
+		a.biz_code AS "bizCode",
+		a.extend_attr AS "extendAttr",
 		a.type AS "type",
 		a.sort AS "sort",
 		a.remark AS "remark"
@@ -43,6 +45,14 @@
 		FROM t_sys_area a
 		<include refid="areaJoins"/>
 		WHERE a.code = #{code} AND a.status = '0'
+	</select>
+
+	<select id="getByBizCode" resultType="Area">
+		SELECT
+		<include refid="areaColumns"/>
+		FROM t_sys_area a
+		<include refid="areaJoins"/>
+		WHERE a.biz_code = #{bizCode} AND a.status = '0'
 	</select>
 
 	<select id="findList" resultType="Area">
@@ -204,6 +214,8 @@
 		name,
 		short_name,
 		code,
+		biz_code,
+		extend_attr,
 		type,
 		sort,
 		remark
@@ -220,11 +232,14 @@
 		#{name},
 		#{shortName},
 		#{code},
+		#{bizCode},
+		#{extendAttr},
 		#{type},
 		#{sort},
 		#{remark}
 		)
 	</insert>
+
 	<insert id="insertBatch">
 		INSERT INTO t_sys_area(
 		id,
@@ -239,6 +254,8 @@
 		name,
 		short_name,
 		code,
+		biz_code,
+		extend_attr,
 		type,
 		sort,
 		remark
@@ -255,6 +272,8 @@
 		#{item.name},
 		#{item.shortName},
 		#{item.code},
+		#{item.bizCode},
+		#{item.extendAttr},
 		#{item.type},
 		#{item.sort},
 		#{item.remark}
@@ -272,6 +291,8 @@
 		name = #{name},
 		short_name = #{shortName},
 		code = #{code},
+		biz_code = #{bizCode},
+		extend_attr = #{extendAttr},
 		type = #{type},
 		sort = #{sort},
 		remark = #{remark}

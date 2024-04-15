@@ -1,4 +1,11 @@
-﻿20270220
+﻿20240415
+V4.2.20240301.08
+1、区域扩展增加信息分类编码
+
+ALTER TABLE t_sys_area ADD COLUMN biz_code varchar(64) COMMENT '信息分类编码';
+ALTER TABLE t_sys_area ADD COLUMN extend_attr text COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}';
+
+20240220
 V4.2.20231124.33
 1、机构扩展增加信息分类编码
 

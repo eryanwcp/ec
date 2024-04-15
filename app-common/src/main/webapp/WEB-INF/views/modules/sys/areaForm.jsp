@@ -64,9 +64,21 @@
 			</div>
 		</div>
 		<div class="control-group">
+			<label class="control-label">信息分类：</label>
+			<div class="controls">
+				<form:input path="bizCode" htmlEscape="false" maxlength="64" class="input-xxlarge" />
+			</div>
+		</div>
+		<div class="control-group">
 			<label class="control-label">备注：</label>
 			<div class="controls">
-				<form:textarea path="remark" htmlEscape="false" rows="3" maxlength="200" class="input-xxlarge"/>
+				<form:textarea path="remark" htmlEscape="false" rows="4" maxlength="200" class="input-xxlarge"/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">自定义参数：</label>
+			<div class="controls">
+				<form:textarea path="extendAttr" htmlEscape="false" rows="4" class="input-xxlarge"/>
 			</div>
 		</div>
 		<div class="form-actions">
