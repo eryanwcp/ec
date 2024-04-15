@@ -71,8 +71,8 @@ public class MDCFilter extends BaseFilter {
             if (userPrincipalId == null) {
                 userPrincipalId = request.getParameter(KEY_UID);
             }
-            if (requestId == null) {
-                requestId = CookieUtils.getCookie(request,"J2CACHE_SESSION_ID");
+            if (userPrincipalId == null) {
+                userPrincipalId = CookieUtils.getCookie(request,"J2CACHE_SESSION_ID");
             }
 //            if (userPrincipalId == null) {
 //                userPrincipalId = request.getHeader("Authorization");
