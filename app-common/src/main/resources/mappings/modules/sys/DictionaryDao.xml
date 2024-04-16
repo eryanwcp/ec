@@ -236,8 +236,12 @@
 		WHERE id = #{id}
 	</update>
 
-	<delete id="removeAll">
+	<delete id="clear">
 		DELETE FROM t_sys_dictionary
+		WHERE id = #{id}
 	</delete>
 
+	<delete id="clearAll">
+		DELETE FROM t_sys_dictionary
+	</delete>
 </mapper>

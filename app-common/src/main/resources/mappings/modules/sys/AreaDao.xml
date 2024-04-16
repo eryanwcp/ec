@@ -330,4 +330,13 @@
 		</choose>
 	</delete>
 
+	<delete id="clear">
+		DELETE FROM t_sys_area
+		WHERE id = #{id}
+	</delete>
+
+	<delete id="clearAll">
+		DELETE FROM t_sys_area
+	</delete>
+
 </mapper>
