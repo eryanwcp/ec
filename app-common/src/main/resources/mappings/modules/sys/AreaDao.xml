@@ -263,7 +263,7 @@
 		#{item.id},
 		#{item.status},
 		0,
-		#item.createUser},
+		#{item.createUser},
 		#{item.createTime},
 		#{item.updateUser},
 		#{item.updateTime},
