@@ -10,7 +10,9 @@ import com.eryansky.common.orm.mybatis.interceptor.BaseInterceptor;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.core.orm.mybatis.service.BaseService;
 import com.eryansky.modules.sys.dao.SystemDao;
+import com.eryansky.modules.sys.mapper.Area;
 import com.eryansky.modules.sys.mapper.Organ;
+import com.eryansky.modules.sys.utils.AreaUtils;
 import com.eryansky.modules.sys.utils.OrganUtils;
 import com.eryansky.utils.AppConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -146,6 +148,7 @@ public class SystemService extends BaseService {
             parent = OrganUtils.getOrgan(organ.get_parentId());
         }
 
+        Area area = AreaUtils.get(organ.getAreaId());
         Organ company = OrganUtils.getCompanyByRecursive(organ.getId());
         Organ homeCompany = OrganUtils.getHomeCompanyByRecursive(organ.getId());
         parameter.put("parentId", null != parent ? parent.getId():null);
@@ -157,6 +160,8 @@ public class SystemService extends BaseService {
         parameter.put("homeCompanyId", homeCompany.getId());
         parameter.put("homeCompanyCode", homeCompany.getCode());
         parameter.put("homeCompanyBizCode", homeCompany.getBizCode());
+        parameter.put("areaCode", null != area ? area.getCode():null);
+        parameter.put("areaBizCode", null != area ? area.getBizCode():null);
         Integer level = StringUtils.isNotBlank(organ.getParentIds()) ? organ.getParentIds().split(",").length : null;
         parameter.put("treeLevel", level);
 //        Integer childCount = organService.findChildCount(organ.getId());

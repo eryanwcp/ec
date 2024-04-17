@@ -1,9 +1,11 @@
 ﻿20240415
-V4.2.20240301.09
+V4.2.20240301.10
 1、区域扩展增加信息分类编码
 
 ALTER TABLE t_sys_area ADD COLUMN biz_code varchar(64) COMMENT '信息分类编码';
 ALTER TABLE t_sys_area ADD COLUMN extend_attr text COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}';
+ALTER TABLE t_sys_organ_extend ADD COLUMN area_code varchar(64) COMMENT '区域编码';
+ALTER TABLE t_sys_organ_extend ADD COLUMN area_biz_code varchar(64) COMMENT '区域信息分类编码';
 
 20240220
 V4.2.20231124.33

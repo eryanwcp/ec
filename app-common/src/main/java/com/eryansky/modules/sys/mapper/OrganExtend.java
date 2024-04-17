@@ -17,27 +17,45 @@ import com.eryansky.modules.sys.utils.OrganUtils;
  */
 public class OrganExtend extends Organ {
 
-
     private Integer treeLevel;
+    /**
+     * 父级ID
+     */
 
     private String parentId;
-
     private String parentCode;
 
     private String parentBizCode;
     private String parentName;
-
+    /**
+     * 所属公司ID
+     */
     private String companyId;
     private String companyCode;
 
     private String companyBizCode;
     private String companyName;
 
+    /**
+     * 管理单元ID
+     */
     private String homeCompanyId;
     private String homeCompanyCode;
 
     private String homeCompanyBizCode;
     private String homeCompanyName;
+    /**
+     * 行政区划编码
+     */
+    private String areaCode;
+    /**
+     * 行政区划信息分类编码
+     */
+    private String areaBizCode;
+    /**
+     * 行政区划名称
+     */
+    private String areaName;
 
     private String isLeaf;
 
@@ -144,6 +162,30 @@ public class OrganExtend extends Organ {
 
     public void setHomeCompanyName(String homeCompanyName) {
         this.homeCompanyName = homeCompanyName;
+    }
+
+    public String getAreaCode() {
+        return areaCode;
+    }
+
+    public void setAreaCode(String areaCode) {
+        this.areaCode = areaCode;
+    }
+
+    public String getAreaBizCode() {
+        return areaBizCode;
+    }
+
+    public void setAreaBizCode(String areaBizCode) {
+        this.areaBizCode = areaBizCode;
+    }
+
+    public String getAreaName() {
+        return areaName;
+    }
+
+    public void setAreaName(String areaName) {
+        this.areaName = areaName;
     }
 
     public String getIsLeaf() {

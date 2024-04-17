@@ -787,6 +787,8 @@
         a.PARENT_ID AS "parentId",
         a.PARENT_IDS AS "parentIds",
         a.AREA_ID AS "areaId",
+        a.area_code AS "areaCode",
+        a.area_biz_code AS "areaBizCode",
         a.REMARK AS "remark",
         a.company_id AS "companyId",
         a.company_code AS "companyCode",

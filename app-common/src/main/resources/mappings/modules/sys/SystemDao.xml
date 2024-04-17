@@ -30,6 +30,8 @@
 		parent_id,
 		parent_ids,
 		area_id,
+		area_code,
+		area_biz_code,
 		remark,
 		parent_code,
 		parent_biz_code,
@@ -65,6 +67,8 @@
 		parent_id,
 		parent_ids,
 		area_id,
+		#{areaCode},
+		#{areaBizCode},
 		remark,
 		#{parentCode},
 		#{parentBizCode},
@@ -110,6 +114,8 @@
 		parent_id,
 		parent_ids,
 		area_id,
+		area_code,
+		area_biz_code,
 		remark,
 		parent_code,
 		parent_biz_code,
@@ -145,6 +151,8 @@
 				 a.parent_id,
 				 a.parent_ids,
 				 a.area_id,
+				 ar.code,
+				 ar.biz_code,
 				 a.remark,
 				 P.code,
 				 p.biz_code,
@@ -157,6 +165,7 @@
 				 (length(a.parent_ids) - length(replace(a.parent_ids,',','')))
 		FROM t_sys_organ a
 		LEFT JOIN t_sys_organ p ON p.id = a.parent_id
+		LEFT JOIN t_sys_area ar ON ar.id = a.area_id
 		<where>
 			<if test="id != null and id != ''">
 				AND a.id = #{id}
