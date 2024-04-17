@@ -285,7 +285,7 @@ $(function () {
                     align: 'center',
                     width: 60,
                     formatter: function (value, rowData, rowIndex) {
-                        if (rowData['status'] !== 0) {
+                        if (rowData['status'] !== "0") {
                             return $.formatString('<span  style="color:red">{0}</span>', value);
                         }
                         return value;
