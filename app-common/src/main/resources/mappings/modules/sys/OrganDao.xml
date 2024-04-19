@@ -34,6 +34,7 @@
         p.short_name AS "parent.shortName",
         p.code AS "parent.code",
         p.sys_code AS "parent.sysCode",
+        p.biz_code AS "parent.bizCode",
         a.PARENT_IDS AS "parentIds",
         a.AREA_ID AS "areaId",
         a.remark AS "remark"
