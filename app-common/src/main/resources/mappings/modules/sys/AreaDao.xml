@@ -17,6 +17,7 @@
 		a.parent_ids AS "parent_ids",
 		a.parent_id AS "parent.id",
 		p.name AS "parent.name",
+		p.short_name AS "parent.shortName",
 		p.code AS "parent.code",
 		p.biz_code AS "parent.bizCode",
 		a.name AS "name",

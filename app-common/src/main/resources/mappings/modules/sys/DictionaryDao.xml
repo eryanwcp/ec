@@ -15,6 +15,7 @@
 		a.remark AS "remark",
 		a.order_no AS "orderNo",
 		d.name AS "group.name",
+		d.code AS "group.code",
 		a.group_id AS "group.id"
 	</sql>
 	
