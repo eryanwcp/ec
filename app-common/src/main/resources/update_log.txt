@@ -1,5 +1,5 @@
 ﻿20240415
-V4.2.20240301.10
+V4.2.20240301.11
 1、区域扩展增加信息分类编码
 
 ALTER TABLE t_sys_area ADD COLUMN biz_code varchar(64) COMMENT '信息分类编码';
