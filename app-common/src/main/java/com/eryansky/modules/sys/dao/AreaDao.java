@@ -43,4 +43,6 @@ public interface AreaDao extends TreeDao<Area> {
 
     List<Area> findByParentId(Parameter parameter);
 
+    List<Area> findByCodes(Parameter parameter);
+
 }

@@ -99,6 +99,26 @@
 		ORDER BY a.code
 	</select>
 
+	<select id="findByCodes" resultType="Area">
+		SELECT
+		<include refid="areaColumns"/>
+		FROM t_sys_area a
+		<include refid="areaJoins"/>
+		<where>
+			a.status = #{status}
+		   AND a.code IN
+			<foreach collection="codes" open="(" separator="," close=")" item="item">
+				#{item}
+			</foreach>
+			<if test="types != null and types.size() !=0">
+				AND a.type IN
+				<foreach collection="types" open="(" separator="," close=")" item="item">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+		ORDER BY a.code
+	</select>
 
 	<select id="findByParentId" resultType="Area">
 		SELECT
