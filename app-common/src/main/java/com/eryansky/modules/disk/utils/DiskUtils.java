@@ -463,6 +463,18 @@ public class DiskUtils {
         return  AppUtils.getAppURL() + AppConstants.getAdminPath() + "/disk/fileDownload/" + fileId;
     }
 
+    /**
+     * 获取文件预览路径
+     * @param fileId
+     * @return
+     */
+    public static String getFilePreviewSrc(String fileId) {
+        if(StringUtils.isBlank(fileId)){
+            return null;
+        }
+        return  AppUtils.getAppURL() + AppConstants.getAdminPath() + "/disk/fileDownload/" + fileId+"?downloadType=inline";
+    }
+
 
 
 

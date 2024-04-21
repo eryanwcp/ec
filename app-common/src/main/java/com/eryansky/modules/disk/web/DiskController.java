@@ -21,7 +21,6 @@ import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.core.security.annotation.RequiresPermissions;
 import com.eryansky.core.web.upload.FileUploadUtils;
 import org.apache.commons.fileupload.FileUploadBase;
-import com.eryansky.core.web.upload.exception.FileNameLengthLimitExceededException;
 import com.eryansky.core.web.upload.exception.InvalidExtensionException;
 import com.eryansky.modules.disk.mapper.Folder;
 import com.eryansky.modules.sys.utils.DownloadFileUtils;
@@ -42,6 +41,7 @@ import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.utils.SelectType;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -543,15 +543,16 @@ public class DiskController extends SimpleController {
      * @param response
      * @param request
      * @param fileId   文件ID
+     * @param downloadType   attachment、inline
      */
     @RequiresUser(required = false)
     @Logging(logType = LogType.access, value = "下载文件")
     @GetMapping(value = {"fileDownload/{fileId}"})
     public ModelAndView fileDownload(HttpServletResponse response,
-                                     HttpServletRequest request, @PathVariable String fileId) throws Exception {
+                                     HttpServletRequest request, @PathVariable String fileId,String downloadType) throws Exception {
         File file = fileService.get(fileId);
         try {
-            return downloadSingleFileUtil(response, request, file);
+            return downloadSingleFileUtil(response, request, file,downloadType);
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
             DownloadFileUtils.loggerHTTPHeader(request,response);
@@ -570,13 +571,37 @@ public class DiskController extends SimpleController {
      * @param request
      * @param fileId   文件ID
      */
-    @Logging(logType = LogType.access, value = "下载文件")
-    @GetMapping(value = {"innerFileDownload/{fileId}"})
+    @Logging(logType = LogType.access, value = "文件下载")
+    @GetMapping(value = {"innerFileDownload/{fileId}"},produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
     public ModelAndView innerFileDownload(HttpServletResponse response,
                                      HttpServletRequest request, @PathVariable String fileId) throws Exception {
         File file = fileService.get(fileId);
         try {
-            return downloadSingleFileUtil(response, request, file);
+            return downloadSingleFileUtil(response, request, file,null);
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+            DownloadFileUtils.loggerHTTPHeader(request,response);
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return null;
+//            throw e;
+        }
+
+    }
+
+    /**
+     * 内部文件预览
+     *
+     * @param response
+     * @param request
+     * @param fileId   文件ID
+     */
+    @Logging(logType = LogType.access, value = "文件预览")
+    @GetMapping(value = {"innerFilePreview/{fileId}"},produces = {MediaType.IMAGE_GIF_VALUE,MediaType.IMAGE_JPEG_VALUE,MediaType.IMAGE_PNG_VALUE})
+    public ModelAndView innerFilePreview(HttpServletResponse response,
+                                          HttpServletRequest request, @PathVariable String fileId) throws Exception {
+        File file = fileService.get(fileId);
+        try {
+            return downloadSingleFileUtil(response, request, file,"inline");
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
             DownloadFileUtils.loggerHTTPHeader(request,response);
@@ -589,7 +614,7 @@ public class DiskController extends SimpleController {
 
 
     private ModelAndView downloadSingleFileUtil(HttpServletResponse response,
-                                                HttpServletRequest request, File file) throws Exception {
+                                                HttpServletRequest request, File file,String downloadType) throws Exception {
         ActionException fileNotFoldException = new ActionException("文件不存在，已被删除或移除。");
         if (file == null) {
 //            throw fileNotFoldException;
@@ -606,7 +631,7 @@ public class DiskController extends SimpleController {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return null;
         }
-        DownloadFileUtils.downRangeFile(diskFile,file.getName(),response,request);
+        DownloadFileUtils.downRangeFile(diskFile,file.getName(),downloadType,response,request);
         return null;
     }
 
@@ -616,7 +641,7 @@ public class DiskController extends SimpleController {
      * @param fileIds 入参Ids拼接字符串
      * @throws Exception
      */
-    @Logging(logType = LogType.access, value = "下载文件")
+    @Logging(logType = LogType.access, value = "文件下载")
     @GetMapping(value = {"downloadDiskFile"})
     public ModelAndView downloadDiskFile(
             HttpServletResponse response,
@@ -629,7 +654,7 @@ public class DiskController extends SimpleController {
         if (fileIds.size() == 1) {
             File file = fileService.get(fileIds.get(0));
             try {
-                return downloadSingleFileUtil(response, request, file);
+                return downloadSingleFileUtil(response, request, file,null);
             } catch (Exception e) {
                 logger.error("{},{}",fileIds.get(0),e.getMessage());
                 throw e;
