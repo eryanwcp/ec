@@ -132,6 +132,8 @@ public class DownloadFileUtils {
         if(null == contentDisposition){
             if(null != downloadType && "inline".equals(downloadType)){
                 WebUtils.setInlineHeader(response, _fileName);
+            }else if("none".equals(downloadType)){
+
             }else{
                 WebUtils.setDownloadableHeader(request, response, _fileName);
             }
