@@ -336,6 +336,30 @@ public class AppConstants extends SysConstants {
         return Collections.emptyList();
     }
 
+    /**
+     * 仅限IP白名单访问
+     *
+     * @return
+     */
+    public static Boolean isXssEnable() {
+        String code = "system.security.xssFilter.enable";
+        String value = getAppConfig(code,"true");
+        return Boolean.valueOf(value);
+    }
+
+    /**
+     * #不通过应用集成账号验证的账号 每行一个或多个之间以";"分割
+     * 自动转换成小写
+     *
+     * @return
+     */
+    public static String getXssBlackListURL() {
+        String code = "system.security.xssFilter.blackListURL";
+        String value = getAppConfig(code);
+        return StringUtils.trim(value).replaceAll("\r\n", ";").replaceAll("；", ";");
+    }
+
+
 
     /**
      * URL请求限制

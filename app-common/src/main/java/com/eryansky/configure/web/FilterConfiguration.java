@@ -1,5 +1,6 @@
 package com.eryansky.configure.web;
 
+import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.web.filter.CustomHttpServletRequestFilter;
 import com.eryansky.common.web.filter.XssFilter;
@@ -7,11 +8,13 @@ import com.eryansky.core.web.filter.MySiteMeshFilter;
 import com.eryansky.core.web.interceptor.ExceptionInterceptor;
 import com.eryansky.core.web.filter.ChinesePathFilter;
 import com.eryansky.utils.AppConstants;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.Ordered;
+import org.springframework.core.env.Environment;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -86,11 +89,13 @@ public class FilterConfiguration {
      * @return
      */
     @Bean
-    public FilterRegistrationBean<XssFilter> xssFilterRegistrationBean() {
+    @ConditionalOnProperty(name = "system.security.xssFilter.enable", havingValue = "true")
+    public FilterRegistrationBean<XssFilter> xssFilterRegistrationBean(Environment environment) {
         XssFilter filter = new XssFilter();
         FilterRegistrationBean<XssFilter> bean = new FilterRegistrationBean<>(filter);
         bean.setFilter(filter);
-        bean.addInitParameter("blackListURL", "/static/**;/api/**;/druid/**");
+        String xssBlackUrl = environment.getProperty("system.security.xssFilter.blackListURL");
+        bean.addInitParameter("blackListURL", "/static/**;/api/**;/druid/**" + (StringUtils.isNotBlank(xssBlackUrl) ? (";" + xssBlackUrl) : ""));
         bean.addInitParameter("whiteListURL", "/**");
         bean.setOrder(Ordered.HIGHEST_PRECEDENCE + 80);
         return bean;
