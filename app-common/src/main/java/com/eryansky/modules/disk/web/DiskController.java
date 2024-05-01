@@ -40,6 +40,7 @@ import com.eryansky.modules.disk.utils.DiskUtils;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.utils.SelectType;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -550,7 +551,7 @@ public class DiskController extends SimpleController {
     @GetMapping(value = {"fileDownload/{fileId}"})
     public ModelAndView fileDownload(HttpServletResponse response,
                                      HttpServletRequest request, @PathVariable String fileId,String downloadType) throws Exception {
-        File file = fileService.get(fileId);
+        File file = fileService.get(StringUtils.substringBefore(fileId,"."));
         try {
             return downloadSingleFileUtil(response, request, file,downloadType);
         } catch (Exception e) {
