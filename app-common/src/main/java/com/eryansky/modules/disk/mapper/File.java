@@ -228,7 +228,7 @@ public class File extends DataEntity<File>{
         if(null != url){
             return url;
         }
-        return DiskUtils.getFileUrl(id);
+        return DiskUtils.getFileSrcWithSuffix(this);
     }
 
     public void setUrl(String url) {
