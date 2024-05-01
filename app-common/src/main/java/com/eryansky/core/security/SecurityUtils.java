@@ -406,7 +406,7 @@ public class SecurityUtils {
         sessionInfo.setCode(user.getCode());
         sessionInfo.setBizCode(user.getBizCode());
         sessionInfo.setUserType(user.getUserType());
-        sessionInfo.setAvatar(user.getPhotoUrl());
+        sessionInfo.setAvatar(user.getPhotoSrc());
         sessionInfo.setGender(user.getSex());
         sessionInfo.setMobile(user.getMobile());
         sessionInfo.setMobileSensitive(user.getMobileSensitive());

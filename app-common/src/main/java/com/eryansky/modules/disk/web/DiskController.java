@@ -40,7 +40,6 @@ import com.eryansky.modules.disk.utils.DiskUtils;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.utils.SelectType;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -576,7 +575,7 @@ public class DiskController extends SimpleController {
     @GetMapping(value = {"innerFileDownload/{fileId}"},produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
     public ModelAndView innerFileDownload(HttpServletResponse response,
                                      HttpServletRequest request, @PathVariable String fileId) throws Exception {
-        File file = fileService.get(fileId);
+        File file = fileService.get(StringUtils.substringBefore(fileId,"."));
         try {
             return downloadSingleFileUtil(response, request, file,null);
         } catch (Exception e) {
@@ -600,7 +599,7 @@ public class DiskController extends SimpleController {
     @GetMapping(value = {"innerFilePreview/{fileId}"},produces = {MediaType.IMAGE_GIF_VALUE,MediaType.IMAGE_JPEG_VALUE,MediaType.IMAGE_PNG_VALUE})
     public ModelAndView innerFilePreview(HttpServletResponse response,
                                           HttpServletRequest request, @PathVariable String fileId) throws Exception {
-        File file = fileService.get(fileId);
+        File file = fileService.get(StringUtils.substringBefore(fileId,"."));
         try {
             return downloadSingleFileUtil(response, request, file,"inline");
         } catch (Exception e) {

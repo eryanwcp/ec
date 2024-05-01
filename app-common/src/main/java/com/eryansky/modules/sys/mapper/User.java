@@ -250,7 +250,7 @@ public class User extends DataEntity<User> implements IUser {
     }
 
     public String getPhotoSrc() {
-        return DiskUtils.getFileSrc(photo);
+        return DiskUtils.getFileSrcWithSuffix(photo);
     }
     public void setEmail(String email) {
         this.email = email;

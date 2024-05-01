@@ -5,7 +5,7 @@
     <logger name="com.alibaba.druid" level="info"/>
     <logger name="com.eryansky" level="info"/>
     <!--<logger name="com.eryansky.common.orm.mybatis" level="DEBUG"/>-->
-<!--    <logger name="com.eryansky.modules.sys.dao" level="debug"/>-->
+    <logger name="com.eryansky.modules.sys.dao" level="debug"/>
     <contextName>ec</contextName>
     <!-- 记录文件到特定目录 -->
     <property name="log.path" value="logs" />
