@@ -7,6 +7,7 @@ import com.eryansky.common.orm.mybatis.sensitive.type.SensitiveTypeRegisty;
 import com.eryansky.common.orm.mybatis.sensitive.utils.JsonUtils;
 import com.eryansky.common.orm.mybatis.sensitive.utils.SensitiveUtils;
 import com.eryansky.common.orm.mybatis.sensitive.IEncrypt;
+import com.google.common.collect.Lists;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
@@ -76,12 +77,28 @@ public class SensitiveAndEncryptWriteInterceptor implements Interceptor {
         Map<String, Object> newValues = new HashMap<>(16);
         MetaObject metaObject = configuration.newMetaObject(param);
 
+        List<String> datas = Lists.newArrayList();
+        for (Field field : param.getClass().getDeclaredFields()) {
+            Object value = metaObject.getValue(field.getName());
+            if (value instanceof CharSequence) {
+                EncryptField encryptField = field.getAnnotation(EncryptField.class);
+                if (encryptField != null && value != null && !"".equals(value.toString())) {
+                    datas.add(value.toString());
+                }
+            }
+        }
+
+        List<String> rDatas = encrypt.batchEncrypt(datas);
         for (Field field : param.getClass().getDeclaredFields()) {
 
             Object value = metaObject.getValue(field.getName());
             Object newValue = value;
             if (value instanceof CharSequence) {
-                newValue = handleEncryptField(field, newValue);
+                EncryptField encryptField = field.getAnnotation(EncryptField.class);
+                if (encryptField != null && value != null && !"".equals(value.toString())) {
+                    newValue = rDatas.get(0);
+                    rDatas.remove(0);
+                }
                 if (isWriteCommand(commandType) && !SensitiveTypeRegisty.alreadyBeSentisived(newValue)) {
                     newValue = handleSensitiveField(field, newValue);
                     newValue = handleSensitiveJSONField(field, newValue);

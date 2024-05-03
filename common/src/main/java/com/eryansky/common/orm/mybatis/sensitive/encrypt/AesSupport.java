@@ -15,6 +15,8 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 数据脱敏用到的AES加解密类
@@ -87,6 +89,9 @@ public class AesSupport implements IEncrypt {
 
     @Override
     public String encrypt(String value) {
+        if (null == value) {
+            return value;
+        }
         if (StringUtils.isEmpty(value)) {
             return "";
         }
@@ -105,7 +110,15 @@ public class AesSupport implements IEncrypt {
     }
 
     @Override
+    public List<String> batchEncrypt(List<String> datas) {
+        return datas.stream().map(this::encrypt).collect(Collectors.toList());
+    }
+
+    @Override
     public String decrypt(String value) {
+        if (null == value) {
+            return value;
+        }
         if (StringUtils.isEmpty(value)) {
             return "";
         }
@@ -119,6 +132,11 @@ public class AesSupport implements IEncrypt {
             log.error("AES解密时出现问题，密钥为：{}，密文为：{}", sensitiveTypeHandler.handle(key), value);
             throw new IllegalStateException("AES解密时出现问题" + e.getMessage(), e);
         }
+    }
+
+    @Override
+    public List<String> batchDecrypt(List<String> datas) {
+        return datas.stream().map(this::decrypt).collect(Collectors.toList());
     }
 
 

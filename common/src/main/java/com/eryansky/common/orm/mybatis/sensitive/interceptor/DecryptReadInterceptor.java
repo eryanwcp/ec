@@ -8,6 +8,8 @@ import com.eryansky.common.orm.mybatis.sensitive.encrypt.AesSupport;
 import com.eryansky.common.orm.mybatis.sensitive.type.SensitiveType;
 import com.eryansky.common.orm.mybatis.sensitive.type.SensitiveTypeRegisty;
 import com.eryansky.common.orm.mybatis.sensitive.utils.SensitiveUtils;
+import com.eryansky.common.utils.collections.Collections3;
+import com.google.common.collect.Lists;
 import org.apache.ibatis.executor.resultset.ResultSetHandler;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
@@ -78,25 +80,38 @@ public class DecryptReadInterceptor implements Interceptor {
             return results;
         }
 
+        List<String> datas = Lists.newArrayList();
         for (Object obj : results) {
             final MetaObject objMetaObject = mappedStatement.getConfiguration().newMetaObject(obj);
             for (Map.Entry<String, EncryptField> entry : sensitiveFieldMap.entrySet()) {
                 String property = entry.getKey();
                 String value = (String) objMetaObject.getValue(property);
                 if (null != value && !"".equals(value)) {
-                    String decryptValue = encrypt.decrypt(value);
-                    objMetaObject.setValue(property, decryptValue);
+                    datas.add(value);
                 }
             }
-            for (Map.Entry<String, SensitiveBinded> entry : sensitiveBindedMap.entrySet()) {
 
+        }
+
+        List<String> rDatas = encrypt.batchDecrypt(datas);
+        for (Object obj : results) {
+            final MetaObject objMetaObject = mappedStatement.getConfiguration().newMetaObject(obj);
+            for (Map.Entry<String, EncryptField> entry : sensitiveFieldMap.entrySet()) {
                 String property = entry.getKey();
+                String value = (String) objMetaObject.getValue(property);
+                if (null != value && !"".equals(value)) {
+                    objMetaObject.setValue(property, rDatas.get(0));
+                    rDatas.remove(0);
+                }
 
+            }
+            for (Map.Entry<String, SensitiveBinded> entry : sensitiveBindedMap.entrySet()) {
+                String property = entry.getKey();
                 SensitiveBinded sensitiveBinded = entry.getValue();
-                String bindPropety = sensitiveBinded.bindField();
+                String bindProperty = sensitiveBinded.bindField();
                 SensitiveType sensitiveType = sensitiveBinded.value();
                 try {
-                    String value = (String) objMetaObject.getValue(bindPropety);
+                    String value = (String) objMetaObject.getValue(bindProperty);
                     String resultValue = SensitiveTypeRegisty.get(sensitiveType).handle(value);
                     objMetaObject.setValue(property, resultValue);
                 } catch (Exception e) {
