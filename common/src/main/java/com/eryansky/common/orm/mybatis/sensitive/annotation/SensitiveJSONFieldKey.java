@@ -21,6 +21,12 @@ public @interface SensitiveJSONFieldKey {
      * @return key
      */
     String key();
+    /**
+     * 该属性从json中key取得
+     *
+     * @return 返回字段名
+     */
+    String bindKey();
 
     /**
      * 脱敏类型

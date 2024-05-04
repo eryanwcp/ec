@@ -1,6 +1,7 @@
 package com.eryansky.common.orm.mybatis.sensitive.type;
 
 import com.eryansky.common.orm.mybatis.sensitive.type.handler.*;
+import com.eryansky.common.orm.mybatis.sensitive.utils.JsonUtils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,6 +53,6 @@ public class SensitiveTypeRegisty {
      * @return 是否已经脱敏了
      */
     public static boolean alreadyBeSentisived(Object src) {
-        return src == null || src.toString().indexOf("*") > 0;
+        return src == null || JsonUtils.parseToJSONString(src).indexOf("*") > 0;
     }
 }

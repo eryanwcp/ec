@@ -3,7 +3,7 @@ package com.eryansky.common.orm.mybatis.sensitive.annotation;
 import java.lang.annotation.*;
 
 /**
- * 标记了注解的字段会在写请求时对数据进行加密，在写请求时进行解密
+ * 对json内的key_value进行加密
  *
  * @author Eryan
  * @version 2019-12-13
@@ -12,10 +12,11 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-public @interface EncryptField {
+public @interface EncryptJSONField {
     /**
-     * 加密方法
-     * @return
+     * 需要加密的字段的数组
+     *
+     * @return 返回结果
      */
-    String type() default "";
+    EncryptJSONFieldKey[] encryptList();
 }

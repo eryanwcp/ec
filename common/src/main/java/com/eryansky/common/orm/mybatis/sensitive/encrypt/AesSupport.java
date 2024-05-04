@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -88,6 +89,20 @@ public class AesSupport implements IEncrypt {
     }
 
     @Override
+    public String defaultType() {
+        return "AES";
+    }
+
+    @Override
+    public String encrypt(String data, String type) {
+        return encrypt(data);
+    }
+
+    @Override
+    public List<String> batchEncrypt(List<String> datas, String type) {
+        return batchEncrypt(datas);
+    }
+
     public String encrypt(String value) {
         if (null == value) {
             return value;
@@ -109,12 +124,25 @@ public class AesSupport implements IEncrypt {
         }
     }
 
-    @Override
     public List<String> batchEncrypt(List<String> datas) {
         return datas.stream().map(this::encrypt).collect(Collectors.toList());
     }
 
     @Override
+    public Map<String, List<String>> batchEncrypt(Map<String, List<String>> mapData) {
+        return mapData.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,e->batchEncrypt(e.getValue())));
+    }
+
+    @Override
+    public String decrypt(String data, String type) {
+        return decrypt(data);
+    }
+
+    @Override
+    public List<String> batchDecrypt(List<String> datas, String type) {
+        return batchDecrypt(datas);
+    }
+
     public String decrypt(String value) {
         if (null == value) {
             return value;
@@ -134,9 +162,13 @@ public class AesSupport implements IEncrypt {
         }
     }
 
-    @Override
     public List<String> batchDecrypt(List<String> datas) {
         return datas.stream().map(this::decrypt).collect(Collectors.toList());
+    }
+
+    @Override
+    public Map<String, List<String>> batchDecrypt(Map<String, List<String>> mapData) {
+        return mapData.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,e->batchDecrypt(e.getValue())));
     }
 
 

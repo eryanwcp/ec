@@ -48,11 +48,20 @@
     }
 ```
 
+mybatis-config.xml 插件配置
+
 ```
-<!-- mybatis-config.xml 插件配置 -->
+    <!-- 仅加密、解密 -->
+
     <plugins>
 		<plugin interceptor="com.eryansky.common.orm.mybatis.sensitive.interceptor.DecryptReadInterceptor" />
-		<plugin interceptor="com.eryansky.common.orm.mybatis.sensitive.interceptor.SensitiveAndEncryptWriteInterceptor" />
+		<plugin interceptor="com.eryansky.common.orm.mybatis.sensitive.interceptor.EncryptWriteInterceptor" />
+    </plugins>
+    
+    <!-- 仅加密、解密 脱密 -->
+    <plugins>
+		<plugin interceptor="com.eryansky.common.orm.mybatis.sensitive.interceptor.SeneitiveDecryptReadInterceptor" />
+		<plugin interceptor="com.eryansky.common.orm.mybatis.sensitive.interceptor.SeneitiveEncryptWriteInterceptor" />
     </plugins>
 ```
 2，在vo类上添加功能注解使得插件生效：
@@ -91,7 +100,7 @@ public class UserDTO {
      * 一个json串，需要脱敏
      * SensitiveJSONField标记json中需要脱敏的字段
      */
-    @SensitiveJSONField(sensitivelist = {
+    @SensitiveJSONField(sensitiveList = {
             @SensitiveJSONFieldKey(key = "idcard",type = SensitiveType.ID_CARD),
             @SensitiveJSONFieldKey(key = "username",type = SensitiveType.CHINESE_NAME),
     })

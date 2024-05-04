@@ -34,7 +34,7 @@ import java.util.*;
 @Intercepts({
         @Signature(type = ResultSetHandler.class, method = "handleResultSets", args = {java.sql.Statement.class})
 })
-public class DecryptReadInterceptor implements Interceptor {
+public class SensitiveAndDecryptReadInterceptor implements Interceptor {
 
     protected Log log = LogFactory.getLog(this.getClass());
 
@@ -43,11 +43,11 @@ public class DecryptReadInterceptor implements Interceptor {
     private Properties properties = new Properties();
     private IEncrypt encrypt;
 
-    public DecryptReadInterceptor() throws NoSuchAlgorithmException {
+    public SensitiveAndDecryptReadInterceptor() throws NoSuchAlgorithmException {
         this.encrypt = new AesSupport();
     }
 
-    public DecryptReadInterceptor(IEncrypt encrypt) {
+    public SensitiveAndDecryptReadInterceptor(IEncrypt encrypt) {
         Objects.requireNonNull(encrypt, "encrypt should not be null!");
         this.encrypt = encrypt;
     }
@@ -74,6 +74,8 @@ public class DecryptReadInterceptor implements Interceptor {
 
         final Map<String, EncryptField> encryptFieldMap = getEncryptFieldByResultMap(resultMap);
         final Map<String, EncryptJSONField> encryptJSONFieldMap = getEncryptJSONFieldByResultMap(resultMap);
+        final Map<String, SensitiveField> sensitiveFieldMap = getSensitiveFieldByResultMap(resultMap);
+        final Map<String, SensitiveEncryptJSONField> encryptJSONFieldByResultMap = getSensitiveEncryptJSONFieldByResultMap(resultMap);
         final Map<String, SensitiveBinded> sensitiveBindedMap = getSensitiveBindedByResultMap(resultMap);
 
         if (sensitiveBindedMap.isEmpty() && encryptFieldMap.isEmpty()) {
@@ -115,9 +117,29 @@ public class DecryptReadInterceptor implements Interceptor {
                 }
             }
 
+
+            for (Map.Entry<String, SensitiveEncryptJSONField> entry : encryptJSONFieldByResultMap.entrySet()) {
+                String property = entry.getKey();
+                Object value = objMetaObject.getValue(property);
+                if (null != value) {
+                    value =  value instanceof String ? JsonUtils.parseToObjectMap(value.toString()):(Map<String, Object>)value;
+                    for(EncryptJSONFieldKey encryptJSONFieldKey: entry.getValue().encryptList()){
+                        String keyValue = (String) ((Map<?, ?>) value).get(encryptJSONFieldKey.key());
+                        if(keyValue != null && !"".equals(keyValue)){
+                            List<String> mapData = mapList.get(!"".equals(encryptJSONFieldKey.type()) ? encryptJSONFieldKey.type():encrypt.defaultType());
+                            if(null == mapData){
+                                mapData = Lists.newArrayList();
+                            }
+                            mapData.add(keyValue);
+                            mapList.put(!"".equals(encryptJSONFieldKey.type()) ? encryptJSONFieldKey.type():encrypt.defaultType(),mapData);
+                        }
+                    }
+                }
+            }
+
         }
 
-        Map<String, List<String>> rDatas = encrypt.batchDecrypt(mapList);
+        Map<String,List<String>> rDatas = encrypt.batchDecrypt(mapList);
         for (Object obj : results) {
             final MetaObject objMetaObject = mappedStatement.getConfiguration().newMetaObject(obj);
             for (Map.Entry<String, EncryptField> entry : encryptFieldMap.entrySet()) {
@@ -140,12 +162,58 @@ public class DecryptReadInterceptor implements Interceptor {
                         isString = true;
                     }
                     for(EncryptJSONFieldKey encryptJSONFieldKey: entry.getValue().encryptList()){
-                        String keyValue = (String) ((Map<String, Object>) value).get(!"".equals(encryptJSONFieldKey.type()) ? encryptJSONFieldKey.type():encrypt.defaultType());
+                        String keyValue = (String) ((Map<String, Object>) value).get(encryptJSONFieldKey.key());
                         if(keyValue != null && !"".equals(keyValue)){
-                            ((Map<String, Object>) value).put(encryptJSONFieldKey.key(), rDatas.get(encryptJSONFieldKey.type()).get(0));
+                            ((Map<String, Object>) value).put(encryptJSONFieldKey.key(), rDatas.get(!"".equals(encryptJSONFieldKey.type()) ? encryptJSONFieldKey.type():encrypt.defaultType()).get(0));
                             rDatas.get(!"".equals(encryptJSONFieldKey.type()) ? encryptJSONFieldKey.type():encrypt.defaultType()).remove(0);
                         }
                     }
+                    objMetaObject.setValue(property, isString ? JsonUtils.parseToJSONString(value) : value);
+                }
+
+            }
+
+            for (Map.Entry<String, SensitiveField> entry : sensitiveFieldMap.entrySet()) {
+                String property = entry.getKey();
+                SensitiveType sensitiveType = entry.getValue().value();
+                try {
+                    String value = (String) objMetaObject.getValue(property);
+                    String resultValue = SensitiveTypeRegisty.get(sensitiveType).handle(value);
+                    objMetaObject.setValue(property, resultValue);
+                } catch (Exception e) {
+                    //ignore it;
+                }
+
+            }
+
+            for (Map.Entry<String, SensitiveEncryptJSONField> entry : encryptJSONFieldByResultMap.entrySet()) {
+                String property = entry.getKey();
+                Object value = objMetaObject.getValue(property);
+                boolean isString = false;
+                if (null != value) {
+                    if(value instanceof String){
+                        value = JsonUtils.parseToObjectMap(value.toString());
+                        isString = true;
+                    }
+                    for(SensitiveJSONFieldKey sensitiveJSONFieldKey: entry.getValue().sensitiveList()){
+                        String bindProperty = sensitiveJSONFieldKey.bindKey();
+                        SensitiveType sensitiveType = sensitiveJSONFieldKey.type();
+                        try {
+                            String keyValue = (String) ((Map<String, Object>)value).get(bindProperty);
+                            String resultValue = SensitiveTypeRegisty.get(sensitiveType).handle(keyValue);
+                            ((Map<String, Object>)value).put(sensitiveJSONFieldKey.key(), resultValue);
+                        } catch (Exception e) {
+                            //ignore it;
+                        }
+                    }
+                    for(EncryptJSONFieldKey encryptJSONFieldKey: entry.getValue().encryptList()){
+                        String keyValue = (String)  ((Map<String, Object>)value).get(encryptJSONFieldKey.key());
+                        if(keyValue != null && !"".equals(keyValue)){
+                            ((Map<String, Object>) value).put(encryptJSONFieldKey.key(), rDatas.get(!"".equals(encryptJSONFieldKey.type()) ? encryptJSONFieldKey.type():encrypt.defaultType()).get(0));
+                            rDatas.get(!"".equals(encryptJSONFieldKey.type()) ? encryptJSONFieldKey.type():encrypt.defaultType()).remove(0);
+                        }
+                    }
+
                     objMetaObject.setValue(property, isString ? JsonUtils.parseToJSONString(value) : value);
                 }
 
@@ -191,6 +259,26 @@ public class DecryptReadInterceptor implements Interceptor {
         return getEncryptFieldByType(resultMap.getType());
     }
 
+    private Map<String, EncryptJSONField> getEncryptJSONFieldByType(Class<?> clazz) {
+        Map<String, EncryptJSONField> encryptJSONFieldMap = new HashMap<>(16);
+
+        for (Field field : clazz.getDeclaredFields()) {
+            EncryptJSONField encryptJSONField = field.getAnnotation(EncryptJSONField.class);
+            if (encryptJSONField != null) {
+                encryptJSONFieldMap.put(field.getName(), encryptJSONField);
+            }
+        }
+        return encryptJSONFieldMap;
+    }
+
+    private Map<String, EncryptJSONField> getEncryptJSONFieldByResultMap(ResultMap resultMap) {
+        if (resultMap == null) {
+            return new HashMap<>(16);
+        }
+
+        return getEncryptJSONFieldByType(resultMap.getType());
+    }
+
     private Map<String, EncryptField> getEncryptFieldByType(Class<?> clazz) {
         Map<String, EncryptField> encryptFieldMap = new HashMap<>(16);
 
@@ -203,19 +291,39 @@ public class DecryptReadInterceptor implements Interceptor {
         return encryptFieldMap;
     }
 
-    private Map<String, EncryptJSONField> getEncryptJSONFieldByResultMap(ResultMap resultMap) {
+    private Map<String, SensitiveField> getSensitiveFieldByResultMap(ResultMap resultMap) {
         if (resultMap == null) {
             return new HashMap<>(16);
         }
 
-        return getEncryptJSONByType(resultMap.getType());
+        return getSensitiveFieldByType(resultMap.getType());
     }
 
-    private Map<String, EncryptJSONField> getEncryptJSONByType(Class<?> clazz) {
-        Map<String, EncryptJSONField> encryptJSONFieldMap = new HashMap<>(16);
+    private Map<String, SensitiveField> getSensitiveFieldByType(Class<?> clazz) {
+        Map<String, SensitiveField> encryptFieldMap = new HashMap<>(16);
 
         for (Field field : clazz.getDeclaredFields()) {
-            EncryptJSONField encryptJSONField = field.getAnnotation(EncryptJSONField.class);
+            SensitiveField encryptField = field.getAnnotation(SensitiveField.class);
+            if (encryptField != null) {
+                encryptFieldMap.put(field.getName(), encryptField);
+            }
+        }
+        return encryptFieldMap;
+    }
+
+    private Map<String, SensitiveEncryptJSONField> getSensitiveEncryptJSONFieldByResultMap(ResultMap resultMap) {
+        if (resultMap == null) {
+            return new HashMap<>(16);
+        }
+
+        return getSensitiveEncryptJSONByType(resultMap.getType());
+    }
+
+    private Map<String, SensitiveEncryptJSONField> getSensitiveEncryptJSONByType(Class<?> clazz) {
+        Map<String, SensitiveEncryptJSONField> encryptJSONFieldMap = new HashMap<>(16);
+
+        for (Field field : clazz.getDeclaredFields()) {
+            SensitiveEncryptJSONField encryptJSONField = field.getAnnotation(SensitiveEncryptJSONField.class);
             if (encryptJSONField != null) {
                 encryptJSONFieldMap.put(field.getName(), encryptJSONField);
             }
