@@ -38,11 +38,11 @@
         @Bean
         public ConfigurationCustomizer configurationCustomizer() throws Exception{
             DecryptReadInterceptor decryptReadInterceptor = new DecryptReadInterceptor(encryptor());
-            SensitiveAndEncryptWriteInterceptor sensitiveAndEncryptWriteInterceptor = new SensitiveAndEncryptWriteInterceptor(encryptor());
+            EncryptWriteInterceptor encryptWriteInterceptor = new EncryptWriteInterceptor(encryptor());
     
             return (configuration) -> {
                 configuration.addInterceptor(decryptReadInterceptor);
-                configuration.addInterceptor(sensitiveAndEncryptWriteInterceptor);
+                configuration.addInterceptor(encryptWriteInterceptor);
             };
         }
     }
@@ -58,10 +58,10 @@ mybatis-config.xml 插件配置
 		<plugin interceptor="com.eryansky.common.orm.mybatis.sensitive.interceptor.EncryptWriteInterceptor" />
     </plugins>
     
-    <!-- 仅加密、解密 脱密 -->
+    <!-- 仅加密、解密 脱敏 -->
     <plugins>
-		<plugin interceptor="com.eryansky.common.orm.mybatis.sensitive.interceptor.SeneitiveDecryptReadInterceptor" />
-		<plugin interceptor="com.eryansky.common.orm.mybatis.sensitive.interceptor.SeneitiveEncryptWriteInterceptor" />
+		<plugin interceptor="com.eryansky.common.orm.mybatis.sensitive.interceptor.SensitiveAndDecryptReadInterceptor" />
+		<plugin interceptor="com.eryansky.common.orm.mybatis.sensitive.interceptor.SensitiveAndEncryptWriteInterceptor" />
     </plugins>
 ```
 2，在vo类上添加功能注解使得插件生效：
@@ -97,10 +97,10 @@ public class UserDTO {
     @SensitiveField(SensitiveType.ID_CARD)
     private String idcardSensitive;
     /**
-     * 一个json串，需要脱敏
-     * SensitiveJSONField标记json中需要脱敏的字段
+     * 一个json串，需要脱敏以及加密、解密
+     * SensitiveEncryptJSONField标记json中需要脱敏的字段
      */
-    @SensitiveJSONField(sensitiveList = {
+    @SensitiveEncryptJSONField(sensitiveList = {
             @SensitiveJSONFieldKey(key = "idcard",type = SensitiveType.ID_CARD),
             @SensitiveJSONFieldKey(key = "username",type = SensitiveType.CHINESE_NAME),
     })
@@ -118,6 +118,12 @@ public class UserDTO {
     标记在类上，声明此数据库映射的model对象开启数据加密和脱敏功能。
     
 #### @EncryptField
+
+    标记在字段上，必须是字符串，声明此字段在和数据库交互前将数据加密。
+    update,select,insert 都会将指定的字段设置为密文与数据库进行交互。
+    在select的结果集里，此字段会自动解密成明文。因此，业务是无感知的。
+
+#### @EncryptJSONField
 
     标记在字段上，必须是字符串，声明此字段在和数据库交互前将数据加密。
     update,select,insert 都会将指定的字段设置为密文与数据库进行交互。
