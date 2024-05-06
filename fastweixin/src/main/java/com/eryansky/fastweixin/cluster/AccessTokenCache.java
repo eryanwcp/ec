@@ -14,6 +14,7 @@ public class AccessTokenCache implements Serializable {
 
     public static String KEY_ACCESS_TOKEN_CACHE = "accessTokenKey";
 
+    private boolean isFromExtend = false;
 
     private String accessToken;
     private String jsApiTicket;
@@ -22,6 +23,14 @@ public class AccessTokenCache implements Serializable {
     private long weixinTokenStartTime;
 
     public AccessTokenCache() {
+    }
+
+    public boolean isFromExtend() {
+        return isFromExtend;
+    }
+
+    public void setFromExtend(boolean fromExtend) {
+        isFromExtend = fromExtend;
     }
 
     public String getAccessToken() {
