@@ -28,15 +28,7 @@ $(function () {
         pageSize: 20,
         pageList: [10, 20, 50, 100, 1000, 99999],
         frozenColumns: [[
-            {field: 'ck', checkbox: true},
-            {
-                title: 'SessionID',
-                field: 'sessionId',
-                width: 120,
-                hidden: false, formatter: function (value, rowData, rowIndex) {
-                    return "<a target='_blank' href='" + ctxAdmin + "/sys/session/detail?id=" + rowData['id'] + "'>" + value + "</a>";
-                }
-            }
+            {field: 'ck', checkbox: true}
         ]],
         columns: [[{
             title: 'ID',
@@ -65,6 +57,10 @@ $(function () {
             width: 200
         }, {
             title: '手机号',
+            field: 'mobileSensitive',
+            width: 120
+        }, {
+            title: '真实手机号',
             field: 'mobile',
             width: 120,
             hidden: true

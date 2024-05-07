@@ -79,6 +79,7 @@
                     <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
                     <otherwise>'%'+#{query}+'%'</otherwise>
                 </choose>
+
                 )
             </if>
             <if test="type != null and type != ''">
@@ -137,6 +138,7 @@
                     <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
                     <otherwise>'%'+#{query}+'%'</otherwise>
                 </choose>
+                OR a.user_id = #{query}
                 )
             </if>
             <if test="type != null and type != ''">
@@ -157,6 +159,8 @@
                     <when test="dbName == 'oracle'">'%'||#{userInfo}||'%'</when>
                     <otherwise>'%'+#{userInfo}+'%'</otherwise>
                 </choose>
+                OR u.mobile = #{query}
+                OR a.user_id = #{query}
                 )
             </if>
             <choose>
