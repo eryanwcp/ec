@@ -540,7 +540,6 @@ public class UserService extends CrudService<UserDao, User> {
      * @return
      */
     public List<User> findByLoginNameOrCode(String loginName, String code) {
-        Assert.notNull(loginName, "参数[loginName]不能为空!");
         Parameter parameter = new Parameter();
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
@@ -557,7 +556,6 @@ public class UserService extends CrudService<UserDao, User> {
      * @return
      */
     public List<User> findByLoginNameOrMobile(String loginName, String mobile) {
-        Assert.notNull(loginName, "参数[loginName]不能为空!");
         Parameter parameter = new Parameter();
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
@@ -576,7 +574,6 @@ public class UserService extends CrudService<UserDao, User> {
      * @return
      */
     public List<User> findByLoginNameOrCodeOrMobile(String loginName,String code, String mobile) {
-        Assert.notNull(loginName, "参数[loginName]不能为空!");
         Parameter parameter = new Parameter();
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());

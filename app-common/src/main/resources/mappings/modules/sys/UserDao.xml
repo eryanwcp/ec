@@ -209,7 +209,7 @@
                 <when test="loginName != null and loginName !='' and code != null and code !=''">
                     AND (a.login_name = #{loginName} OR a.code = #{code})
                 </when>
-                <when test="loginName != null and loginName">
+                <when test="loginName != null and loginName !=''">
                     AND a.login_name = #{loginName}
                 </when>
                 <when test="code != null and code !=''">
@@ -234,7 +234,7 @@
                 <when test="loginName != null and loginName !='' and mobile != null and mobile !=''">
                     AND (a.login_name = #{loginName} OR a.mobile = #{mobile})
                 </when>
-                <when test="loginName != null and loginName">
+                <when test="loginName != null and loginName !=''">
                     AND a.login_name = #{loginName}
                 </when>
                 <when test="mobile != null and mobile !=''">
@@ -268,7 +268,7 @@
                 <when test="code != null and code !='' and mobile != null and mobile !=''">
                     AND (a.code = #{code} OR a.mobile = #{mobile})
                 </when>
-                <when test="loginName != null and loginName">
+                <when test="loginName != null and loginName !=''">
                     AND a.login_name = #{loginName}
                 </when>
                 <when test="mobile != null and mobile !=''">
