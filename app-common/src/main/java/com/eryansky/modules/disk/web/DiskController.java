@@ -19,6 +19,7 @@ import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.core.security.annotation.RequiresPermissions;
+import com.eryansky.core.security.annotation.RestApi;
 import com.eryansky.core.web.upload.FileUploadUtils;
 import org.apache.commons.fileupload.FileUploadBase;
 import com.eryansky.core.web.upload.exception.InvalidExtensionException;
@@ -549,6 +550,32 @@ public class DiskController extends SimpleController {
     @Logging(logType = LogType.access, value = "下载文件")
     @GetMapping(value = {"fileDownload/{fileId}"})
     public ModelAndView fileDownload(HttpServletResponse response,
+                                     HttpServletRequest request, @PathVariable String fileId,String downloadType) throws Exception {
+        File file = fileService.get(StringUtils.substringBefore(fileId,"."));
+        try {
+            return downloadSingleFileUtil(response, request, file,downloadType);
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+            DownloadFileUtils.loggerHTTPHeader(request,response);
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return null;
+//            throw e;
+        }
+
+    }
+
+    /**
+     * 文件下载
+     *
+     * @param response
+     * @param request
+     * @param fileId   文件ID
+     * @param downloadType   attachment、inline
+     */
+    @RestApi
+    @Logging(logType = LogType.access, value = "接口文件")
+    @GetMapping(value = {"restFileDownload/{fileId}"})
+    public ModelAndView restFileDownload(HttpServletResponse response,
                                      HttpServletRequest request, @PathVariable String fileId,String downloadType) throws Exception {
         File file = fileService.get(StringUtils.substringBefore(fileId,"."));
         try {
