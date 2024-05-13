@@ -476,6 +476,19 @@ public class DiskUtils {
     }
 
     /**
+     * 获取文件路径
+     *
+     * @param fileId
+     * @return
+     */
+    public static String getRestFileSrc(String fileId) {
+        if (StringUtils.isBlank(fileId)) {
+            return null;
+        }
+        return AppUtils.getAppURL() + AppConstants.getAdminPath() + "/disk/restFileDownload/" + fileId;
+    }
+
+    /**
      * 获取文件路径（支持后缀）
      *
      * @param fileId
