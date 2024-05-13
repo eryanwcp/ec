@@ -565,7 +565,7 @@ public class DiskController extends SimpleController {
     }
 
     /**
-     * 文件下载
+     * 接口文件下载
      *
      * @param response
      * @param request
