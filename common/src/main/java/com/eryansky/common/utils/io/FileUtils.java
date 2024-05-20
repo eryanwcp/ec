@@ -6,6 +6,7 @@
 package com.eryansky.common.utils.io;
 
 import com.eryansky.common.exception.ServiceException;
+import com.eryansky.common.orm.Page;
 import com.eryansky.common.utils.DateUtils;
 import com.eryansky.common.utils.Identities;
 import com.eryansky.common.utils.StringUtils;
@@ -16,6 +17,13 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 文件工具类.
@@ -398,4 +406,31 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 			throw new IllegalStateException("文件不再目标目录内容");
 		}
 	}
+
+	/**
+	 * 分页读取文件行
+	 *
+	 * @param file     文件路径
+	 * @param page  分页对象
+	 * @return
+	 */
+	public static Page<String> readFileLineByPage(String file, Page<String> page) throws IOException {
+		Path path = Paths.get(file);
+		Supplier<Stream<String>> streamSupplier  = () -> {
+			try {
+				return Files.lines(path);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		};
+		page.setTotalCount(streamSupplier.get().count());
+		if(page.getPageSize() == Page.PAGESIZE_ALL){
+			return page.setResult(streamSupplier.get().collect(Collectors.toList()));
+		}
+		int beginIndex = (page.getPageNo() - 1) * page.getPageSize();
+		return  page.setResult(streamSupplier.get().skip(beginIndex)
+				.limit(page.getPageSize())
+				.collect(Collectors.toList()));
+	}
+
 }

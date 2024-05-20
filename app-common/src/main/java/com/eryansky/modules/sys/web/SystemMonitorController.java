@@ -30,6 +30,7 @@ import com.eryansky.utils.*;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.LineIterator;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -40,6 +41,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -290,7 +292,7 @@ public class SystemMonitorController extends SimpleController {
                       @RequestParam(name = "showTotal",defaultValue = "false") boolean showTotal,
                       @RequestParam(name = "fileName",required = false) String fileName,
                       HttpServletRequest request, HttpServletResponse response, Model uiModel) {
-        Page<String> page = new Page<>(request, response, 1000);
+        Page<String> page = new Page<>(request, response, 5000);
         if(showTotal){
             page.setPageSize(Page.PAGESIZE_ALL);
         }
@@ -303,13 +305,8 @@ public class SystemMonitorController extends SimpleController {
         if (WebUtils.isAjaxRequest(request)) {
             try {
                 // 读取日志
-                List<String> totalLogs = org.apache.commons.io.FileUtils.readLines(file, StandardCharsets.UTF_8);
-                List<String> showLogs = totalLogs;
-                if (page.getPageSize() != Page.PAGESIZE_ALL) {
-                    showLogs = Collections3.getPagedList(totalLogs, page.getPageNo(), page.getPageSize());
-                }
-
-                List<String> resultLogs = showLogs.parallelStream().map(line->{
+                page = FileUtils.readFileLineByPage(file.getPath(),page);
+                List<String> resultLogs = page.getResult().parallelStream().map(line->{
                     line = XsslHttpServletRequestWrapper.replaceXSS(line);
                     if (pretty) {
                         //先转义
@@ -339,7 +336,6 @@ public class SystemMonitorController extends SimpleController {
                     }
                     return line;
                 }).collect(Collectors.toList());
-                page.setTotalCount(totalLogs.size());
                 page.setResult(resultLogs);
                 return renderString(response, Result.successResult().setObj(page).setData(PrettyMemoryUtils.prettyByteSize(file.length())));
             } catch (Exception e) {
