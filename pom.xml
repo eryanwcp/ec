@@ -60,7 +60,7 @@
         <ec-j2cache-spring-boot-starter.version>4.2.20240301.23</ec-j2cache-spring-boot-starter.version>
         <ec-fastweixin.version>4.2.20240301.23</ec-fastweixin.version>
 
-        <jackson.version>2.15.2</jackson.version>
+        <jackson.version>2.15.4</jackson.version>
     </properties>
 
 
