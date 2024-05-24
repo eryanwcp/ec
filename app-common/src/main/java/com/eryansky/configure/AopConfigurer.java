@@ -5,6 +5,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
+import com.eryansky.core.aop.ContextCopyingDecorator;
 import com.eryansky.core.orm.mybatis.entity.BaseEntity;
 import com.eryansky.modules.notice.utils.MessageUtils;
 import com.eryansky.modules.sys.mapper.User;
@@ -46,16 +47,22 @@ public class AopConfigurer implements AsyncConfigurer {
         int processors = Runtime.getRuntime().availableProcessors();
         int initProcessors = processors < 4 ? processors : processors - 1;
         executor.setCorePoolSize(initProcessors);
-        executor.setMaxPoolSize(initProcessors * 5);//最大线程数量
+        executor.setMaxPoolSize(initProcessors * 10);//最大线程数量
         executor.setQueueCapacity(initProcessors * 10000);//线程池的队列容量
-        executor.setRejectedExecutionHandler((Runnable r, ThreadPoolExecutor exe) -> {
-            StringBuffer msg = new StringBuffer();
-            msg.append("当前任务线程池队列已满：").append(executor.getActiveCount()).append("/").append(executor.getCorePoolSize()).append("~").append(executor.getMaxPoolSize());
-            logger.error(msg.toString());
-            MessageUtils.sendToUserMessage(User.SUPERUSER_ID,msg.toString());
-            List<String>  systemOpsWarnUserIds = UserUtils.findUsersByLoginNames(AppConstants.getSystemOpsWarnLoginNameList()).stream().map(BaseEntity::getId).filter(id ->!User.SUPERUSER_ID.equals(id)).collect(Collectors.toList());
-            MessageUtils.sendToUserMessage(systemOpsWarnUserIds,msg.toString());
-        });
+        // for passing in request scope context 转换请求范围的上下文
+        executor.setTaskDecorator(new ContextCopyingDecorator());
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        // rejection-policy：当pool已经达到max size的时候，如何处理新任务
+        // CALLER_RUNS：不在新线程中执行任务，而是有调用者所在的线程来执行
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+//        executor.setRejectedExecutionHandler((Runnable r, ThreadPoolExecutor exe) -> {
+//            StringBuffer msg = new StringBuffer();
+//            msg.append("当前任务线程池队列已满：").append(executor.getActiveCount()).append("/").append(executor.getCorePoolSize()).append("~").append(executor.getMaxPoolSize());
+//            logger.error(msg.toString());
+//            MessageUtils.sendToUserMessage(User.SUPERUSER_ID,msg.toString());
+//            List<String>  systemOpsWarnUserIds = UserUtils.findUsersByLoginNames(AppConstants.getSystemOpsWarnLoginNameList()).stream().map(BaseEntity::getId).filter(id ->!User.SUPERUSER_ID.equals(id)).collect(Collectors.toList());
+//            MessageUtils.sendToUserMessage(systemOpsWarnUserIds,msg.toString());
+//        });
         executor.initialize();
         return executor;
     }
