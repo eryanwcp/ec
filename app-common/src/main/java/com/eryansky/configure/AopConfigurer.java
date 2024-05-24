@@ -53,7 +53,7 @@ public class AopConfigurer implements AsyncConfigurer {
             msg.append("当前任务线程池队列已满：").append(executor.getActiveCount()).append("/").append(executor.getCorePoolSize()).append("~").append(executor.getMaxPoolSize());
             logger.error(msg.toString());
             MessageUtils.sendToUserMessage(User.SUPERUSER_ID,msg.toString());
-            List<String>  systemOpsWarnUserIds = UserUtils.findUsersByLoginNames(AppConstants.getSystemOpsWarnLoginNameList()).stream().map(BaseEntity::getId).collect(Collectors.toList());
+            List<String>  systemOpsWarnUserIds = UserUtils.findUsersByLoginNames(AppConstants.getSystemOpsWarnLoginNameList()).stream().map(BaseEntity::getId).filter(id ->!User.SUPERUSER_ID.equals(id)).collect(Collectors.toList());
             MessageUtils.sendToUserMessage(systemOpsWarnUserIds,msg.toString());
         });
         executor.initialize();
@@ -67,6 +67,8 @@ public class AopConfigurer implements AsyncConfigurer {
             msg.append("线程池执行任务发生未知异常：").append(method.getDeclaringClass().getName()).append(".").append(method.getName()).append(",").append(throwable.getMessage());
             logger.error(msg.toString(),throwable);
             MessageUtils.sendToUserMessage(User.SUPERUSER_ID,msg.toString());
+            List<String>  systemOpsWarnUserIds = UserUtils.findUsersByLoginNames(AppConstants.getSystemOpsWarnLoginNameList()).stream().map(BaseEntity::getId).filter(id ->!User.SUPERUSER_ID.equals(id)).collect(Collectors.toList());
+            MessageUtils.sendToUserMessage(systemOpsWarnUserIds,msg.toString());
         };
     }
 
