@@ -411,8 +411,7 @@ public class SystemMonitorController extends SimpleController {
         logger.info("Log path {}", canonicalPath);
         return canonicalPath;
     }
-    @Autowired
-    private AsyncConfigurer asyncConfigurer;
+
     /**
      * 系统监控-异步任务
      *

@@ -5,12 +5,14 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
+import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.core.aop.ContextCopyingDecorator;
 import com.eryansky.core.orm.mybatis.entity.BaseEntity;
 import com.eryansky.modules.notice.utils.MessageUtils;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.utils.AppConstants;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
@@ -60,15 +62,18 @@ public class DefaultAsyncConfigurer implements AsyncConfigurer {
         executor.setRejectedExecutionHandler((Runnable r, ThreadPoolExecutor exe) -> {
             StringBuffer msg = new StringBuffer();
             msg.append("当前任务线程池队列已满：").append(executor.getQueueSize())
+                    .append(";默认线程数：").append(executor.getCorePoolSize())
                     .append(";最大线程数：").append(executor.getMaxPoolSize())
-                    .append(";提交任务数：").append(executor.getThreadPoolExecutor().getTaskCount())
-                    .append(";完成任务数：").append(executor.getThreadPoolExecutor().getCompletedTaskCount())
                     .append(";执行中线程数：").append(executor.getActiveCount())
                     .append(";待执行队列数：").append(executor.getThreadPoolExecutor().getQueue().size())
+                    .append(";提交任务数：").append(executor.getThreadPoolExecutor().getTaskCount())
+                    .append(";完成任务数：").append(executor.getThreadPoolExecutor().getCompletedTaskCount())
                     .append(";可用队列长度：").append(executor.getThreadPoolExecutor().getQueue().remainingCapacity());
             log.error(msg.toString());
-            MessageUtils.sendToUserMessage(User.SUPERUSER_ID,msg.toString());
-            List<String>  systemOpsWarnUserIds = UserUtils.findUsersByLoginNames(AppConstants.getSystemOpsWarnLoginNameList()).stream().map(BaseEntity::getId).filter(id ->!User.SUPERUSER_ID.equals(id)).collect(Collectors.toList());
+            List<String>  systemOpsWarnUserIds = UserUtils.findUsersByLoginNames(AppConstants.getSystemOpsWarnLoginNameList()).stream().map(BaseEntity::getId).collect(Collectors.toList());
+            if(Collections3.isEmpty(systemOpsWarnUserIds)){
+                systemOpsWarnUserIds = Lists.newArrayList(User.SUPERUSER_ID);
+            }
             MessageUtils.sendToUserMessage(systemOpsWarnUserIds,msg.toString());
         });
 
@@ -87,8 +92,10 @@ public class DefaultAsyncConfigurer implements AsyncConfigurer {
             StringBuffer msg = new StringBuffer();
             msg.append("线程池执行任务发生未知异常：").append(method.getDeclaringClass().getName()).append(".").append(method.getName()).append(",").append(throwable.getMessage());
             log.error(msg.toString(),throwable);
-            MessageUtils.sendToUserMessage(User.SUPERUSER_ID,msg.toString());
-            List<String>  systemOpsWarnUserIds = UserUtils.findUsersByLoginNames(AppConstants.getSystemOpsWarnLoginNameList()).stream().map(BaseEntity::getId).filter(id ->!User.SUPERUSER_ID.equals(id)).collect(Collectors.toList());
+            List<String>  systemOpsWarnUserIds = UserUtils.findUsersByLoginNames(AppConstants.getSystemOpsWarnLoginNameList()).stream().map(BaseEntity::getId).collect(Collectors.toList());
+            if(Collections3.isEmpty(systemOpsWarnUserIds)){
+                systemOpsWarnUserIds = Lists.newArrayList(User.SUPERUSER_ID);
+            }
             MessageUtils.sendToUserMessage(systemOpsWarnUserIds,msg.toString());
         };
     }

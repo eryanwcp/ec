@@ -41,6 +41,10 @@
 				<td style="color: red;">{{activeCount}}</td>
 			</tr>
 			<tr>
+				<td>待执行队列数</td>
+				<td>{{queueSize}}</td>
+			</tr>
+			<tr>
 				<td>提交任务数</td>
 				<td>{{taskCount}}</td>
 			</tr>
@@ -48,10 +52,7 @@
 				<td>完成任务数</td>
 				<td>{{completedTaskCount}}</td>
 			</tr>
-			<tr>
-				<td>待执行队列数</td>
-				<td>{{queueSize}}</td>
-			</tr>
+
 			<tr>
 				<td>可用队列长度</td>
 				<td style="color: green;"> {{queueRemainingCapacity}}</td>
