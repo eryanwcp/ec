@@ -14,6 +14,7 @@ import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
 import com.eryansky.modules.notice.mapper.Notice;
+import com.eryansky.modules.notice.utils.MessageUtils;
 import com.eryansky.modules.notice.vo.NoticeQueryVo;
 import com.eryansky.modules.sys.utils.UserUtils;
 //import com.eryansky.modules.weixin.utils.WeixinUtils;
@@ -138,12 +139,14 @@ public class MessageService extends CrudService<MessageDao, Message> {
             message.setSendTime(Calendar.getInstance().getTime());
         }
         this.save(message);
+        List<MessageSender> messageSenders = Lists.newArrayList();
         List<MessageReceive> messageReceives = Lists.newArrayList();
-        for (String objectId : receiveObjectIds) {
+        receiveObjectIds.forEach(objectId->{
             MessageSender messageSender = new MessageSender(message.getId());
             messageSender.setObjectType(messageReceiveObjectType.getValue());
             messageSender.setObjectId(objectId);
-            messageSenderService.save(messageSender);
+            messageSender.prePersist();
+            messageSenders.add(messageSender);
 
             List<String> targetIds = Lists.newArrayList();
             if (MessageReceiveObjectType.User.equals(messageReceiveObjectType)) {
@@ -160,11 +163,11 @@ public class MessageService extends CrudService<MessageDao, Message> {
                 messageReceive.setUserId(targetId);
                 messageReceive.setIsRead(YesOrNo.NO.getValue());
                 messageReceive.prePersist();
-//                messageReceiveService.save(messageReceive);
                 messageReceives.add(messageReceive);
             }
-        }
+        });
         message.setMessageReceives(messageReceives);
+        messageSenderService.insertAutoBatch(messageSenders);
         messageReceiveService.insertAutoBatch(messageReceives);
         message.setBizMode(MessageMode.Published.getValue());
         this.save(message);
