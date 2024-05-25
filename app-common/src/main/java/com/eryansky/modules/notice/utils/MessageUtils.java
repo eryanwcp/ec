@@ -273,6 +273,6 @@ public class MessageUtils {
      */
     public static Page<MessageReceive> findUserMessages(String userId, int pageNo, int pageSize, String appId, String isRead, String isSend) {
         Page<MessageReceive> page = new Page<>(pageNo, pageSize);
-        return Static.messageReceiveService.findUserPage(page, appId, userId,isRead,null,null);
+        return Static.messageReceiveService.findUserPage(page, appId, userId,isRead,isSend,null);
     }
 }
