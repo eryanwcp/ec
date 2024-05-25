@@ -32,17 +32,24 @@ import com.google.common.collect.Maps;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.annotation.AsyncConfigurer;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
 /**
@@ -54,6 +61,12 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping(value = "${adminPath}/sys/systemMonitor")
 public class SystemMonitorController extends SimpleController {
+
+    @Autowired
+//    @Qualifier("applicationTaskExecutor")
+//    @Qualifier("taskScheduler")
+    @Qualifier("defaultAsyncExecutor")
+    private Executor asyncExecutor;
 
     /**
      * 系统信息
@@ -76,6 +89,7 @@ public class SystemMonitorController extends SimpleController {
         }
         return "modules/sys/systemMonitor";
     }
+
 
 
     /**
@@ -397,5 +411,31 @@ public class SystemMonitorController extends SimpleController {
         logger.info("Log path {}", canonicalPath);
         return canonicalPath;
     }
+    @Autowired
+    private AsyncConfigurer asyncConfigurer;
+    /**
+     * 系统监控-异步任务
+     *
+     * @return
+     */
+    @RequiresPermissions("sys:systemMonitor:view")
+    @Logging(value = "系统监控-异步任务", logType = LogType.access, logging = "!#isAjax")
+    @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = "asyncTask")
+    public String asyncTask(HttpServletRequest request, Model uiModel, HttpServletResponse response) {
+        if (WebUtils.isAjaxRequest(request)) {
+            Map<String,Object> map = Maps.newHashMap();
+            ThreadPoolTaskExecutor threadTask = (ThreadPoolTaskExecutor) asyncExecutor;
+            ThreadPoolExecutor threadPoolExecutor = threadTask.getThreadPoolExecutor();
+            map.put("corePoolSize", threadTask.getCorePoolSize());
+            map.put("maxPoolSize", threadTask.getMaxPoolSize());
 
+            map.put("taskCount", threadPoolExecutor.getTaskCount());
+            map.put("activeCount", threadPoolExecutor.getActiveCount());
+            map.put("completedTaskCount", threadPoolExecutor.getCompletedTaskCount());
+            map.put("queueSize", threadPoolExecutor.getQueue().size());
+            map.put("queueRemainingCapacity", threadPoolExecutor.getQueue().remainingCapacity());
+            return renderString(response, Result.successResult().setData(map));
+        }
+        return "modules/sys/systemMonitor-asyncTask";
+    }
 }
