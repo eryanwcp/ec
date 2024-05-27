@@ -1341,6 +1341,20 @@ public class UserService extends CrudService<UserDao, User> {
     }
 
     /**
+     * 根据角色查询
+     *
+     * @param roleCode 角色编码
+     * @return
+     */
+    public List<User> findUsersByRoleCode(String roleCode) {
+        Parameter parameter = new Parameter();
+        parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
+        parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
+        parameter.put("roleCode", roleCode);
+        return dao.findUsersByRoleCode(parameter);
+    }
+
+    /**
      * 根据角色查询（分页）
      *
      * @param page

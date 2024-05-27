@@ -863,6 +863,20 @@
         ORDER BY a.sort ASC
     </select>
 
+    <select id="findUsersByRoleCode" resultType="User">
+        SELECT
+        <include refid="userColumns"/>
+        FROM t_sys_user a
+        LEFT JOIN t_sys_user_role ur ON ur.user_id = a.id
+        LEFT JOIN t_sys_role r ON r.id = ur.role_id
+        <where>
+            a.status = #{status}
+            AND r.status = #{status}
+            AND r.code = #{roleCode}
+        </where>
+        ORDER BY a.sort ASC
+    </select>
+
     <select id="findUserIdsByRoleId" resultType="java.lang.String">
         SELECT
         a.id
