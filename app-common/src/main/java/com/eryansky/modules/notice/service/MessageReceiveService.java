@@ -123,10 +123,12 @@ public class MessageReceiveService extends CrudService<MessageReceiveDao, Messag
 
 
     /**
-     * 根据用户ID以及消息ID设置未发送成功
+     * 根据用户ID以及消息ID设置是否发送成功、是否阅读
      *
      * @param userId
      * @param messageId
+     * @param isSend
+     * @param isRead
      * @return
      */
     public int updateByUserIdAndMessageId(String userId, String messageId, String isSend, String isRead) {
@@ -139,6 +141,25 @@ public class MessageReceiveService extends CrudService<MessageReceiveDao, Messag
             messageReceive.setReadTime(Calendar.getInstance().getTime());
         }
         return dao.updateByUserIdAndMessageId(messageReceive);
+    }
+
+    /**
+     * 根据ID以设置是否发送成功、是否阅读
+     *
+     * @param id
+     * @param isSend
+     * @param isRead
+     * @return
+     */
+    public int updateById(String id, String isSend, String isRead) {
+        MessageReceive messageReceive = new MessageReceive();
+        messageReceive.setId(id);
+        messageReceive.setIsSend(isSend);
+        messageReceive.setIsRead(isRead);
+        if(YesOrNo.YES.getValue().equals((messageReceive.getIsRead()))){
+            messageReceive.setReadTime(Calendar.getInstance().getTime());
+        }
+        return dao.updateById(messageReceive);
     }
 
 

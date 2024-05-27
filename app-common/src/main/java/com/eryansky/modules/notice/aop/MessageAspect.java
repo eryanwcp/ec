@@ -61,7 +61,7 @@ public class MessageAspect implements InitializingBean, DisposableBean {
         }
         //TODO 设置已发送
         messageReceives.forEach(v->{
-            messageReceiveService.updateByUserIdAndMessageId(v.getUserId(),returnObj.getId(), YesOrNo.YES.getValue(),null);
+            messageReceiveService.updateById(v.getId(), YesOrNo.YES.getValue(),null);
         });
     }
 
