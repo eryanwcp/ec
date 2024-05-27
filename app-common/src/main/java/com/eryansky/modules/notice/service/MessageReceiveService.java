@@ -154,6 +154,7 @@ public class MessageReceiveService extends CrudService<MessageReceiveDao, Messag
         this.save(receive);
     }
 
+
     /**
      * 设置通知已读状态
      *

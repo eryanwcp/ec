@@ -129,7 +129,7 @@ public class MessageService extends CrudService<MessageDao, Message> {
      * @param messageReceiveObjectType {@link MessageReceiveObjectType}
      * @param receiveObjectIds
      */
-    public Message saveAndSend(Message message, MessageReceiveObjectType messageReceiveObjectType, Collection<String> receiveObjectIds) {
+    public Message save(Message message, MessageReceiveObjectType messageReceiveObjectType, Collection<String> receiveObjectIds) {
         if (Collections3.isEmpty(receiveObjectIds)) {
             throw new SystemException("未定义参数[receiveObjectIds]");
         }

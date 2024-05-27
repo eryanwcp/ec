@@ -134,13 +134,13 @@ public class MessageController extends SimpleController {
             model.setSender(sessionInfo.getUserId());
         }
 
-        messageService.save(model);
-
         MessageReceiveObjectType messageReceiveObjectType = MessageReceiveObjectType.getByValue(receiveObjectType);
         if (StringUtils.isNotBlank(receiveObjectType) && messageReceiveObjectType != null) {
-            messageTask.saveAndSend(model, messageReceiveObjectType, objectIds);
+            messageService.save(model, messageReceiveObjectType, objectIds);
+        }else{
+            messageService.save(model);
         }
-
+        messageTask.push(model.getId());
         addMessage(redirectAttributes, "消息正在发送...请稍候！");
         ModelAndView modelAndView = new ModelAndView("redirect:" + AppConstants.getAdminPath() + "/notice/message");
         return modelAndView;

@@ -12,17 +12,15 @@ import com.eryansky.modules.notice.mapper.MessageSender;
 import com.eryansky.modules.notice.mapper.Notice;
 import com.eryansky.modules.notice.service.MessageReceiveService;
 import com.eryansky.modules.notice.service.MessageSenderService;
-import com.eryansky.modules.notice.service.MessageService;
 import com.eryansky.modules.notice.utils.NoticeUtils;
+import com.eryansky.modules.sys._enum.YesOrNo;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,28 +47,6 @@ public class MessageAspect implements InitializingBean, DisposableBean {
      *
      * @param joinPoint 切入点
      */
-    @AfterReturning(value = "execution(* com.eryansky.modules.notice.service.MessageService.saveAndSend(..))",returning = "returnObj")
-    public void afterMessagePublish(JoinPoint joinPoint, Message returnObj) {
-        if (null == returnObj) {
-            return;
-        }
-        Object[] args = joinPoint.getArgs();
-        if (null == args || args.length < 3) {
-            return;
-        }
-        MessageReceiveObjectType messageReceiveObjectType = (MessageReceiveObjectType) args[1];
-        List<String> receiveObjectIds = (List<String>) args[2];
-        logger.info("消息推送-消息：{} {} {} {} {}",returnObj.getId(),returnObj.getAppId(),returnObj.getTipMessage(),messageReceiveObjectType.getValue(),receiveObjectIds.size());
-        if(MessageReceiveObjectType.User.getValue().equals(messageReceiveObjectType.getValue())){
-
-        }
-    }
-
-    /**
-     * 消息发布切面信息推送
-     *
-     * @param joinPoint 切入点
-     */
     @AfterReturning(value = "execution(* com.eryansky.modules.notice.service.MessageService.push(..))",returning = "returnObj")
     public void afterMessagePush(JoinPoint joinPoint, Message returnObj) {
         if (null == returnObj) {
@@ -84,6 +60,10 @@ public class MessageAspect implements InitializingBean, DisposableBean {
         if(MessageReceiveObjectType.User.getValue().equals(messageReceiveObjectType.getValue())){
 
         }
+        //TODO 设置已发送
+        messageReceives.forEach(v->{
+            messageReceiveService.updateByUserIdAndMessageId(v.getUserId(),returnObj.getId(), YesOrNo.YES.getValue(),null);
+        });
     }
 
 
