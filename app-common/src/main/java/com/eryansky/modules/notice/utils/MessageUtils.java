@@ -229,6 +229,7 @@ public class MessageUtils {
             for (String targetId : targetIds) {
                 MessageReceive messageReceive = new MessageReceive(model.getId());
                 messageReceive.setUserId(targetId);
+                messageReceive.setIsSend(YesOrNo.NO.getValue());
                 messageReceive.setIsRead(YesOrNo.NO.getValue());
                 messageReceive.prePersist();
                 messageReceives.add(messageReceive);
