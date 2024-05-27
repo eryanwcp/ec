@@ -55,8 +55,7 @@ public class MessageAspect implements InitializingBean, DisposableBean {
         List<MessageSender> messageSenders = messageSenderService.findByMessageId(returnObj.getId());
         MessageReceiveObjectType messageReceiveObjectType = MessageReceiveObjectType.getByValue(messageSenders.get(0).getObjectType());
         List<MessageReceive> messageReceives = messageReceiveService.findByMessageId(returnObj.getId());
-        List<String> receiveObjectIds = messageReceives.parallelStream().map(MessageReceive::getUserId).collect(Collectors.toList());
-        logger.info("消息推送-消息：{} {} {} {} {}",returnObj.getId(),returnObj.getAppId(),returnObj.getTipMessage(),messageReceiveObjectType.getValue(),receiveObjectIds.size());
+        logger.info("消息推送-消息：{} {} {} {} {}",returnObj.getId(),returnObj.getAppId(),returnObj.getTipMessage(),messageReceiveObjectType.getValue(),messageReceives.size());
         if(MessageReceiveObjectType.User.getValue().equals(messageReceiveObjectType.getValue())){
 
         }
