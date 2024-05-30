@@ -51,7 +51,7 @@ public class DefaultAsyncConfigurer implements AsyncConfigurer {
         int initProcessors = processors < 4 ? processors : processors - 1;
         executor.setCorePoolSize(initProcessors);
         executor.setMaxPoolSize(initProcessors * 10);//最大线程数量
-        executor.setQueueCapacity(initProcessors * 1000);//线程池的队列容量
+        executor.setQueueCapacity(initProcessors * 10000);//线程池的队列容量
         // for passing in request scope context 转换请求范围的上下文
         executor.setTaskDecorator(new ContextCopyingDecorator());
         executor.setWaitForTasksToCompleteOnShutdown(true);
