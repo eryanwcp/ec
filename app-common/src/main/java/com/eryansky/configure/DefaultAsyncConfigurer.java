@@ -12,6 +12,7 @@ import com.eryansky.modules.notice.utils.MessageUtils;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.utils.AppConstants;
+import com.eryansky.utils.CacheUtils;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +62,7 @@ public class DefaultAsyncConfigurer implements AsyncConfigurer {
 //        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         executor.setRejectedExecutionHandler((Runnable r, ThreadPoolExecutor exe) -> {
             StringBuffer msg = new StringBuffer();
-            msg.append("当前任务线程池队列已满：").append(executor.getQueueSize())
+            msg.append("当前任务线程池队列已满（注：30分钟内仅提示一条）：").append(executor.getQueueSize())
                     .append(";默认线程数：").append(executor.getCorePoolSize())
                     .append(";最大线程数：").append(executor.getMaxPoolSize())
                     .append(";执行中线程数：").append(executor.getActiveCount())
@@ -70,11 +71,17 @@ public class DefaultAsyncConfigurer implements AsyncConfigurer {
                     .append(";完成任务数：").append(executor.getThreadPoolExecutor().getCompletedTaskCount())
                     .append(";可用队列长度：").append(executor.getThreadPoolExecutor().getQueue().remainingCapacity());
             log.error(msg.toString());
-            List<String>  systemOpsWarnUserIds = UserUtils.findUsersByLoginNames(AppConstants.getSystemOpsWarnLoginNameList()).stream().map(BaseEntity::getId).collect(Collectors.toList());
-            if(Collections3.isEmpty(systemOpsWarnUserIds)){
-                systemOpsWarnUserIds = Lists.newArrayList(User.SUPERUSER_ID);
+            String tipKey = "system_ops_warn_defaultAsyncExecutor";
+            Boolean isTip = CacheUtils.get(tipKey);
+            if (null == isTip) {
+                List<String>  systemOpsWarnUserIds = UserUtils.findUsersByLoginNames(AppConstants.getSystemOpsWarnLoginNameList()).stream().map(BaseEntity::getId).collect(Collectors.toList());
+                if(Collections3.isEmpty(systemOpsWarnUserIds)){
+                    systemOpsWarnUserIds = Lists.newArrayList(User.SUPERUSER_ID);
+                }
+                MessageUtils.sendToUserMessage(systemOpsWarnUserIds,msg.toString());
+                CacheUtils.put(tipKey, true);
             }
-            MessageUtils.sendToUserMessage(systemOpsWarnUserIds,msg.toString());
+
         });
 
         executor.initialize();
@@ -90,13 +97,20 @@ public class DefaultAsyncConfigurer implements AsyncConfigurer {
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
         return (throwable, method, objects) -> {
             StringBuffer msg = new StringBuffer();
-            msg.append("线程池执行任务发生未知异常：").append(method.getDeclaringClass().getName()).append(".").append(method.getName()).append(",").append(throwable.getMessage());
+            msg.append("线程池执行任务发生未知异常（注：30分钟内仅提示一条）：").append(method.getDeclaringClass().getName()).append(".").append(method.getName()).append(",").append(throwable.getMessage());
             log.error(msg.toString(),throwable);
-            List<String>  systemOpsWarnUserIds = UserUtils.findUsersByLoginNames(AppConstants.getSystemOpsWarnLoginNameList()).stream().map(BaseEntity::getId).collect(Collectors.toList());
-            if(Collections3.isEmpty(systemOpsWarnUserIds)){
-                systemOpsWarnUserIds = Lists.newArrayList(User.SUPERUSER_ID);
+            String tipKey = "system_ops_warn_asyncUncaughtExceptionHandler";
+            Boolean isTip = CacheUtils.get(tipKey);
+            if (null == isTip) {
+                List<String>  systemOpsWarnUserIds = UserUtils.findUsersByLoginNames(AppConstants.getSystemOpsWarnLoginNameList()).stream().map(BaseEntity::getId).collect(Collectors.toList());
+                if(Collections3.isEmpty(systemOpsWarnUserIds)){
+                    systemOpsWarnUserIds = Lists.newArrayList(User.SUPERUSER_ID);
+                }
+                MessageUtils.sendToUserMessage(systemOpsWarnUserIds,msg.toString());
+                CacheUtils.put(tipKey, true);
             }
-            MessageUtils.sendToUserMessage(systemOpsWarnUserIds,msg.toString());
+
+
         };
     }
 

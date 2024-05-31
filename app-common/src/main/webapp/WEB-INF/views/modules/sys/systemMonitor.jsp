@@ -7,7 +7,7 @@
 	<script type="text/javascript">
 		$(function(){
 			reLoad();
-            window.setInterval('reLoad()',5*1000);
+            window.setInterval('reLoad()',10*1000);
 		});
 		function reLoad(){
 			$.ajax({
