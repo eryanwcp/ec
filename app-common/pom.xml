@@ -22,11 +22,11 @@
         <sitemesh.version>2.5.0</sitemesh.version>
         <commons-csv.version>1.10.0</commons-csv.version>
         <commons-dbutils.version>1.8.1</commons-dbutils.version>
-        <commons-cli.version>1.6.0</commons-cli.version>
+        <commons-cli.version>1.8.0</commons-cli.version>
         <fop.version>2.9</fop.version>
         <ckfinder.version>2.3</ckfinder.version>
         <jwt.version>4.4.0</jwt.version>
-        <guava.version>33.0.0-jre</guava.version>
+        <guava.version>33.2.1-jre</guava.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
