@@ -257,7 +257,7 @@
         <div class="control-group">
             <label class="control-label">X-Api-Key：</label>
             <div class="controls">
-                <input name="system.rest.defaultApiKey" type="text" class="input-xxlarge"/>
+                <input name="system.rest.defaultApiKey" type="password" class="input-xxlarge"/>
                 <span class="help-inline"></span>
             </div>
         </div>

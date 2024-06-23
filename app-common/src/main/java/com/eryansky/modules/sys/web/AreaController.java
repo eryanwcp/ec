@@ -165,7 +165,7 @@ public class AreaController extends SimpleController {
             Area e = list.get(i);
             if (StringUtils.isBlank(extId) || (extId != null && !extId.equals(e.getId()) && e.getParentIds().indexOf("," + extId + ",") == -1)) {
                 TreeNode treeNode = new TreeNode(e.getId(), e.getName());
-                treeNode.setState(StringUtils.isNotBlank(state) ? state:TreeNode.STATE_OPEN);
+                treeNode.setState(TreeNode.STATE_OPEN.equals(state) ? TreeNode.STATE_OPEN:TreeNode.STATE_CLOASED);
                 treeNode.setpId(e.getParentId());
                 treeNodes.add(treeNode);
             }
@@ -188,7 +188,7 @@ public class AreaController extends SimpleController {
         for (int i = 0; i < list.size(); i++) {
             Area e = list.get(i);
             TreeNode treeNode = new TreeNode(e.getId(), e.getName());
-            treeNode.setState(StringUtils.isNotBlank(state) ? state:TreeNode.STATE_OPEN);
+            treeNode.setState(TreeNode.STATE_OPEN.equals(state) ? TreeNode.STATE_OPEN:TreeNode.STATE_CLOASED);
             treeNode.setpId(e.getParentId());
             treeNodes.add(treeNode);
         }
@@ -212,7 +212,7 @@ public class AreaController extends SimpleController {
         for (int i = 0; i < list.size(); i++) {
             Area e = list.get(i);
             TreeNode treeNode = new TreeNode(e.getId(), e.getName());
-            treeNode.setState(StringUtils.isNotBlank(state) ? state:TreeNode.STATE_OPEN);
+            treeNode.setState(TreeNode.STATE_OPEN.equals(state) ? TreeNode.STATE_OPEN:TreeNode.STATE_CLOASED);
             treeNode.setpId(e.getParentId());
             treeNodes.add(treeNode);
         }
@@ -237,7 +237,7 @@ public class AreaController extends SimpleController {
         for (int i = 0; i < list.size(); i++) {
             Area e = list.get(i);
             TreeNode treeNode = new TreeNode(e.getId(), e.getName());
-            treeNode.setState(StringUtils.isNotBlank(state) ? state:TreeNode.STATE_OPEN);
+            treeNode.setState(TreeNode.STATE_OPEN.equals(state) ? TreeNode.STATE_OPEN:TreeNode.STATE_CLOASED);
             treeNode.setpId(e.getParentId());
             treeNodes.add(treeNode);
         }

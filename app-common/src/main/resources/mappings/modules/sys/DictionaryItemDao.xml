@@ -74,7 +74,7 @@
 		<if test="dictionary != null and dictionary.id != null and dictionary.id != ''">
 			AND a.dictionary_id = #{dictionary.id}
 		</if>
-		AND (a.parent_id is null OR a.parent_id = '')
+		AND (a.parent_id IS NULL OR a.parent_id = '')
 	</select>
 
 	<select id="getByDictionaryItem" resultType="DictionaryItem">
