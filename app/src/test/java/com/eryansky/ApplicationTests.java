@@ -13,13 +13,11 @@ import com.eryansky.modules.sys.utils.SystemSerialNumberUtils;
 import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.client.common.vo.ExtendAttr;
 import com.google.common.collect.Maps;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.mybatis.dynamic.sql.render.RenderingStrategies;
 import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.*;
 
@@ -27,7 +25,6 @@ import static com.eryansky.modules.sys.mapper.VersionLogDynamicSqlSupport.*;
 import static org.mybatis.dynamic.sql.SqlBuilder.isEqualTo;
 import static org.mybatis.dynamic.sql.select.SelectDSL.select;
 
-@RunWith(value = SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = Application.class)
 public class ApplicationTests {
 
