@@ -1106,7 +1106,7 @@
                 <when test="dbName == 'db2'">'%,'||#{organId}||',%'</when>
                 <when test="dbName == 'mysql'">CONCAT('%,', #{organId}, ',%')</when>
                 <when test="dbName == 'oracle'">'%,'||#{organId}||',%'</when>
-                <otherwise>'%,${organId},%'</otherwise>
+                <otherwise>'%,'+#{organId}+',%'</otherwise>
             </choose>
             )
         </where>
