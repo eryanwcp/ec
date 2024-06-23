@@ -37,7 +37,7 @@
         <spring-boot.version>2.7.18</spring-boot.version>
         <spring-integration-redis.version>5.5.20</spring-integration-redis.version>
         <logback.version>7.4</logback.version>
-        <byte-buddy.version>1.14.2</byte-buddy.version>
+        <byte-buddy.version>1.14.17</byte-buddy.version>
 
         <tomcat.version>9.0.83</tomcat.version>
 
