@@ -30,6 +30,8 @@ public interface FileDao extends CrudDao<File> {
 
     List<File> findByCode(Parameter parameter);
 
+    File getByFilePath(Parameter parameter);
+
     List<File> findFilesByIds(Parameter parameter);
 
 

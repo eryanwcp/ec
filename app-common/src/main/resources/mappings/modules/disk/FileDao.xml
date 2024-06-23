@@ -34,6 +34,13 @@
         WHERE a.id = #{id}
     </select>
 
+    <select id="getByFilePath" resultType="File">
+        SELECT
+        <include refid="fileColumns"/>
+        FROM t_disk_file a
+        WHERE a.file_path = #{filePath}
+    </select>
+
     <select id="findByCode" resultType="File">
         SELECT
         <include refid="fileColumns"/>

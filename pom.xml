@@ -5,7 +5,7 @@
 
     <groupId>com.eryansky</groupId>
     <artifactId>ec-parent</artifactId>
-    <version>4.2.20240301.32</version>
+    <version>4.2.20240301.33</version>
     <modules>
         <module>common</module>
         <module>j2cache</module>
@@ -43,8 +43,9 @@
 
         <mybatis-spring-boot.version>2.3.2</mybatis-spring-boot.version>
         <commons-pool2.version>2.12.0</commons-pool2.version>
-        <druid-version>1.2.11</druid-version>
-        <mariadb.driver.version>3.1.4</mariadb.driver.version>
+        <druid-version>1.2.23</druid-version>
+        <mariadb.driver.version>3.4.0</mariadb.driver.version>
+        <mysql.driver.version>8.0.33</mysql.driver.version>
         <oracle.driver.version>12.1.0.1-atlassian-hosted</oracle.driver.version>
         <db2.driver.version>10.1</db2.driver.version>
         <oscar.driver.version>4.0.2</oscar.driver.version>
@@ -53,12 +54,12 @@
         <commons-codec.version>1.16.0</commons-codec.version>
 
 
-        <ec-common.version>4.2.20240301.32</ec-common.version>
-        <ec-app-common.version>4.2.20240301.32</ec-app-common.version>
-        <ec-client-common.version>4.2.20240301.32</ec-client-common.version>
-        <ec-j2cache.version>4.2.20240301.32</ec-j2cache.version>
-        <ec-j2cache-spring-boot-starter.version>4.2.20240301.32</ec-j2cache-spring-boot-starter.version>
-        <ec-fastweixin.version>4.2.20240301.32</ec-fastweixin.version>
+        <ec-common.version>4.2.20240301.33</ec-common.version>
+        <ec-app-common.version>4.2.20240301.33</ec-app-common.version>
+        <ec-client-common.version>4.2.20240301.33</ec-client-common.version>
+        <ec-j2cache.version>4.2.20240301.33</ec-j2cache.version>
+        <ec-j2cache-spring-boot-starter.version>4.2.20240301.33</ec-j2cache-spring-boot-starter.version>
+        <ec-fastweixin.version>4.2.20240301.33</ec-fastweixin.version>
 
         <jackson.version>2.15.4</jackson.version>
     </properties>
@@ -196,7 +197,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>${mysql.driver.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.oscar.jdbc</groupId>
             <artifactId>oscar-java-client</artifactId>
