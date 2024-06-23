@@ -71,6 +71,18 @@ public class WordToHtmlConverter {
     }
 
     /**
+     * 替换UEditor无法识别的转义字符
+     * @param content
+     * @return
+     * @throws Exception
+     */
+    public String escapeUEditorHtml(String content)
+            throws Exception{
+        //替换UEditor无法识别的转义字符
+        return  content.replaceAll("&ldquo;", "\"").replaceAll("&rdquo;", "\"").replaceAll("&mdash;", "-");
+    }
+
+    /**
      * docx文件转html
      * @param fileName
      * @return

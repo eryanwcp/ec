@@ -72,6 +72,18 @@ public class WordToHtmlBase64Converter {
     }
 
     /**
+     * 替换UEditor无法识别的转义字符
+     * @param content
+     * @return
+     * @throws Exception
+     */
+    public String escapeUEditorHtml(String content)
+            throws Exception{
+        //替换UEditor无法识别的转义字符
+        return  content.replaceAll("&ldquo;", "\"").replaceAll("&rdquo;", "\"").replaceAll("&mdash;", "-");
+    }
+
+    /**
      * docx文件转html
      * @param fileName
      * @return
@@ -100,8 +112,6 @@ public class WordToHtmlBase64Converter {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             XHTMLConverter.getInstance().convert(document, baos, options);
             content = new String(baos.toByteArray(), StandardCharsets.UTF_8);
-            //替换UEditor无法识别的转义字符
-//            content = content.replaceAll("&ldquo;", "\"").replaceAll("&rdquo;", "\"").replaceAll("&mdash;", "-");
         } catch (Exception e) {
             log.error(e.getMessage(),e);
         }
@@ -156,8 +166,6 @@ public class WordToHtmlBase64Converter {
             serializer.setOutputProperty(OutputKeys.METHOD, "html");
             serializer.transform(domSource, streamResult);
             content = new String(out.toByteArray(), StandardCharsets.UTF_8);
-            //替换UEditor无法识别的转义字符
-//            content = content.replaceAll("&ldquo;", "\"").replaceAll("&rdquo;", "\"").replaceAll("&mdash;", "-");
         } catch (Exception e) {
             log.error(e.getMessage(),e);
         }
