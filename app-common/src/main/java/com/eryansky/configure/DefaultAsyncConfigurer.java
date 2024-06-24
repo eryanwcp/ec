@@ -30,6 +30,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 public class DefaultAsyncConfigurer implements AsyncConfigurer {
 
     private static Logger log = LoggerFactory.getLogger(DefaultAsyncConfigurer.class);
+    private static final String CACHE_KEY = "system_ops_warn_defaultAsyncExecutor";
 
 //    @Value("${thread.pool.corePoolSize:10}")
 //    private int corePoolSize;
@@ -51,7 +52,7 @@ public class DefaultAsyncConfigurer implements AsyncConfigurer {
         int processors = Runtime.getRuntime().availableProcessors();
         int initProcessors = processors < 4 ? processors : processors - 1;
         executor.setCorePoolSize(initProcessors);
-        executor.setMaxPoolSize(initProcessors * 4);//最大线程数量
+        executor.setMaxPoolSize(initProcessors * 2);//最大线程数量
         executor.setQueueCapacity(Math.max(100000, initProcessors * 10000));//线程池的队列容量
         // for passing in request scope context 转换请求范围的上下文
         executor.setTaskDecorator(new ContextCopyingDecorator());
@@ -71,15 +72,17 @@ public class DefaultAsyncConfigurer implements AsyncConfigurer {
                     .append(";完成任务数：").append(executor.getThreadPoolExecutor().getCompletedTaskCount())
                     .append(";可用队列长度：").append(executor.getThreadPoolExecutor().getQueue().remainingCapacity());
             log.error(msg.toString());
-            String tipKey = "system_ops_warn_defaultAsyncExecutor";
-            Boolean isTip = CacheUtils.get(tipKey);
+            Boolean isTip = CacheUtils.get(CACHE_KEY);
             if (null == isTip) {
                 List<String>  systemOpsWarnUserIds = UserUtils.findUsersByLoginNames(AppConstants.getSystemOpsWarnLoginNameList()).stream().map(BaseEntity::getId).collect(Collectors.toList());
                 if(Collections3.isEmpty(systemOpsWarnUserIds)){
                     systemOpsWarnUserIds = Lists.newArrayList(User.SUPERUSER_ID);
                 }
                 MessageUtils.sendToUserMessage(systemOpsWarnUserIds,msg.toString());
-                CacheUtils.put(tipKey, true);
+                CacheUtils.put(CACHE_KEY, true);
+            }
+            if (!exe.isShutdown()) {
+                r.run();
             }
 
         });
