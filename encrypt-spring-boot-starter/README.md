@@ -267,7 +267,7 @@ xxxController //控制器
             test.setUsername("少林寺张三丰"+new Random().nextFloat());
             test.setPassword("密码8个8 你来破解啊"+ UUID.randomUUID());
             test.setAddress("xx省xx市xxx");
-            test.setEmail("尔演@Eryanxxxx@163.com");
+            test.setEmail("xxxx@163.com");
             test.setPhone("18886137xxx");
             test.setCard("xxx6xx19xx01306xxx");
             testList.add(test);
