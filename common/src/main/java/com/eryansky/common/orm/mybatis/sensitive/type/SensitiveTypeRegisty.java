@@ -23,13 +23,18 @@ public class SensitiveTypeRegisty {
         HANDLER_REGISTY.put(SensitiveType.CHINESE_NAME, new NameSensitiveHandler());
         HANDLER_REGISTY.put(SensitiveType.ID_CARD, new IDCardSensitiveHandler());
         HANDLER_REGISTY.put(SensitiveType.MOBILE_PHONE, new MobilePhoneSensitiveHandler());
+        HANDLER_REGISTY.put(SensitiveType.FIXED_PHONE, new FixedPhoneSensitiveHandler());
         HANDLER_REGISTY.put(SensitiveType.MOBILE_OR_FIXED_PHONE, new MobileOrFixexPhoneSensitiveHandler());
         HANDLER_REGISTY.put(SensitiveType.ADDRESS, new AddressSensitiveHandler());
         HANDLER_REGISTY.put(SensitiveType.EMAIL, new EmailSensitiveHandler());
+        HANDLER_REGISTY.put(SensitiveType.CAR_LICENSE, new CarLicenseSensitiveHandler());
         HANDLER_REGISTY.put(SensitiveType.BANK_CARD, new BandCardSensitiveHandler());
-        HANDLER_REGISTY.put(SensitiveType.FIXED_PHONE, new FixedPhoneSensitiveHandler());
         HANDLER_REGISTY.put(SensitiveType.CNAPS_CODE, new CnapsSensitiveHandler());
+        HANDLER_REGISTY.put(SensitiveType.IPV4, new IPv4SensitiveHandler());
+        HANDLER_REGISTY.put(SensitiveType.IPV6, new IPv6SensitiveHandler());
+        HANDLER_REGISTY.put(SensitiveType.PASSWORD, new PasswordSensitiveHandler());
         HANDLER_REGISTY.put(SensitiveType.PAY_SIGN_NO, new PaySignNoSensitiveHandler());
+        HANDLER_REGISTY.put(SensitiveType.CREDIT_CODE, new CreditCodeSensitiveHandler());
         HANDLER_REGISTY.put(SensitiveType.SHOP_CODE, new ShopCodeSensitiveHandler());
     }
 
