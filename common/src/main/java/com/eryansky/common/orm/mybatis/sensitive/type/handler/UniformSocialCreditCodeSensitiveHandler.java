@@ -11,10 +11,10 @@ import org.apache.commons.lang3.StringUtils;
  * @author Eryan
  * @version 2024-06-13
  */
-public class CreditCodeSensitiveHandler implements SensitiveTypeHandler {
+public class UniformSocialCreditCodeSensitiveHandler implements SensitiveTypeHandler {
     @Override
     public SensitiveType getSensitiveType() {
-        return SensitiveType.CREDIT_CODE;
+        return SensitiveType.UniformSocialCreditCode;
     }
 
     @Override

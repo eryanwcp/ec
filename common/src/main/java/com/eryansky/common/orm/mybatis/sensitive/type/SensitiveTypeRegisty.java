@@ -34,7 +34,7 @@ public class SensitiveTypeRegisty {
         HANDLER_REGISTY.put(SensitiveType.IPV6, new IPv6SensitiveHandler());
         HANDLER_REGISTY.put(SensitiveType.PASSWORD, new PasswordSensitiveHandler());
         HANDLER_REGISTY.put(SensitiveType.PAY_SIGN_NO, new PaySignNoSensitiveHandler());
-        HANDLER_REGISTY.put(SensitiveType.CREDIT_CODE, new CreditCodeSensitiveHandler());
+        HANDLER_REGISTY.put(SensitiveType.UniformSocialCreditCode, new UniformSocialCreditCodeSensitiveHandler());
         HANDLER_REGISTY.put(SensitiveType.SHOP_CODE, new ShopCodeSensitiveHandler());
     }
 

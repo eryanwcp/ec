@@ -74,7 +74,7 @@ public enum SensitiveType {
     /**
      * 统一社会信用代码
      */
-    CREDIT_CODE,
+    UniformSocialCreditCode,
     /**
      * 店铺编号
      */
