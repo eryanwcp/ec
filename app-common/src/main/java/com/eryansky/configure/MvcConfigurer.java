@@ -8,6 +8,8 @@ import com.eryansky.core.dialect.dialect.ShiroDialect;
 import com.eryansky.core.security.interceptor.*;
 import com.eryansky.core.web.interceptor.LogInterceptor;
 import com.eryansky.core.web.interceptor.MobileInterceptor;
+import com.eryansky.encrypt.advice.DecryptRequestBodyAdvice;
+import com.eryansky.encrypt.advice.EncryptResultResponseBodyAdvice;
 import com.eryansky.modules.disk.extend.DISKManager;
 import com.eryansky.modules.disk.extend.IFileManager;
 import com.eryansky.utils.AppConstants;
@@ -172,6 +174,16 @@ public class MvcConfigurer implements WebMvcConfigurer {
    @Bean
    public ShiroDialect shiroDialect() {
       return new ShiroDialect();
+   }
+
+   @Bean
+   public EncryptResultResponseBodyAdvice encryptResultResponseBodyAdvice() {
+      return new EncryptResultResponseBodyAdvice();
+   }
+
+   @Bean
+   public DecryptRequestBodyAdvice decryptRequestBodyAdvice() {
+      return new DecryptRequestBodyAdvice();
    }
 
 }
