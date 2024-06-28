@@ -68,11 +68,7 @@
             <artifactId>ec-j2cache-spring-boot-starter</artifactId>
             <version>${ec-j2cache-spring-boot-starter.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.eryansky</groupId>
-            <artifactId>ec-encrypt-spring-boot-starter</artifactId>
-            <version>${ec-encrypt-spring-boot-starter.version}</version>
-        </dependency>
+
         <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
