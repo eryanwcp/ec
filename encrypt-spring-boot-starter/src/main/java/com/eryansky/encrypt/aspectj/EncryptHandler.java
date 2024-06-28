@@ -5,7 +5,6 @@ import com.eryansky.encrypt.anotation.Encrypt;
 import com.eryansky.encrypt.badger.HoneyBadgerEncrypt;
 import com.eryansky.encrypt.enums.CipherMode;
 import com.eryansky.encrypt.handler.ScenarioHolder;
-import com.eryansky.common.utils.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -13,10 +12,6 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.core.annotation.Order;
 import org.springframework.lang.NonNull;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Arrays;
 
 /**
  * The type Encrypt handler.

@@ -15,11 +15,11 @@ import java.lang.annotation.*;
 @Documented
 public @interface Encrypt {
     /**
-     * 是否启用AOP切面
-     * @return
+     * 是否启用aop切面拦截
+     *
+     * @return {@link  Scenario}
      */
     boolean enableAop() default true;
-
     /**
      * 应用场景 网络传输、或者 持久化 默认用于加密存储
      *
