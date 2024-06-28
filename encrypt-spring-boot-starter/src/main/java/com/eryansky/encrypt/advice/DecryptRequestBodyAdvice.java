@@ -1,4 +1,4 @@
-package com.eryansky.configure.web;
+package com.eryansky.encrypt.advice;
 
 import com.eryansky.encrypt.anotation.Decrypt;
 import com.eryansky.encrypt.badger.HoneyBadgerEncrypt;
@@ -10,12 +10,13 @@ import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdvice;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
 
-//@RestControllerAdvice
+@RestControllerAdvice
 public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
 
     private static final Logger log = LoggerFactory.getLogger(DecryptRequestBodyAdvice.class);
