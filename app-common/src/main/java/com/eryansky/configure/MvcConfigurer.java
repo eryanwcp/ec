@@ -176,14 +176,14 @@ public class MvcConfigurer implements WebMvcConfigurer {
       return new ShiroDialect();
    }
 
-   @Bean
-   public EncryptResultResponseBodyAdvice encryptResultResponseBodyAdvice() {
-      return new EncryptResultResponseBodyAdvice();
-   }
-
-   @Bean
-   public DecryptRequestBodyAdvice decryptRequestBodyAdvice() {
-      return new DecryptRequestBodyAdvice();
-   }
+//   @Bean
+//   public EncryptResultResponseBodyAdvice encryptResultResponseBodyAdvice() {
+//      return new EncryptResultResponseBodyAdvice();
+//   }
+//
+//   @Bean
+//   public DecryptRequestBodyAdvice decryptRequestBodyAdvice() {
+//      return new DecryptRequestBodyAdvice();
+//   }
 
 }
