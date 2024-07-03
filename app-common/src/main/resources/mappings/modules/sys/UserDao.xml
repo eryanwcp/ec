@@ -444,7 +444,8 @@
             )
             <if test="query != null and query !=''">
                 AND (
-                a.login_name = #{query}
+                a.id = #{query}
+                OR a.login_name = #{query}
                 OR a.mobile = #{query}
                 OR a.code = #{query}
                 OR a.biz_code = #{query}
