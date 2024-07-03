@@ -11,7 +11,7 @@
         <form id="user_post_search_form" style="padding: 5px;">
             <input class="easyui-textbox" id="query" name="query"
                    data-options="buttonText:' 查 询 ',buttonIcon:'easyui-icon-search',prompt:'用户信息...',onClickButton:searchPostUser"
-                   onkeydown="if(event.keyCode==13)searchPostUser()" maxLength="25"
+                   onkeydown="if(event.keyCode==13)searchPostUser()" maxLength="36"
                    style="width:250px;height:28px;">
         </form>
     </div>

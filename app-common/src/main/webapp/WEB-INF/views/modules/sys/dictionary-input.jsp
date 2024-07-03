@@ -15,7 +15,7 @@
 		</div>
 		<div>
 			<label>字典名称：</label>
-			<input type="text" id="name" name="name"  maxLength="20"
+			<input type="text" id="name" name="name"  maxLength="36"
 				class="easyui-validatebox textbox" value="${model.name}"   placeholder="请输入字典名称..."
 				data-options="required:true,missingMessage:'请输入字典名称.'" />
 		</div>

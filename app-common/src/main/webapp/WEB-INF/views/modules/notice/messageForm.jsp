@@ -92,7 +92,7 @@
 		<div class="control-group">
 			<label class="control-label">链接地址：</label>
 			<div class="controls">
-				<form:input path="url" htmlEscape="false" maxlength="200" class="input-xxlarge"/>
+				<form:input path="url" htmlEscape="false" maxlength="512" class="input-xxlarge"/>
 			</div>
 		</div>
 		<c:if test="${not empty messageChannels}">

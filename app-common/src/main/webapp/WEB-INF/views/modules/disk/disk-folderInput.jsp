@@ -54,7 +54,7 @@
         <div>
             <label>名称：</label>
             <input name="name" type="text" class="easyui-validatebox textbox" value="${model.name}"
-                   maxLength="12"
+                   maxLength="36"
                    data-options="required:true,missingMessage:'请输入名称.',validType:['minLength[1]','legalInput']">
         </div>
         <div>
@@ -76,7 +76,7 @@
             <label>备注：</label>
             <%--<textarea maxLength="255" name="remark"--%>
                       <%--style="position: relative;resize: none;height: 75px;width: 260px;">${model.remark}</textarea>--%>
-            <input name="remark" maxlength="120" class="easyui-textbox" value="${model.remark}" data-options="multiline:true" style="width:260px;height:100px;">
+            <input name="remark" maxlength="200" class="easyui-textbox" value="${model.remark}" data-options="multiline:true" style="width:260px;height:100px;">
         </div>
 
     </form>

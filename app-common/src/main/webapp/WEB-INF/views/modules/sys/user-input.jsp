@@ -52,7 +52,7 @@
         </div>
         <div>
             <label>姓名：</label>
-            <input name="name" type="text" maxLength="12" value="${model.name}" class="easyui-validatebox textbox"
+            <input name="name" type="text" maxLength="36" value="${model.name}" class="easyui-validatebox textbox"
                    data-options="required:true,missingMessage:'请输入登录名.',validType:['length[2,12]']" />
         </div>
         <div>

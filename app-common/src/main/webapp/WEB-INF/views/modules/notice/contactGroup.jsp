@@ -50,7 +50,7 @@
                 <form id="contactGroup_search_form" style="padding: 5px;">
                     &nbsp;&nbsp;<span id="search">
                     关键字：<input type="text" id="query" name="query" class="easyui-validatebox textbox eu-input" placeholder="关键字..."
-                          onkeydown="if(event.keyCode==13)search()"  maxLength="25" style="width: 160px"/>
+                          onkeydown="if(event.keyCode==13)search()"  maxLength="36" style="width: 160px"/>
 
                 </span>
                     <%--姓名或登录名：<input type="text" id="loginNameOrName" name="loginNameOrName" class="easyui-validatebox textbox eu-input" placeholder="姓名或登录名..."--%>

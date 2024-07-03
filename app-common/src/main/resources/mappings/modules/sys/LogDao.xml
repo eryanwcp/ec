@@ -79,7 +79,7 @@
                     <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
                     <otherwise>'%'+#{query}+'%'</otherwise>
                 </choose>
-
+                OR a.user_id = #{query}
                 )
             </if>
             <if test="type != null and type != ''">

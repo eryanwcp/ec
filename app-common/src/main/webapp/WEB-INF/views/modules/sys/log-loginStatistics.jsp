@@ -46,7 +46,7 @@
 
             &nbsp;账号或姓名：<input type="text" id="name" name="name"
                                class="easyui-validatebox textbox eu-input" placeholder="账号或姓名..."  onkeydown="if(event.keyCode==13)search()"
-                               maxLength="25" style="width: 160px" />
+                               maxLength="36" style="width: 160px" />
             &nbsp;起始时间：<input type="text" id="startTime" name="startTime" class="easyui-my97" placeholder="起始时间..."/>
             &nbsp;结束时间：<input type="text" id="endTime" name="endTime" class="easyui-my97"  placeholder="结束时间..."/>
             &nbsp;<a class="easyui-linkbutton" href="#" data-options="iconCls:'easyui-icon-search',width:100,height:28, onClick:search">查询</a>

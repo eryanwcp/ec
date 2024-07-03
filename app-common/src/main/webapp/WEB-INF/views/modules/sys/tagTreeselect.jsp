@@ -123,7 +123,7 @@
 </div>
 <div id="search" class="control-group hide" style="padding:10px 0 0 15px;">
 	<label for="key" class="control-label" style="float:left;padding:5px 5px 3px;">关键字：</label>
-	<input type="text" class="empty" id="key" name="key" maxlength="50" style="width:180px;">
+	<input type="text" class="empty" id="key" name="key" maxlength="64" style="width:180px;">
 </div>
 <div id="tree" class="ztree" style="padding:15px 20px;"></div>
 </body>

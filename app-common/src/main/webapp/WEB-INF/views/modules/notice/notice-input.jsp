@@ -46,7 +46,7 @@
         <div>
             <label>通知标题：</label>
             <input name="title" type="text" class="easyui-validatebox textbox" style="width: 360px;" value="${model.title}"
-                   maxLength="128" data-options="required:true,missingMessage:'请输入标题.',validType:['minLength[1]']">
+                   maxLength="255" data-options="required:true,missingMessage:'请输入标题.',validType:['minLength[1]']">
             <e:dictionary id="notice_type" name="type" code="<%=NoticeUtils.DIC_NOTICE%>" type="combobox" value="${model.type}" editable="false" selectType="select" height="28"></e:dictionary>
             <%--<input id="notice_type" name="type" style="height: 28px;" />--%>
         </div>

@@ -11,7 +11,7 @@
         <form id="user_role_search_form" style="padding: 5px;">
             <input class="easyui-textbox" id="query" name="query"
                    data-options="buttonText:' 查 询 ',buttonIcon:'easyui-icon-search',prompt:'用户信息...',onClickButton:searchRoleUser"
-                   onkeydown="if(event.keyCode==13)searchRoleUser()" maxLength="25"
+                   onkeydown="if(event.keyCode==13)searchRoleUser()" maxLength="36"
                    style="width:250px;height:28px;">
         </form>
     </div>
