@@ -49,6 +49,7 @@
                     <otherwise>'%'+#{query}+'%'</otherwise>
                 </choose>
                 OR a.code  = #{query}
+                OR a.id  = #{query}
                 )
             </if>
             <if test="organId != null and organId !=''">

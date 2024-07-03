@@ -76,7 +76,7 @@
                 <form id="user_search_form" style="padding: 5px;">
                     &nbsp;关键字：<input type="text" id="query" name="query"
                                         class="easyui-validatebox textbox eu-input" placeholder="关键字..."
-                                        onkeydown="if(event.keyCode==13)search()" maxLength="25" style="width: 160px;height: 28px;"/>
+                                        onkeydown="if(event.keyCode==13)search()" maxLength="36" style="width: 260px;height: 28px;"/>
                     &nbsp;<a class="easyui-linkbutton" href="#" data-options="iconCls:'easyui-icon-search',width:100,height:28,onClick:search">查 询</a>
                      <a class="easyui-linkbutton" href="#" data-options="iconCls:'easyui-icon-no',width:100,height:28" onclick="$user_search_form.form('reset');">重置</a>
                 </form>
