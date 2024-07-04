@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.eryansky</groupId>
         <artifactId>ec-parent</artifactId>
-        <version>4.2.20240301.40</version>
+        <version>4.2.20240301.41</version>
     </parent>
     <artifactId>ec-app-common</artifactId>
     <version>${ec-app-common.version}</version>
@@ -23,6 +23,7 @@
         <commons-csv.version>1.10.0</commons-csv.version>
         <commons-dbutils.version>1.8.1</commons-dbutils.version>
         <commons-cli.version>1.8.0</commons-cli.version>
+        <commons-compress.version>1.26.1</commons-compress.version>
         <fop.version>2.9</fop.version>
         <ckfinder.version>2.3</ckfinder.version>
         <jwt.version>4.4.0</jwt.version>
@@ -111,11 +112,12 @@
                     <groupId>org.apache.logging.log4j</groupId>
                     <artifactId>log4j-api</artifactId>
                 </exclusion>
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-compress</artifactId>
-                </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>${commons-compress.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
