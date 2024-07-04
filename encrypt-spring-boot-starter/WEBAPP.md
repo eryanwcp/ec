@@ -1,4 +1,4 @@
-前端加解密 js文件链接：https://static.尔演@Eryan.cloud/files/HoneyBadgerEncrypt.js 后期完善再上传到npm
+前端加解密 js文件链接：/HoneyBadgerEncrypt.js 后期完善再上传到npm
 支持前端RSA AES SM4 加解密
 
 

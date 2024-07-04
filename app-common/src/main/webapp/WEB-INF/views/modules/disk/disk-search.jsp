@@ -367,7 +367,7 @@ function loadFileSize() {
                     <td>类型：<input  id="folderAuthorize"  name="folderAuthorize"  style="width: 160px;height: 28px;"/>
                     </td>
                     <td>关键字：<input type="text"  name="query" placeholder="关键字..."  class="easyui-validatebox textbox eu-input"
-                                   maxLength="25" style="width: 160px"/></td>
+                                   maxLength="36" style="width: 160px"/></td>
                     <td>
                         更新时间：<input  id="startTime" name="startTime" class="easyui-my97"  data-options="dateFmt:'yyyy-MM-dd HH:mm'" style="width: 120px"/>
                         ~

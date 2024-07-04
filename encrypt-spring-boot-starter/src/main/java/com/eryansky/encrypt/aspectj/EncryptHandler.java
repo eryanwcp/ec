@@ -47,9 +47,6 @@ public class EncryptHandler{
      */
     @Around("@annotation(encrypt)")
     public Object encrypt(ProceedingJoinPoint joinPoint , Encrypt encrypt) throws Throwable {
-        if(!encrypt.enableAop()){
-            return joinPoint.proceed();
-        }
         //混合加密 if encrypt.dynamic() == true 则是动态模式 每一次的密钥都会变化
         if (encrypt.cipher().equals(CipherMode.SM4_RSA) || encrypt.cipher().equals(CipherMode.AES_RSA)){
             honeyBadgerEncrypt.initHybridEncryption(encrypt.cipher(),encrypt.dynamic());
@@ -84,9 +81,6 @@ public class EncryptHandler{
      */
     @Around("@annotation(decrypt)")
     public Object decrypt(ProceedingJoinPoint joinPoint, Decrypt decrypt) throws Throwable {
-        if(!decrypt.enableAop()){
-            return joinPoint.proceed();
-        }
         //混合加密 if encrypt.dynamic() == true 则是动态模式 每一次的密钥都会变化
         if (decrypt.cipher().equals(CipherMode.SM4_RSA) || decrypt.cipher().equals(CipherMode.AES_RSA)){
 //            Object[] args = joinPoint.getArgs();

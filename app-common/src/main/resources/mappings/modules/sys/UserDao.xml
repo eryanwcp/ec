@@ -304,7 +304,8 @@
             </if>
             <if test="query != null and query !=''">
                 AND (
-                a.login_name = #{query}
+                a.id = #{query}
+                OR a.login_name = #{query}
                 OR a.mobile = #{query}
                 OR a.code = #{query}
                 OR a.biz_code = #{query}
@@ -372,7 +373,8 @@
             a.status = #{status}
             <if test="query != null and query !=''">
                 AND (
-                a.login_name = #{query}
+                a.id = #{query}
+                OR a.login_name = #{query}
                 OR a.mobile = #{query}
                 OR a.code = #{query}
                 OR a.biz_code = #{query}
@@ -496,7 +498,8 @@
             AND a.status = '0'
             <if test="query != null and query !=''">
                 AND (
-                a.login_name = #{query}
+                a.id = #{query}
+                OR a.login_name = #{query}
                 OR a.mobile = #{query}
                 OR a.code = #{query}
                 OR a.biz_code = #{query}
@@ -569,7 +572,8 @@
             )
             <if test="query != null and query !=''">
                 AND (
-                    a.login_name = #{query}
+                    a.id = #{query}
+                    OR a.login_name = #{query}
                     OR a.mobile = #{query}
                     OR a.code = #{query}
                     OR a.biz_code = #{query}
@@ -912,7 +916,8 @@
             </if>
             <if test="query != null and query !=''">
                 AND (
-                a.login_name = #{query}
+                a.id = #{query}
+                OR a.login_name = #{query}
                 OR a.mobile = #{query}
                 OR a.code = #{query}
                 OR a.biz_code = #{query}
@@ -956,7 +961,8 @@
             </if>
             <if test="query != null and query !=''">
                 AND (
-                a.login_name = #{query}
+                a.id = #{query}
+                OR a.login_name = #{query}
                 OR a.mobile = #{query}
                 OR a.code = #{query}
                 OR a.biz_code = #{query}
