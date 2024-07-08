@@ -12,6 +12,9 @@ import cn.hutool.crypto.digest.Digester;
 import cn.hutool.crypto.symmetric.AES;
 import cn.hutool.crypto.symmetric.SymmetricAlgorithm;
 import cn.hutool.crypto.symmetric.SymmetricCrypto;
+import com.eryansky.common.utils.encode.RSAUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -25,6 +28,9 @@ import java.util.UUID;
  *
  */
 public class EncryptUtils {
+
+    private static final Logger log = LoggerFactory.getLogger(EncryptUtils.class);
+
     /**
      * The constant SERVER_KEY.
      */
@@ -58,7 +64,7 @@ public class EncryptUtils {
         PRIVATE_KEY = rsa.getPrivateKeyBase64();
         PUBLIC_KEY = rsa.getPublicKeyBase64();
         rsa = new RSA(AsymmetricAlgorithm.RSA.toString(),PRIVATE_KEY,PUBLIC_KEY);
-        System.out.println(("私钥:"+PRIVATE_KEY+"\n"+"公钥:"+PUBLIC_KEY));
+        log.info("RSA私钥:{} RSA公钥:{}",PRIVATE_KEY,PUBLIC_KEY);
     }
 
     /**
@@ -80,22 +86,46 @@ public class EncryptUtils {
     }
 
     /**
+     * aes加密
+     *
+     * @param content 文本内容跟
+     * @return 加密字符串 16进制
+     */
+    public static String aesEncrypt(String content,String key){
+        //构建
+        AES aes = new AES(Mode.CTS, Padding.PKCS5Padding,key.getBytes());
+        //
+        if (content.isEmpty()){
+            throw new RuntimeException("加密内容不能为空");
+        }
+        byte[] encrypt = aes.encrypt(content);
+        //解密
+        return aes.encryptHex(encrypt);
+    }
+
+    /**
+     * aes解密
+     *
+     * @param encrypt 密文
+     * @return 明文 string
+     */
+    public static String aesDecrypt(String encrypt){
+        AES aes = new AES(Mode.CTS, Padding.PKCS5Padding,SERVER_KEY,SERVER_IV);
+        //解密
+        byte[] decrypt = aes.decrypt(encrypt);
+        return aes.decryptStr(decrypt);
+    }
+
+    /**
      * aes解密
      *
      * @param encrypt 密文
      * @param key     密钥
-     * @param iv      偏移量
      * @return 明文 string
      */
-    public static String aesDecrypt(String encrypt,byte[] key,byte[] iv){
+    public static String aesDecrypt(String encrypt,String key,String iv){
         //构建
-        if (key.length == 0){
-            throw new RuntimeException("没有密钥");
-        }
-        if (iv.length == 0){
-            throw new RuntimeException("没有偏移量");
-        }
-        AES aes = new AES(Mode.CTS, Padding.PKCS5Padding,key,iv);
+        AES aes = new AES(Mode.CTS, Padding.PKCS5Padding,key.getBytes(),iv.getBytes());
         //解密
         byte[] decrypt = aes.decrypt(encrypt);
         return aes.decryptStr(decrypt);
