@@ -29,6 +29,7 @@ public class Cryptos {
 
     private static final String AES = "AES";
     private static final String AES_CBC = "AES/GCM/NoPadding";
+    private static final String AES_ECB = "AES/ECB/PKCS5Padding";
     private static final String HMACSHA1 = "HmacSHA1";
 
     private static final int DEFAULT_HMACSHA1_KEYSIZE = 160; //RFC2401
@@ -111,6 +112,16 @@ public class Cryptos {
      *
      * @param input 原始输入字符数组
      * @param key 符合AES要求的密钥
+     */
+    public static byte[] aesECBEncrypt(byte[] input, byte[] key) {
+        return aesECB(input, key, Cipher.ENCRYPT_MODE);
+    }
+
+    /**
+     * 使用AES加密原始字符串.
+     *
+     * @param input 原始输入字符数组
+     * @param key 符合AES要求的密钥
      * @param iv 初始向量
      */
     public static byte[] aesEncrypt(byte[] input, byte[] key, Byte[] iv) {
@@ -141,6 +152,18 @@ public class Cryptos {
     }
 
     /**
+     * 使用AES解密字符串, 返回原始字符串.
+     *
+     * @param input Hex编码的加密字符串
+     * @param key 符合AES要求的密钥
+     */
+    public static String aesECBDecrypt(byte[] input, byte[] key) {
+        byte[] decryptResult = aesECB(input, key, Cipher.DECRYPT_MODE);
+        return new String(decryptResult);
+    }
+
+
+    /**
      * 使用AES加密或解密无编码的原始字节数组, 返回无编码的字节数组结果.
      *
      * @param input 原始字节数组
@@ -167,6 +190,25 @@ public class Cryptos {
             }
             Cipher cipher = Cipher.getInstance(AES_CBC);
             cipher.init(mode, secretKey, gcMParameterSpec);
+            return cipher.doFinal(input);
+        } catch (GeneralSecurityException e) {
+            throw Exceptions.unchecked(e);
+        }
+    }
+
+
+    /**
+     * 使用AES加密或解密无编码的原始字节数组, 返回无编码的字节数组结果.
+     *
+     * @param input 原始字节数组
+     * @param key 符合AES要求的密钥
+     * @param mode Cipher.ENCRYPT_MODE 或 Cipher.DECRYPT_MODE
+     */
+    public static byte[] aesECB(byte[] input, byte[] key, int mode) {
+        try {
+            SecretKey secretKey = new SecretKeySpec(key, AES);
+            Cipher cipher = Cipher.getInstance(AES_ECB);
+            cipher.init(mode, secretKey);
             return cipher.doFinal(input);
         } catch (GeneralSecurityException e) {
             throw Exceptions.unchecked(e);

@@ -62,14 +62,14 @@ public class EncryptResultResponseBodyAdvice implements ResponseBodyAdvice<Resul
             }else if(CipherMode.AES.name().equals(requestEncrypt)){
                 if(StringUtils.isNotBlank(data) && !StringUtils.equals(data,"null")){
                     try {
-                        body.setData(new AesSupport(key).encrypt(data));
+                        body.setData(new AesSupport(key).encryptECB(data));
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
                 }
                 if(StringUtils.isNotBlank(obj) && !StringUtils.equals(obj,"null")){
                     try {
-                        body.setObj(new AesSupport(key).encrypt(obj));
+                        body.setObj(new AesSupport(key).encryptECB(obj));
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }

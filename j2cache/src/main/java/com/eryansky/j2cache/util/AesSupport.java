@@ -26,6 +26,7 @@ public class AesSupport {
      * 加密解密算法/加密模式/填充方式
      */
     private static final String DEFAULT_CIPHER_ALGORITHM = "AES/GCM/NoPadding";
+    private static final String DEFAULT_CIPHER_ECB = "AES/ECB/PKCS5Padding";
     /**
      * 默认密钥, 256位32个字节
      */
@@ -81,6 +82,24 @@ public class AesSupport {
         }
     }
 
+    public String encryptECB(String value) {
+        if (StringUtils.isEmpty(value)) {
+            return "";
+        }
+        try {
+            Cipher cipher = Cipher.getInstance(DEFAULT_CIPHER_ECB);
+            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+
+            byte[] content = value.getBytes(StandardCharsets.UTF_8);
+            byte[] encryptData = cipher.doFinal(content);
+
+            return Hex.bytesToHexString(encryptData);
+        } catch (Exception e) {
+            log.error("AES加密时出现问题，密钥为：{}",key);
+            throw new IllegalStateException("AES加密时出现问题" + e.getMessage(), e);
+        }
+    }
+
     public String decrypt(String value) {
         if (StringUtils.isEmpty(value)) {
             return "";
@@ -89,6 +108,22 @@ public class AesSupport {
             byte[] encryptData = Hex.hexStringToBytes(value);
             Cipher cipher = Cipher.getInstance(DEFAULT_CIPHER_ALGORITHM);
             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, gcMParameterSpec);
+            byte[] content = cipher.doFinal(encryptData);
+            return new String(content, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            log.error("AES解密时出现问题，密钥为：{}，密文为：{}", key, value);
+            throw new IllegalStateException("AES解密时出现问题" + e.getMessage(), e);
+        }
+    }
+
+    public String decryptECB(String value) {
+        if (StringUtils.isEmpty(value)) {
+            return "";
+        }
+        try {
+            byte[] encryptData = Hex.hexStringToBytes(value);
+            Cipher cipher = Cipher.getInstance(DEFAULT_CIPHER_ECB);
+            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
             byte[] content = cipher.doFinal(encryptData);
             return new String(content, StandardCharsets.UTF_8);
         } catch (Exception e) {

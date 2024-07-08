@@ -58,7 +58,7 @@ public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
                         if(CipherMode.SM4.name().equals(requestEncrypt)){
                             return IOUtils.toInputStream(Sm4Utils.decrypt(key, content), StandardCharsets.UTF_8);
                         }else if(CipherMode.AES.name().equals(requestEncrypt)){
-                            return IOUtils.toInputStream(new AesSupport(key).decrypt(content), StandardCharsets.UTF_8);
+                            return IOUtils.toInputStream(new AesSupport(key).decryptECB(content), StandardCharsets.UTF_8);
                         }
                         return IOUtils.toInputStream(content, StandardCharsets.UTF_8);
                     } catch (Exception e) {
