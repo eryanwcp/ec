@@ -175,6 +175,7 @@
 
 	<!--删除organ扩展表数据-->
 	<delete id="deleteOrganExtend">
+		/*TDDL:FORBID_EXECUTE_DML_ALL=FALSE*/
 		DELETE FROM t_sys_organ_extend
 		<where>
 			<if test="id != null and id != ''">
