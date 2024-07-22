@@ -59,9 +59,9 @@ public class LogReportController extends SimpleController {
     @RequiresPermissions(value = "sys:log:loginStatistics")
     @PostMapping(value = {"loginStatisticsData"})
     @ResponseBody
-    public Datagrid<Map<String, Object>> loginStatisticsData(String name, String startTime, String endTime, HttpServletRequest request) {
+    public Datagrid<Map<String, Object>> loginStatisticsData(String query, String startTime, String endTime, HttpServletRequest request) {
         Page<Map<String, Object>> page = new Page<>(request);
-        page = logService.getLoginStatistics(page, name, startTime, endTime);
+        page = logService.getLoginStatistics(page, query, startTime, endTime);
         Datagrid<Map<String, Object>> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
         List<Map<String, Object>> footer = Lists.newArrayList();
         long totalSize = page.getResult().parallelStream().mapToLong(r-> (Long) r.get("count")).sum();
@@ -76,11 +76,11 @@ public class LogReportController extends SimpleController {
     @RequiresPermissions(value = "sys:log:loginStatistics")
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"loginStatisticsExportExcel"})
     @ResponseBody
-    public void loginStatisticsExportExcel(String name, String startTime, String endTime, HttpServletResponse response, HttpServletRequest request) throws Exception {
+    public void loginStatisticsExportExcel(String query, String startTime, String endTime, HttpServletResponse response, HttpServletRequest request) throws Exception {
         Page<Map<String, Object>> page = new Page<>(1, -1);
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();  //获取当前用户名
         String fileName = "登录次数统计";
-        Page<Map<String, Object>> pageMap = logService.getLoginStatistics(page.pageSize(-1), name, startTime, endTime);
+        Page<Map<String, Object>> pageMap = logService.getLoginStatistics(page.pageSize(-1), query, startTime, endTime);
         List<Map<String, Object>> result = pageMap.getResult();
         String[] hearders = {"单位/部门", "部门", "姓名", "用户ID", "账号", "登录次数"};//表头数组
         String[] fields = new String[]{"company", "department", "name", "userId", "userName", "count"};//People对象属性数组

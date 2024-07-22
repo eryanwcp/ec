@@ -244,9 +244,9 @@ public class LogService extends CrudService<LogDao, Log> {
     }
 
     /**
-     * 员工登录统计
+     * 用户登录统计
      */
-    public Page<Map<String, Object>> getLoginStatistics(Page pg, String name, String startTime, String endTime) {
+    public Page<Map<String, Object>> getLoginStatistics(Page pg, String query, String startTime, String endTime) {
         Parameter parameter = Parameter.newParameter();
         if (StringUtils.isNotBlank(startTime)) {
             parameter.put("startTime", startTime + " 00:00:00");
@@ -254,7 +254,7 @@ public class LogService extends CrudService<LogDao, Log> {
         if (StringUtils.isNotBlank(endTime)) {
             parameter.put("endTime", endTime + " 23:59:59");
         }
-        parameter.put("name", name);
+        parameter.put("query", query);
         parameter.put(BaseInterceptor.PAGE, pg);
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
         parameter.put(Log.FIELD_STATUS, Log.STATUS_NORMAL);
