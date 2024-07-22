@@ -5,6 +5,7 @@
  */
 package com.eryansky.modules.sys.aop;
 
+import com.eryansky.client.common.vo.ExtendAttr;
 import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.core.security.SecurityType;
@@ -108,6 +109,9 @@ public class SecurityLogAspect {
             log.setDeviceType(sessionInfo.getDeviceType());
             log.setBrowserType(sessionInfo.getBrowserType());
             log.setOperTime(new Date());
+            ExtendAttr extendAttr = new ExtendAttr();
+            extendAttr.put("userType",sessionInfo.getUserType());
+            log.setExtendAttr(extendAttr);
             try {
                 HttpServletRequest request = SpringMVCHolder.getRequest();
                 log.setParams(request.getParameterMap());

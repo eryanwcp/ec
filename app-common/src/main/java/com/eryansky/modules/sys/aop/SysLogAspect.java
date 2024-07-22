@@ -5,6 +5,7 @@
  */
 package com.eryansky.modules.sys.aop;
 
+import com.eryansky.client.common.vo.ExtendAttr;
 import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.common.utils.Exceptions;
 import com.eryansky.common.utils.StringUtils;
@@ -15,12 +16,10 @@ import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys.event.SysLogEvent;
 import com.eryansky.modules.sys.mapper.Log;
 import com.eryansky.modules.sys.mapper.User;
-import com.eryansky.modules.sys.service.UserService;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -90,6 +89,12 @@ public class SysLogAspect {
             log.setDeviceType(null != sessionInfo ? sessionInfo.getDeviceType() : StringUtils.EMPTY);
             log.setBrowserType(null != sessionInfo ? sessionInfo.getBrowserType() : StringUtils.EMPTY);
             log.setOperTime(Calendar.getInstance().getTime());
+            if(null != sessionInfo){
+                ExtendAttr extendAttr = new ExtendAttr();
+                extendAttr.put("userType",sessionInfo.getUserType());
+                log.setExtendAttr(extendAttr);
+            }
+
             log.setRemark(logging.remark());
             SpringContextHolder.publishEvent(new SysLogEvent(log));
         } catch (Exception e) {
