@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.eryansky</groupId>
         <artifactId>ec-parent</artifactId>
-        <version>4.2.20240301.44</version>
+        <version>4.2.20240301.45</version>
     </parent>
 
     <artifactId>ec-j2cache-spring-boot-starter</artifactId>
