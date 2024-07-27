@@ -286,18 +286,15 @@
                 <version>3.4.3</version>
                 <configuration>
                     <from>
-                        <image>openjdk:8-jre-alpine</image>
-                        <auth>
-                            <username>username</username>
-                            <password>password</password>
-                        </auth>
+<!--                        <image>openjdk:8-jre-alpine</image>-->
+                        <image>dragonwell-registry.cn-hangzhou.cr.aliyuncs.com/dragonwell/dragonwell:8</image>
                     </from>
                     <to>
-                        <image>www.eryansky.com:8082/eryansky/${project.artifactId}:${project.version}</image>
-                        <auth>
-                            <username>username</username>
-                            <password>password</password>
-                        </auth>
+                        <image>eryanwcp/${project.artifactId}</image>
+                        <tags>
+                            <tag>latest</tag>
+                            <tag>${project.version}</tag>
+                        </tags>
                     </to>
                     <allowInsecureRegistries>true</allowInsecureRegistries>
                     <container>
