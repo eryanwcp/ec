@@ -1,5 +1,6 @@
 package com.eryansky.encrypt.badger;
 
+import com.eryansky.encrypt.aspectj.EncryptHandler;
 import com.eryansky.encrypt.config.EncryptProvider;
 import com.eryansky.encrypt.enums.CipherMode;
 import cn.hutool.core.util.CharsetUtil;
@@ -15,8 +16,8 @@ import cn.hutool.crypto.symmetric.AES;
 import cn.hutool.crypto.symmetric.SM4;
 import cn.hutool.crypto.symmetric.SymmetricAlgorithm;
 import cn.hutool.crypto.symmetric.SymmetricCrypto;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -36,7 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 
  */
 public class HoneyBadgerEncrypt implements InitializingBean {
-    private static final Log echo = LogFactory.getLog(HoneyBadgerEncrypt.class);
+    private static final Logger echo = LoggerFactory.getLogger(HoneyBadgerEncrypt.class);
     /**
      * The Aes key.
      */

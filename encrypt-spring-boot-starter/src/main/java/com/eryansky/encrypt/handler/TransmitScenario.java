@@ -2,9 +2,9 @@ package com.eryansky.encrypt.handler;
 
 import com.eryansky.encrypt.anotation.Decrypt;
 import com.eryansky.encrypt.anotation.Encrypt;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The type Transmit scenario.
@@ -13,7 +13,7 @@ import org.aspectj.lang.reflect.MethodSignature;
  *
  */
 public class TransmitScenario extends ScenarioHandler {
-    private static final Log echo = LogFactory.getLog(TransmitScenario.class);
+    private static final Logger echo = LoggerFactory.getLogger(TransmitScenario.class);
 
     @Override
     public void transmitEncryptProcessor(Object process, MethodSignature signature, Encrypt encrypt) throws Throwable {

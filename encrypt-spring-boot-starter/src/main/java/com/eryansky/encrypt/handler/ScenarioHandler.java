@@ -5,9 +5,9 @@ import com.eryansky.encrypt.anotation.Decrypt;
 import com.eryansky.encrypt.anotation.Encrypt;
 import com.eryansky.encrypt.badger.HoneyBadgerEncrypt;
 import com.eryansky.encrypt.enums.CipherMode;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
 import org.springframework.util.StringUtils;
 
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  *
  */
 public abstract class ScenarioHandler  implements ScenarioHolder {
-    private static final Log echo = LogFactory.getLog(ScenarioHandler.class);
+    private static final Logger echo = LoggerFactory.getLogger(ScenarioHandler.class);
     /**
      * The constant honeyBadgerEncrypt.
      */

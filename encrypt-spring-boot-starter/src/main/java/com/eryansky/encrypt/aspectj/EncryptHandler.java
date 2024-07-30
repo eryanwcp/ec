@@ -5,11 +5,12 @@ import com.eryansky.encrypt.anotation.Encrypt;
 import com.eryansky.encrypt.badger.HoneyBadgerEncrypt;
 import com.eryansky.encrypt.enums.CipherMode;
 import com.eryansky.encrypt.handler.ScenarioHolder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.eryansky.encrypt.handler.StorageScenario;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.lang.NonNull;
 
@@ -26,8 +27,7 @@ public class EncryptHandler{
     /**
      * The constant echo.
      */
-    public static final Log echo = LogFactory.getLog(EncryptHandler.class);
-
+    private static final Logger echo = LoggerFactory.getLogger(EncryptHandler.class);
     public static String  AESKEY = "AES-RSA";
     public static String  SM4KEY = "SM4-RSA";
 
