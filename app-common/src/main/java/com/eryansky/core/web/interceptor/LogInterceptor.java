@@ -192,13 +192,14 @@ public class LogInterceptor implements HandlerInterceptor {
 			log.setDeviceType(UserAgentUtils.getDeviceType(request).toString());
 			log.setBrowserType(UserAgentUtils.getBrowser(request).getName());
 			log.setOperTime(Calendar.getInstance().getTime());
-			log.setActionTime((endTime - beginTime) + "");
+			log.setActionTime(String.valueOf(endTime - beginTime));
 			log.setModule(requestUrl);
 			log.setAction(request.getMethod());
 			log.setRemark(remark);
 			log.setParams(request.getParameterMap());
 			// 如果有异常，设置异常信息
 			log.setException(Exceptions.getStackTraceAsString(ex));
+			log.prePersist();
 			SpringContextHolder.publishEvent(new SysLogEvent(log));
 		}
 

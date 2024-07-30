@@ -15,6 +15,7 @@ import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.security._enum.DeviceType;
+import com.eryansky.core.security.interceptor.AuthorityInterceptor;
 import com.eryansky.core.security.jwt.JWTUtils;
 import com.eryansky.modules.sys._enum.DataScope;
 import com.eryansky.modules.sys.mapper.*;
@@ -678,8 +679,10 @@ public class SecurityUtils {
             }
 
             HttpSession session = null;
+            String token = null;
             try {
                 session = request.getSession();
+                token = request.getHeader(AuthorityInterceptor.ATTR_AUTHORIZATION);
             } catch (Exception e) {
 //                logger.error(e.getMessage());
             }
@@ -687,14 +690,11 @@ public class SecurityUtils {
                 return null;
             }
             sessionInfo = getSessionInfo(getFixedSessionId(getNoSuffixSessionId(session)));
-            if (sessionInfo == null) {
-                String token = request.getHeader("Authorization");
-                if (StringUtils.isNotBlank(token)) {
-                    sessionInfo = getSessionInfoByTokenOrRefreshToken(StringUtils.replaceOnce(token, "Bearer ", ""));
-                }
+            if (null == sessionInfo && StringUtils.isNotBlank(token)) {
+                sessionInfo = getSessionInfoByTokenOrRefreshToken(StringUtils.replaceOnce(token, "Bearer ", ""));
             }
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(),e);
         } finally {
             if (null != sessionInfo) {
                 refreshSessionInfo(sessionInfo);

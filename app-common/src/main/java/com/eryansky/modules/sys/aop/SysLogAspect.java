@@ -57,8 +57,7 @@ public class SysLogAspect {
     @Before(value = "sysLogAspect()&&@annotation(logging)")
     public void recordLog(JoinPoint joinPoint, Logging logging) throws Throwable {
         Log log = new Log();
-        //将当前实体保存到threadLocal
-        sysLogThreadLocal.set(log);
+
 
         Long start = System.currentTimeMillis();
         log.setStartTime(start);
@@ -94,9 +93,9 @@ public class SysLogAspect {
                 extendAttr.put("userType",sessionInfo.getUserType());
                 log.setExtendAttr(extendAttr);
             }
-
             log.setRemark(logging.remark());
-            SpringContextHolder.publishEvent(new SysLogEvent(log));
+            //将当前实体保存到threadLocal
+            sysLogThreadLocal.set(log);
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
@@ -115,7 +114,7 @@ public class SysLogAspect {
         long end = System.currentTimeMillis();
         long opTime = end - log.getStartTime();
         log.setActionTime(String.valueOf(opTime));
-
+        log.prePersist();
         // 发布事件
         SpringContextHolder.publishEvent(new SysLogEvent(log));
         //移除当前log实体
@@ -136,6 +135,7 @@ public class SysLogAspect {
         // 异常
         log.setType(LogType.exception.getValue());
         log.setException(Exceptions.getStackTraceAsString(new Exception(e)));
+        log.prePersist();
         // 发布事件
         SpringContextHolder.publishEvent(new SysLogEvent(log));
         //移除当前log实体

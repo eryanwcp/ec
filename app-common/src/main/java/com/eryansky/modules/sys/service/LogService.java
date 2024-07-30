@@ -30,6 +30,10 @@ import java.util.*;
 @Service
 public class LogService extends CrudService<LogDao, Log> {
 
+    public void insert(Log entity) {
+        dao.insert(entity);
+    }
+
     @Override
     public Page<Log> findPage(Page<Log> page, Log entity) {
         entity.setEntityPage(page);

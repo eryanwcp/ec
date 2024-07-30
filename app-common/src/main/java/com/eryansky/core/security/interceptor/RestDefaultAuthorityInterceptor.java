@@ -58,7 +58,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
         }
 
         //注解处理
-        handlerResult = this.defaultaHndler(request, response, o, requestUrl);
+        handlerResult = this.defaultHndler(request, response, o, requestUrl);
         CacheUtils.put(cacheKey, handlerResult);
         if (null != handlerResult) {
             return handlerResult;
@@ -76,7 +76,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
      * @return
      * @throws Exception
      */
-    private Boolean defaultaHndler(HttpServletRequest request, HttpServletResponse response, Object handler, String requestUrl) throws Exception {
+    private Boolean defaultHndler(HttpServletRequest request, HttpServletResponse response, Object handler, String requestUrl) throws Exception {
         HandlerMethod handlerMethod = null;
         //注解处理 满足设置不拦截
         if(handler instanceof HandlerMethod) {

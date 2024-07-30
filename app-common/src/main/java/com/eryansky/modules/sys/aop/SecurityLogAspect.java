@@ -121,6 +121,7 @@ public class SecurityLogAspect {
             end = System.currentTimeMillis();
             long opTime = end - start;
             log.setActionTime(String.valueOf(opTime));
+            log.prePersist();
             SpringContextHolder.publishEvent(new SysLogEvent(log));
             if (logger.isDebugEnabled()) {
                 logger.debug("用户:{},操作类：{},操作方法：{},耗时：{}ms.", new Object[]{user, className, methodName, end - start});
