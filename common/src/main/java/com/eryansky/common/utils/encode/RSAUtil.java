@@ -226,11 +226,11 @@ public class RSAUtil {
             //接口
             System.out.println(Base64.encodeBase64String(key.getBytes()));
             byte[] encryptKeys = RSAUtil.encrypt(Base64.encodeBase64String(key.getBytes()), DEFAULT_PUBLIC_KEY);
-            System.out.println(new String(Base64.decodeBase64(RSAUtil.decrypt(encryptKeys, DEFAULT_PRIVATE_KEY))));
             String encrypt = Base64.encodeBase64String(encryptKeys);
             System.out.println(encrypt);
             System.out.println(RSAUtil.decryptBase64(encrypt, DEFAULT_PRIVATE_KEY));
             System.out.println(new String(Base64.decodeBase64(RSAUtil.decryptBase64(encrypt, DEFAULT_PRIVATE_KEY))));
+            System.out.println(new String(Base64.decodeBase64(RSAUtil.decrypt(encryptKeys, DEFAULT_PRIVATE_KEY))));
 
 
             String data = "123456";
