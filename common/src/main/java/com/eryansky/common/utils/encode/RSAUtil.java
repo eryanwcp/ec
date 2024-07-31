@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.crypto.*;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
@@ -98,6 +99,15 @@ public class RSAUtil {
         return DEFAULT_PUBLIC_KEY;
     }
 
+
+    /**
+     * 获取默认私钥
+     * @return
+     */
+    public static String getDefaultBase64Private() {
+        return DEFAULT_PRIVATE_KEY;
+    }
+
     public static PublicKey getPublicKey(String base64PublicKey){
         PublicKey publicKey = null;
         try{
@@ -168,6 +178,9 @@ public class RSAUtil {
             throw new RuntimeException(e);
         }
     }
+    public static String decrypt(byte[] data, String base64PrivateKey) {
+        return decrypt(data,getPrivateKey(base64PrivateKey));
+    }
 
     public static String decrypt(byte[] data, PrivateKey privateKey) {
         try {
@@ -202,8 +215,20 @@ public class RSAUtil {
             String key = Identities.uuid2().substring(0,16);
             System.out.println(key);
             System.out.println(Base64.encodeBase64String(key.getBytes()));
-            byte[] encryptKeys = encrypt(Base64.encodeBase64String(key.getBytes()),DEFAULT_PUBLIC_KEY);
-            System.out.println(new String(Base64.decodeBase64(decrypt(encryptKeys,getPrivateKey(DEFAULT_PRIVATE_KEY)))));
+            byte[] encryptKeys = RSAUtil.encrypt(Base64.encodeBase64String(key.getBytes()),DEFAULT_PUBLIC_KEY);
+            System.out.println(new String(Base64.decodeBase64(RSAUtil.decrypt(encryptKeys,DEFAULT_PRIVATE_KEY))));
+            String encrypt = Base64.encodeBase64String(encryptKeys);
+            System.out.println(encrypt);
+            System.out.println(RSAUtil.decryptBase64(encrypt,DEFAULT_PRIVATE_KEY));
+            System.out.println(new String(Base64.decodeBase64(RSAUtil.decryptBase64(encrypt,DEFAULT_PRIVATE_KEY))));
+
+
+            String data = "123456";
+            System.out.println(data);
+            String encryptData = Cryptos.aesECBEncryptBase64String(data,key);
+            System.out.println(encryptData);
+            String decryptData = Cryptos.aesECBDecryptBase64String(encryptData,key);
+            System.out.println(decryptData);
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
         }

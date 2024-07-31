@@ -7,6 +7,7 @@ package com.eryansky.common.utils.encode;
 
 import com.eryansky.common.utils.Exceptions;
 import com.eryansky.common.utils.collections.Collections3;
+import org.apache.commons.codec.binary.Base64;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -14,6 +15,7 @@ import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -116,6 +118,15 @@ public class Cryptos {
     public static byte[] aesECBEncrypt(byte[] input, byte[] key) {
         return aesECB(input, key, Cipher.ENCRYPT_MODE);
     }
+    /**
+     * 使用AES加密原始字符串.
+     *
+     * @param input 原始输入字符数组
+     * @param key 符合AES要求的密钥
+     */
+    public static String aesECBEncryptBase64String(String input, String key) {
+        return Base64.encodeBase64String(aesECB(input.getBytes(StandardCharsets.UTF_8), key.getBytes(StandardCharsets.UTF_8), Cipher.ENCRYPT_MODE));
+    }
 
     /**
      * 使用AES加密原始字符串.
@@ -148,6 +159,17 @@ public class Cryptos {
      */
     public static String aesDecrypt(byte[] input, byte[] key, Byte[] iv) {
         byte[] decryptResult = aes(input, key, iv, Cipher.DECRYPT_MODE);
+        return new String(decryptResult);
+    }
+
+    /**
+     * 使用AES解密字符串, 返回原始字符串.
+     *
+     * @param input Hex编码的加密字符串
+     * @param key 符合AES要求的密钥
+     */
+    public static String aesECBDecryptBase64String(String input, String key) {
+        byte[] decryptResult = aesECB(Base64.decodeBase64(input.getBytes()), key.getBytes(), Cipher.DECRYPT_MODE);
         return new String(decryptResult);
     }
 
