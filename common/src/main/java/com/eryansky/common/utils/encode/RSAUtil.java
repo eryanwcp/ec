@@ -1,7 +1,10 @@
 package com.eryansky.common.utils.encode;
 
+import com.eryansky.common.orm.mybatis.sensitive.encrypt.AesSupport;
+import com.eryansky.common.utils.Identities;
 import com.google.common.collect.Maps;
 import org.apache.commons.codec.binary.Base64;
+import org.bouncycastle.pqc.legacy.math.linearalgebra.ByteUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -156,6 +159,16 @@ public class RSAUtil {
         return decrypt(Base64.decodeBase64(data.getBytes()), getPrivateKey(base64PrivateKey));
     }
 
+    public static String decrypt(String data, String base64PrivateKey) {
+        try {
+            Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+            cipher.init(Cipher.DECRYPT_MODE, getPrivateKey(base64PrivateKey));
+            return new String(cipher.doFinal(data.getBytes()));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static String decrypt(byte[] data, PrivateKey privateKey) {
         try {
             Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
@@ -185,6 +198,12 @@ public class RSAUtil {
             System.out.println(encryptedString);
             String decryptedString = RSAUtil.decryptBase64(encryptedString);
             System.out.println(decryptedString);
+
+            String key = Identities.uuid2().substring(0,16);
+            System.out.println(key);
+            System.out.println(Base64.encodeBase64String(key.getBytes()));
+            byte[] encryptKeys = encrypt(Base64.encodeBase64String(key.getBytes()),DEFAULT_PUBLIC_KEY);
+            System.out.println(new String(Base64.decodeBase64(decrypt(encryptKeys,getPrivateKey(DEFAULT_PRIVATE_KEY)))));
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
         }
