@@ -5,6 +5,7 @@ import com.eryansky.common.utils.Identities;
 import com.google.common.collect.Maps;
 import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.pqc.legacy.math.linearalgebra.ByteUtils;
+import org.bouncycastle.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -225,10 +226,18 @@ public class RSAUtil {
 
             String data = "123456";
             System.out.println(data);
+            //AES
             String encryptData = Cryptos.aesECBEncryptBase64String(data,key);
             System.out.println(encryptData);
             String decryptData = Cryptos.aesECBDecryptBase64String(encryptData,key);
             System.out.println(decryptData);
+            //SM4
+            String encryptData2 = Sm4Utils.encryptEcb(ByteUtils.toHexString(key.getBytes()),data);
+            System.out.println(encryptData2);
+            String decryptData2 = Sm4Utils.decryptEcb(ByteUtils.toHexString(key.getBytes()),encryptData2);
+            System.out.println(decryptData2);
+
+
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
         }
