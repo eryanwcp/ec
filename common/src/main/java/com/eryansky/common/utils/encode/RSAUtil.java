@@ -218,6 +218,12 @@ public class RSAUtil {
 
             String key = Identities.uuid2().substring(0, 16);
             System.out.println(key);
+            //常規方法
+            String encryptKey = RSAUtil.encodeBase64String(key,DEFAULT_PUBLIC_KEY);
+            String decryptKey = RSAUtil.decryptBase64(encryptKey,DEFAULT_PRIVATE_KEY);
+            System.out.println(encryptKey);
+            System.out.println(decryptKey);
+            //接口
             System.out.println(Base64.encodeBase64String(key.getBytes()));
             byte[] encryptKeys = RSAUtil.encrypt(Base64.encodeBase64String(key.getBytes()), DEFAULT_PUBLIC_KEY);
             System.out.println(new String(Base64.decodeBase64(RSAUtil.decrypt(encryptKeys, DEFAULT_PRIVATE_KEY))));
