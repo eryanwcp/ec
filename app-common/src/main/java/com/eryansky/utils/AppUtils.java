@@ -582,5 +582,39 @@ public class AppUtils {
         return url.toString();
     }
 
+    /**
+     * 设置HTTP代理 影响JVM中所有通过HttpURLConnection或HttpsURLConnection发起的HTTP请求
+     * @param host
+     * @param port
+     */
+    public static void setHttpProxy(String host, String port) {
+        System.setProperty("http.proxyHost", host);
+        System.setProperty("http.proxyPort", port);
+    }
+
+    /**
+     * 清空HTTP代理
+     */
+    public static void clearHttpProxy() {
+        System.clearProperty("http.proxyHost");
+        System.clearProperty("http.proxyPort");
+    }
+
+    /**
+     * 设置HTTP代理 影响JVM中所有通过HttpURLConnection或HttpsURLConnection发起的HTTPS请求
+     * @param host
+     * @param port
+     */
+    public static void setHttpsProxy(String host, String port) {
+        System.setProperty("https.proxyHost", host);
+        System.setProperty("https.proxyPort", port);
+    }
+    /**
+     * 清空HTTPS代理
+     */
+    public static void clearHttpsProxy() {
+        System.clearProperty("https.proxyHost");
+        System.clearProperty("https.proxyPort");
+    }
 
 }
