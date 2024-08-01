@@ -1,16 +1,13 @@
 package com.eryansky.common.utils.encode;
 
-import com.eryansky.common.orm.mybatis.sensitive.encrypt.AesSupport;
 import com.eryansky.common.utils.Identities;
 import com.google.common.collect.Maps;
 import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.pqc.legacy.math.linearalgebra.ByteUtils;
-import org.bouncycastle.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.crypto.*;
-import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
@@ -107,7 +104,7 @@ public class RSAUtil {
      *
      * @return
      */
-    public static String getDefaultBase64Private() {
+    public static String getDefaultBase64PrivateKey() {
         return DEFAULT_PRIVATE_KEY;
     }
 
