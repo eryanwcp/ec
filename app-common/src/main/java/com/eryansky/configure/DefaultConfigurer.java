@@ -7,6 +7,7 @@ package com.eryansky.configure;
 
 import com.eryansky.common.utils.ObjectUtils;
 import com.eryansky.common.utils.collections.Collections3;
+import com.eryansky.common.utils.io.PropertiesLoader;
 import com.eryansky.modules.sys.mapper.Config;
 import com.eryansky.modules.sys.service.ConfigService;
 import com.eryansky.utils.AppConstants;
@@ -36,8 +37,10 @@ public class DefaultConfigurer {
     @Bean
     public String checkSysConfig() {
         List<Config> dbConfigs = configService.findList(new Config());
+        PropertiesLoader propertiesLoader = AppConstants.getConfig();
+        String[] resourcesPaths = propertiesLoader.getResourcesPaths();
         Properties properties = AppConstants.getConfig().getProperties();
-        logger.info("系统参数读取模式：{}", AppConstants.isdevMode() ? "配置文件config*.properties" : "数据库t_sys_config");
+        logger.info("系统参数读取模式：{}", AppConstants.isdevMode() ? "配置文件" + resourcesPaths[0] : "数据库t_sys_config");
         if (Collections3.isNotEmpty(dbConfigs) && null != properties) {
             dbConfigs.forEach(v -> {
                 Map.Entry<Object, Object> r = properties.entrySet().stream().filter(p -> p.getKey().toString().equals(v.getCode())).findFirst().orElse(null);
