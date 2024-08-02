@@ -71,42 +71,42 @@ public class AppConstants extends SysConstants {
      * 获取jdbc交校验sql
      */
     public static String getJdbcValidationQuery() {
-        return SysConstants.getAppConfig().getProperty("jdbc.validationQuery");
+        return getAppConfig().getProperty("jdbc.validationQuery");
     }
 
     /**
      * 获取管理端根路径
      */
     public static String getAdminPath() {
-        return SysConstants.getAppConfig().getProperty("adminPath");
+        return getAppConfig().getProperty("adminPath");
     }
 
     /**
      * 获取前端根路径
      */
     public static String getFrontPath() {
-        return SysConstants.getAppConfig().getProperty("frontPath");
+        return getAppConfig().getProperty("frontPath");
     }
 
     /**
      * 获取移动端根路径
      */
     public static String getMobilePath() {
-        return SysConstants.getAppConfig().getProperty("mobilePath");
+        return getAppConfig().getProperty("mobilePath");
     }
 
     /**
      * 获取URL后缀
      */
     public static String getUrlSuffix() {
-        return SysConstants.getAppConfig().getProperty("urlSuffix");
+        return getAppConfig().getProperty("urlSuffix");
     }
 
     /**
      * 系统文件存储方式
      */
     public static String getSystemDiskType() {
-        return SysConstants.getAppConfig().getProperty("system.disk.type");
+        return getAppConfig().getProperty("system.disk.type");
     }
 
     /**
@@ -562,7 +562,7 @@ public class AppConstants extends SysConstants {
     public static int getSessionUserMaxSize() {
         String code = "security.sessionUser.MaxSize";
         String value = getConfigValue(code);
-        return Integer.valueOf(value);
+        return Integer.parseInt(value);
     }
 
 
@@ -575,7 +575,7 @@ public class AppConstants extends SysConstants {
     public static int getUserSessionSize() {
         String code = "security.sessionUser.UserSessionSize";
         String value = getConfigValue(code);
-        return StringUtils.isBlank(value) ? 0 : Integer.valueOf(value);
+        return StringUtils.isBlank(value) ? 0 : Integer.parseInt(value);
     }
 
     /**
@@ -586,7 +586,7 @@ public class AppConstants extends SysConstants {
     public static int getLoginAgainSize() {
         String code = "security.password.loginAgainSize";
         String value = getConfigValue(code);
-        return StringUtils.isBlank(value) ? 3 : Integer.valueOf(value);
+        return StringUtils.isBlank(value) ? 3 : Integer.parseInt(value);
     }
 
     /**
@@ -597,7 +597,7 @@ public class AppConstants extends SysConstants {
     public static int getUserPasswordUpdateCycle() {
         String code = "security.password.updateCycle";
         String value = getConfigValue(code);
-        return StringUtils.isBlank(value) ? 30 : Integer.valueOf(value);
+        return StringUtils.isBlank(value) ? 30 : Integer.parseInt(value);
     }
 
     /**
@@ -608,7 +608,7 @@ public class AppConstants extends SysConstants {
     public static int getUserPasswordRepeatCount() {
         String code = "security.password.repeatCount";
         String value = getConfigValue(code);
-        return StringUtils.isBlank(value) ? 5 : Integer.valueOf(value);
+        return StringUtils.isBlank(value) ? 5 : Integer.parseInt(value);
     }
 
 
@@ -773,8 +773,7 @@ public class AppConstants extends SysConstants {
      */
     public static String getSystemOpsWarnLoginNames() {
         String code = "system.ops.warn.loginNames";
-        String value = getConfigValue(code);
-        return value;
+        return getConfigValue(code);
     }
 
 
