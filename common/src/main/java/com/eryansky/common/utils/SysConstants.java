@@ -42,14 +42,14 @@ public class SysConstants {
      * 获取配置
      */
     public static String getAppConfig(String key) {
-        return SysConstants.getAppConfig().getProperty(key);
+        return getAppConfig().getProperty(key);
     }
 
     /**
      * 获取配置
      */
     public static String getAppConfig(String key,String defaultValue) {
-        return SysConstants.getAppConfig().getProperty(key,defaultValue);
+        return getAppConfig().getProperty(key,defaultValue);
     }
 
     /**
