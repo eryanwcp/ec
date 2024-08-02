@@ -10,6 +10,7 @@ import com.eryansky.common.orm.Page;
 import com.eryansky.common.utils.DateUtils;
 import com.eryansky.common.utils.Identities;
 import com.eryansky.common.utils.StringUtils;
+import com.google.common.collect.Lists;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -33,6 +35,9 @@ import java.util.stream.Stream;
 public class FileUtils extends org.apache.commons.io.FileUtils {
 
 	private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
+
+	public static final String SEPARATOR = "/";
+	public static final String WIN_SEPARATOR = "\\";
 
 	/**
 	 * 生成随机的文件名 将原始文件名去掉,改为一个UUID的文件名,后缀名以原文件名的后缀为准
@@ -332,21 +337,87 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
         return sb.toString();
     }
 
+
 	/**
-	 * 修复路径，将 \\ 或 / 等替换为 File.separator
-	 * @param path
-	 * @return
+	 * 修正路径，将 \\ 或 / 等替换为 /
+	 * @param path 待修正的路径
+	 * @return 修正后的路径
 	 */
 	public static String path(String path){
-		String p = StringUtils.replace(path, "\\", "/");
-		p = StringUtils.join(StringUtils.split(p, "/"), "/");
-		if (!StringUtils.startsWithAny(p, "/") && StringUtils.startsWithAny(path, "\\", "/")){
-			p += "/";
+		String p = StringUtils.replace(path, WIN_SEPARATOR, SEPARATOR);
+		p = StringUtils.join(StringUtils.split(p, SEPARATOR), SEPARATOR);
+		if (!StringUtils.startsWithAny(p, SEPARATOR) && StringUtils.startsWithAny(path, WIN_SEPARATOR, SEPARATOR)){
+			p = SEPARATOR + p;
 		}
-		if (!StringUtils.endsWithAny(p, "/") && StringUtils.endsWithAny(path, "\\", "/")){
-			p = p + "/";
+		if (!StringUtils.endsWithAny(p, SEPARATOR) && StringUtils.endsWithAny(path, WIN_SEPARATOR, SEPARATOR)){
+			p = p + SEPARATOR;
+		}
+		if (path != null && path.startsWith(SEPARATOR) && !p.startsWith(SEPARATOR)){
+			p = SEPARATOR + p; // linux下路径
 		}
 		return p;
+	}
+
+	/**
+	 * 获目录下的文件列表
+	 * @param dir 搜索目录
+	 * @param searchDirs 是否是搜索目录
+	 * @return 文件列表
+	 */
+	public static List<String> findChildrenList(File dir, boolean searchDirs) {
+		List<String> files = Lists.newArrayList();
+		for (String subFiles : Objects.requireNonNull(dir.list())) {
+			File file = new File(dir + SEPARATOR + subFiles);
+			if (((searchDirs) && (file.isDirectory())) || ((!searchDirs) && (!file.isDirectory()))) {
+				files.add(file.getName());
+			}
+		}
+		return files;
+	}
+
+
+	/**
+	 * 获取文件名，不包含扩展名
+	 * @param fileName 文件名
+	 * @return 例如：d:\files\test.jpg  返回：d:\files\test
+	 */
+	public static String getFileNameWithoutExtension(String fileName) {
+		if ((fileName == null) || (fileName.lastIndexOf(".") == -1)) {
+			return null;
+		}
+		return fileName.substring(0, fileName.lastIndexOf("."));
+	}
+
+	/**
+	 * 获取文件扩展名(返回小写)
+	 * @param fileName 文件名
+	 * @return 例如：test.jpg  返回：  jpg
+	 */
+	public static String getFileExtension(String fileName) {
+		if ((fileName == null) || (fileName.lastIndexOf(".") == -1)
+				|| (fileName.lastIndexOf(".") == fileName.length() - 1)) {
+			return null;
+		}
+		return StringUtils.lowerCase(fileName.substring(fileName.lastIndexOf(".") + 1));
+	}
+
+	/**
+	 * 根据图片Base64获取文件扩展名
+	 * @param imageBase64
+	 * @return
+	 * @author ThinkGem
+	 */
+	public static String getFileExtensionByImageBase64(String imageBase64){
+		String extension = null;
+		String type = StringUtils.substringBetween(imageBase64, "data:", ";base64,");
+		if (StringUtils.inStringIgnoreCase(type, "image/jpeg")){
+			extension = "jpg";
+		}else if (StringUtils.inStringIgnoreCase(type, "image/gif")){
+			extension = "gif";
+		}else{
+			extension = "png";
+		}
+		return extension;
 	}
 
 	/**
@@ -361,7 +432,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 			throw new ServiceException("文件[" + (null == file ? "" : file.getAbsolutePath()) + "]不存在");
 		}
 		String code = null;
-		try (InputStream inputStream = new FileInputStream(file);
+		try (InputStream inputStream = Files.newInputStream(file.toPath());
 			 BufferedInputStream bin = new BufferedInputStream(inputStream)){
 			int p = (bin.read() << 8) + bin.read();
 

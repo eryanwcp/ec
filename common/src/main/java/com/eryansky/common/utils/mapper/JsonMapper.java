@@ -6,21 +6,28 @@
 package com.eryansky.common.utils.mapper;
 
 import com.eryansky.common.utils.StringUtils;
+import com.eryansky.common.utils.encode.EncodeUtils;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotationUtils;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 /**
@@ -95,6 +102,59 @@ public class JsonMapper  extends ObjectMapper{
     public JsonMapper enableSimple() {
         this.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
         this.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+        return this;
+    }
+
+    /**
+     * 开启将空值转换为空字符串
+     * @author ThinkGem
+     */
+    public JsonMapper enabledNullValueToEmpty(){
+        this.getSerializerProvider().setNullValueSerializer(new JsonSerializer<Object>(){
+            @Override
+            public void serialize(Object value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+                jgen.writeString(StringUtils.EMPTY);
+            }
+        });
+        return this;
+    }
+
+
+    /**
+     * 开启 XSS 过滤器
+     */
+    public JsonMapper enabledXssFilter(){
+        this.registerModule(new SimpleModule().addDeserializer(String.class, new JsonDeserializer<String>() {
+            @Override
+            public String deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+                String text = p.getText();
+                if (text != null) {
+                    return EncodeUtils.xssFilter(text);
+                }
+                return null;
+            }
+        }));
+        return this;
+    }
+
+    /**
+     * 设定是否使用Enum的toString函数來读写Enum,
+     * 为False时使用Enum的name()读写來读写Enum, 默认为False.
+     * 注意本函数一定要在Mapper创建后, 所有的读写动作之前调用.
+     */
+    public JsonMapper enableEnumUseToString() {
+        this.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING);
+        this.enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING);
+        return this;
+    }
+
+    /**
+     * 支持使用Jaxb的Annotation，使得POJO上的annotation不用与Jackson耦合。
+     * 默认会先查找jaxb的annotation，如果找不到再找jackson的。
+     */
+    public JsonMapper enableJaxbAnnotation() {
+        JaxbAnnotationModule module = new JaxbAnnotationModule();
+        this.registerModule(module);
         return this;
     }
 
@@ -211,6 +271,19 @@ public class JsonMapper  extends ObjectMapper{
 		}
 	}
 
+    public <T> T fromJson(String jsonString, TypeReference<T> valueTypeRef){
+        if (StringUtils.isEmpty(jsonString)) {
+            return null;
+        }
+
+        try {
+            return super.readValue(jsonString, valueTypeRef);
+        } catch (IOException e) {
+            logger.warn("parse json string error:" + jsonString, e);
+            return null;
+        }
+    }
+
     /**
      * 获取泛型的Collection Type
      * @param jsonString json字符串
@@ -266,26 +339,7 @@ public class JsonMapper  extends ObjectMapper{
         return null;
     }
     
-    /**
-	 * 设定是否使用Enum的toString函数來读写Enum,
-	 * 为False时使用Enum的name()读写來读写Enum, 默认为False.
-	 * 注意本函数一定要在Mapper创建后, 所有的读写动作之前调用.
-	 */
-	public JsonMapper enableEnumUseToString() {
-        this.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING);
-        this.enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING);
-        return this;
-	}
 
-	/**
-	 * 支持使用Jaxb的Annotation，使得POJO上的annotation不用与Jackson耦合。
-	 * 默认会先查找jaxb的annotation，如果找不到再找jackson的。
-	 */
-	public JsonMapper enableJaxbAnnotation() {
-		JaxbAnnotationModule module = new JaxbAnnotationModule();
-        this.registerModule(module);
-        return this;
-	}
 
 	/**
 	 * 取出Mapper做进一步的设置或使用其他序列化API.
@@ -304,13 +358,22 @@ public class JsonMapper  extends ObjectMapper{
     }
 
     /**
-     * JSON字符串转换为对象
-     * @param jsonString
-     * @param clazz
-     * @return
+     * JSON字符串转换为 List<Map<String, Object>>
      */
-    public static Object fromJsonString(String jsonString, Class<?> clazz){
-        return JsonMapper.getInstance().fromJson(jsonString, clazz);
+    public static List<Map<String, Object>> fromJsonForMapList(String jsonString){
+        List<Map<String, Object>> result = Lists.newArrayList();
+        if (StringUtils.startsWith(jsonString, "{")){
+            Map<String, Object> map = JsonMapper.getInstance().fromJson(jsonString, new TypeReference<Map<String,Object>>() {});
+            if (map != null){
+                result.add(map);
+            }
+        }else if (StringUtils.startsWith(jsonString, "[")){
+            List<Map<String, Object>> list = JsonMapper.getInstance().fromJson(jsonString, new TypeReference<List<Map<String, Object>>>() {});
+            if (list != null){
+                result = list;
+            }
+        }
+        return result;
     }
 
     /**

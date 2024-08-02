@@ -263,6 +263,12 @@
             <artifactId>bcpkix-jdk18on</artifactId>
             <version>1.78.1</version>
         </dependency>
+        <dependency>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+            <version>0.4.19</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
 

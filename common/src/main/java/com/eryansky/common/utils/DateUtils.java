@@ -47,8 +47,12 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     public static final String TIMEZONE = "GMT+08:00";
     public static final String T_END_TIME = "9999-12-31";
 
-	private static final String[] parsePatterns = {"yyyy-MM", "yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm",
-		"yyyy/MM/dd", "yyyy/MM/dd HH:mm:ss", "yyyy/MM/dd HH:mm", "yyyy-MM-dd'T'HH:mm", "yyyy年MM月dd日", "yyyy年MM月"};
+	private static final String[] parsePatterns = {
+            "yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm", "yyyy-MM-dd HH", "yyyy-MM",
+            "yyyy/MM/dd", "yyyy/MM/dd HH:mm:ss", "yyyy/MM/dd HH:mm", "yyyy/MM/dd HH", "yyyy/MM",
+            "yyyy.MM.dd", "yyyy.MM.dd HH:mm:ss", "yyyy.MM.dd HH:mm", "yyyy.MM.dd HH", "yyyy.MM",
+            "yyyy年MM月dd日", "yyyy年MM月dd日 HH时mm分ss秒", "yyyy年MM月dd日 HH时mm分", "yyyy年MM月dd日 HH时", "yyyy年MM月",
+            "yyyyMMdd", "yyyyMM", "yyyy"};
 
 	/**
 	 * 得到当前日期字符串 格式（yyyy-MM-dd）
