@@ -59,8 +59,8 @@ public class AppConstants extends SysConstants {
      * 静态内部类，延迟加载，懒汉式，线程安全的单例模式
      */
     private static final class Static {
-        private static ConfigService configService = SpringContextHolder.getBean(ConfigService.class);
-        private static PropertiesLoader config = getConfig();
+        private static final ConfigService configService = SpringContextHolder.getBean(ConfigService.class);
+        private static final PropertiesLoader config = getConfig();
         private static PropertiesLoader getConfig(){
             String activeProfile = getAppConfig().getActiveProfiles()[0];
             return new PropertiesLoader("config" + (null == activeProfile ? "" : "-" + activeProfile) + ".properties");

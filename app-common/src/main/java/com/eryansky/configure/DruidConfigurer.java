@@ -40,9 +40,6 @@ public class DruidConfigurer {
 
         //创建filter进行过滤
         Filter filter = new Filter() {
-            @Override
-            public void init(FilterConfig filterConfig) throws ServletException {
-            }
 
             @Override
             public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -57,9 +54,6 @@ public class DruidConfigurer {
                 response.getWriter().write(text);
             }
 
-            @Override
-            public void destroy() {
-            }
         };
 
         FilterRegistrationBean registrationBean = new FilterRegistrationBean();

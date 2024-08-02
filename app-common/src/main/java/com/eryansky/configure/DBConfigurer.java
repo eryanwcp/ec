@@ -47,7 +47,7 @@ import java.util.Properties;
 @Configuration
 public class DBConfigurer {
 
-    private static Logger logger = LoggerFactory.getLogger(DBConfigurer.class);
+    private static final Logger logger = LoggerFactory.getLogger(DBConfigurer.class);
 
     public static final String TX_MANAGER_NAME = "transactionManager";
 
