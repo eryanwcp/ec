@@ -12,7 +12,6 @@ import com.eryansky.common.utils.Identities;
 import com.eryansky.common.utils.reflection.ReflectionUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,7 +43,6 @@ public abstract class PBaseEntity<T, PK extends Serializable> extends AbstractBa
     }
 
     @JsonIgnore
-    @XmlTransient
     @Override
     public IUser getCurrentUser() {
         return null;
@@ -75,7 +73,6 @@ public abstract class PBaseEntity<T, PK extends Serializable> extends AbstractBa
     }
 
     @JsonIgnore
-    @XmlTransient
     @Override
     public Page<T> getEntityPage() {
         return super.getEntityPage();
@@ -83,7 +80,6 @@ public abstract class PBaseEntity<T, PK extends Serializable> extends AbstractBa
 
 
     @JsonIgnore
-    @XmlTransient
     @Override
     public Map<String, String> getSqlMap() {
         return super.getSqlMap();

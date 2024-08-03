@@ -35,7 +35,7 @@
         <tomcat-plugin.version>2.2</tomcat-plugin.version>
 
         <spring-boot.version>3.3.2</spring-boot.version>
-        <spring-integration-redis.version>6.2.2</spring-integration-redis.version>
+        <spring-integration-redis.version>6.3.2</spring-integration-redis.version>
         <logstash-logback-encoder.version>8.0</logstash-logback-encoder.version>
         <logback-classic.version>1.5.6</logback-classic.version>
         <byte-buddy.version>1.14.18</byte-buddy.version>
@@ -232,6 +232,10 @@
                 <exclusion>
                     <groupId>com.google.errorprone</groupId>
                     <artifactId>error_prone_annotations</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>jcl-over-slf4j</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

@@ -11,7 +11,6 @@ import com.eryansky.common.orm.persistence.IUser;
 import com.eryansky.common.utils.Identities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.xml.bind.annotation.XmlTransient;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,7 +45,6 @@ public abstract class BaseEntity<T> extends AbstractBaseEntity<T,String> {
     }
 
     @JsonIgnore
-    @XmlTransient
     @Override
     public IUser getCurrentUser() {
         return null;
@@ -72,14 +70,12 @@ public abstract class BaseEntity<T> extends AbstractBaseEntity<T,String> {
     }
 
     @JsonIgnore
-    @XmlTransient
     @Override
     public Page<T> getEntityPage() {
         return super.getEntityPage();
     }
 
     @JsonIgnore
-    @XmlTransient
     @Override
     public Map<String, String> getSqlMap() {
         return super.getSqlMap();
