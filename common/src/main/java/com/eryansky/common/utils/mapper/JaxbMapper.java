@@ -8,11 +8,11 @@ package com.eryansky.common.utils.mapper;
 import com.eryansky.common.utils.Exceptions;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.reflection.ReflectionUtils;
+import jakarta.xml.bind.*;
+import jakarta.xml.bind.annotation.XmlAnyElement;
 import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.util.Assert;
 
-import javax.xml.bind.*;
-import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.namespace.QName;
 import java.io.StringReader;
 import java.io.StringWriter;

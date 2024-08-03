@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.eryansky</groupId>
         <artifactId>ec-parent</artifactId>
-        <version>4.3.20240226.01</version>
+        <version>4.3.20240801.01</version>
     </parent>
 
     <artifactId>ec-app</artifactId>
@@ -18,12 +18,12 @@
     <properties>
         <velocity.version>2.3</velocity.version>
         <ckfinder.version>2.3</ckfinder.version>
-        <liquibase.version>4.26.0</liquibase.version>
-        <commons-cli.version>1.6.0</commons-cli.version>
+        <liquibase.version>4.29.0</liquibase.version>
+        <commons-cli.version>1.8.0</commons-cli.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>1.8</java.version>
+        <java.version>17</java.version>
     </properties>
 
     <profiles>
@@ -43,6 +43,38 @@
                     <groupId>org.apache.tomcat.embed</groupId>
                     <artifactId>tomcat-embed-jasper</artifactId>
                     <version>${tomcat.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>jakarta.annotation</groupId>
+                    <artifactId>jakarta.annotation-api</artifactId>
+                    <version>2.1.1</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.tomcat.embed</groupId>
+                    <artifactId>tomcat-embed-core</artifactId>
+                    <version>${tomcat.version}</version>
+                    <exclusions>
+                        <exclusion>
+                            <artifactId>tomcat-annotations-api</artifactId>
+                            <groupId>org.apache.tomcat</groupId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.tomcat.embed</groupId>
+                    <artifactId>tomcat-embed-el</artifactId>
+                    <version>${tomcat.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.tomcat.embed</groupId>
+                    <artifactId>tomcat-embed-websocket</artifactId>
+                    <version>${tomcat.version}</version>
+                    <exclusions>
+                        <exclusion>
+                            <artifactId>tomcat-annotations-api</artifactId>
+                            <groupId>org.apache.tomcat</groupId>
+                        </exclusion>
+                    </exclusions>
                 </dependency>
             </dependencies>
         </profile>
@@ -77,6 +109,13 @@
     </profiles>
 
     <dependencies>
+        <!-- ... other dependencies -->
+        <dependency>
+            <groupId>org.sitemesh</groupId>
+            <artifactId>spring-boot-starter-sitemesh</artifactId>
+            <version>3.2.1</version>
+        </dependency>
+
         <dependency>
             <groupId>com.eryansky</groupId>
             <artifactId>ec-common</artifactId>
@@ -85,6 +124,10 @@
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jakarta.servlet</groupId>
+                    <artifactId>jakarta.servlet-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -141,6 +184,7 @@
 <!--            </exclusions>-->
         </dependency>
 
+
     </dependencies>
     <build>
         <finalName>${project.artifactId}</finalName>
@@ -175,6 +219,16 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <parameters>true</parameters>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <version>3.4.0</version>
                 <configuration>
@@ -204,21 +258,18 @@
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
-                <version>3.4.0</version>
+                <version>3.4.3</version>
                 <configuration>
                     <from>
-                        <image>openjdk:8-jre-alpine</image>
-                        <auth>
-                            <username>username</username>
-                            <password>password</password>
-                        </auth>
+<!--                        <image>openjdk:8-jre-alpine</image>-->
+                        <image>dragonwell-registry.cn-hangzhou.cr.aliyuncs.com/dragonwell/dragonwell:8</image>
                     </from>
                     <to>
-                        <image>www.eryansky.com:8082/eryansky/${project.artifactId}:${project.version}</image>
-                        <auth>
-                            <username>username</username>
-                            <password>password</password>
-                        </auth>
+                        <image>eryanwcp/${project.artifactId}</image>
+                        <tags>
+                            <tag>latest</tag>
+                            <tag>${project.version}</tag>
+                        </tags>
                     </to>
                     <allowInsecureRegistries>true</allowInsecureRegistries>
                     <container>
@@ -226,7 +277,7 @@
                         <jvmFlags>
                             <jvmFlag>-Dspring.profiles.active=${profileActive}</jvmFlag>
                             <jvmFlag>-Xms1g</jvmFlag>
-                            <jvmFlag>-Xmx1g</jvmFlag>
+                            <jvmFlag>-Xmx2g</jvmFlag>
                             <jvmFlag>-Djava.awt.headless=true</jvmFlag>
                             <jvmFlag>-Duser.timezone=GMT+08</jvmFlag>
                         </jvmFlags>
