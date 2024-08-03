@@ -18,6 +18,7 @@ import javax.servlet.ServletException;
         scanBasePackages = {"com.eryansky.j2cache.autoconfigure",
                 "com.eryansky.common.spring",
                 "com.eryansky.configure",
+                "com.eryansky.core.rpc",
                 "com.eryansky.modules.**.aop",
                 "com.eryansky.modules.**.task",
                 "com.eryansky.modules.**.event",
