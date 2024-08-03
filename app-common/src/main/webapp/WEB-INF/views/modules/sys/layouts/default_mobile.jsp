@@ -16,9 +16,9 @@
     <script type="text/javascript" charset="utf-8" src="${ctxStatic}/mobile/map_module${yuicompressor}.js?_=${sysInitTime}"></script>
     <link rel="stylesheet" type="text/css" href="${ctxStatic}/app/mobile/mobile${yuicompressor}.css?_=${sysInitTime}" />
     <meta name="viewport" id="viewport" content="width=device-width, initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
-    <sitemesh:head/>
+    <sitemesh:write property='head'/>
 </head>
 <body style="background-color: #e6e6e6;">
-<sitemesh:body/>
+<sitemesh:write property='body'/>
 </body>
 </html>

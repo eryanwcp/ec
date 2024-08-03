@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemesh>
+    <mapping decorator="/decorators/default"/>
+
+    <!-- Exclude path from decoration. -->
+    <mapping path="/static/*" exclude="true"/>
+    <mapping path="/api/*" exclude="true"/>
+    <mapping path="/rest/*" exclude="true"/>
+</sitemesh>

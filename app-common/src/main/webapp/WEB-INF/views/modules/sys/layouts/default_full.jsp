@@ -24,9 +24,9 @@
     <script type="text/javascript" src="${ctxStatic}/js/easyui/extend/js/easyui-extend${yuicompressor}.js?_=${sysInitTime}" charset="utf-8"></script>
     <%-- easyui自定义表单校验扩展 --%>
     <script type="text/javascript" src="${ctxStatic}/js/easyui/extend/js/validatebox-extend${yuicompressor}.js?_=${sysInitTime}" charset="utf-8"></script>
-	<sitemesh:head/>
+    <sitemesh:write property='head'/>
 </head>
 <body>
-<sitemesh:body/>
+<sitemesh:write property='body'/>
 </body>
 </html>

@@ -62,6 +62,8 @@ public class AppErrorController extends AbstractErrorController {
         Map<String, Object> errorData = new java.util.HashMap<>(getErrorAttributes(request, ErrorAttributeOptions.of(ErrorAttributeOptions.Include.MESSAGE)));
         errorData.put("clientIP", IpUtils.getIpAddr0(request));
         errorData.put("userAgent", UserAgentUtils.getHTTPUserAgent(request));
+        errorData.put("status", status);
+        errorData.put("error", null != errorData.get("error") ? errorData.get("error"):"");
         logger.error("{}",JsonMapper.toJsonString(errorData));
         ModelAndView modelAndView = null;
         int statusCode = status.value();

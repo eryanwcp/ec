@@ -258,7 +258,7 @@
                 <configuration>
                     <from>
 <!--                        <image>openjdk:8-jre-alpine</image>-->
-                        <image>dragonwell-registry.cn-hangzhou.cr.aliyuncs.com/dragonwell/dragonwell:8</image>
+                        <image>dragonwell-registry.cn-hangzhou.cr.aliyuncs.com/dragonwell/dragonwell:17</image>
                     </from>
                     <to>
                         <image>eryanwcp/${project.artifactId}</image>
