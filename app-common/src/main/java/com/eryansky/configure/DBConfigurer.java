@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
@@ -44,7 +45,7 @@ import java.util.Properties;
  * @author Eryan
  * @date 2019-01-23
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class DBConfigurer {
 
     private static Logger logger = LoggerFactory.getLogger(DBConfigurer.class);
@@ -98,7 +99,7 @@ public class DBConfigurer {
         sqlSessionFactoryBean.setMapperLocations(resolver.getResources("classpath*:mappings/modules/**/*Dao.xml"));
 
         String mybatisProperties = environment.getProperty("spring.dataSource.mybatis.properties");
-        Map<String,Object> map = (Map<String, Object>) JsonMapper.fromJsonString(mybatisProperties,HashMap.class);
+        Map<String,Object> map = JsonMapper.getInstance().toMap(mybatisProperties);
         sqlSessionFactoryBean.setConfigurationProperties(AppUtils.mapToProperties(map));
         return sqlSessionFactoryBean.getObject();
     }
