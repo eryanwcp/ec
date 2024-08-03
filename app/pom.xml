@@ -81,7 +81,7 @@
         <profile>
             <id>prod</id>
             <properties>
-                <project.packaging>jar</project.packaging>
+                <project.packaging>war</project.packaging>
                 <configSuffix>-prod</configSuffix>
                 <profileActive>prod</profileActive>
             </properties>
