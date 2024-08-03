@@ -49,6 +49,17 @@ public class AreaUtils {
         return null;
     }
 
+    /**
+     * @param bizCode 信息分类编码
+     * @return
+     */
+    public static Area getByBizCode(String bizCode) {
+        if (StringUtils.isNotBlank(bizCode)) {
+            return Static.areaService.getByBizCode(bizCode);
+        }
+        return null;
+    }
+
 
     /**
      * 查找名称
@@ -72,6 +83,21 @@ public class AreaUtils {
      */
     public static String getAreaNameByAreaCode(String areaCode) {
         Area area = getByCode(areaCode);
+        if (area != null) {
+            return area.getName();
+        }
+        return null;
+    }
+
+
+    /**
+     * 查找名称
+     *
+     * @param areaBizCode 区域信息分类编码
+     * @return
+     */
+    public static String getAreaNameByAreaBizCode(String areaBizCode) {
+        Area area = getByBizCode(areaBizCode);
         if (area != null) {
             return area.getName();
         }

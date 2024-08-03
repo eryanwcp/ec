@@ -31,6 +31,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -41,6 +44,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
 /**
@@ -52,6 +57,12 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping(value = "${adminPath}/sys/systemMonitor")
 public class SystemMonitorController extends SimpleController {
+
+    @Autowired
+//    @Qualifier("applicationTaskExecutor")
+//    @Qualifier("taskScheduler")
+    @Qualifier("defaultAsyncExecutor")
+    private Executor asyncExecutor;
 
     /**
      * 系统信息
@@ -74,6 +85,7 @@ public class SystemMonitorController extends SimpleController {
         }
         return "modules/sys/systemMonitor";
     }
+
 
 
     /**
@@ -290,7 +302,7 @@ public class SystemMonitorController extends SimpleController {
                       @RequestParam(name = "showTotal",defaultValue = "false") boolean showTotal,
                       @RequestParam(name = "fileName",required = false) String fileName,
                       HttpServletRequest request, HttpServletResponse response, Model uiModel) {
-        Page<String> page = new Page<>(request, response, 1000);
+        Page<String> page = new Page<>(request, response, 5000);
         if(showTotal){
             page.setPageSize(Page.PAGESIZE_ALL);
         }
@@ -303,13 +315,8 @@ public class SystemMonitorController extends SimpleController {
         if (WebUtils.isAjaxRequest(request)) {
             try {
                 // 读取日志
-                List<String> totalLogs = org.apache.commons.io.FileUtils.readLines(file, StandardCharsets.UTF_8);
-                List<String> showLogs = totalLogs;
-                if (page.getPageSize() != Page.PAGESIZE_ALL) {
-                    showLogs = Collections3.getPagedList(totalLogs, page.getPageNo(), page.getPageSize());
-                }
-
-                List<String> resultLogs = showLogs.parallelStream().map(line->{
+                page = FileUtils.readFileLineByPage(file.getPath(),page);
+                List<String> resultLogs = page.getResult().parallelStream().map(line->{
                     line = XsslHttpServletRequestWrapper.replaceXSS(line);
                     if (pretty) {
                         //先转义
@@ -320,10 +327,10 @@ public class SystemMonitorController extends SimpleController {
                                 .replaceAll("\t", "&nbsp;");
 
                         //处理等级
-                        line = line.replace("DEBUG", "<span style='color: blue;'>DEBUG</span>")
-                                .replace("INFO", "<span style='color: green;'>INFO</span>")
-                                .replace("WARN", "<span style='color: orange;'>WARN</span>")
-                                .replace("ERROR", "<span style='color: red;'>ERROR</span>");
+                        line = line.replace("] DEBUG", "] <span style='color: blue;'>DEBUG</span>")
+                                .replace("] INFO", "] <span style='color: green;'>INFO</span>")
+                                .replace("] WARN", "] <span style='color: orange;'>WARN</span>")
+                                .replace("] ERROR", "] <span style='color: red;'>ERROR</span>");
 
                         //处理类名
                         String[] split = line.split("] ");
@@ -339,7 +346,6 @@ public class SystemMonitorController extends SimpleController {
                     }
                     return line;
                 }).collect(Collectors.toList());
-                page.setTotalCount(totalLogs.size());
                 page.setResult(resultLogs);
                 return renderString(response, Result.successResult().setObj(page).setData(PrettyMemoryUtils.prettyByteSize(file.length())));
             } catch (Exception e) {
@@ -402,4 +408,29 @@ public class SystemMonitorController extends SimpleController {
         return canonicalPath;
     }
 
+    /**
+     * 系统监控-异步任务
+     *
+     * @return
+     */
+    @RequiresPermissions("sys:systemMonitor:view")
+    @Logging(value = "系统监控-异步任务", logType = LogType.access, logging = "!#isAjax")
+    @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = "asyncTask")
+    public String asyncTask(HttpServletRequest request, Model uiModel, HttpServletResponse response) {
+        if (WebUtils.isAjaxRequest(request)) {
+            Map<String,Object> map = Maps.newHashMap();
+            ThreadPoolTaskExecutor threadTask = (ThreadPoolTaskExecutor) asyncExecutor;
+            ThreadPoolExecutor threadPoolExecutor = threadTask.getThreadPoolExecutor();
+            map.put("corePoolSize", threadTask.getCorePoolSize());
+            map.put("maxPoolSize", threadTask.getMaxPoolSize());
+
+            map.put("taskCount", threadPoolExecutor.getTaskCount());
+            map.put("activeCount", threadPoolExecutor.getActiveCount());
+            map.put("completedTaskCount", threadPoolExecutor.getCompletedTaskCount());
+            map.put("queueSize", threadPoolExecutor.getQueue().size());
+            map.put("queueRemainingCapacity", threadPoolExecutor.getQueue().remainingCapacity());
+            return renderString(response, Result.successResult().setData(map));
+        }
+        return "modules/sys/systemMonitor-asyncTask";
+    }
 }

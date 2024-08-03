@@ -76,8 +76,9 @@ public class DiskUtils {
 
     /**
      * 得到用户相对路径
+     *
      * @param folderCode 文件夹编码
-     * @param userId 用户ID
+     * @param userId     用户ID
      * @return
      */
     public static String getRelativePath(String folderCode, String userId) {
@@ -89,10 +90,9 @@ public class DiskUtils {
 
 
     /**
-     *  生成对象保存的相对地址
+     * 生成对象保存的相对地址
      *
-     * @param folder
-     *            文件夹
+     * @param folder 文件夹
      * @return
      */
     public static String getRelativePath(Folder folder, String userId) {
@@ -115,6 +115,7 @@ public class DiskUtils {
 
     /**
      * 本地磁盘存储目录
+     *
      * @param folder
      * @param userId
      * @return
@@ -127,6 +128,7 @@ public class DiskUtils {
 
     /**
      * 本地磁盘存储目录
+     *
      * @param folderCode
      * @param userId
      * @return
@@ -140,6 +142,7 @@ public class DiskUtils {
 
     /**
      * FTP存储目录
+     *
      * @param folder
      * @param userId
      * @return
@@ -193,24 +196,22 @@ public class DiskUtils {
      * 根据编码获取 获取系统文件夹 <br/>
      * 如果不存在则自动创建
      *
-     * @param code 系统文件夹编码
-     * @param userId 用户ID
+     * @param code       系统文件夹编码
+     * @param userId     用户ID
      * @param folderType {@link FolderType}
      * @return
      */
-    public static Folder checkAndSaveSystemFolderByCode(String code, String userId,String folderType) {
-        return Static.folderService.checkAndSaveSystemFolderByCode(code, userId,folderType);
+    public static Folder checkAndSaveSystemFolderByCode(String code, String userId, String folderType) {
+        return Static.folderService.checkAndSaveSystemFolderByCode(code, userId, folderType);
     }
 
 
     /**
      * 保存系统文件
      *
-     * @param folderCode
-     *            系统文件夹编码
-     * @param userId 用户ID 允允许为null
-     * @param multipartFile
-     *            上传文件对象 SpringMVC
+     * @param folderCode    系统文件夹编码
+     * @param userId        用户ID 允允许为null
+     * @param multipartFile 上传文件对象 SpringMVC
      * @return
      * @throws InvalidExtensionException
      * @throws FileUploadBase.FileSizeLimitExceededException
@@ -221,31 +222,29 @@ public class DiskUtils {
                                       MultipartFile multipartFile) throws InvalidExtensionException,
             FileUploadBase.FileSizeLimitExceededException,
             FileNameLengthLimitExceededException, IOException {
-        return saveSystemFile(folderCode,FolderType.HIDE.getValue(), userId, multipartFile.getInputStream(), DiskUtils.getMultipartOriginalFilename(multipartFile));
+        return saveSystemFile(folderCode, FolderType.HIDE.getValue(), userId, multipartFile.getInputStream(), DiskUtils.getMultipartOriginalFilename(multipartFile));
     }
 
     /**
      * 保存系统文件
      *
-     * @param folderCode
-     *            系统文件夹编码
-     * @param userId 用户ID 允允许为null
+     * @param folderCode  系统文件夹编码
+     * @param userId      用户ID 允允许为null
      * @param inputStream 文件输入流
-     * @param fileName
-     *            文件名称
+     * @param fileName    文件名称
      * @return
      * @throws InvalidExtensionException
      * @throws FileUploadBase.FileSizeLimitExceededException
      * @throws FileNameLengthLimitExceededException
      * @throws IOException
      */
-    public static File saveSystemFile(String folderCode,String folderType, String userId,
+    public static File saveSystemFile(String folderCode, String folderType, String userId,
                                       InputStream inputStream, String fileName) throws InvalidExtensionException,
             FileUploadBase.FileSizeLimitExceededException,
             FileNameLengthLimitExceededException, IOException {
         String _userId = StringUtils.isBlank(userId) ? User.SUPERUSER_ID : userId;
         String code = FileUploadUtils.encodingFilenamePrefix(_userId + "", fileName);
-        Folder folder = checkAndSaveSystemFolderByCode(folderCode, _userId,folderType);
+        Folder folder = checkAndSaveSystemFolderByCode(folderCode, _userId, folderType);
         String storeFilePath = Static.iFileManager.getStorePath(folder, _userId, fileName);
         File file = new File();
         file.setFolderId(folder.getId());
@@ -264,8 +263,7 @@ public class DiskUtils {
     /**
      * 获取文件的位置
      *
-     * @param folderId
-     *            文件所属文件夹
+     * @param folderId 文件所属文件夹
      * @return
      */
     public static String getFileLocationName(String folderId) {
@@ -279,7 +277,7 @@ public class DiskUtils {
             String userName = folder.getUserName();// 文件夹创建人
             String folderName = folder.getName();// 文件夹名称
             FolderAuthorize folderAuthorize = FolderAuthorize.getByValue(folder.getFolderAuthorize());// 文件夹授权类型
-            if(null != folderAuthorize){
+            if (null != folderAuthorize) {
                 location.append(folderAuthorize.getDescription())
                         .append("：")
                         .append(folderName)
@@ -295,6 +293,7 @@ public class DiskUtils {
 
     /**
      * 获取文件夹文件
+     *
      * @param folderId
      * @return
      */
@@ -305,6 +304,7 @@ public class DiskUtils {
 
     /**
      * 获取文件夹文件
+     *
      * @param folderId
      * @return
      */
@@ -314,6 +314,7 @@ public class DiskUtils {
 
     /**
      * 更新文件
+     *
      * @param fildIds 文件IDS
      * @return
      */
@@ -323,6 +324,7 @@ public class DiskUtils {
 
     /**
      * 根据IDS查找文件
+     *
      * @param fildIds 文件IDS
      * @return
      */
@@ -333,9 +335,10 @@ public class DiskUtils {
 
     /**
      * 复制文件
-     * @param userId 用户ID
+     *
+     * @param userId     用户ID
      * @param folderCode 文件夹编码
-     * @param fildIds 文件IDS
+     * @param fildIds    文件IDS
      * @return
      */
     public static List<File> copyFiles(String userId, String folderCode, Collection<String> fildIds) {
@@ -356,6 +359,7 @@ public class DiskUtils {
 
     /**
      * 提取文件IDS
+     *
      * @param files 文件集合
      * @return
      */
@@ -373,19 +377,21 @@ public class DiskUtils {
 
     /**
      * 统计文件大小
+     *
      * @param fileIds 文件ID集合
      * @return
      */
     public static long countFileSize(Collection<String> fileIds) {
         if (Collections3.isNotEmpty(fileIds)) {
             Long s = Static.fileService.countFileSize(fileIds);
-            return null != s ? s:0L;
+            return null != s ? s : 0L;
         }
         return 0L;
     }
 
     /**
      * 根据文件ID获取文件
+     *
      * @param fileId
      * @return
      */
@@ -395,6 +401,7 @@ public class DiskUtils {
 
     /**
      * 保存文件
+     *
      * @param file 文件
      * @return
      */
@@ -405,6 +412,7 @@ public class DiskUtils {
 
     /**
      * 删除文件
+     *
      * @param fileId 文件ID
      * @return
      */
@@ -415,6 +423,7 @@ public class DiskUtils {
 
     /**
      * 删除文件
+     *
      * @param file
      * @return
      */
@@ -426,6 +435,7 @@ public class DiskUtils {
 
     /**
      * 获取文件虚拟路径
+     *
      * @param file
      * @return
      */
@@ -436,11 +446,12 @@ public class DiskUtils {
 
     /**
      * 获取文件路径
+     *
      * @param fileId
      * @return
      */
     public static String getFileUrl(String fileId) {
-        if(StringUtils.isBlank(fileId)){
+        if (StringUtils.isBlank(fileId)) {
             return null;
         }
         String ctx = StringUtils.EMPTY;
@@ -448,26 +459,77 @@ public class DiskUtils {
             ctx = WebUtils.getAppURL(SpringMVCHolder.getRequest());
         } catch (Exception e) {
         }
-        return  ctx + AppConstants.getAdminPath() + "/disk/fileDownload/" + fileId;
+        return ctx + AppConstants.getAdminPath() + "/disk/fileDownload/" + fileId;
     }
 
     /**
      * 获取文件路径
+     *
      * @param fileId
      * @return
      */
     public static String getFileSrc(String fileId) {
-        if(StringUtils.isBlank(fileId)){
+        if (StringUtils.isBlank(fileId)) {
             return null;
         }
-        return  AppUtils.getAppURL() + AppConstants.getAdminPath() + "/disk/fileDownload/" + fileId;
+        return AppUtils.getAppURL() + AppConstants.getAdminPath() + "/disk/fileDownload/" + fileId;
+    }
+
+    /**
+     * 获取文件路径
+     *
+     * @param fileId
+     * @return
+     */
+    public static String getRestFileSrc(String fileId) {
+        if (StringUtils.isBlank(fileId)) {
+            return null;
+        }
+        return AppUtils.getAppURL() + AppConstants.getAdminPath() + "/disk/restFileDownload/" + fileId;
+    }
+
+    /**
+     * 获取文件路径（支持后缀）
+     *
+     * @param fileId
+     * @return
+     */
+    public static String getFileSrcWithSuffix(String fileId) {
+        if (StringUtils.isBlank(fileId)) {
+            return null;
+        }
+        return getFileSrcWithSuffix(getFile(fileId));
+    }
+
+    /**
+     * 获取文件路径（支持后缀）
+     *
+     * @param file
+     * @return
+     */
+    public static String getFileSrcWithSuffix(File file) {
+        if (null == file) {
+            return null;
+        }
+        return AppUtils.getAppURL() + AppConstants.getAdminPath() + "/disk/fileDownload/" + (StringUtils.isNotBlank(file.getFileSuffix()) ? file.getId() + "." + file.getFileSuffix() : file.getId());
+    }
+
+    /**
+     * 获取文件预览路径
+     *
+     * @param fileId
+     * @return
+     */
+    public static String getFilePreviewSrc(String fileId) {
+        if (StringUtils.isBlank(fileId)) {
+            return null;
+        }
+        return AppUtils.getAppURL() + AppConstants.getAdminPath() + "/disk/fileDownload/" + fileId + "?downloadType=inline";
     }
 
 
-
-
     public static java.io.File getDiskFile(String fileId) {
-        if(StringUtils.isBlank(fileId)){
+        if (StringUtils.isBlank(fileId)) {
             return null;
         }
         File file = Static.fileService.get(fileId);
@@ -506,7 +568,7 @@ public class DiskUtils {
 
     public static void makeZip(List<File> inFiles, String zipPath,
                                String encoding) throws Exception {
-        try(ZipOutputStream zipOut = new ZipOutputStream(new BufferedOutputStream(
+        try (ZipOutputStream zipOut = new ZipOutputStream(new BufferedOutputStream(
                 new FileOutputStream(zipPath)))) {
             zipOut.setEncoding(encoding);
             doZipFile(zipOut, inFiles);
@@ -517,8 +579,7 @@ public class DiskUtils {
     /**
      * 处理文件同名
      *
-     * @param inFiles
-     *            文件对象集合
+     * @param inFiles 文件对象集合
      * @return
      * @throws Exception
      */
@@ -573,6 +634,7 @@ public class DiskUtils {
 
     /**
      * 云盘管理员 超级管理 + 系统管理员 + 网盘管理员
+     *
      * @param userId 用户ID 如果为null,则为当前登录用户ID
      * @return
      */
@@ -593,6 +655,7 @@ public class DiskUtils {
 
     /**
      * 下载文件
+     *
      * @param request
      * @param response
      * @param inputStream 输入流
@@ -650,7 +713,7 @@ public class DiskUtils {
             is = new BufferedInputStream(inputStream);
             IOUtils.copy(is, os);
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
         } finally {
             IOUtils.closeQuietly(is);
         }
@@ -659,6 +722,7 @@ public class DiskUtils {
 
     /**
      * 获取文件名 兼容IE、Chrome
+     *
      * @param file
      * @return
      */
@@ -667,7 +731,7 @@ public class DiskUtils {
         String fileName = file.getOriginalFilename();
         //判断是否为IE浏览器的文件名，IE浏览器下文件名会带有盘符信息
         // Check for Unix-style path
-        if(null == fileName){
+        if (null == fileName) {
             return null;
         }
         int unixSep = fileName.lastIndexOf('/');

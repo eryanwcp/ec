@@ -28,6 +28,9 @@ public class Config extends BaseEntity<Config> {
      */
     private String remark;
 
+
+    private String query;
+
     public Config() {
         super();
     }
@@ -66,5 +69,13 @@ public class Config extends BaseEntity<Config> {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getQuery() {
+        return query;
+    }
+
+    public void setQuery(String query) {
+        this.query = query;
     }
 }

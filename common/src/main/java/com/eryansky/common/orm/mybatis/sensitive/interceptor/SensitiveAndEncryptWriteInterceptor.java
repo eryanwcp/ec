@@ -7,6 +7,8 @@ import com.eryansky.common.orm.mybatis.sensitive.type.SensitiveTypeRegisty;
 import com.eryansky.common.orm.mybatis.sensitive.utils.JsonUtils;
 import com.eryansky.common.orm.mybatis.sensitive.utils.SensitiveUtils;
 import com.eryansky.common.orm.mybatis.sensitive.IEncrypt;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
@@ -39,15 +41,16 @@ public class SensitiveAndEncryptWriteInterceptor implements Interceptor {
     private static final String MAPPEDSTATEMENT = "delegate.mappedStatement";
     private static final String BOUND_SQL = "delegate.boundSql";
 
-    private final IEncrypt IEncrypt;
+    private Properties properties = new Properties();
+    private IEncrypt encrypt;
 
     public SensitiveAndEncryptWriteInterceptor() throws NoSuchAlgorithmException {
-        this.IEncrypt = new AesSupport();
+        this.encrypt = new AesSupport();
     }
 
-    public SensitiveAndEncryptWriteInterceptor(IEncrypt IEncrypt) {
-        Objects.requireNonNull(IEncrypt, "encrypt should not be null!");
-        this.IEncrypt = IEncrypt;
+    public SensitiveAndEncryptWriteInterceptor(IEncrypt encrypt) {
+        Objects.requireNonNull(encrypt, "encrypt should not be null!");
+        this.encrypt = encrypt;
     }
 
     @Override
@@ -75,16 +78,156 @@ public class SensitiveAndEncryptWriteInterceptor implements Interceptor {
         Map<String, Object> newValues = new HashMap<>(16);
         MetaObject metaObject = configuration.newMetaObject(param);
 
+        Map<String,List<String>> mapList = Maps.newHashMap();
         for (Field field : param.getClass().getDeclaredFields()) {
+            Object value = metaObject.getValue(field.getName());
+            if (value instanceof CharSequence) {
+                EncryptField encryptField = field.getAnnotation(EncryptField.class);
+                if (encryptField != null && value != null && !"".equals(value.toString())) {
+                    List<String> mapData = mapList.get(!"".equals(encryptField.type()) ? encryptField.type():encrypt.defaultType());
+                    if(null == mapData){
+                        mapData = Lists.newArrayList();
+                    }
+                    mapData.add(value.toString());
+                    mapList.put(!"".equals(encryptField.type()) ? encryptField.type():encrypt.defaultType(),mapData);
+                }
+                EncryptJSONField encryptJSONField = field.getAnnotation(EncryptJSONField.class);
+                if (encryptJSONField != null && value != null) {
+                    value =  JsonUtils.parseToObjectMap(value.toString());
+                    for(EncryptJSONFieldKey encryptJSONFieldKey: encryptJSONField.encryptList()){
+                        String keyValue = (String) ((Map<String, Object>) value).get(encryptJSONFieldKey.key());
+                        if(keyValue != null && !"".equals(keyValue)){
+                            List<String> mapData = mapList.get(!"".equals(encryptJSONFieldKey.type()) ? encryptJSONFieldKey.type():encrypt.defaultType());
+                            if(null == mapData){
+                                mapData = Lists.newArrayList();
+                            }
+                            mapData.add(keyValue);
+                            mapList.put(!"".equals(encryptJSONFieldKey.type()) ? encryptJSONFieldKey.type():encrypt.defaultType(),mapData);
+                        }
 
+                    }
+
+                }
+                SensitiveEncryptJSONField sensitiveEncryptJSONField = field.getAnnotation(SensitiveEncryptJSONField.class);
+                if (sensitiveEncryptJSONField != null && value != null) {
+                    value =  JsonUtils.parseToObjectMap(value.toString());
+                    for(EncryptJSONFieldKey encryptJSONFieldKey: sensitiveEncryptJSONField.encryptList()){
+                        String keyValue = (String) ((Map<String, Object>) value).get(encryptJSONFieldKey.key());
+                        if(keyValue != null && !"".equals(keyValue)){
+                            List<String> mapData = mapList.get(!"".equals(encryptJSONFieldKey.type()) ? encryptJSONFieldKey.type():encrypt.defaultType());
+                            if(null == mapData){
+                                mapData = Lists.newArrayList();
+                            }
+                            mapData.add(keyValue);
+                            mapList.put(!"".equals(encryptJSONFieldKey.type()) ? encryptJSONFieldKey.type():encrypt.defaultType(),mapData);
+                        }
+
+                    }
+
+                }
+            }else if (value instanceof Map) {
+                EncryptJSONField encryptField = field.getAnnotation(EncryptJSONField.class);
+                if (encryptField != null && value != null) {
+                    for(EncryptJSONFieldKey encryptJSONFieldKey: encryptField.encryptList()){
+                        String keyValue = (String) ((Map<?, ?>) value).get(encryptJSONFieldKey.key());
+                        if(keyValue != null && !"".equals(keyValue)){
+                            List<String> mapData = mapList.get(!"".equals(encryptJSONFieldKey.type()) ? encryptJSONFieldKey.type():encrypt.defaultType());
+                            if(null == mapData){
+                                mapData = Lists.newArrayList();
+                            }
+                            mapData.add(keyValue);
+                            mapList.put(!"".equals(encryptJSONFieldKey.type()) ? encryptJSONFieldKey.type():encrypt.defaultType(),mapData);
+                        }
+
+                    }
+
+                }
+                SensitiveEncryptJSONField sensitiveEncryptJSONField = field.getAnnotation(SensitiveEncryptJSONField.class);
+                if (sensitiveEncryptJSONField != null && value != null) {
+                    value =  value instanceof String ? JsonUtils.parseToObjectMap(value.toString()):(Map<String, Object>)value;
+                    for(EncryptJSONFieldKey encryptJSONFieldKey: sensitiveEncryptJSONField.encryptList()){
+                        String keyValue = (String) ((Map<String, Object>) value).get(encryptJSONFieldKey.key());
+                        if(keyValue != null && !"".equals(keyValue)){
+                            List<String> mapData = mapList.get(!"".equals(encryptJSONFieldKey.type()) ? encryptJSONFieldKey.type():encrypt.defaultType());
+                            if(null == mapData){
+                                mapData = Lists.newArrayList();
+                            }
+                            mapData.add(keyValue);
+                            mapList.put(!"".equals(encryptJSONFieldKey.type()) ? encryptJSONFieldKey.type():encrypt.defaultType(),mapData);
+                        }
+
+                    }
+
+                }
+            }
+        }
+
+        Map<String,List<String>> rDatas = encrypt.batchEncrypt(mapList);
+        for (Field field : param.getClass().getDeclaredFields()) {
             Object value = metaObject.getValue(field.getName());
             Object newValue = value;
             if (value instanceof CharSequence) {
-                newValue = handleEncryptField(field, newValue);
-                if (isWriteCommand(commandType) && !SensitiveTypeRegisty.alreadyBeSentisived(newValue)) {
-                    newValue = handleSensitiveField(field, newValue);
-                    newValue = handleSensitiveJSONField(field, newValue);
+                EncryptField encryptField = field.getAnnotation(EncryptField.class);
+                if (encryptField != null && value != null && !"".equals(value.toString())) {
+                    newValue = rDatas.get(!"".equals(encryptField.type()) ? encryptField.type():encrypt.defaultType()).get(0);
+                    rDatas.get(!"".equals(encryptField.type()) ? encryptField.type():encrypt.defaultType()).remove(0);
                 }
+                EncryptJSONField encryptJSONField = field.getAnnotation(EncryptJSONField.class);
+                if (encryptJSONField != null && value != null) {
+                    newValue = JsonUtils.parseToObjectMap(value.toString());
+                    for(EncryptJSONFieldKey encryptJSONFieldKey: encryptJSONField.encryptList()){
+                        String keyValue = (String) ((Map<String, Object>) newValue).get(encryptJSONFieldKey.key());
+                        if(keyValue != null && !"".equals(keyValue)){
+                            ((Map<String, Object>) newValue).put(encryptJSONFieldKey.key(),rDatas.get(!"".equals(encryptJSONFieldKey.type()) ? encryptJSONFieldKey.type():encrypt.defaultType()).get(0));
+                            rDatas.get(!"".equals(encryptJSONFieldKey.type()) ? encryptJSONFieldKey.type():encrypt.defaultType()).remove(0);
+                        }
+
+                    }
+                    newValue = JsonUtils.parseMaptoJSONString(((Map<String, Object>) newValue));
+                }
+                SensitiveEncryptJSONField sensitiveEncryptJSONField = field.getAnnotation(SensitiveEncryptJSONField.class);
+                if (sensitiveEncryptJSONField != null && value != null) {
+                    newValue = JsonUtils.parseToObjectMap(value.toString());
+                    for(EncryptJSONFieldKey encryptJSONFieldKey: sensitiveEncryptJSONField.encryptList()){
+                        String keyValue = (String) ((Map<?, ?>) newValue).get(encryptJSONFieldKey.key());
+                        if(keyValue != null && !"".equals(keyValue)){
+                            ((Map<String, Object>) newValue).put(encryptJSONFieldKey.key(),rDatas.get(!"".equals(encryptJSONFieldKey.type()) ? encryptJSONFieldKey.type():encrypt.defaultType()).get(0));
+                            rDatas.get(!"".equals(encryptJSONFieldKey.type()) ? encryptJSONFieldKey.type():encrypt.defaultType()).remove(0);
+                        }
+
+                    }
+                    newValue = handleSensitiveJSONField(sensitiveEncryptJSONField.sensitiveList(), (Map<String, Object>) newValue);
+//                    newValue = JsonUtils.parseToJSONString(newValue);
+                }
+            }else if (value instanceof Map) {
+                EncryptJSONField encryptField = field.getAnnotation(EncryptJSONField.class);
+                if (encryptField != null && value != null) {
+                    for(EncryptJSONFieldKey encryptJSONFieldKey: encryptField.encryptList()){
+                        String keyValue = (String) ((Map<String, Object>) newValue).get(encryptJSONFieldKey.key());
+                        if(keyValue != null && !"".equals(keyValue)){
+                            ((Map<String, Object>) newValue).put(encryptJSONFieldKey.key(),rDatas.get(!"".equals(encryptJSONFieldKey.type()) ? encryptJSONFieldKey.type():encrypt.defaultType()).get(0));
+                            rDatas.get(!"".equals(encryptJSONFieldKey.type()) ? encryptJSONFieldKey.type():encrypt.defaultType()).remove(0);
+                        }
+
+                    }
+                }
+                SensitiveEncryptJSONField sensitiveEncryptJSONField = field.getAnnotation(SensitiveEncryptJSONField.class);
+                if (sensitiveEncryptJSONField != null && value != null) {
+                    for(EncryptJSONFieldKey encryptJSONFieldKey: sensitiveEncryptJSONField.encryptList()){
+                        String keyValue = (String) ((Map<?, ?>) newValue).get(encryptJSONFieldKey.key());
+                        if(keyValue != null && !"".equals(keyValue)){
+                            ((Map<String, Object>) newValue).put(encryptJSONFieldKey.key(),rDatas.get(!"".equals(encryptJSONFieldKey.type()) ? encryptJSONFieldKey.type():encrypt.defaultType()).get(0));
+                            rDatas.get(!"".equals(encryptJSONFieldKey.type()) ? encryptJSONFieldKey.type():encrypt.defaultType()).remove(0);
+                        }
+
+                    }
+                    newValue = handleSensitiveJSONField(sensitiveEncryptJSONField.sensitiveList(), (Map<String, Object>) newValue);
+                }
+
+            }
+            if (isWriteCommand(commandType) && !SensitiveTypeRegisty.alreadyBeSentisived(newValue)) {
+                newValue = handleSensitiveField(field, newValue);
+                newValue = handleSensitiveJSONField(field, newValue);
             }
             if (value != null && newValue != null && !value.equals(newValue)) {
                 newValues.put(field.getName(), newValue);
@@ -100,16 +243,6 @@ public class SensitiveAndEncryptWriteInterceptor implements Interceptor {
         return SqlCommandType.UPDATE.equals(commandType) || SqlCommandType.INSERT.equals(commandType);
     }
 
-    private Object handleEncryptField(Field field, Object value) {
-
-        EncryptField encryptField = field.getAnnotation(EncryptField.class);
-        Object newValue = value;
-        if (encryptField != null && value != null) {
-            newValue = IEncrypt.encrypt(value.toString());
-        }
-        return newValue;
-    }
-
     private Object handleSensitiveField(Field field, Object value) {
         SensitiveField sensitiveField = field.getAnnotation(SensitiveField.class);
         Object newValue = value;
@@ -119,11 +252,19 @@ public class SensitiveAndEncryptWriteInterceptor implements Interceptor {
         return newValue;
     }
 
+    private Object handleSensitiveJSONField(SensitiveJSONFieldKey[] keys, Map value) {
+        Object newValue = value;
+        if (keys != null && value != null) {
+            newValue = processJsonField(newValue, keys);
+        }
+        return newValue;
+    }
+
     private Object handleSensitiveJSONField(Field field, Object value) {
         SensitiveJSONField sensitiveJSONField = field.getAnnotation(SensitiveJSONField.class);
         Object newValue = value;
         if (sensitiveJSONField != null && value != null) {
-            newValue = processJsonField(newValue, sensitiveJSONField);
+            newValue = processJsonField(newValue, sensitiveJSONField.sensitiveList());
         }
         return newValue;
     }
@@ -132,18 +273,18 @@ public class SensitiveAndEncryptWriteInterceptor implements Interceptor {
      * 在json中进行脱敏
      *
      * @param newValue           new
-     * @param sensitiveJSONField 脱敏的字段
+     * @param keys 脱敏的字段
      * @return json
      */
-    private Object processJsonField(Object newValue, SensitiveJSONField sensitiveJSONField) {
+    private Object processJsonField(Object newValue, SensitiveJSONFieldKey[] keys) {
 
         try {
-            Map<String, Object> map = JsonUtils.parseToObjectMap(newValue.toString());
-            SensitiveJSONFieldKey[] keys = sensitiveJSONField.sensitiveList();
+            Map<String, Object> map = newValue instanceof Map ? (Map<String, Object>) newValue : JsonUtils.parseToObjectMap(newValue.toString());
             for (SensitiveJSONFieldKey jsonFieldKey : keys) {
+                String bindField = jsonFieldKey.bindKey();
                 String key = jsonFieldKey.key();
                 SensitiveType sensitiveType = jsonFieldKey.type();
-                Object oldData = map.get(key);
+                Object oldData = map.get(bindField);
                 if (oldData != null) {
                     String newData = SensitiveTypeRegisty.get(sensitiveType).handle(oldData);
                     map.put(key, newData);
@@ -157,6 +298,8 @@ public class SensitiveAndEncryptWriteInterceptor implements Interceptor {
         }
     }
 
+
+
     @Override
     public Object plugin(Object o) {
         return Plugin.wrap(o, this);
@@ -164,6 +307,21 @@ public class SensitiveAndEncryptWriteInterceptor implements Interceptor {
 
     @Override
     public void setProperties(Properties properties) {
-        //do nothing
+        this.properties = properties;
+        String encryptValue = (String) properties.get("encrypt");
+        if (null != encryptValue) {
+            log.debug("properties-encrypt:" + encryptValue);
+            try {
+                Class clazz = Class.forName(encryptValue);
+                encrypt = (IEncrypt) clazz.newInstance();
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
     }
 }

@@ -25,6 +25,8 @@ public interface AreaDao extends TreeDao<Area> {
 
     Area getByCode(String code);
 
+    Area getByBizCode(String bizCode);
+
     List<Area> findAreaUp(Area area);
 
     List<Area> findAreaDown(Parameter parameter);
@@ -40,5 +42,7 @@ public interface AreaDao extends TreeDao<Area> {
     List<Area> findChild(Parameter parameter);
 
     List<Area> findByParentId(Parameter parameter);
+
+    List<Area> findByCodes(Parameter parameter);
 
 }

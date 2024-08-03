@@ -17,6 +17,7 @@
 		type,
 		code,
 		biz_code,
+		extend_attr,
 		sys_code,
 		address,
 		mobile,
@@ -29,6 +30,8 @@
 		parent_id,
 		parent_ids,
 		area_id,
+		area_code,
+		area_biz_code,
 		remark,
 		parent_code,
 		parent_biz_code,
@@ -38,8 +41,7 @@
 		home_company_id,
 		home_company_code,
 		home_company_biz_code,
-		tree_level,
- 		is_leaf
+		tree_level
 		) SELECT id,
 		status,
 		version,
@@ -52,6 +54,7 @@
 		type,
 		code,
 		biz_code,
+		extend_attr,
 		sys_code,
 		address,
 		mobile,
@@ -64,18 +67,18 @@
 		parent_id,
 		parent_ids,
 		area_id,
+		#{areaCode},
+		#{areaBizCode},
 		remark,
 		#{parentCode},
 		#{parentBizCode},
-		#{companyId},
 		#{companyId},
 		#{companyCode},
 		#{companyBizCode},
 		#{homeCompanyId},
 		#{homeCompanyCode},
 		#{homeCompanyBizCode},
-		#{treeLevel},
-		#{isLeaf}
+		#{treeLevel}
 		FROM t_sys_organ
 		<where>
 			id = #{id}
@@ -98,6 +101,7 @@
 		type,
 		code,
 		biz_code,
+		extend_attr,
 		sys_code,
 		address,
 		mobile,
@@ -110,6 +114,8 @@
 		parent_id,
 		parent_ids,
 		area_id,
+		area_code,
+		area_biz_code,
 		remark,
 		parent_code,
 		parent_biz_code,
@@ -132,6 +138,7 @@
 				 a.type,
 				 a.code,
 				 a.biz_code,
+				 a.extend_attr,
 				 a.sys_code,
 				 a.address,
 				 a.mobile,
@@ -144,6 +151,8 @@
 				 a.parent_id,
 				 a.parent_ids,
 				 a.area_id,
+				 ar.code,
+				 ar.biz_code,
 				 a.remark,
 				 P.code,
 				 p.biz_code,
@@ -156,6 +165,7 @@
 				 (length(a.parent_ids) - length(replace(a.parent_ids,',','')))
 		FROM t_sys_organ a
 		LEFT JOIN t_sys_organ p ON p.id = a.parent_id
+		LEFT JOIN t_sys_area ar ON ar.id = a.area_id
 		<where>
 			<if test="id != null and id != ''">
 				AND a.id = #{id}
@@ -165,6 +175,7 @@
 
 	<!--删除organ扩展表数据-->
 	<delete id="deleteOrganExtend">
+		/*TDDL:FORBID_EXECUTE_DML_ALL=FALSE*/
 		DELETE FROM t_sys_organ_extend
 		<where>
 			<if test="id != null and id != ''">

@@ -15,6 +15,9 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 数据脱敏用到的AES加解密类
@@ -31,6 +34,8 @@ public class AesSupport implements IEncrypt {
      * 加密解密算法/加密模式/填充方式
      */
     private static final String DEFAULT_CIPHER_ALGORITHM = "AES/GCM/NoPadding";
+
+    private static final String DEFAULT_CIPHER_ECB = "AES/ECB/PKCS5Padding";
     /**
      * 默认密钥, 256位32个字节
      */
@@ -39,7 +44,7 @@ public class AesSupport implements IEncrypt {
      * 密钥, 256位32个字节
      */
     private String key;
-    private final SensitiveTypeHandler sensitiveTypeHandler = SensitiveTypeRegisty.get(SensitiveType.DEFAUL);
+    private final SensitiveTypeHandler sensitiveTypeHandler = SensitiveTypeRegisty.get(SensitiveType.DEFAULT);
 
     private SecretKeySpec secretKeySpec;
     /**
@@ -51,13 +56,28 @@ public class AesSupport implements IEncrypt {
      */
     public static final String DEFAULT_IV = "ecececececececec";
 
+
+    private static class AesSupportHolder {
+        private static final AesSupport aesSupport = new AesSupport();
+    }
+    /**
+     * 创建只输出非Null且非Empty(如List.isEmpty)的属性到Json字符串的Mapper,建议在外部接口中使用.
+     */
+    public static AesSupport getInstance() {
+        return AesSupport.AesSupportHolder.aesSupport;
+    }
+
     static {
         gcMParameterSpec = new GCMParameterSpec(128, DEFAULT_IV.getBytes());
         java.security.Security.setProperty("crypto.policy", "unlimited");
     }
-    public AesSupport() throws NoSuchAlgorithmException {
-        this.key = DEFAULT_KEY;
-        this.secretKeySpec = getSecretKey(key);
+    public AesSupport() {
+        try {
+            this.key = DEFAULT_KEY;
+            this.secretKeySpec = getSecretKey(key);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public AesSupport(String key) throws NoSuchAlgorithmException {
@@ -71,7 +91,24 @@ public class AesSupport implements IEncrypt {
     }
 
     @Override
+    public String defaultType() {
+        return "AES";
+    }
+
+    @Override
+    public String encrypt(String data, String type) {
+        return encrypt(data);
+    }
+
+    @Override
+    public List<String> batchEncrypt(List<String> datas, String type) {
+        return batchEncrypt(datas);
+    }
+
     public String encrypt(String value) {
+        if (null == value) {
+            return value;
+        }
         if (StringUtils.isEmpty(value)) {
             return "";
         }
@@ -89,8 +126,47 @@ public class AesSupport implements IEncrypt {
         }
     }
 
+    public String encryptECB(String value) {
+        if (org.springframework.util.StringUtils.isEmpty(value)) {
+            return "";
+        }
+        try {
+            Cipher cipher = Cipher.getInstance(DEFAULT_CIPHER_ECB);
+            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+
+            byte[] content = value.getBytes(StandardCharsets.UTF_8);
+            byte[] encryptData = cipher.doFinal(content);
+
+            return Hex.bytesToHexString(encryptData);
+        } catch (Exception e) {
+            log.error("AES加密时出现问题，密钥为：{}",key);
+            throw new IllegalStateException("AES加密时出现问题" + e.getMessage(), e);
+        }
+    }
+
+    public List<String> batchEncrypt(List<String> datas) {
+        return datas.stream().map(this::encrypt).collect(Collectors.toList());
+    }
+
     @Override
+    public Map<String, List<String>> batchEncrypt(Map<String, List<String>> mapData) {
+        return mapData.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,e->batchEncrypt(e.getValue())));
+    }
+
+    @Override
+    public String decrypt(String data, String type) {
+        return decrypt(data);
+    }
+
+    @Override
+    public List<String> batchDecrypt(List<String> datas, String type) {
+        return batchDecrypt(datas);
+    }
+
     public String decrypt(String value) {
+        if (null == value) {
+            return value;
+        }
         if (StringUtils.isEmpty(value)) {
             return "";
         }
@@ -104,6 +180,31 @@ public class AesSupport implements IEncrypt {
             log.error("AES解密时出现问题，密钥为：{}，密文为：{}", sensitiveTypeHandler.handle(key), value);
             throw new IllegalStateException("AES解密时出现问题" + e.getMessage(), e);
         }
+    }
+
+    public String decryptECB(String value) {
+        if (org.springframework.util.StringUtils.isEmpty(value)) {
+            return "";
+        }
+        try {
+            byte[] encryptData = Hex.hexStringToBytes(value);
+            Cipher cipher = Cipher.getInstance(DEFAULT_CIPHER_ECB);
+            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
+            byte[] content = cipher.doFinal(encryptData);
+            return new String(content, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            log.error("AES解密时出现问题，密钥为：{}，密文为：{}", key, value);
+            throw new IllegalStateException("AES解密时出现问题" + e.getMessage(), e);
+        }
+    }
+
+    public List<String> batchDecrypt(List<String> datas) {
+        return datas.stream().map(this::decrypt).collect(Collectors.toList());
+    }
+
+    @Override
+    public Map<String, List<String>> batchDecrypt(Map<String, List<String>> mapData) {
+        return mapData.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,e->batchDecrypt(e.getValue())));
     }
 
 

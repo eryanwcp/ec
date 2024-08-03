@@ -13,10 +13,7 @@ import com.eryansky.common.utils.DateUtils;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
-import com.eryansky.modules.notice.mapper.Notice;
-import com.eryansky.modules.notice.vo.NoticeQueryVo;
 import com.eryansky.modules.sys.utils.UserUtils;
-//import com.eryansky.modules.weixin.utils.WeixinUtils;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Lists;
 import com.eryansky.core.orm.mybatis.service.CrudService;
@@ -128,7 +125,7 @@ public class MessageService extends CrudService<MessageDao, Message> {
      * @param messageReceiveObjectType {@link MessageReceiveObjectType}
      * @param receiveObjectIds
      */
-    public Message saveAndSend(Message message, MessageReceiveObjectType messageReceiveObjectType, Collection<String> receiveObjectIds) {
+    public Message save(Message message, MessageReceiveObjectType messageReceiveObjectType, Collection<String> receiveObjectIds) {
         if (Collections3.isEmpty(receiveObjectIds)) {
             throw new SystemException("未定义参数[receiveObjectIds]");
         }
@@ -138,12 +135,14 @@ public class MessageService extends CrudService<MessageDao, Message> {
             message.setSendTime(Calendar.getInstance().getTime());
         }
         this.save(message);
+        List<MessageSender> messageSenders = Lists.newArrayList();
         List<MessageReceive> messageReceives = Lists.newArrayList();
-        for (String objectId : receiveObjectIds) {
+        receiveObjectIds.forEach(objectId->{
             MessageSender messageSender = new MessageSender(message.getId());
             messageSender.setObjectType(messageReceiveObjectType.getValue());
             messageSender.setObjectId(objectId);
-            messageSenderService.save(messageSender);
+            messageSender.prePersist();
+            messageSenders.add(messageSender);
 
             List<String> targetIds = Lists.newArrayList();
             if (MessageReceiveObjectType.User.equals(messageReceiveObjectType)) {
@@ -160,11 +159,11 @@ public class MessageService extends CrudService<MessageDao, Message> {
                 messageReceive.setUserId(targetId);
                 messageReceive.setIsRead(YesOrNo.NO.getValue());
                 messageReceive.prePersist();
-//                messageReceiveService.save(messageReceive);
                 messageReceives.add(messageReceive);
             }
-        }
+        });
         message.setMessageReceives(messageReceives);
+        messageSenderService.insertAutoBatch(messageSenders);
         messageReceiveService.insertAutoBatch(messageReceives);
         message.setBizMode(MessageMode.Published.getValue());
         this.save(message);

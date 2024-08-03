@@ -31,7 +31,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * @date ${date}
  */
 @Controller
-@RequestMapping(value = "${J}{adminPath}/${modulePath}/${entityInstance}")
+@RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = "${J}{adminPath}/${modulePath}/${entityInstance}")
 public class ${entityName}Controller extends SimpleController {
 
     @Autowired

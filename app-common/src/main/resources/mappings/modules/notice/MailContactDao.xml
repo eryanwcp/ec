@@ -118,14 +118,14 @@
                         <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
                         <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
                         <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
-                        <otherwise>'%${query}%'</otherwise>
+                        <otherwise>'%,'+#{query}+',%'</otherwise>
                     </choose>
                     OR a.email LIKE
                     <choose>
                         <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
                         <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
                         <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
-                        <otherwise>'%${query}%'</otherwise>
+                        <otherwise>'%,'+#{query}+',%'</otherwise>
                     </choose>
                     )
                 </when>
@@ -141,7 +141,7 @@
                         <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
                         <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
                         <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
-                        <otherwise>'%${query}%'</otherwise>
+                        <otherwise>'%,'+#{query}+',%'</otherwise>
                     </choose>
                     OR a.email LIKE
                     <choose>

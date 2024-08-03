@@ -32,7 +32,20 @@ public class DownloadFileUtils {
      * @param request
      * @throws Exception
      */
-    public static void downRangeFile(File downloadFile, String downloadFileName, HttpServletResponse response, HttpServletRequest request) throws Exception {
+    public static void downRangeFile(File downloadFile, String downloadFileName,HttpServletResponse response, HttpServletRequest request) throws Exception {
+        downRangeFile(downloadFile,downloadFileName,null,response,request);
+    }
+    /**
+     * 文件下载 分片断点下载
+     *
+     * @param downloadFile
+     * @param downloadFileName
+     * @param downloadType
+     * @param response
+     * @param request
+     * @throws Exception
+     */
+    public static void downRangeFile(File downloadFile, String downloadFileName,String downloadType, HttpServletResponse response, HttpServletRequest request) throws Exception {
         // 文件不存在
         if (!downloadFile.exists() || !downloadFile.canRead()) {
             // 404

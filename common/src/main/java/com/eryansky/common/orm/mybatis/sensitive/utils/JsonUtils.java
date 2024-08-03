@@ -5,6 +5,7 @@ import com.eryansky.common.utils.mapper.JsonMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -26,7 +27,7 @@ public class JsonUtils {
             return JsonMapper.getInstance().readValue(jsonStr, new TypeReference<LinkedHashMap<String, Object>>() {
             });
         } catch (JsonProcessingException e) {
-            return null;
+            return new HashMap<>();
         }
     }
 
@@ -38,6 +39,16 @@ public class JsonUtils {
      */
     public static String parseMaptoJSONString(Map<String, Object> params) {
         return JsonMapper.toJsonString(params);
+    }
+
+    /**
+     * 将Object转化为json字符串
+     *
+     * @param src 参数集合
+     * @return json
+     */
+    public static String parseToJSONString(Object src) {
+        return JsonMapper.toJsonString(src);
     }
 
 }

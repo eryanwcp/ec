@@ -17,10 +17,14 @@ package com.eryansky.j2cache;
 
 import com.eryansky.j2cache.caffeine.CaffeineProvider;
 import com.eryansky.j2cache.lettuce.LettuceCacheProvider;
+import com.eryansky.j2cache.util.AesSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.ObjectUtils;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
+import java.util.Properties;
 
 /**
  * 两级的缓存管理器
@@ -59,6 +63,24 @@ public class CacheProviderHolder {
 		holder.l2_provider = loadProviderInstance(config.getL2CacheName());
 		if (!holder.l2_provider.isLevel(CacheObject.LEVEL_2))
 			throw new CacheException(holder.l2_provider.getClass().getName() + " is not level_2 cache provider");
+		Properties l2_props = config.getL2CacheProperties();
+		String password_encrypt = l2_props.getProperty("passwordEncrypt");
+		boolean passwordEncrypt = Boolean.parseBoolean(password_encrypt);
+		if(passwordEncrypt && !ObjectUtils.isEmpty(l2_props.getProperty("password"))){
+			try {
+				l2_props.put("password",new AesSupport().decrypt(l2_props.getProperty("password")));
+			} catch (NoSuchAlgorithmException e) {
+				log.error(e.getMessage(),e);
+			}
+		}
+		if(passwordEncrypt && !ObjectUtils.isEmpty(l2_props.getProperty("sentinelPassword"))){
+			try {
+				l2_props.put("sentinelPassword",new AesSupport().decrypt(l2_props.getProperty("sentinelPassword")));
+			} catch (NoSuchAlgorithmException e) {
+				log.error(e.getMessage(),e);
+			}
+		}
+
 		holder.l2_provider.start(config.getL2CacheProperties());
 		log.info("Using L2 CacheProvider : {}", holder.l2_provider.getClass().getName());
 

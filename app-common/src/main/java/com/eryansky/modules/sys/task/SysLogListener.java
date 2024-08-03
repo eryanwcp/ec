@@ -27,7 +27,7 @@ public class SysLogListener implements ApplicationListener<SysLogEvent> {
     @Override
     public void onApplicationEvent(SysLogEvent event) {
         Log log = (Log) event.getSource();
-        logService.save(log);
+        logService.insert(log);
     }
 
 

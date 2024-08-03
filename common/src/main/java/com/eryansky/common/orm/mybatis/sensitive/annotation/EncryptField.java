@@ -13,4 +13,9 @@ import java.lang.annotation.*;
 @Inherited
 @Documented
 public @interface EncryptField {
+    /**
+     * 加密方法
+     * @return
+     */
+    String type() default "";
 }

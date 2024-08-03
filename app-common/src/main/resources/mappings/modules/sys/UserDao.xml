@@ -209,7 +209,7 @@
                 <when test="loginName != null and loginName !='' and code != null and code !=''">
                     AND (a.login_name = #{loginName} OR a.code = #{code})
                 </when>
-                <when test="loginName != null and loginName">
+                <when test="loginName != null and loginName !=''">
                     AND a.login_name = #{loginName}
                 </when>
                 <when test="code != null and code !=''">
@@ -234,7 +234,7 @@
                 <when test="loginName != null and loginName !='' and mobile != null and mobile !=''">
                     AND (a.login_name = #{loginName} OR a.mobile = #{mobile})
                 </when>
-                <when test="loginName != null and loginName">
+                <when test="loginName != null and loginName !=''">
                     AND a.login_name = #{loginName}
                 </when>
                 <when test="mobile != null and mobile !=''">
@@ -268,7 +268,7 @@
                 <when test="code != null and code !='' and mobile != null and mobile !=''">
                     AND (a.code = #{code} OR a.mobile = #{mobile})
                 </when>
-                <when test="loginName != null and loginName">
+                <when test="loginName != null and loginName !=''">
                     AND a.login_name = #{loginName}
                 </when>
                 <when test="mobile != null and mobile !=''">
@@ -289,6 +289,9 @@
         SELECT
         <include refid="userColumns"/>
         FROM t_sys_user a
+        <if test="parentOrganId != null and parentOrganId !=''">
+            LEFT JOIN t_sys_organ_extend o ON o.id = a.default_organ_id
+        </if>
         <where>
             <if test="status != null and status !=''">
                 AND a.status = #{status}
@@ -299,7 +302,43 @@
                     #{item}
                 </foreach>
             </if>
+            <if test="query != null and query !=''">
+                AND (
+                a.id = #{query}
+                OR a.login_name = #{query}
+                OR a.mobile = #{query}
+                OR a.code = #{query}
+                OR a.biz_code = #{query}
+                OR a.name LIKE
+                <choose>
+                    <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+                    <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+                    <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+                    <otherwise>'%'+#{query}+'%'</otherwise>
+                </choose>
+                )
+            </if>
+            <if test="userType != null and userType !=''">
+                AND a.user_type = #{userType}
+            </if>
+            <if test="parentOrganId != null and parentOrganId !=''">
+                AND (o.id = #{parentOrganId} OR o.parent_id = #{parentOrganId} OR o.parent_ids LIKE
+                <choose>
+                    <when test="dbName == 'db2'">'%,'||#{parentOrganId}||',%'</when>
+                    <when test="dbName == 'mysql'">CONCAT('%,', #{parentOrganId}, ',%')</when>
+                    <when test="dbName == 'oracle'">'%,'||#{parentOrganId}||',%'</when>
+                    <otherwise>'%,'+#{parentOrganId}+',%'</otherwise>
+                </choose>)
+            </if>
         </where>
+        <choose>
+            <when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
+                ORDER BY ${entityPage.orderBy} ${entityPage.order}
+            </when>
+            <otherwise>
+                ORDER BY a.sort ASC
+            </otherwise>
+        </choose>
     </select>
 
 
@@ -334,7 +373,8 @@
             a.status = #{status}
             <if test="query != null and query !=''">
                 AND (
-                a.login_name = #{query}
+                a.id = #{query}
+                OR a.login_name = #{query}
                 OR a.mobile = #{query}
                 OR a.code = #{query}
                 OR a.biz_code = #{query}
@@ -406,7 +446,8 @@
             )
             <if test="query != null and query !=''">
                 AND (
-                a.login_name = #{query}
+                a.id = #{query}
+                OR a.login_name = #{query}
                 OR a.mobile = #{query}
                 OR a.code = #{query}
                 OR a.biz_code = #{query}
@@ -457,7 +498,8 @@
             AND a.status = '0'
             <if test="query != null and query !=''">
                 AND (
-                a.login_name = #{query}
+                a.id = #{query}
+                OR a.login_name = #{query}
                 OR a.mobile = #{query}
                 OR a.code = #{query}
                 OR a.biz_code = #{query}
@@ -530,7 +572,8 @@
             )
             <if test="query != null and query !=''">
                 AND (
-                    a.login_name = #{query}
+                    a.id = #{query}
+                    OR a.login_name = #{query}
                     OR a.mobile = #{query}
                     OR a.code = #{query}
                     OR a.biz_code = #{query}
@@ -825,6 +868,20 @@
         ORDER BY a.sort ASC
     </select>
 
+    <select id="findUsersByRoleCode" resultType="User">
+        SELECT
+        <include refid="userColumns"/>
+        FROM t_sys_user a
+        LEFT JOIN t_sys_user_role ur ON ur.user_id = a.id
+        LEFT JOIN t_sys_role r ON r.id = ur.role_id
+        <where>
+            a.status = #{status}
+            AND r.status = #{status}
+            AND r.code = #{roleCode}
+        </where>
+        ORDER BY a.sort ASC
+    </select>
+
     <select id="findUserIdsByRoleId" resultType="java.lang.String">
         SELECT
         a.id
@@ -859,7 +916,8 @@
             </if>
             <if test="query != null and query !=''">
                 AND (
-                a.login_name = #{query}
+                a.id = #{query}
+                OR a.login_name = #{query}
                 OR a.mobile = #{query}
                 OR a.code = #{query}
                 OR a.biz_code = #{query}
@@ -893,7 +951,7 @@
                 AND p.code = #{postCode}
             </if>
             <if test="parentOrganId != null and parentOrganId !=''">
-                AND (o.id = #{parentOrganId} OR o.parent_id = #{parentOrganId} OR parent_ids LIKE
+                AND (o.id = #{parentOrganId} OR o.parent_id = #{parentOrganId} OR o.parent_ids LIKE
                 <choose>
                     <when test="dbName == 'db2'">'%,'||#{parentOrganId}||',%'</when>
                     <when test="dbName == 'mysql'">CONCAT('%,', #{parentOrganId}, ',%')</when>
@@ -903,7 +961,8 @@
             </if>
             <if test="query != null and query !=''">
                 AND (
-                a.login_name = #{query}
+                a.id = #{query}
+                OR a.login_name = #{query}
                 OR a.mobile = #{query}
                 OR a.code = #{query}
                 OR a.biz_code = #{query}
@@ -1054,7 +1113,7 @@
                 <when test="dbName == 'db2'">'%,'||#{organId}||',%'</when>
                 <when test="dbName == 'mysql'">CONCAT('%,', #{organId}, ',%')</when>
                 <when test="dbName == 'oracle'">'%,'||#{organId}||',%'</when>
-                <otherwise>'%,${organId},%'</otherwise>
+                <otherwise>'%,'+#{organId}+',%'</otherwise>
             </choose>
             )
         </where>

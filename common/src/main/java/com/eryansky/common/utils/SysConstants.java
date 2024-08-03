@@ -42,28 +42,28 @@ public class SysConstants {
      * 获取配置
      */
     public static String getAppConfig(String key) {
-        return SysConstants.getAppConfig().getProperty(key);
+        return getAppConfig().getProperty(key);
     }
 
     /**
      * 获取配置
      */
     public static String getAppConfig(String key,String defaultValue) {
-        return SysConstants.getAppConfig().getProperty(key,defaultValue);
+        return getAppConfig().getProperty(key,defaultValue);
     }
 
     /**
      * jdbc type连接参数(默认:"").
      */
     public static String getJdbcType(){
-        return SysConstants.getAppConfig().getProperty("jdbc.type","");
+        return getAppConfig().getProperty("jdbc.type","");
     }
     
     /**
      * jdbc url连接参数(默认:"").
      */
     public static String getJdbcUrl(){
-    	return SysConstants.getAppConfig().getProperty("spring.datasource.url","");
+    	return getAppConfig().getProperty("spring.datasource.url","");
     }
 
     /**
@@ -71,7 +71,7 @@ public class SysConstants {
      * @return
      */
     public static String getJdbcDriverClassName(){
-        return SysConstants.getAppConfig().getProperty("spring.datasource.driver-class-name","");
+        return getAppConfig().getProperty("spring.datasource.driver-class-name","");
     }
 
     /**
@@ -79,7 +79,7 @@ public class SysConstants {
      * @return
      */
     public static String getJdbcUserName(){
-        return SysConstants.getAppConfig().getProperty("spring.datasource.username","");
+        return getAppConfig().getProperty("spring.datasource.username","");
     }
 
     /**
@@ -87,7 +87,7 @@ public class SysConstants {
      * @return
      */
     public static String getJdbcPassword(){
-        return SysConstants.getAppConfig().getProperty("spring.datasource.password","");
+        return getAppConfig().getProperty("spring.datasource.password","");
     }
 
 

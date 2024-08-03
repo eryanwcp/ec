@@ -47,11 +47,11 @@ $(function () {
             width: 120,
             hidden: true
         }, {
-            title: '姓名',
+            title: '名称',
             field: 'name',
             width: 160
         }, {
-            title: '登录名',
+            title: '账号',
             field: 'loginName',
             width: 160
         }, {

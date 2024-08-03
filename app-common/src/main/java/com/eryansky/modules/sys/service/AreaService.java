@@ -7,6 +7,8 @@ package com.eryansky.modules.sys.service;
 
 import com.eryansky.common.orm.model.Parameter;
 import com.eryansky.common.orm.mybatis.interceptor.BaseInterceptor;
+import com.eryansky.common.utils.collections.Collections3;
+import com.eryansky.core.orm.mybatis.entity.DataEntity;
 import com.eryansky.core.orm.mybatis.service.TreeService;
 import com.eryansky.modules.sys.dao.AreaDao;
 import com.eryansky.modules.sys.mapper.Area;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -50,6 +53,17 @@ public class AreaService extends TreeService<AreaDao, Area> {
      */
     public Area getByCode(String code) {
         return dao.getByCode(code);
+    }
+
+
+    /**
+     * 根据信息分类编码查找
+     *
+     * @param bizCode 息分类编码
+     * @return
+     */
+    public Area getByBizCode(String bizCode) {
+        return dao.getByBizCode(bizCode);
     }
 
     /**
@@ -157,6 +171,34 @@ public class AreaService extends TreeService<AreaDao, Area> {
         parameter.put("parentId", parentId);
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
         return dao.findByParentId(parameter);
+    }
+
+    /**
+     * 根据编码查找
+     *
+     * @param codes
+     * @return
+     */
+    public List<Area> findByCodes(Collection<String> codes) {
+        return findByCodes(codes,null);
+    }
+
+    /**
+     * 根据编码查找
+     *
+     * @param codes
+     * @param types
+     * @return
+     */
+    public List<Area> findByCodes(Collection<String> codes,Collection<String> types) {
+        if(Collections3.isEmpty(codes)){
+           return Collections.emptyList();
+        }
+        Parameter parameter = Parameter.newParameter();
+        parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
+        parameter.put("types", types);
+        parameter.put("codes", codes);
+        return dao.findByCodes(parameter);
     }
 
 

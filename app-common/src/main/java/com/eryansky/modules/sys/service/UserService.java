@@ -540,7 +540,6 @@ public class UserService extends CrudService<UserDao, User> {
      * @return
      */
     public List<User> findByLoginNameOrCode(String loginName, String code) {
-        Assert.notNull(loginName, "参数[loginName]不能为空!");
         Parameter parameter = new Parameter();
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
@@ -557,7 +556,6 @@ public class UserService extends CrudService<UserDao, User> {
      * @return
      */
     public List<User> findByLoginNameOrMobile(String loginName, String mobile) {
-        Assert.notNull(loginName, "参数[loginName]不能为空!");
         Parameter parameter = new Parameter();
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
@@ -576,7 +574,6 @@ public class UserService extends CrudService<UserDao, User> {
      * @return
      */
     public List<User> findByLoginNameOrCodeOrMobile(String loginName,String code, String mobile) {
-        Assert.notNull(loginName, "参数[loginName]不能为空!");
         Parameter parameter = new Parameter();
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
@@ -600,6 +597,30 @@ public class UserService extends CrudService<UserDao, User> {
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put("passwords", passwords);
         return dao.findByPasswords(parameter);
+    }
+
+    /**
+     * 根据密码查找.
+     *
+     * @param page 账号
+     * @param passwords 不安全密码（加密）
+     * @param parentOrganId 父级机构ID
+     * @param userType 用户类型
+     * @param query 关键字
+     * @return
+     */
+    public Page<User> findPageByPasswords(Page<User> page,Collection<String> passwords,String parentOrganId,String userType,String query) {
+        Assert.notEmpty(passwords, "参数[passwords]不能为空!");
+        Parameter parameter = new Parameter();
+        parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
+        parameter.put(BaseInterceptor.PAGE, page);
+        parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
+        parameter.put("passwords", passwords);
+        parameter.put("parentOrganId", parentOrganId);
+        parameter.put("userType", userType);
+        parameter.put("query", query);
+        page.setResult(dao.findByPasswords(parameter));
+        return page;
     }
 
     /**
@@ -1317,6 +1338,20 @@ public class UserService extends CrudService<UserDao, User> {
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
         parameter.put("roleId", roleId);
         return dao.findUsersByRoleId(parameter);
+    }
+
+    /**
+     * 根据角色查询
+     *
+     * @param roleCode 角色编码
+     * @return
+     */
+    public List<User> findUsersByRoleCode(String roleCode) {
+        Parameter parameter = new Parameter();
+        parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
+        parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
+        parameter.put("roleCode", roleCode);
+        return dao.findUsersByRoleCode(parameter);
     }
 
     /**

@@ -13,7 +13,7 @@
 <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
 <!--[if lt IE 9]> <script src="${ctxStatic}/js/common/html5.js"></script><![endif]-->
 <script src="${ctxStatic}/js/My97DatePicker/WdatePicker.js" type="text/javascript"></script>
-<script src="${ctxStatic}/js/common/mustache.min.js" type="text/javascript"></script>
+<script src="${ctxStatic}/js/common/mustache.js" type="text/javascript"></script>
 <script src="${ctxStatic}/js/list/list.min.js" type="text/javascript"></script>
 <link href="${ctxStatic}/js/select2/select2.min.css" type="text/css" rel="stylesheet" />
 <script src="${ctxStatic}/js/select2/select2.min.js" type="text/javascript"></script>

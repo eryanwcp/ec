@@ -3,6 +3,7 @@ ALTER TABLE t_sys_user ADD COLUMN biz_code varchar(64) COMMENT '信息分类编�
 ALTER TABLE t_sys_user ADD COLUMN extend_attr text COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}';
 ALTER TABLE t_sys_organ ADD COLUMN biz_code varchar(64) COMMENT '信息分类编码';
 ALTER TABLE t_sys_organ ADD COLUMN extend_attr text COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}';
+ALTER TABLE t_sys_organ_extend ADD COLUMN area_code varchar(64) COMMENT '行政区划编码';
 ALTER TABLE t_sys_organ_extend ADD COLUMN biz_code varchar(64) COMMENT '信息分类编码';
 ALTER TABLE t_sys_organ_extend ADD COLUMN extend_attr text COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}';
 ALTER TABLE t_sys_log ADD COLUMN extend_attr text COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}';

@@ -12,12 +12,16 @@ import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.modules.notice._enum.MessageChannel;
+import com.eryansky.modules.notice._enum.MessageMode;
 import com.eryansky.modules.notice._enum.MessageReceiveObjectType;
 import com.eryansky.modules.notice.mapper.Message;
 import com.eryansky.modules.notice.mapper.MessageReceive;
+import com.eryansky.modules.notice.mapper.MessageSender;
 import com.eryansky.modules.notice.service.MessageReceiveService;
+import com.eryansky.modules.notice.service.MessageSenderService;
 import com.eryansky.modules.notice.service.MessageService;
 import com.eryansky.modules.notice.task.MessageTask;
+import com.eryansky.modules.sys._enum.YesOrNo;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.service.UserService;
 import com.eryansky.modules.sys.utils.UserUtils;
@@ -29,6 +33,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 /**
  * 消息工具类
@@ -43,6 +48,7 @@ public class MessageUtils {
      */
     public static final class Static {
         private static MessageService messageService = SpringContextHolder.getBean(MessageService.class);
+        private static MessageSenderService messageSenderService = SpringContextHolder.getBean(MessageSenderService.class);
         private static MessageReceiveService messageReceiveService = SpringContextHolder.getBean(MessageReceiveService.class);
         private static MessageTask messageTask = SpringContextHolder.getBean(MessageTask.class);
         private static UserService userService = SpringContextHolder.getBean(UserService.class);
@@ -184,7 +190,6 @@ public class MessageUtils {
             throw new SystemException("[" + sender + "]用户不存在");
         }
         if (Collections3.isEmpty(messageChannels)) {
-//            model.setTipMessage(MessageChannel.Message.getValue() + "," + MessageChannel.QYWeixin.getValue() + "," + MessageChannel.APP.getValue());
             model.setTipMessage(NoticeConstants.getMessageDefaultTipChannel());
         } else {
             model.setTipMessage(Collections3.extractToString(messageChannels, "value", ","));
@@ -199,8 +204,42 @@ public class MessageUtils {
         model.setContent(content);
         model.setUrl(linkUrl);
         model.setSendTime(null != date ? date:Calendar.getInstance().getTime());
+        model.setBizMode(MessageMode.Publishing.getValue());
         Static.messageService.save(model);
-        return Static.messageTask.saveAndSend(model, messageReceiveObjectType, receiveObjectIds);
+
+        List<MessageSender> messageSenders = Lists.newArrayList();
+        List<MessageReceive> messageReceives = Lists.newArrayList();
+        receiveObjectIds.forEach(objectId->{
+            MessageSender messageSender = new MessageSender(model.getId());
+            messageSender.setObjectType(messageReceiveObjectType.getValue());
+            messageSender.setObjectId(objectId);
+            messageSender.prePersist();
+            messageSenders.add(messageSender);
+
+            List<String> targetIds = Lists.newArrayList();
+            if (MessageReceiveObjectType.User.equals(messageReceiveObjectType)) {
+                targetIds.add(objectId);
+            } else if (MessageReceiveObjectType.Organ.equals(messageReceiveObjectType)) {
+//                targetIds = userService.findUsersLoginNamesByOrganId(objectId);
+                targetIds = Static.userService.findUserIdsByOrganId(objectId);
+            } else if (MessageReceiveObjectType.Member.equals(messageReceiveObjectType)) {
+                targetIds.add(objectId);
+
+            }
+            for (String targetId : targetIds) {
+                MessageReceive messageReceive = new MessageReceive(model.getId());
+                messageReceive.setUserId(targetId);
+                messageReceive.setIsSend(YesOrNo.NO.getValue());
+                messageReceive.setIsRead(YesOrNo.NO.getValue());
+                messageReceive.prePersist();
+                messageReceives.add(messageReceive);
+            }
+        });
+        Static.messageSenderService.insertAutoBatch(messageSenders);
+        Static.messageReceiveService.insertAutoBatch(messageReceives);
+        model.setBizMode(MessageMode.Published.getValue());
+        Static.messageService.save(model);
+        return Static.messageTask.push(model.getId());
     }
 
     /**
@@ -235,6 +274,6 @@ public class MessageUtils {
      */
     public static Page<MessageReceive> findUserMessages(String userId, int pageNo, int pageSize, String appId, String isRead, String isSend) {
         Page<MessageReceive> page = new Page<>(pageNo, pageSize);
-        return Static.messageReceiveService.findUserPage(page, appId, userId,isRead,null,null);
+        return Static.messageReceiveService.findUserPage(page, appId, userId,isRead,isSend,null);
     }
 }

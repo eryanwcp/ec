@@ -343,6 +343,17 @@ public class FileService extends CrudService<FileDao, File> {
         return dao.findByCode(parameter);
     }
 
+    /**
+     * 根据文件路径获取文件
+     * @param filePath 文件路径
+     * @return
+     */
+    public File getByFilePath(String filePath) {
+        Parameter parameter = Parameter.newParameter();
+        parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
+        parameter.put("filePath", filePath);
+        return dao.getByFilePath(parameter);
+    }
 
     /**
      * 统计文件大小

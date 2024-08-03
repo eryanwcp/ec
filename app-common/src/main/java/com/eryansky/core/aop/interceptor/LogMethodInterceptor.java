@@ -5,9 +5,11 @@
  */
 package com.eryansky.core.aop.interceptor;
 
+import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
+import com.eryansky.modules.sys.event.SysLogEvent;
 import com.google.common.collect.Lists;
 import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.security.SecurityUtils;
@@ -154,7 +156,8 @@ public class LogMethodInterceptor implements MethodInterceptor, InitializingBean
                 log.setDeviceType(sessionInfo.getDeviceType());
                 log.setBrowserType(sessionInfo.getBrowserType());
             }
-            logService.save(log);
+            log.prePersist();
+            SpringContextHolder.publishEvent(new SysLogEvent(log));
         }
         if (logger.isDebugEnabled()) {
             logger.debug("用户:{},操作类：{},操作方法：{},耗时：{}ms.", new Object[]{userId, className, methodName, end - start});

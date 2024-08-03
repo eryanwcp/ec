@@ -11,12 +11,21 @@ import java.lang.annotation.*;
 //@Scope("prototype")
 public @interface QuartzJob {
 
+    String DEFAULT_INSTANCE_NAME = "DefaultQuartzScheduler";
+
     String AUTO_GENERATE_INSTANCE_ID = "AUTO";
 	/**
 	 * 是否启用
 	 * @return
 	 */
     boolean enable() default true;
+
+    /**
+     * 集群名称
+     * 对应参数spring.quartz.properties.org.quartz.scheduler.instanceName 默认为：DefaultQuartzScheduler
+     * @return
+     */
+    String instanceName() default DEFAULT_INSTANCE_NAME;
 
     /**
      * 执行实例名称（仅集群模式下有效org.quartz.jobStore.isClustered = true），默认为在所有节点随机执行

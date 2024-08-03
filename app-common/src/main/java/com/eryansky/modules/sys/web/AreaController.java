@@ -5,9 +5,11 @@
  */
 package com.eryansky.modules.sys.web;
 
+import com.eryansky.client.common.vo.ExtendAttr;
 import com.eryansky.common.model.Result;
 import com.eryansky.common.model.TreeNode;
 import com.eryansky.common.utils.StringUtils;
+import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.modules.sys._enum.LogType;
@@ -24,11 +26,13 @@ import com.eryansky.utils.AppConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.beans.PropertyEditorSupport;
 import java.util.List;
 
 /**
@@ -99,6 +103,17 @@ public class AreaController extends SimpleController {
         return "modules/sys/areaForm";
     }
 
+    @Override
+    protected void initBinder(WebDataBinder binder) {
+        super.initBinder(binder);
+        binder.registerCustomEditor(ExtendAttr.class, new PropertyEditorSupport() {
+            @Override
+            public void setAsText(String text) {
+                setValue(JsonMapper.getInstance().fromJson(text,ExtendAttr.class));
+            }
+        });
+    }
+
     @Logging(value = "区域管理-保存区域", logType = LogType.access)
     @RequiresPermissions("sys:area:edit")
     @PostMapping(value = "save")
@@ -150,7 +165,7 @@ public class AreaController extends SimpleController {
             Area e = list.get(i);
             if (StringUtils.isBlank(extId) || (extId != null && !extId.equals(e.getId()) && e.getParentIds().indexOf("," + extId + ",") == -1)) {
                 TreeNode treeNode = new TreeNode(e.getId(), e.getName());
-                treeNode.setState(StringUtils.isNotBlank(state) ? state:TreeNode.STATE_OPEN);
+                treeNode.setState(TreeNode.STATE_OPEN.equals(state) ? TreeNode.STATE_OPEN:TreeNode.STATE_CLOASED);
                 treeNode.setpId(e.getParentId());
                 treeNodes.add(treeNode);
             }
@@ -173,7 +188,7 @@ public class AreaController extends SimpleController {
         for (int i = 0; i < list.size(); i++) {
             Area e = list.get(i);
             TreeNode treeNode = new TreeNode(e.getId(), e.getName());
-            treeNode.setState(StringUtils.isNotBlank(state) ? state:TreeNode.STATE_OPEN);
+            treeNode.setState(TreeNode.STATE_OPEN.equals(state) ? TreeNode.STATE_OPEN:TreeNode.STATE_CLOASED);
             treeNode.setpId(e.getParentId());
             treeNodes.add(treeNode);
         }
@@ -197,7 +212,7 @@ public class AreaController extends SimpleController {
         for (int i = 0; i < list.size(); i++) {
             Area e = list.get(i);
             TreeNode treeNode = new TreeNode(e.getId(), e.getName());
-            treeNode.setState(StringUtils.isNotBlank(state) ? state:TreeNode.STATE_OPEN);
+            treeNode.setState(TreeNode.STATE_OPEN.equals(state) ? TreeNode.STATE_OPEN:TreeNode.STATE_CLOASED);
             treeNode.setpId(e.getParentId());
             treeNodes.add(treeNode);
         }
@@ -222,7 +237,7 @@ public class AreaController extends SimpleController {
         for (int i = 0; i < list.size(); i++) {
             Area e = list.get(i);
             TreeNode treeNode = new TreeNode(e.getId(), e.getName());
-            treeNode.setState(StringUtils.isNotBlank(state) ? state:TreeNode.STATE_OPEN);
+            treeNode.setState(TreeNode.STATE_OPEN.equals(state) ? TreeNode.STATE_OPEN:TreeNode.STATE_CLOASED);
             treeNode.setpId(e.getParentId());
             treeNodes.add(treeNode);
         }

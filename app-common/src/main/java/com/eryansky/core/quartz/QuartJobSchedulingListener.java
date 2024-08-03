@@ -49,6 +49,9 @@ public class QuartJobSchedulingListener implements ApplicationListener<ContextRe
             try {
                 if (Job.class.isAssignableFrom(object.getClass())) {
                     QuartzJob quartzJobAnnotation = AnnotationUtils.findAnnotation(object.getClass(), QuartzJob.class);
+                    if(!scheduler.getSchedulerName().equals(quartzJobAnnotation.instanceName())){
+                        continue;
+                    }
                     JobKey jobKey = new JobKey(quartzJobAnnotation.name(), quartzJobAnnotation.group());
                     JobDetail job = JobBuilder
                             .newJob((Class<? extends Job>) object.getClass())

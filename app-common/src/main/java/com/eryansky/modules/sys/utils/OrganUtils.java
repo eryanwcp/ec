@@ -83,6 +83,31 @@ public class OrganUtils {
     }
 
     /**
+     * 根据机构信息分类编码查找
+     *
+     * @param bizCode 信息分类编码
+     * @return
+     */
+    public static OrganExtend getOrganExtendByBizCode(String bizCode) {
+        if (StringUtils.isBlank(bizCode)) {
+            return null;
+        }
+        return Static.organService.getOrganExtendByBizCode(bizCode);
+    }
+
+
+    /**
+     * 根据机构信息分类编码查找
+     *
+     * @param bizCode 信息分类编码
+     * @return
+     */
+    public static String getOrganCodeByBizCode(String bizCode) {
+        OrganExtend entity = getOrganExtendByBizCode(bizCode);
+        return null != entity ? entity.getCode():bizCode;
+    }
+
+    /**
      * 根据机构编码查找
      *
      * @param organId 机构ID

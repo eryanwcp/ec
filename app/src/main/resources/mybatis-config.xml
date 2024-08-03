@@ -54,8 +54,12 @@
 	<!-- 插件配置 -->
 	<plugins>
 		<plugin interceptor="com.eryansky.common.orm.mybatis.interceptor.PaginationInterceptor" />
-<!--		<plugin interceptor="com.eryansky.common.orm.mybatis.sensitive.interceptor.DecryptReadInterceptor" />-->
-<!--		<plugin interceptor="com.eryansky.common.orm.mybatis.sensitive.interceptor.SensitiveAndEncryptWriteInterceptor" />-->
+		<plugin interceptor="com.eryansky.common.orm.mybatis.sensitive.interceptor.DecryptReadInterceptor" >
+<!--			<property name="encrypt" value="com.eryansky.common.orm.mybatis.sensitive.encrypt.AesSupport"/>-->
+		</plugin>
+		<plugin interceptor="com.eryansky.common.orm.mybatis.sensitive.interceptor.SensitiveAndEncryptWriteInterceptor" >
+<!--		<property name="encrypt" value="com.eryansky.common.orm.mybatis.sensitive.encrypt.AesSupport"/>-->
+		</plugin>
     </plugins>
 	
 </configuration>

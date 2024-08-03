@@ -1,7 +1,7 @@
 /**
- *  Copyright (c) 2012-2022 https://www.eryansky.com
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
+ * Copyright (c) 2012-2022 https://www.eryansky.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.eryansky.common.utils.io;
 
@@ -39,13 +39,19 @@ public class PropertiesLoader {
     private static final Logger logger = LoggerFactory.getLogger(PropertiesLoader.class);
 
     private final Properties properties;
+    private final String[] resourcesPaths;
 
     public PropertiesLoader(String... resourcesPaths) {
         properties = loadProperties(resourcesPaths);
+        this.resourcesPaths = resourcesPaths;
     }
 
     public Properties getProperties() {
         return properties;
+    }
+
+    public String[] getResourcesPaths() {
+        return resourcesPaths;
     }
 
     /**
@@ -113,7 +119,7 @@ public class PropertiesLoader {
      */
     public Double getDouble(String key, Integer defaultValue) {
         String value = getValue(key);
-        return value != null ? Double.valueOf(value) : defaultValue;
+        return value != null ? Double.parseDouble(value) : defaultValue;
     }
 
     /**
@@ -132,7 +138,7 @@ public class PropertiesLoader {
      */
     public Boolean getBoolean(String key, boolean defaultValue) {
         String value = getValue(key);
-        return value != null ? Boolean.valueOf(value) : defaultValue;
+        return value != null ? Boolean.parseBoolean(value) : defaultValue;
     }
 
     /**
@@ -143,13 +149,13 @@ public class PropertiesLoader {
      * @param value         值
      */
     public void modifyProperties(String resourcesPath, String key, String value) {
-        try (FileOutputStream outputFile = new FileOutputStream(resourcesPath)){
+        try (FileOutputStream outputFile = new FileOutputStream(resourcesPath)) {
             // 从输入流中读取属性列表（键和元素对）
             properties.setProperty(key, value);
             properties.store(outputFile, "modify");
-            outputFile.close();
             outputFile.flush();
         } catch (Exception e) {
+            logger.error(e.getMessage());
         }
     }
 
@@ -161,20 +167,13 @@ public class PropertiesLoader {
      */
     private Properties loadProperties(String... resourcesPaths) {
         Properties props = new Properties();
-
         for (String location : resourcesPaths) {
-
             logger.debug("Loading properties file from:" + location);
-
-            InputStream is = null;
-            try {
-                Resource resource = Static.resourceLoader.getResource(location);
-                is = resource.getInputStream();
-                props.load(is);
+            Resource resource = Static.resourceLoader.getResource(location);
+            try (InputStream inputStream = resource.getInputStream()) {
+                props.load(inputStream);
             } catch (IOException ex) {
                 logger.info("Could not load properties from path:" + location + ", " + ex.getMessage());
-            } finally {
-                IOUtils.closeQuietly(is);
             }
         }
         return props;

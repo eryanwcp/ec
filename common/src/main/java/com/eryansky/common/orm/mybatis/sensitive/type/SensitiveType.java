@@ -14,7 +14,11 @@ public enum SensitiveType {
     /**
      * 默认脱敏方式
      */
-    DEFAUL,
+    DEFAULT,
+    /**
+     * 密码
+     */
+    PASSWORD,
     /**
      * 中文名
      */
@@ -28,9 +32,12 @@ public enum SensitiveType {
      */
     FIXED_PHONE,
     /**
-     * 手机号或座机号
+     * 手机号
      */
     MOBILE_PHONE,
+    /**
+     * 手机号或座机号
+     */
     MOBILE_OR_FIXED_PHONE,
     /**
      * 地址
@@ -41,9 +48,21 @@ public enum SensitiveType {
      */
     EMAIL,
     /**
+     * 中国大陆车牌，包含普通车辆、新能源车辆
+     */
+    CAR_LICENSE,
+    /**
      * 银行卡
      */
     BANK_CARD,
+    /**
+     * IPv4地址
+     */
+    IPV4,
+    /**
+     * IPv6地址
+     */
+    IPV6,
     /**
      * 公司开户银行联号
      */
@@ -52,6 +71,10 @@ public enum SensitiveType {
      * 支付签约协议号
      */
     PAY_SIGN_NO,
+    /**
+     * 统一社会信用代码
+     */
+    UniformSocialCreditCode,
     /**
      * 店铺编号
      */

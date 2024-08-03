@@ -150,6 +150,22 @@
 		WHERE user_id = #{userId} AND message_id = #{messageId}
 	</update>
 
+	<update id="updateById">
+		UPDATE t_notice_message_receive
+		<set>
+			<if test="isSend != null and isSend !=''">
+				is_send = #{isSend},
+			</if>
+			<if test="isRead != null and isRead !=''">
+				is_read = #{isRead},
+			</if>
+			<if test="readTime != null">
+				read_time = #{readTime},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
 	<insert id="insert">
 		INSERT INTO t_notice_message_receive(
 		id,

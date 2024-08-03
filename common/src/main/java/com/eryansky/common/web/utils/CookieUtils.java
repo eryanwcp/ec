@@ -36,7 +36,7 @@ public class CookieUtils {
 	 * @param maxAge 生存时间（单位秒）
 	 */
 	public static void setCookie(HttpServletResponse response, String name, String value, int maxAge,boolean secure) {
-		Cookie cookie = new Cookie(name, EncodeUtils.urlEncode(value));
+		Cookie cookie = new Cookie(EncodeUtils.urlEncode(name), EncodeUtils.urlEncode(value));
         if(StringUtils.isNotBlank(SpringContextHolder.getApplicationContext().getApplicationName())){
             cookie.setPath(SpringContextHolder.getApplicationContext().getApplicationName());
         }else{
@@ -54,14 +54,16 @@ public class CookieUtils {
 	public static String getCookie(HttpServletRequest request, String name) {
 		return getCookie(request, null, name, false);
 	}
+
 	/**
 	 * 获得指定Cookie的值，并删除。
 	 * @param name 名称
 	 * @return 值
 	 */
 	public static String getCookie(HttpServletRequest request, HttpServletResponse response, String name) {
-		return getCookie(request, response, name, true);
+		return getCookie(request, response, name, false);
 	}
+
 	/**
 	 * 获得指定Cookie的值
 	 * @param request 请求对象
@@ -71,15 +73,33 @@ public class CookieUtils {
 	 * @return 值
 	 */
 	public static String getCookie(HttpServletRequest request, HttpServletResponse response, String name, boolean isRemove) {
+		String ctxPath =  request != null ? request.getContextPath() : StringUtils.EMPTY;
+		return getCookie(request, response, name, ctxPath, isRemove);
+	}
+
+	/**
+	 * 获得指定Cookie的值
+	 * @param request 请求对象
+	 * @param response 响应对象
+	 * @param name 名字
+	 * @param isRemove 是否移除
+	 * @return 值
+	 */
+	public static String getCookie(HttpServletRequest request, HttpServletResponse response, String name, String path, boolean isRemove) {
 		String value = null;
-		Cookie[] cookies = request.getCookies();
-		if (cookies != null) {
-			for (Cookie cookie : cookies) {
-				if (cookie.getName().equals(name)) {
-                    value = EncodeUtils.urlDecode(cookie.getValue());
-					if (isRemove) {
-						cookie.setMaxAge(0);
-						response.addCookie(cookie);
+		if (StringUtils.isNotBlank(name)){
+			name = EncodeUtils.urlEncode(name);
+			Cookie[] cookies = request.getCookies();
+			if (cookies != null) {
+				for (Cookie cookie : cookies) {
+					if (cookie.getName().equals(name)) {
+						value = EncodeUtils.urlDecode(cookie.getValue());
+						value = EncodeUtils.xssFilter(value);
+						if (isRemove && response != null) {
+							cookie.setPath(path);
+							cookie.setMaxAge(0);
+							response.addCookie(cookie);
+						}
 					}
 				}
 			}

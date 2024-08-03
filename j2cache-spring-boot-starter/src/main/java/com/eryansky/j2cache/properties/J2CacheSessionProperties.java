@@ -143,6 +143,7 @@ public class J2CacheSessionProperties {
         private String cluster_name;
         private String timeout;
         private String password;
+        private String passwordEncrypt;
         private String database;
         private String maxTotal;
         private String maxIdle;
@@ -203,6 +204,14 @@ public class J2CacheSessionProperties {
 
         public void setPassword(String password) {
             this.password = password;
+        }
+
+        public String getPasswordEncrypt() {
+            return passwordEncrypt;
+        }
+
+        public void setPasswordEncrypt(String passwordEncrypt) {
+            this.passwordEncrypt = passwordEncrypt;
         }
 
         public String getDatabase() {

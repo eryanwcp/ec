@@ -24,7 +24,7 @@
 		<e:isAdmin>
 			<label>APP：</label><form:input path="appId" htmlEscape="false" maxlength="36" class="input-small"/>&nbsp;
 		</e:isAdmin>
-		<label>关键字：</label><form:input path="query" htmlEscape="false" maxlength="50" class="input-small"/>&nbsp;
+		<label>关键字：</label><form:input path="query" htmlEscape="false" maxlength="64" class="input-small"/>&nbsp;
 		<label>状态：</label><form:radiobuttons onclick="$('#searchForm').submit();" path="status" items="${fns:getDictList('cms_del_flag')}" itemLabel="name" itemValue="value" htmlEscape="false" />
 		&nbsp;&nbsp;<input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/>&nbsp;&nbsp;
 	</form:form>

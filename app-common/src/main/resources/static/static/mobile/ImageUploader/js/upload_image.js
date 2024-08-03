@@ -212,21 +212,35 @@ function ImageUploader($parent, options) {
             ctx = canvas.getContext('2d'),
             img = new Image();
         $parent.addClass('g-img-loading');
+
         img.onload = function() {
             var width = img.width,
-                height = img.height,
-                needWidth = 320,
-                screenWidth = window.screen.availWidth;
-            //根据所需宽度对图片进行缩放
-            if (width > screenWidth) {
-                canvas.width = screenWidth;
-                canvas.height = height * (screenWidth / width);
-            } else {
-                canvas.width = width;
-                canvas.height = height;
-            }
+                height = img.height;
 
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // canvas清屏
+
+            var _maxWidth = $parent.width() || img.width;
+            var _maxHeight =$parent.height() || img.height;
+            if (img.width > _maxWidth || img.height > _maxHeight) {
+                var bili = Math.max(img.width / _maxWidth, img.height / _maxHeight);
+                canvas.width = img.width / bili;
+                canvas.height = img.height / bili;
+            } else {
+                canvas.width = img.width;
+                canvas.height = img.height;
+            }
+            ctx.drawImage(img, 0, 0, img.width, img.height,0,0,canvas.width,canvas.height); // 将图像绘制到canvas上
+
+            //根据所需宽度对图片进行缩放
+            // if (width > screenWidth) {
+            //     canvas.width = screenWidth;
+            //     canvas.height = height * (screenWidth / width);
+            // } else {
+            //     canvas.width = width;
+            //     canvas.height = height;
+            // }
+            //
+            // ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
             /*var base64 = canvas.toDataURL('image/jpeg', 0.5);
             $('#j_thumb').val(base64.substr(22));*/
@@ -263,6 +277,9 @@ function ImageUploader($parent, options) {
         var scroll = document.documentElement.scrollTop || document.body.scrollTop || window.pageYOffset;
         var screen = window.screen.height;
         var top = scroll-(screen*0.1);
+        if(top < 0){
+            top = 0;
+        }
         l.css({
             paddingTop: "5%",
             height: "90%",

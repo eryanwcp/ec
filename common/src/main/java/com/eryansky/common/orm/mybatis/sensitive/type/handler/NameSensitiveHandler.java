@@ -6,9 +6,8 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * 姓名脱敏的解析类
- * 中文姓名只显示第一个汉字，其他隐藏为2个星号
- * 例子：李**
- * 张三丰 ：张**
+ * 例子：李四 ：李*
+ * 张三丰 ：张*丰
  *
  * @author Eryan
  * @version 2019-12-13
@@ -25,6 +24,9 @@ public class NameSensitiveHandler implements SensitiveTypeHandler {
             return "";
         }
         String fullName = src.toString();
+        if(fullName.length() > 2){
+            return fullName.replaceAll("(.).+(.)", "$1*$2");
+        }
         String name = StringUtils.left(fullName, 1);
         return StringUtils.rightPad(name, StringUtils.length(fullName), "*");
     }

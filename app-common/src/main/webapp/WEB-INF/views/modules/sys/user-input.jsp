@@ -52,7 +52,7 @@
         </div>
         <div>
             <label>姓名：</label>
-            <input name="name" type="text" maxLength="12" value="${model.name}" class="easyui-validatebox textbox"
+            <input name="name" type="text" maxLength="36" value="${model.name}" class="easyui-validatebox textbox"
                    data-options="required:true,missingMessage:'请输入登录名.',validType:['length[2,12]']" />
         </div>
         <div>
@@ -135,7 +135,7 @@
         </div>
         <div>
             <label>排序：</label>
-            <input type="text" id="sort" name="sort" value="${model.sort}"  class="easyui-numberspinner"
+            <input type="text" id="sort" name="sort" value="${model.sort}"  class="easyui-numberspinner" style="width:120px;"
                    data-options="min:1,max:99999999,size:9,maxlength:9,height:28" />
         </div>
         <div>
@@ -149,7 +149,7 @@
         </div>
         <div>
             <label>自定义参数：</label>
-            <textarea name="extendAttr" rows="4" class="easyui-textbox" style="width:260px;height:75px;">${model.extendAttr}</textarea>
+            <textarea name="extendAttr" rows="4" class="easyui-textbox" data-options="multiline:true" style="width:260px;height:75px;">${model.extendAttr}</textarea>
         </div>
     </form>
 </div>

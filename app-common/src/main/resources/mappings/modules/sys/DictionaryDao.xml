@@ -15,6 +15,7 @@
 		a.remark AS "remark",
 		a.order_no AS "orderNo",
 		d.name AS "group.name",
+		d.code AS "group.code",
 		a.group_id AS "group.id"
 	</sql>
 	
@@ -61,7 +62,7 @@
 		FROM t_sys_dictionary a
 		<include refid="sysDictionaryJoins"/>
 		WHERE a.status = #{STATUS_NORMAL}
-			AND (a.group_id is null OR a.group_id  = '')
+			AND (a.group_id IS NULL OR a.group_id  = '')
 		ORDER BY a.order_no ASC
 	</select>
 
@@ -236,8 +237,12 @@
 		WHERE id = #{id}
 	</update>
 
-	<delete id="removeAll">
+	<delete id="clear">
 		DELETE FROM t_sys_dictionary
+		WHERE id = #{id}
 	</delete>
 
+	<delete id="clearAll">
+		DELETE FROM t_sys_dictionary
+	</delete>
 </mapper>

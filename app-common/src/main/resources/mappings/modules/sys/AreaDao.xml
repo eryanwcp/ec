@@ -17,9 +17,14 @@
 		a.parent_ids AS "parent_ids",
 		a.parent_id AS "parent.id",
 		p.name AS "parent.name",
+		p.short_name AS "parent.shortName",
+		p.code AS "parent.code",
+		p.biz_code AS "parent.bizCode",
 		a.name AS "name",
 		a.short_name AS "shortName",
 		a.code AS "code",
+		a.biz_code AS "bizCode",
+		a.extend_attr AS "extendAttr",
 		a.type AS "type",
 		a.sort AS "sort",
 		a.remark AS "remark"
@@ -43,6 +48,14 @@
 		FROM t_sys_area a
 		<include refid="areaJoins"/>
 		WHERE a.code = #{code} AND a.status = '0'
+	</select>
+
+	<select id="getByBizCode" resultType="Area">
+		SELECT
+		<include refid="areaColumns"/>
+		FROM t_sys_area a
+		<include refid="areaJoins"/>
+		WHERE a.biz_code = #{bizCode} AND a.status = '0'
 	</select>
 
 	<select id="findList" resultType="Area">
@@ -86,6 +99,26 @@
 		ORDER BY a.code
 	</select>
 
+	<select id="findByCodes" resultType="Area">
+		SELECT
+		<include refid="areaColumns"/>
+		FROM t_sys_area a
+		<include refid="areaJoins"/>
+		<where>
+			a.status = #{status}
+		   AND a.code IN
+			<foreach collection="codes" open="(" separator="," close=")" item="item">
+				#{item}
+			</foreach>
+			<if test="types != null and types.size() !=0">
+				AND a.type IN
+				<foreach collection="types" open="(" separator="," close=")" item="item">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+		ORDER BY a.code
+	</select>
 
 	<select id="findByParentId" resultType="Area">
 		SELECT
@@ -204,6 +237,8 @@
 		name,
 		short_name,
 		code,
+		biz_code,
+		extend_attr,
 		type,
 		sort,
 		remark
@@ -220,11 +255,14 @@
 		#{name},
 		#{shortName},
 		#{code},
+		#{bizCode},
+		#{extendAttr},
 		#{type},
 		#{sort},
 		#{remark}
 		)
 	</insert>
+
 	<insert id="insertBatch">
 		INSERT INTO t_sys_area(
 		id,
@@ -239,6 +277,8 @@
 		name,
 		short_name,
 		code,
+		biz_code,
+		extend_attr,
 		type,
 		sort,
 		remark
@@ -246,7 +286,7 @@
 		#{item.id},
 		#{item.status},
 		0,
-		#item.createUser},
+		#{item.createUser},
 		#{item.createTime},
 		#{item.updateUser},
 		#{item.updateTime},
@@ -255,6 +295,8 @@
 		#{item.name},
 		#{item.shortName},
 		#{item.code},
+		#{item.bizCode},
+		#{item.extendAttr},
 		#{item.type},
 		#{item.sort},
 		#{item.remark}
@@ -272,6 +314,8 @@
 		name = #{name},
 		short_name = #{shortName},
 		code = #{code},
+		biz_code = #{bizCode},
+		extend_attr = #{extendAttr},
 		type = #{type},
 		sort = #{sort},
 		remark = #{remark}
@@ -307,6 +351,15 @@
 			<when test="dbName == 'oracle'">'%,'||#{id}||',%'</when>
 			<otherwise>'%,'+#{id}+',%'</otherwise>
 		</choose>
+	</delete>
+
+	<delete id="clear">
+		DELETE FROM t_sys_area
+		WHERE id = #{id}
+	</delete>
+
+	<delete id="clearAll">
+		DELETE FROM t_sys_area
 	</delete>
 
 </mapper>

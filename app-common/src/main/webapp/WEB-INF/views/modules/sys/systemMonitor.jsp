@@ -7,7 +7,7 @@
 	<script type="text/javascript">
 		$(function(){
 			reLoad();
-            window.setInterval('reLoad()',5*1000);
+            window.setInterval('reLoad()',10*1000);
 		});
 		function reLoad(){
 			$.ajax({
@@ -81,6 +81,7 @@
 	<li><a href="${ctxAdmin}/sys/systemMonitor/log">系统日志</a></li>
 	<li><a href="${ctxAdmin}/sys/systemMonitor/cache">缓存管理</a></li>
 	<li><a href="${ctxAdmin}/sys/systemMonitor/queue">队列管理</a></li>
+	<li><a href="${ctxAdmin}/sys/systemMonitor/asyncTask">异步任务</a></li>
 </ul>
 <form:form id="searchForm" method="post" class="breadcrumb form-search">
 	&nbsp;&nbsp;<input id="btnSubmit" class="btn btn-primary" type="button" value="刷新" onclick="reLoad();"/>&nbsp;&nbsp;

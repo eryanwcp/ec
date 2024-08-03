@@ -5,6 +5,7 @@
  */
 package com.eryansky.modules.sys.aop;
 
+import com.eryansky.client.common.vo.ExtendAttr;
 import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.common.utils.Exceptions;
 import com.eryansky.common.utils.StringUtils;
@@ -15,12 +16,10 @@ import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys.event.SysLogEvent;
 import com.eryansky.modules.sys.mapper.Log;
 import com.eryansky.modules.sys.mapper.User;
-import com.eryansky.modules.sys.service.UserService;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -58,8 +57,7 @@ public class SysLogAspect {
     @Before(value = "sysLogAspect()&&@annotation(logging)")
     public void recordLog(JoinPoint joinPoint, Logging logging) throws Throwable {
         Log log = new Log();
-        //将当前实体保存到threadLocal
-        sysLogThreadLocal.set(log);
+
 
         Long start = System.currentTimeMillis();
         log.setStartTime(start);
@@ -90,8 +88,14 @@ public class SysLogAspect {
             log.setDeviceType(null != sessionInfo ? sessionInfo.getDeviceType() : StringUtils.EMPTY);
             log.setBrowserType(null != sessionInfo ? sessionInfo.getBrowserType() : StringUtils.EMPTY);
             log.setOperTime(Calendar.getInstance().getTime());
+            if(null != sessionInfo){
+                ExtendAttr extendAttr = new ExtendAttr();
+                extendAttr.put("userType",sessionInfo.getUserType());
+                log.setExtendAttr(extendAttr);
+            }
             log.setRemark(logging.remark());
-            SpringContextHolder.publishEvent(new SysLogEvent(log));
+            //将当前实体保存到threadLocal
+            sysLogThreadLocal.set(log);
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
@@ -110,7 +114,7 @@ public class SysLogAspect {
         long end = System.currentTimeMillis();
         long opTime = end - log.getStartTime();
         log.setActionTime(String.valueOf(opTime));
-
+        log.prePersist();
         // 发布事件
         SpringContextHolder.publishEvent(new SysLogEvent(log));
         //移除当前log实体
@@ -131,6 +135,7 @@ public class SysLogAspect {
         // 异常
         log.setType(LogType.exception.getValue());
         log.setException(Exceptions.getStackTraceAsString(new Exception(e)));
+        log.prePersist();
         // 发布事件
         SpringContextHolder.publishEvent(new SysLogEvent(log));
         //移除当前log实体

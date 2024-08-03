@@ -14,12 +14,12 @@
          style="padding: 0px; height: 100px;width:100%; overflow-y: hidden;">
         <form id="log_search_form" style="padding: 5px;">
             &nbsp;日志类型：<input id="_type" name="type" />
-            &nbsp;账号或姓名：<input type="text" name="userInfo"
-                               class="easyui-validatebox textbox eu-input" placeholder="账号或姓名..."  onkeydown="if(event.keyCode==13)search()"
-                               maxLength="25" style="width: 160px" />
+            &nbsp;操作用户：<input type="text" name="userInfo"
+                               class="easyui-validatebox textbox eu-input" placeholder="ID、账号、手机号或姓名..."  onkeydown="if(event.keyCode==13)search()"
+                               maxLength="36" style="width: 160px" />
             &nbsp;关键字：<input type="text" name="query"
                              class="easyui-validatebox textbox eu-input" placeholder="关键字..."  onkeydown="if(event.keyCode==13)search()"
-                             maxLength="30" style="width: 160px" />
+                             maxLength="36" style="width: 160px" />
             &nbsp;时间：<input type="text" id="startTime" name="startTime" class="easyui-my97" value="${startTime}" placeholder="起始时间..."/>~<input type="text" id="endTime" name="endTime" class="easyui-my97"  placeholder="结束时间..."/>
             &nbsp;<a class="easyui-linkbutton" href="#" data-options="iconCls:'easyui-icon-search',width:100,height:28,onClick:search">查 询</a>
             <a class="easyui-linkbutton" href="#" data-options="iconCls:'easyui-icon-no',width:100,height:28" onclick="$log_search_form.form('reset');">重置</a>

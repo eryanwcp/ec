@@ -12,9 +12,11 @@ import com.eryansky.common.utils.UserAgentUtils;
 import com.eryansky.common.utils.encode.Encrypt;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
+import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
 import com.eryansky.core.security.annotation.RequiresUser;
+import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys._enum.UserPasswordUpdateType;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.service.UserPasswordService;
@@ -25,10 +27,7 @@ import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.AppUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -138,4 +137,15 @@ public class IndexController extends SimpleController {
         return modelAnView;
     }
 
+    /**
+     * 单点登录内部系统
+     *
+     * @return
+     */
+    @Logging(value = "单点登录", logType = LogType.REST)
+    @GetMapping(value = {"sso/{url}"})
+    public String sso(HttpServletRequest request, @PathVariable String url) {
+        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
+        return "redirect:" + url + "?Authorization=" + (null != sessionInfo ? sessionInfo.getToken() : "");
+    }
 }

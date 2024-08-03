@@ -58,7 +58,7 @@ public class FileUploadUtils {
             //图片
             "bmp", "gif", "jpg", "jpeg", "png",
             //word excel powerpoint
-            "doc", "docx", "xls", "xlsx", "ppt", "pptx",
+            "doc", "docx", "xls", "xlsx", "ppt", "pptx", "wps",
             "html", "htm", "txt",
             //压缩文件
             "rar", "zip", "gz", "bz2",

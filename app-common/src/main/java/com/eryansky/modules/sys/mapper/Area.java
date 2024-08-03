@@ -5,8 +5,8 @@
  */
 package com.eryansky.modules.sys.mapper;
 
+import com.eryansky.client.common.vo.ExtendAttr;
 import com.eryansky.common.orm._enum.GenericEnumUtils;
-import com.eryansky.modules.sys._enum.LogType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.eryansky.core.orm.mybatis.entity.TreeEntity;
 import com.eryansky.modules.sys._enum.AreaType;
@@ -25,11 +25,22 @@ public class Area extends TreeEntity<Area> {
      * 简称
      */
     private String shortName;
-    private String code;    // 区域编码
+    /**
+     * 区域编码
+     */
+    private String code;
+    /**
+     * 信息分类编码
+     */
+    private String bizCode;
     /**
      * 区域类型 {@link com.eryansky.modules.sys._enum.AreaType}
      */
     private String type;
+    /**
+     * 自定义扩展数据
+     */
+    private ExtendAttr extendAttr;
     /**
      * 备注
      */
@@ -70,6 +81,14 @@ public class Area extends TreeEntity<Area> {
         this.code = code;
     }
 
+    public String getBizCode() {
+        return bizCode;
+    }
+
+    public void setBizCode(String bizCode) {
+        this.bizCode = bizCode;
+    }
+
     @Length(min = 1, max = 1)
     public String getType() {
         return type;
@@ -86,6 +105,14 @@ public class Area extends TreeEntity<Area> {
 
     public String getParentId() {
         return parent != null && parent.getId() != null ? parent.getId() : "0";
+    }
+
+    public ExtendAttr getExtendAttr() {
+        return extendAttr;
+    }
+
+    public void setExtendAttr(ExtendAttr extendAttr) {
+        this.extendAttr = extendAttr;
     }
 
     public String getRemark() {

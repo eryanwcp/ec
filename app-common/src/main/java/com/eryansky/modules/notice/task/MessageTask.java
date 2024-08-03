@@ -38,40 +38,6 @@ public class MessageTask {
     private MessageReceiveService messageReceiveService;
 
     /**
-     * 发送消息
-     *
-     * @param message
-     * @param receiveObjectType
-     */
-    @Async
-    public CompletableFuture<Message> saveAndSend(Message message, String receiveObjectType, Collection<String> receiveObjectIds) {
-        MessageReceiveObjectType messageReceiveObjectType = MessageReceiveObjectType.getByValue(receiveObjectType);
-        if(null == messageReceiveObjectType){
-            logger.warn("参数[receiveObjectType]未定义对应类型，{}",receiveObjectType);
-            return CompletableFuture.completedFuture(null);
-        }
-        if (MessageReceiveObjectType.User.equals(messageReceiveObjectType)) {
-            return saveAndSend(message, messageReceiveObjectType, receiveObjectIds);
-        } else if (MessageReceiveObjectType.Organ.equals(messageReceiveObjectType)) {
-            return saveAndSend(message, messageReceiveObjectType, receiveObjectIds);
-        }else{
-            logger.warn("参数[receiveObjectType]未定义对应类型，{}",receiveObjectType);
-        }
-        return CompletableFuture.completedFuture(null);
-    }
-
-    /**
-     * @param message
-     * @param messageReceiveObjectType
-     * @param receiveObjectIds
-     */
-    @Async
-    public CompletableFuture<Message> saveAndSend(Message message, MessageReceiveObjectType messageReceiveObjectType, Collection<String> receiveObjectIds) {
-        return CompletableFuture.completedFuture(messageService.saveAndSend(message, messageReceiveObjectType, receiveObjectIds));
-    }
-
-
-    /**
      * 消息推送（仅限推送,由切面实现）
      * @param messageId
      * @return

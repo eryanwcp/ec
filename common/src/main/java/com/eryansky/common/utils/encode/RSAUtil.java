@@ -1,7 +1,9 @@
 package com.eryansky.common.utils.encode;
 
+import com.eryansky.common.utils.Identities;
 import com.google.common.collect.Maps;
 import org.apache.commons.codec.binary.Base64;
+import org.bouncycastle.pqc.legacy.math.linearalgebra.ByteUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,49 +91,60 @@ public class RSAUtil {
 
     /**
      * 获取默认公钥
+     *
      * @return
      */
     public static String getDefaultBase64PublicKey() {
         return DEFAULT_PUBLIC_KEY;
     }
 
-    public static PublicKey getPublicKey(String base64PublicKey){
+
+    /**
+     * 获取默认私钥
+     *
+     * @return
+     */
+    public static String getDefaultBase64PrivateKey() {
+        return DEFAULT_PRIVATE_KEY;
+    }
+
+    public static PublicKey getPublicKey(String base64PublicKey) {
         PublicKey publicKey = null;
-        try{
+        try {
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.decodeBase64(base64PublicKey.getBytes()));
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             publicKey = keyFactory.generatePublic(keySpec);
             return publicKey;
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
         }
         return publicKey;
     }
 
-    public static PrivateKey getPrivateKey(String base64PrivateKey){
+    public static PrivateKey getPrivateKey(String base64PrivateKey) {
         PrivateKey privateKey = null;
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(Base64.decodeBase64(base64PrivateKey.getBytes()));
         KeyFactory keyFactory = null;
         try {
             keyFactory = KeyFactory.getInstance("RSA");
         } catch (NoSuchAlgorithmException e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
         }
         try {
             privateKey = keyFactory.generatePrivate(keySpec);
         } catch (InvalidKeySpecException e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
         }
         return privateKey;
     }
 
 
-    public static String encodeBase64String(String data){
+    public static String encodeBase64String(String data) {
         return encodeBase64String(data, DEFAULT_PUBLIC_KEY);
     }
 
-    public static String encodeBase64String(String data,String publicKey) {
-        return Base64.encodeBase64String(encrypt(data,publicKey));
+    public static String encodeBase64String(String data, String publicKey) {
+        return Base64.encodeBase64String(encrypt(data, publicKey));
     }
 
     public static byte[] encrypt(String data) {
@@ -156,6 +169,20 @@ public class RSAUtil {
         return decrypt(Base64.decodeBase64(data.getBytes()), getPrivateKey(base64PrivateKey));
     }
 
+    public static String decrypt(String data, String base64PrivateKey) {
+        try {
+            Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+            cipher.init(Cipher.DECRYPT_MODE, getPrivateKey(base64PrivateKey));
+            return new String(cipher.doFinal(data.getBytes()));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String decrypt(byte[] data, String base64PrivateKey) {
+        return decrypt(data, getPrivateKey(base64PrivateKey));
+    }
+
     public static String decrypt(byte[] data, PrivateKey privateKey) {
         try {
             Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
@@ -177,7 +204,7 @@ public class RSAUtil {
             System.out.println("公钥：" + Base64.encodeBase64String(publicKey));
             System.out.println("私钥：" + Base64.encodeBase64String(privateKey));
 
-            System.out.println("默认公钥：" +RSAUtil.getDefaultBase64PublicKey());
+            System.out.println("默认公钥：" + RSAUtil.getDefaultBase64PublicKey());
 
             String encryptedString = RSAUtil.encodeBase64String("123456");
 
@@ -185,8 +212,40 @@ public class RSAUtil {
             System.out.println(encryptedString);
             String decryptedString = RSAUtil.decryptBase64(encryptedString);
             System.out.println(decryptedString);
+
+            String key = Identities.uuid2().substring(0, 16);
+            System.out.println(key);
+            //常規方法
+            String encryptKey = RSAUtil.encodeBase64String(key,DEFAULT_PUBLIC_KEY);
+            String decryptKey = RSAUtil.decryptBase64(encryptKey,DEFAULT_PRIVATE_KEY);
+            System.out.println(encryptKey);
+            System.out.println(decryptKey);
+            //接口
+            System.out.println(Base64.encodeBase64String(key.getBytes()));
+            byte[] encryptKeys = RSAUtil.encrypt(Base64.encodeBase64String(key.getBytes()), DEFAULT_PUBLIC_KEY);
+            String encrypt = Base64.encodeBase64String(encryptKeys);
+            System.out.println(encrypt);
+            System.out.println(RSAUtil.decryptBase64(encrypt, DEFAULT_PRIVATE_KEY));
+            System.out.println(new String(Base64.decodeBase64(RSAUtil.decryptBase64(encrypt, DEFAULT_PRIVATE_KEY))));
+            System.out.println(new String(Base64.decodeBase64(RSAUtil.decrypt(encryptKeys, DEFAULT_PRIVATE_KEY))));
+
+
+            String data = "123456";
+            System.out.println(data);
+            //AES
+            String encryptData = Cryptos.aesECBEncryptBase64String(data, key);
+            System.out.println(encryptData);
+            String decryptData = Cryptos.aesECBDecryptBase64String(encryptData, key);
+            System.out.println(decryptData);
+            //SM4
+            String encryptData2 = Sm4Utils.encryptEcb(ByteUtils.toHexString(key.getBytes()), data);
+            System.out.println(encryptData2);
+            String decryptData2 = Sm4Utils.decryptEcb(ByteUtils.toHexString(key.getBytes()), encryptData2);
+            System.out.println(decryptData2);
+
+
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
         }
     }
 
