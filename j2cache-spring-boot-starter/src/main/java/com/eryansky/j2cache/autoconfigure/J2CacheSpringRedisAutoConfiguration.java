@@ -28,9 +28,6 @@ import org.springframework.data.redis.connection.RedisNode;
 import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisSentinelConfiguration;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
-import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
-import org.springframework.data.redis.connection.jedis.JedisClientConfiguration.JedisClientConfigurationBuilder;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration.LettucePoolingClientConfigurationBuilder;
@@ -42,9 +39,6 @@ import org.springframework.integration.redis.util.RedisLockRegistry;
 import org.springframework.util.StringUtils;
 
 import com.eryansky.j2cache.cache.support.util.J2CacheSerializer;
-import redis.clients.jedis.JedisPoolConfig;
-import redis.clients.jedis.JedisShardInfo;
-import redis.clients.jedis.exceptions.JedisConnectionException;
 
 /**
  * 对spring redis支持的配置入口
@@ -80,8 +74,8 @@ public class J2CacheSpringRedisAutoConfiguration {
 //		}
 		Properties l2CacheProperties = j2CacheConfig.getL2CacheProperties();
 		String hosts = l2CacheProperties.getProperty("hosts");
-		String mode = l2CacheProperties.getProperty("mode") == null ? "null" : l2CacheProperties.getProperty("mode");
-		String clusterName = l2CacheProperties.getProperty("cluster_name");
+		String scheme = l2CacheProperties.getProperty("scheme") == null ? "null" : l2CacheProperties.getProperty("scheme");
+		String clusterName = l2CacheProperties.getProperty("cluster_name","j2cache");
 		String password = l2CacheProperties.getProperty("password");
 		int database = l2CacheProperties.getProperty("database") == null ? 0
 				: Integer.parseInt(l2CacheProperties.getProperty("database"));
@@ -106,8 +100,8 @@ public class J2CacheSpringRedisAutoConfiguration {
 		if (!StringUtils.isEmpty(password)) {
 			paw = RedisPassword.of(password);
 		}
-		switch (mode) {
-		case "sentinel":
+		switch (scheme) {
+		case "redis-sentinel":
 			RedisSentinelConfiguration sentinel = new RedisSentinelConfiguration();
 			sentinel.setDatabase(database);
 			sentinel.setPassword(paw);
@@ -115,15 +109,15 @@ public class J2CacheSpringRedisAutoConfiguration {
 			sentinel.setSentinels(nodes);
 			connectionFactory = new LettuceConnectionFactory(sentinel, config.build());
 			break;
-		case "cluster":
+		case "redis-cluster":
 			RedisClusterConfiguration cluster = new RedisClusterConfiguration();
 			cluster.setClusterNodes(nodes);
 			cluster.setMaxRedirects(MAX_ATTEMPTS);
 			cluster.setPassword(paw);
 			connectionFactory = new LettuceConnectionFactory(cluster, config.build());
 			break;
-		case "sharded":
-			throw new IllegalArgumentException("Lettuce not support use mode [sharded]!!");
+		case "redis-sharded":
+			throw new IllegalArgumentException("Lettuce not support use scheme [redis-sharded]!!");
 		default:
 			for (RedisNode node : nodes) {
 				String host = node.getHost();
@@ -134,8 +128,8 @@ public class J2CacheSpringRedisAutoConfiguration {
 				connectionFactory = new LettuceConnectionFactory(single, config.build());
 				break;
 			}
-			if (!"single".equalsIgnoreCase(mode))
-				log.warn("Redis mode [" + mode + "] not defined. Using 'single'.");
+			if (!"redis".equalsIgnoreCase(scheme) && !"rediss".equalsIgnoreCase(scheme))
+				log.warn("Redis scheme [" + scheme + "] not defined. Using 'redis'.");
 			break;
 		}
 		connectionFactory.setValidateConnection(true);

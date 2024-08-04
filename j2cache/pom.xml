@@ -14,7 +14,6 @@
     <packaging>jar</packaging>
     <properties>
         <caffeine.version>3.1.8</caffeine.version>
-        <jedis.version>2.10.2</jedis.version>
         <lettuce.version>6.3.1.RELEASE</lettuce.version>
         <objenesis.version>3.3</objenesis.version>
         <fst.version>3.0.4-jdk17</fst.version>
@@ -32,15 +31,14 @@
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
             <version>${caffeine.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-            <version>${jedis.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.checkerframework</groupId>
+                    <artifactId>checker-qual</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.errorprone</groupId>
+                    <artifactId>error_prone_annotations</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -48,6 +46,12 @@
             <groupId>io.lettuce</groupId>
             <artifactId>lettuce-core</artifactId>
             <version>${lettuce.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.projectreactor</groupId>
+                    <artifactId>reactor-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.objenesis</groupId>

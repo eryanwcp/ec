@@ -18,6 +18,7 @@ package com.eryansky.j2cache.cluster;
 import com.eryansky.j2cache.CacheException;
 import com.eryansky.j2cache.CacheProviderHolder;
 import com.eryansky.j2cache.lettuce.LettuceCacheProvider;
+
 import java.util.Properties;
 
 /**
@@ -45,7 +46,11 @@ public class ClusterPolicyFactory {
         return policy;
     }
 
-
+    /**
+     * 使用 Redis 订阅和发布机制，该方法只能调用一次
+     * @param props 框架配置
+     * @return 返回 Redis 集群策略的实例
+     */
     private final static ClusterPolicy lettuce(Properties props, CacheProviderHolder holder) {
         LettuceCacheProvider policy = new LettuceCacheProvider();
         policy.connect(props, holder);

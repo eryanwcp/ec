@@ -15,6 +15,7 @@
  */
 package com.eryansky.j2cache.lettuce;
 
+import com.eryansky.j2cache.util.AesSupport;
 import io.lettuce.core.AbstractRedisClient;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
@@ -31,7 +32,12 @@ import com.eryansky.j2cache.cluster.ClusterPolicy;
 import io.lettuce.core.support.ConnectionPoolSupport;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -55,6 +61,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Winter Lau (javayou@gmail.com)
  */
 public class LettuceCacheProvider extends RedisPubSubAdapter<String, String> implements CacheProvider, ClusterPolicy {
+
+    private static final Logger log = LoggerFactory.getLogger(LettuceCacheProvider.class);
 
     private final int LOCAL_COMMAND_ID = Command.genRandomSrc(); //命令源标识，随机生成，每个节点都有唯一标识
 
@@ -100,7 +108,7 @@ public class LettuceCacheProvider extends RedisPubSubAdapter<String, String> imp
         String password = props.getProperty("password");
         int database = Integer.parseInt(props.getProperty("database", "0"));
         String sentinelMasterId = props.getProperty("sentinelMasterId");
-        String sentinelPassword = props.getProperty("sentinelPassword ");
+        String sentinelPassword = props.getProperty("sentinelPassword");
         long clusterTopologyRefreshMs = Long.valueOf(props.getProperty("clusterTopologyRefresh", "3000"));
 
         if("redis-cluster".equalsIgnoreCase(scheme)) {

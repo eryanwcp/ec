@@ -16,7 +16,6 @@
 package com.eryansky.j2cache;
 
 import com.eryansky.j2cache.util.FstJSONSerializer;
-import com.eryansky.j2cache.util.JavaSerializer;
 import com.eryansky.j2cache.util.Serializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,8 +53,7 @@ public class Command implements java.io.Serializable{
 	private static final Serializer serializer;
 
 	static {
-//		serializer = new FstJSONSerializer(null);
-		serializer = new JavaSerializer();
+		serializer = new FstJSONSerializer(null);
 	}
 
 	public static int genRandomSrc() {

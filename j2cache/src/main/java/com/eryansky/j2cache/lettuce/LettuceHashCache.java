@@ -16,6 +16,7 @@
 package com.eryansky.j2cache.lettuce;
 
 import com.eryansky.j2cache.Cache;
+import com.google.common.collect.Maps;
 import io.lettuce.core.AbstractRedisClient;
 import io.lettuce.core.api.StatefulConnection;
 import io.lettuce.core.api.sync.RedisHashCommands;
@@ -67,6 +68,12 @@ public class LettuceHashCache extends LettuceCache {
     public void setBytes(String key, byte[] bytes) {
         try(StatefulConnection<String, byte[]> connection = super.connect()) {
             RedisHashCommands<String, byte[]> cmd = (RedisHashCommands)super.sync(connection);
+            Map<String, byte[]> data = cmd.hgetall(this.region);
+            if(null == data){
+                data = Maps.newHashMap();
+            }
+            data.put(key,bytes);
+            cmd.hmset(this.region,data);
         }
     }
 
@@ -75,6 +82,15 @@ public class LettuceHashCache extends LettuceCache {
         try(StatefulConnection<String, byte[]> connection = super.connect()) {
             RedisHashCommands<String, byte[]> cmd = (RedisHashCommands)super.sync(connection);
             cmd.hmset(this.region, bytes);
+        }
+    }
+
+    @Override
+    public void setBytes(Map<String, byte[]> bytes, long timeToLiveInSeconds) {
+        super.setBytes(bytes, timeToLiveInSeconds);
+        try(StatefulConnection<String, byte[]> connection = super.connect()) {
+            RedisKeyCommands<String, byte[]> cmd = (RedisKeyCommands)sync(connection);
+            cmd.expire(this.region,timeToLiveInSeconds);
         }
     }
 
