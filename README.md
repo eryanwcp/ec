@@ -11,6 +11,7 @@
 Docker打包
 
 
+    mvn package -P prod
     mvn package com.google.cloud.tools:jib-maven-plugin:3.4.3:buildTar -P docker
     mvn package com.google.cloud.tools:jib-maven-plugin:3.4.3:buildTar -DsendCredentialsOverHttp=true
 
@@ -25,4 +26,11 @@ Docker发布
 
     mvn package com.google.cloud.tools:jib-maven-plugin:3.4.3:build -P docker
     mvn package com.google.cloud.tools:jib-maven-plugin:3.4.3:build -DsendCredentialsOverHttp=true -P docker
+
+
+Docker加载镜像
+
+    Linux：docker load < jib-image.tar
+    Windows：docker load -i jib-image.tar
+
 

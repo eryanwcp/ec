@@ -561,8 +561,8 @@ public class AppConstants extends SysConstants {
      */
     public static int getSessionUserMaxSize() {
         String code = "security.sessionUser.MaxSize";
-        String value = getConfigValue(code);
-        return Integer.parseInt(value);
+        String value = getConfigValue(code,"0");
+        return StringUtils.isBlank(value) ? 0 :Integer.parseInt(value);
     }
 
 
@@ -574,7 +574,7 @@ public class AppConstants extends SysConstants {
      */
     public static int getUserSessionSize() {
         String code = "security.sessionUser.UserSessionSize";
-        String value = getConfigValue(code);
+        String value = getConfigValue(code,"0");
         return StringUtils.isBlank(value) ? 0 : Integer.parseInt(value);
     }
 
