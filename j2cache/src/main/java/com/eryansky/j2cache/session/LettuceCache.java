@@ -119,6 +119,12 @@ public class LettuceCache {
         }
     }
 
+    public void setBytes(String session_id, String key, byte[] bytes) {
+        try(StatefulConnection<String, byte[]> connection = connect()) {
+            RedisHashCommands<String, byte[]> cmd = (RedisHashCommands)sync(connection);
+            cmd.hset(getRegionName(session_id),key,bytes);
+        }
+    }
 
 
     public void setBytes(String session_id, Map<String,byte[]> bytes, int expireInSeconds) {

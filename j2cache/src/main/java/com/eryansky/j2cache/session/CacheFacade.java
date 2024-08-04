@@ -330,7 +330,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             session.setLastAccess_at(System.currentTimeMillis());
             cache1.put(session.getId(), session);
             if(this.cache2 != null){
-                cache2.updateKeyBytes(session.getId(), SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
+                cache2.setBytes(session.getId(), SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
                 cache2.ttl(session.getId(), cache1.getExpire());
             }
         } finally {
@@ -345,7 +345,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             cache1.put(session.getId(), session);
             if(this.cache2 != null){
                 try {
-                    cache2.updateKeyBytes(session.getId(), key, Serializer.write(session.get(key)));
+                    cache2.setBytes(session.getId(), key, Serializer.write(session.get(key)));
                 } catch (RuntimeException | IOException e) {
                     if(!this.discardNonSerializable)
                         throw ((e instanceof RuntimeException)?(RuntimeException)e : new RuntimeException(e));
