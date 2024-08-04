@@ -17,8 +17,6 @@ package com.eryansky.j2cache;
 
 import com.eryansky.j2cache.caffeine.CaffeineProvider;
 import com.eryansky.j2cache.lettuce.LettuceCacheProvider;
-import com.eryansky.j2cache.redis.RedisCacheProvider;
-import com.eryansky.j2cache.redis.ReadonlyRedisCacheProvider;
 import com.eryansky.j2cache.util.AesSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,12 +99,8 @@ public class CacheProviderHolder {
 		switch (cacheIdent.toLowerCase()) {
 			case "caffeine":
 				return new CaffeineProvider();
-			case "redis":
-				return new RedisCacheProvider();
 			case "lettuce":
 				return new LettuceCacheProvider();
-			case "readonly-redis":
-				return new ReadonlyRedisCacheProvider();
 			case "none":
 				return new NullCacheProvider();
 		}

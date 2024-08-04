@@ -28,9 +28,6 @@ import org.springframework.data.redis.connection.RedisNode;
 import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisSentinelConfiguration;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
-import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
-import org.springframework.data.redis.connection.jedis.JedisClientConfiguration.JedisClientConfigurationBuilder;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration.LettucePoolingClientConfigurationBuilder;
@@ -42,10 +39,6 @@ import org.springframework.integration.redis.util.RedisLockRegistry;
 import org.springframework.util.StringUtils;
 
 import com.eryansky.j2cache.cache.support.util.J2CacheSerializer;
-import com.eryansky.j2cache.redis.RedisUtils;
-import redis.clients.jedis.JedisPoolConfig;
-import redis.clients.jedis.JedisShardInfo;
-import redis.clients.jedis.exceptions.JedisConnectionException;
 
 /**
  * 对spring redis支持的配置入口
@@ -70,90 +63,6 @@ public class J2CacheSpringRedisAutoConfiguration {
 
 //    @Autowired(required = false)
 //    private LettuceConnectionFactory lettuceConnectionFactory;
-
-	@SuppressWarnings("deprecation")
-	@Bean("j2CahceRedisConnectionFactory")
-	@ConditionalOnMissingBean(name = "j2CahceRedisConnectionFactory")
-	@ConditionalOnProperty(name = "j2cache.redis-client", havingValue = "jedis", matchIfMissing = true)
-	public JedisConnectionFactory jedisConnectionFactory(com.eryansky.j2cache.J2CacheConfig j2CacheConfig) {
-//        if (null != this.jedisConnectionFactory) {
-//            return this.jedisConnectionFactory;
-//        }
-	    Properties l2CacheProperties = j2CacheConfig.getL2CacheProperties();
-		String hosts = l2CacheProperties.getProperty("hosts");
-		String mode = l2CacheProperties.getProperty("mode") == null ? "null" : l2CacheProperties.getProperty("mode");
-		String clusterName = l2CacheProperties.getProperty("cluster_name");
-		String password = l2CacheProperties.getProperty("password");
-		int database = l2CacheProperties.getProperty("database") == null ? 0
-				: Integer.parseInt(l2CacheProperties.getProperty("database"));
-		JedisConnectionFactory connectionFactory = null;
-		JedisPoolConfig config = RedisUtils.newPoolConfig(l2CacheProperties, null);
-		List<RedisNode> nodes = new ArrayList<>();
-		if (hosts != null && !"".equals(hosts)) {
-			for (String node : hosts.split(",")) {
-				String[] s = node.split(":");
-				String host = s[0];
-				int port = (s.length > 1) ? Integer.parseInt(s[1]) : 6379;
-				RedisNode n = new RedisNode(host, port);
-				nodes.add(n);
-			}
-		} else {
-			log.error("j2cache中的redis配置缺少hosts！！");
-			throw new IllegalArgumentException();
-		}
-
-		RedisPassword paw = RedisPassword.none();
-		if (!StringUtils.isEmpty(password)) {
-			paw = RedisPassword.of(password);
-		}
-
-		switch (mode) {
-		case "sentinel":
-			RedisSentinelConfiguration sentinel = new RedisSentinelConfiguration();
-			sentinel.setDatabase(database);
-			sentinel.setPassword(paw);
-			sentinel.setMaster(clusterName);
-			sentinel.setSentinels(nodes);
-			connectionFactory = new JedisConnectionFactory(sentinel, config);
-			break;
-		case "cluster":
-			RedisClusterConfiguration cluster = new RedisClusterConfiguration();
-			cluster.setClusterNodes(nodes);
-			cluster.setMaxRedirects(MAX_ATTEMPTS);
-			cluster.setPassword(paw);
-			connectionFactory = new JedisConnectionFactory(cluster, config);
-			break;
-		case "sharded":
-			try {
-				for (String node : hosts.split(",")) {
-					connectionFactory = new JedisConnectionFactory(new JedisShardInfo(new URI(node)));
-					connectionFactory.setPoolConfig(config);
-					log.warn("Jedis mode [sharded] not recommended for use!!");
-					break;
-				}
-			} catch (URISyntaxException e) {
-				throw new JedisConnectionException(e);
-			}
-			break;
-		default:
-			for (RedisNode node : nodes) {
-				String host = node.getHost();
-				int port = node.getPort();
-				RedisStandaloneConfiguration single = new RedisStandaloneConfiguration(host, port);
-				single.setDatabase(database);
-				single.setPassword(paw);
-				JedisClientConfigurationBuilder clientConfiguration = JedisClientConfiguration.builder();
-				clientConfiguration.usePooling().poolConfig(config);
-				clientConfiguration.connectTimeout(Duration.ofMillis(CONNECT_TIMEOUT));
-				connectionFactory = new JedisConnectionFactory(single, clientConfiguration.build());
-				break;
-			}
-			if (!"single".equalsIgnoreCase(mode))
-				log.warn("Redis mode [" + mode + "] not defined. Using 'single'.");
-			break;
-		}
-		return connectionFactory;
-	}
 
 	@Primary
 	@Bean("j2CahceRedisConnectionFactory")

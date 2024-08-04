@@ -18,7 +18,6 @@ package com.eryansky.j2cache.cluster;
 import com.eryansky.j2cache.CacheException;
 import com.eryansky.j2cache.CacheProviderHolder;
 import com.eryansky.j2cache.lettuce.LettuceCacheProvider;
-import com.eryansky.j2cache.redis.RedisPubSubClusterPolicy;
 
 import java.util.Properties;
 
@@ -38,9 +37,7 @@ public class ClusterPolicyFactory {
      */
     public final static ClusterPolicy init(CacheProviderHolder holder, String broadcast, Properties props) {
         ClusterPolicy policy;
-        if ("redis".equalsIgnoreCase(broadcast))
-            policy = ClusterPolicyFactory.redis(props,holder);
-        else if ("lettuce".equalsIgnoreCase(broadcast))
+        if ("lettuce".equalsIgnoreCase(broadcast))
             policy = ClusterPolicyFactory.lettuce(props, holder);
         else if ("none".equalsIgnoreCase(broadcast))
             policy = new NoneClusterPolicy();
@@ -54,13 +51,6 @@ public class ClusterPolicyFactory {
      * @param props 框架配置
      * @return 返回 Redis 集群策略的实例
      */
-    private final static ClusterPolicy redis(Properties props, CacheProviderHolder holder) {
-        String name = props.getProperty("channel");
-        RedisPubSubClusterPolicy policy = new RedisPubSubClusterPolicy(name, props);
-        policy.connect(props, holder);
-        return policy;
-    }
-
     private final static ClusterPolicy lettuce(Properties props, CacheProviderHolder holder) {
         LettuceCacheProvider policy = new LettuceCacheProvider();
         policy.connect(props, holder);
