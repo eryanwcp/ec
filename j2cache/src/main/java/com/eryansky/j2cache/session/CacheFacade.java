@@ -106,6 +106,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         long ct = System.currentTimeMillis();
 
         String scheme = redisConf.getProperty("scheme", "redis");
+        String clusterName = redisConf.getProperty("cluster_name","j2cache-session");
         String sentinelMasterId = redisConf.getProperty("sentinelMasterId");
         String sentinelPassword = redisConf.getProperty("sentinelPassword");
         long clusterTopologyRefreshMs = Long.valueOf(redisConf.getProperty("clusterTopologyRefresh", "3000"));
@@ -184,7 +185,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             return null;
         }, poolConfig);
 
-        this.cache2 = new LettuceCache(null, redisClient,pool,scanCount);
+        this.cache2 = new LettuceCache(clusterName, redisClient,pool,scanCount);
         logger.info("J2Cache Session L2 CacheProvider {}.",this.cache2.getClass().getName());
 
         this.publish(Command.join());
@@ -347,7 +348,8 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             session.setLastAccess_at(System.currentTimeMillis());
             cache1.put(session.getId(), session);
             if(this.cache2 != null){
-                cache2.setBytes(session.getId(),SessionObject.KEY_ACCESS_AT,String.valueOf(session.getLastAccess_at()).getBytes(), cache1.getExpire());
+                cache2.updateKeyBytes(session.getId(), SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
+                cache2.ttl(session.getId(), cache1.getExpire());
             }
         } finally {
             if(this.cache2 != null){
@@ -361,7 +363,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             cache1.put(session.getId(), session);
             if(this.cache2 != null){
                 try {
-                    cache2.setBytes(session.getId(), key, Serializer.write(session.get(key)));
+                    cache2.updateKeyBytes(session.getId(), key, Serializer.write(session.get(key)));
                 } catch (RuntimeException | IOException e) {
                     if(!this.discardNonSerializable)
                         throw ((e instanceof RuntimeException)?(RuntimeException)e : new RuntimeException(e));
