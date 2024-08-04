@@ -79,25 +79,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         String hosts = redisConf.getProperty("hosts","127.0.0.1:6379");
 
         int scanCount = Integer.parseInt(redisConf.getProperty("scanCount","1000"));
-        String password_encrypt = redisConf.getProperty("passwordEncrypt","false");
-        boolean passwordEncrypt = Boolean.parseBoolean(password_encrypt);
-        if(passwordEncrypt && !ObjectUtils.isEmpty(redisConf.getProperty("password"))){
-            try {
-                redisConf.put("password",new AesSupport().decrypt(redisConf.getProperty("password")));
-            } catch (NoSuchAlgorithmException e) {
-                logger.error(e.getMessage(),e);
-            }
-        }
-        if(passwordEncrypt && !ObjectUtils.isEmpty(redisConf.getProperty("sentinelPassword"))){
-            try {
-                redisConf.put("sentinelPassword",new AesSupport().decrypt(redisConf.getProperty("sentinelPassword")));
-            } catch (NoSuchAlgorithmException e) {
-                logger.error(e.getMessage(),e);
-            }
-        }
         String password = redisConf.getProperty("password");
-
-
         String mDatabase = redisConf.getProperty("database");
         int database = mDatabase != null ? Integer.parseInt(mDatabase):0;
 
