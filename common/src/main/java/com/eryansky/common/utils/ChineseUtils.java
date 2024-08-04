@@ -85,10 +85,4 @@ public class ChineseUtils {
     }
 
 
-    public static void main(String[] args) {
-        System.out.println(isChinese('め'));// false
-        System.out.println(isChineseWord('我'));// true
-        System.out.println(containsChinese("a我b"));// true
-        System.out.println(containsChineseWords("a，b")); // false
-    }
 }
