@@ -15,39 +15,52 @@
  */
 package com.eryansky.j2cache.session;
 
+import com.eryansky.j2cache.lettuce.LettuceByteCodec;
 import com.eryansky.j2cache.util.AesSupport;
 import com.eryansky.j2cache.util.IpUtils;
+import io.lettuce.core.AbstractRedisClient;
+import io.lettuce.core.RedisClient;
+import io.lettuce.core.RedisURI;
+import io.lettuce.core.api.StatefulConnection;
+import io.lettuce.core.cluster.ClusterClientOptions;
+import io.lettuce.core.cluster.ClusterTopologyRefreshOptions;
+import io.lettuce.core.cluster.RedisClusterClient;
+import io.lettuce.core.pubsub.RedisPubSubAdapter;
+import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
+import io.lettuce.core.pubsub.api.async.RedisPubSubAsyncCommands;
+import io.lettuce.core.pubsub.api.sync.RedisPubSubCommands;
+import io.lettuce.core.support.ConnectionPoolSupport;
+import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
-import redis.clients.jedis.*;
-import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.time.Duration;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 缓存封装入口
  * @author Winter Lau(javayou@gmail.com)
  */
-public class CacheFacade extends JedisPubSub implements Closeable, AutoCloseable, CacheExpiredListener {
+public class CacheFacade extends RedisPubSubAdapter<String, String> implements Closeable, CacheExpiredListener {
 
     private final Logger logger = LoggerFactory.getLogger(CacheFacade.class);
 
     private static final Map<String, Object> _g_keyLocks = new ConcurrentHashMap<>();
 
     private final CaffeineCache cache1;
-    private RedisCache cache2;
+    private LettuceCache cache2;
 
-    private RedisClient redisClient;
+    private AbstractRedisClient redisClient;
     private String pubsub_channel;
+    private GenericObjectPool<StatefulConnection<String, byte[]>> pool;
+    private StatefulRedisPubSubConnection<String, String> pubsub_subscriber;
+    private static final LettuceByteCodec codec = new LettuceByteCodec();
 
     private final boolean discardNonSerializable;
 
@@ -62,68 +75,138 @@ public class CacheFacade extends JedisPubSub implements Closeable, AutoCloseable
             logger.info("J2Cache Session L2/redis not enabled.");
             return;
         }
-        JedisPoolConfig poolConfig = RedisUtils.newPoolConfig(redisConf, null);
 
-        String hosts = redisConf.getProperty("hosts");
-        hosts = hosts != null ? hosts:"127.0.0.1:6379";
-        String mode = redisConf.getProperty("mode");
-        mode = mode != null ? mode:"single";
-        String clusterName = redisConf.getProperty("cluster_name");
-        clusterName = clusterName != null ? clusterName:"j2cache-session";
+        String hosts = redisConf.getProperty("hosts","127.0.0.1:6379");
 
+        int scanCount = Integer.parseInt(redisConf.getProperty("scanCount","1000"));
+        String password_encrypt = redisConf.getProperty("passwordEncrypt","false");
+        boolean passwordEncrypt = Boolean.parseBoolean(password_encrypt);
+        if(passwordEncrypt && !ObjectUtils.isEmpty(redisConf.getProperty("password"))){
+            try {
+                redisConf.put("password",new AesSupport().decrypt(redisConf.getProperty("password")));
+            } catch (NoSuchAlgorithmException e) {
+                logger.error(e.getMessage(),e);
+            }
+        }
+        if(passwordEncrypt && !ObjectUtils.isEmpty(redisConf.getProperty("sentinelPassword"))){
+            try {
+                redisConf.put("sentinelPassword",new AesSupport().decrypt(redisConf.getProperty("sentinelPassword")));
+            } catch (NoSuchAlgorithmException e) {
+                logger.error(e.getMessage(),e);
+            }
+        }
         String password = redisConf.getProperty("password");
+
+
         String mDatabase = redisConf.getProperty("database");
         int database = mDatabase != null ? Integer.parseInt(mDatabase):0;
 
-        this.pubsub_channel = redisConf.getProperty("channel");
-        this.pubsub_channel = this.pubsub_channel != null ? this.pubsub_channel:"j2cache-session";
+        this.pubsub_channel = redisConf.getProperty("channel","j2cache-session");
 
         long ct = System.currentTimeMillis();
 
-        this.redisClient = new RedisClient.Builder()
-                .mode(mode)
-                .hosts(hosts)
-                .password(password)
-                .cluster(clusterName)
-                .database(database)
-                .poolConfig(poolConfig).newClient();
+        String scheme = redisConf.getProperty("scheme", "redis");
+        String sentinelMasterId = redisConf.getProperty("sentinelMasterId");
+        String sentinelPassword = redisConf.getProperty("sentinelPassword");
+        long clusterTopologyRefreshMs = Long.valueOf(redisConf.getProperty("clusterTopologyRefresh", "3000"));
 
-        this.cache2 = new RedisCache(null, redisClient);
+        if("redis-cluster".equalsIgnoreCase(scheme)) {
+            scheme = "redis";
+            List<RedisURI> redisURIs = new ArrayList<>();
+            String[] hostArray = hosts.split(",");
+            for(String host : hostArray) {
+                String[] redisArray = host.split(":");
+                RedisURI uri = RedisURI.create(redisArray[0], Integer.valueOf(redisArray[1]));
+                uri.setDatabase(database);
+                uri.setPassword(password);
+                uri.setSentinelMasterId(sentinelMasterId);
+                redisURIs.add(uri);
+            }
+            redisClient = RedisClusterClient.create(redisURIs);
+            ClusterTopologyRefreshOptions topologyRefreshOptions = ClusterTopologyRefreshOptions.builder()
+                    //开启自适应刷新
+                    .enableAdaptiveRefreshTrigger(ClusterTopologyRefreshOptions.RefreshTrigger.MOVED_REDIRECT, ClusterTopologyRefreshOptions.RefreshTrigger.PERSISTENT_RECONNECTS)
+                    .enableAllAdaptiveRefreshTriggers()
+                    .adaptiveRefreshTriggersTimeout(Duration.ofMillis(clusterTopologyRefreshMs))
+                    //开启定时刷新,时间间隔根据实际情况修改
+                    .enablePeriodicRefresh(Duration.ofMillis(clusterTopologyRefreshMs))
+                    .build();
+            ((RedisClusterClient)redisClient).setOptions(ClusterClientOptions.builder().topologyRefreshOptions(topologyRefreshOptions).build());
+        } else if("redis-sentinel".equalsIgnoreCase(scheme)) {
+            scheme = "redis";
+            String[] hostArray = hosts.split(",");
+            RedisURI.Builder builder = null;
+            boolean isFirst = true;
+            for(String host : hostArray) {
+                String[] redisArray = host.split(":");
+                if(isFirst) {
+                    builder = RedisURI.Builder.sentinel(
+                            redisArray[0],
+                            Integer.valueOf(redisArray[1]),
+                            sentinelMasterId,
+                            sentinelPassword);
+                    isFirst = false;
+                }
+                else {
+                    builder.withSentinel(redisArray[0], Integer.valueOf(redisArray[1]));
+                }
+            }
+            assert builder != null;
+            builder.withDatabase(database).withPassword(password);
+
+            RedisURI uri = builder.build();
+            redisClient = io.lettuce.core.RedisClient.create(uri);
+        }else {
+            String[] redisArray = hosts.split(":");
+            RedisURI uri = RedisURI.create(redisArray[0], Integer.valueOf(redisArray[1]));
+            uri.setDatabase(database);
+            uri.setPassword(password);
+            redisClient = io.lettuce.core.RedisClient.create(uri);
+        }
+        try {
+            int timeout = Integer.parseInt(redisConf.getProperty("timeout", "10000"));
+            redisClient.setDefaultTimeout(Duration.ofMillis(timeout));
+        }catch(Exception e){
+            logger.warn("Failed to set default timeout, using default 10000 milliseconds.", e);
+        }
+
+        //connection pool configurations
+        GenericObjectPoolConfig<StatefulConnection<String, byte[]>> poolConfig = new GenericObjectPoolConfig<>();
+        poolConfig.setMaxTotal(Integer.parseInt(redisConf.getProperty("maxTotal", "100")));
+        poolConfig.setMaxIdle(Integer.parseInt(redisConf.getProperty("maxIdle", "10")));
+        poolConfig.setMinIdle(Integer.parseInt(redisConf.getProperty("minIdle", "10")));
+
+        pool = ConnectionPoolSupport.createGenericObjectPool(() -> {
+            if(redisClient instanceof io.lettuce.core.RedisClient)
+                return ((io.lettuce.core.RedisClient)redisClient).connect(codec);
+            else if(redisClient instanceof RedisClusterClient)
+                return ((RedisClusterClient)redisClient).connect(codec);
+            return null;
+        }, poolConfig);
+
+        this.cache2 = new LettuceCache(null, redisClient,pool,scanCount);
         logger.info("J2Cache Session L2 CacheProvider {}.",this.cache2.getClass().getName());
 
         this.publish(Command.join());
 
-        Thread subscribeThread = new Thread(()-> {
-            //当 Redis 重启会导致订阅线程断开连接，需要进行重连
-            int tryCount = 0;
-            while(true) {
-                try {
-                    Jedis jedis = (Jedis)redisClient.get();
-                    jedis.subscribe(this, pubsub_channel);
-                    logger.info("Disconnect to redis channel: " + pubsub_channel);
-                    break;
-                } catch (JedisConnectionException e) {
-                    if (tryCount++ < 3) {
-                        // 失败先快速释放再重连
-                        redisClient.release();
-                        continue;
-                    }
-                    tryCount = 0;
-                    logger.error("Failed connect to redis, reconnect it.", e);
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ie){
-                        break;
-                    }
-                }
-            }
-        }, "RedisSessionSubscribeThread");
 
-        subscribeThread.setDaemon(true);
-        subscribeThread.start();
+        this.pubsub_subscriber = this.pubsub();
+        this.pubsub_subscriber.addListener(this);
+        RedisPubSubAsyncCommands<String, String> async = this.pubsub_subscriber.async();
+        async.subscribe(this.pubsub_channel);
+        logger.info("Connected to redis channel:{}, time {}ms.", this.pubsub_channel, System.currentTimeMillis()-ct);
+    }
 
-        logger.info("Connected to redis channel:" + pubsub_channel + ", time " + (System.currentTimeMillis()-ct) + " ms.");
-
+    /**
+     * Get PubSub connection
+     * @return connection instance
+     */
+    private StatefulRedisPubSubConnection pubsub() {
+        if(redisClient instanceof io.lettuce.core.RedisClient)
+            return ((RedisClient)redisClient).connectPubSub();
+        else if(redisClient instanceof RedisClusterClient)
+            return ((RedisClusterClient)redisClient).connectPubSub();
+        return null;
     }
 
     /**
@@ -134,19 +217,12 @@ public class CacheFacade extends JedisPubSub implements Closeable, AutoCloseable
         if(this.cache2 == null){
             return;
         }
-        try  {
-            BinaryJedisCommands redis = redisClient.get();
-            if(redis instanceof Jedis) {
-                Jedis jedis = (Jedis) redis;
-                jedis.publish(pubsub_channel, cmd.toString());
-            }
-            else if(redis instanceof JedisCluster) {
-                JedisCluster jedis = (JedisCluster) redis;
-                jedis.publish(pubsub_channel, cmd.toString());
-            }
-        } finally {
-            redisClient.release();
+
+        try (StatefulRedisPubSubConnection<String, String> connection = this.pubsub()){
+            RedisPubSubCommands<String, String> sync = connection.sync();
+            sync.publish(this.pubsub_channel, cmd.toString());
         }
+
     }
 
     /**
@@ -155,7 +231,7 @@ public class CacheFacade extends JedisPubSub implements Closeable, AutoCloseable
      * @param message 消息体
      */
     @Override
-    public void onMessage(String channel, String message) {
+    public void message(String channel, String message) {
         if(this.cache2 == null){
             return;
         }
@@ -195,22 +271,13 @@ public class CacheFacade extends JedisPubSub implements Closeable, AutoCloseable
     @Override
     public void close() {
         try {
-            if(this.cache2 != null){
-                this.publish(Command.quit());
-                if (this.isSubscribed())
-                    this.unsubscribe();
-            }
+            this.publish(Command.quit());
+            this.unsubscribed(this.pubsub_channel, 1);
         } finally {
-            this.cache1.close();
-            if(this.cache2 != null){
-                this.cache2.close();
-                try {
-                    this.redisClient.close();
-                } catch (IOException e) {}
-            }
-
+            this.pubsub_subscriber.close();
         }
     }
+
 
     /**
      * 读取 Session 对象信息
@@ -280,8 +347,7 @@ public class CacheFacade extends JedisPubSub implements Closeable, AutoCloseable
             session.setLastAccess_at(System.currentTimeMillis());
             cache1.put(session.getId(), session);
             if(this.cache2 != null){
-                cache2.setBytes(session.getId(), SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
-                cache2.ttl(session.getId(), cache1.getExpire());
+                cache2.setBytes(session.getId(),SessionObject.KEY_ACCESS_AT,String.valueOf(session.getLastAccess_at()).getBytes(), cache1.getExpire());
             }
         } finally {
             if(this.cache2 != null){

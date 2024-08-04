@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.eryansky</groupId>
         <artifactId>ec-parent</artifactId>
-        <version>4.2.20240301.51</version>
+        <version>4.2.20240801.01</version>
     </parent>
 
     <artifactId>ec-j2cache</artifactId>
@@ -14,7 +14,6 @@
     <packaging>jar</packaging>
     <properties>
         <caffeine.version>2.9.3</caffeine.version>
-        <jedis.version>2.10.2</jedis.version>
         <lettuce.version>6.2.7.RELEASE</lettuce.version>
         <objenesis.version>3.3</objenesis.version>
         <fst.version>2.57</fst.version>
@@ -40,17 +39,6 @@
                 <exclusion>
                     <groupId>com.google.errorprone</groupId>
                     <artifactId>error_prone_annotations</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-            <version>${jedis.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
