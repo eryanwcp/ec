@@ -136,11 +136,11 @@ public class RSAUtils {
     }
 
 
-    public static String encodeBase64String(String data) {
-        return encodeBase64String(data, DEFAULT_PUBLIC_KEY);
+    public static String encryptBase64String(String data) {
+        return encryptBase64String(data, DEFAULT_PUBLIC_KEY);
     }
 
-    public static String encodeBase64String(String data, String base64PublicKey) {
+    public static String encryptBase64String(String data, String base64PublicKey) {
         return EncodeUtils.base64Encode(encrypt(data, base64PublicKey));
     }
 
@@ -158,11 +158,11 @@ public class RSAUtils {
         }
     }
 
-    public static String decryptBase64(String base64Data) {
-        return decryptBase64(base64Data, DEFAULT_PRIVATE_KEY);
+    public static String decryptBase64String(String base64Data) {
+        return decryptBase64String(base64Data, DEFAULT_PRIVATE_KEY);
     }
 
-    public static String decryptBase64(String base64Data, String base64PrivateKey) {
+    public static String decryptBase64String(String base64Data, String base64PrivateKey) {
         return decrypt(EncodeUtils.base64Decode(base64Data), getPrivateKey(base64PrivateKey));
     }
 
@@ -206,8 +206,8 @@ public class RSAUtils {
             String base64EncodeKey = Cryptos.getBase64EncodeKey();
             System.out.println(base64EncodeKey);
             //常規方法
-            String encryptKey = RSAUtils.encodeBase64String(base64EncodeKey,DEFAULT_PUBLIC_KEY);
-            String decryptKey = RSAUtils.decryptBase64(encryptKey,DEFAULT_PRIVATE_KEY);
+            String encryptKey = RSAUtils.encryptBase64String(base64EncodeKey,DEFAULT_PUBLIC_KEY);
+            String decryptKey = RSAUtils.decryptBase64String(encryptKey,DEFAULT_PRIVATE_KEY);
             System.out.println(encryptKey);
             System.out.println(decryptKey);
 

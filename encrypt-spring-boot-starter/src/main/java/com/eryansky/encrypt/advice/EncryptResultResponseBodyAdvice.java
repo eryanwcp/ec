@@ -41,7 +41,7 @@ public class EncryptResultResponseBodyAdvice implements ResponseBodyAdvice<Resul
         String requestEncrypt = Collections3.getFirst(headers.get(ENCRYPT));
         String requestEncryptKey = Collections3.getFirst(headers.get(ENCRYPT_KEY));
         if (StringUtils.isNotBlank(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey) ){
-            String key = RSAUtils.decryptBase64(requestEncryptKey);
+            String key = RSAUtils.decryptBase64String(requestEncryptKey);
             String data = JsonMapper.toJsonString(body.getData());
             String obj = JsonMapper.toJsonString(body.getObj());
             if(CipherMode.SM4.name().equals(requestEncrypt)){
