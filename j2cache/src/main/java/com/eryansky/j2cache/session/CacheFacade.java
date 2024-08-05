@@ -254,10 +254,14 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
     @Override
     public void close() {
         try {
+            cache1.close();
             this.publish(Command.quit());
             this.unsubscribed(this.pubsub_channel, 1);
         } finally {
-            this.pubsub_subscriber.close();
+            if(null != this.pubsub_subscriber){
+                this.pubsub_subscriber.close();
+            }
+
         }
     }
 
