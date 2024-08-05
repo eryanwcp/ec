@@ -140,8 +140,8 @@ public class RSAUtils {
         return encodeBase64String(data, DEFAULT_PUBLIC_KEY);
     }
 
-    public static String encodeBase64String(String data, String publicKey) {
-        return EncodeUtils.base64Encode(encrypt(data, publicKey));
+    public static String encodeBase64String(String data, String base64PublicKey) {
+        return EncodeUtils.base64Encode(encrypt(data, base64PublicKey));
     }
 
     public static byte[] encrypt(String data) {
@@ -158,12 +158,12 @@ public class RSAUtils {
         }
     }
 
-    public static String decryptBase64(String data) {
-        return decryptBase64(data, DEFAULT_PRIVATE_KEY);
+    public static String decryptBase64(String base64Data) {
+        return decryptBase64(base64Data, DEFAULT_PRIVATE_KEY);
     }
 
-    public static String decryptBase64(String data, String base64PrivateKey) {
-        return decrypt(EncodeUtils.base64Decode(data), getPrivateKey(base64PrivateKey));
+    public static String decryptBase64(String base64Data, String base64PrivateKey) {
+        return decrypt(EncodeUtils.base64Decode(base64Data), getPrivateKey(base64PrivateKey));
     }
 
     public static String decrypt(String data, String base64PrivateKey) {
