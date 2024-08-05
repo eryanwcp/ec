@@ -204,14 +204,14 @@ public class Cryptos {
     /**
      * 使用AES解密字符串, 返回原始字符串.
      *
-     * @param input Base64编码的加密字符串
+     * @param base64Data Base64编码的加密字符串
      * @param base64Key 符合AES要求的base64密钥
      */
-    public static String aesECBDecryptBase64String(String input, String base64Key) {
-        if(StringUtils.isBlank(input)){
-            return input;
+    public static String aesECBDecryptBase64String(String base64Data, String base64Key) {
+        if(StringUtils.isBlank(base64Data)){
+            return base64Data;
         }
-        byte[] decryptResult = aesECB(EncodeUtils.base64Decode(input), getBase64DecodeKey(base64Key), Cipher.DECRYPT_MODE);
+        byte[] decryptResult = aesECB(EncodeUtils.base64Decode(base64Data), getBase64DecodeKey(base64Key), Cipher.DECRYPT_MODE);
         return new String(decryptResult);
     }
 
