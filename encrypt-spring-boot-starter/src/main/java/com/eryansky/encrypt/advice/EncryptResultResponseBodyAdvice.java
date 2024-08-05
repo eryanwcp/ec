@@ -4,7 +4,7 @@ import com.eryansky.common.model.Result;
 import com.eryansky.common.orm.mybatis.sensitive.encrypt.AesSupport;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
-import com.eryansky.common.utils.encode.RSAUtil;
+import com.eryansky.common.utils.encode.RSAUtils;
 import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.encrypt.anotation.EncryptResponseBody;
@@ -41,7 +41,7 @@ public class EncryptResultResponseBodyAdvice implements ResponseBodyAdvice<Resul
         String requestEncrypt = Collections3.getFirst(headers.get(ENCRYPT));
         String requestEncryptKey = Collections3.getFirst(headers.get(ENCRYPT_KEY));
         if (StringUtils.isNotBlank(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey) ){
-            String key = RSAUtil.decryptBase64(requestEncryptKey);
+            String key = RSAUtils.decryptBase64(requestEncryptKey);
             String data = JsonMapper.toJsonString(body.getData());
             String obj = JsonMapper.toJsonString(body.getObj());
             if(CipherMode.SM4.name().equals(requestEncrypt)){

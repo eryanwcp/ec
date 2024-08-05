@@ -13,9 +13,9 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Map;
 
-public class RSAUtil {
+public class RSAUtils {
 
-    private static Logger logger = LoggerFactory.getLogger(RSAUtil.class);
+    private static Logger logger = LoggerFactory.getLogger(RSAUtils.class);
 
     /**
      * 默认初始公钥
@@ -201,13 +201,13 @@ public class RSAUtil {
             System.out.println("公钥：" + EncodeUtils.base64Encode(publicKey));
             System.out.println("私钥：" + EncodeUtils.base64Encode(privateKey));
 
-            System.out.println("默认公钥：" + RSAUtil.getDefaultBase64PublicKey());
+            System.out.println("默认公钥：" + RSAUtils.getDefaultBase64PublicKey());
 
             String base64EncodeKey = Cryptos.getBase64EncodeKey();
             System.out.println(base64EncodeKey);
             //常規方法
-            String encryptKey = RSAUtil.encodeBase64String(base64EncodeKey,DEFAULT_PUBLIC_KEY);
-            String decryptKey = RSAUtil.decryptBase64(encryptKey,DEFAULT_PRIVATE_KEY);
+            String encryptKey = RSAUtils.encodeBase64String(base64EncodeKey,DEFAULT_PUBLIC_KEY);
+            String decryptKey = RSAUtils.decryptBase64(encryptKey,DEFAULT_PRIVATE_KEY);
             System.out.println(encryptKey);
             System.out.println(decryptKey);
 

@@ -6,7 +6,7 @@
 package com.eryansky.modules.sys.web;
 
 import com.eryansky.common.model.Result;
-import com.eryansky.common.utils.encode.RSAUtil;
+import com.eryansky.common.utils.encode.RSAUtils;
 import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.encrypt.anotation.DecryptRequestBody;
@@ -45,9 +45,9 @@ public class SystemEncryptController extends SimpleController {
         //动态密钥
         String sm4Key = Sm4Utils.generateKeyString();
         //RSA公钥
-        data.put("publicKey", RSAUtil.getDefaultBase64PublicKey());
+        data.put("publicKey", RSAUtils.getDefaultBase64PublicKey());
         //RSA加密密钥 RSA对密钥加密
-        data.put("requestKey", RSAUtil.encrypt(sm4Key));
+        data.put("requestKey", RSAUtils.encrypt(sm4Key));
 
         //加密后的示例数据 模拟前端数据加密
         String requestData = "{\"key\":123}";
