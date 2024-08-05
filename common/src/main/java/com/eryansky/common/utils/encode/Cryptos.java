@@ -6,8 +6,10 @@
 package com.eryansky.common.utils.encode;
 
 import com.eryansky.common.utils.Exceptions;
+import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import org.apache.commons.codec.binary.Base64;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -18,6 +20,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
+import java.security.Security;
 import java.util.Arrays;
 
 /**
@@ -100,6 +103,44 @@ public class Cryptos {
 
     //-- AES funciton --//
     /**
+     * @description: 初始化秘钥
+     * @return: byte
+     */
+    public static byte[] initKey() throws Exception {
+        Security.addProvider(new BouncyCastleProvider());
+        KeyGenerator kg = KeyGenerator.getInstance("AES");
+        kg.init(128);
+        SecretKey secretKey = kg.generateKey();
+        return secretKey.getEncoded();
+    }
+
+    /**
+     * @description: 生成秘钥
+     * @return: String
+     * @author yameng.cui
+     * @date: 2024/7/1 16:00
+     */
+    public static String getBase64EncodeKey() throws Exception {
+        byte[] keys = initKey();
+        return Base64.encodeBase64String(keys);
+    }
+
+    /**
+     * @description: 秘钥转换
+     * @return: String
+     * @author yameng.cui
+     * @date: 2024/7/1 16:00
+     */
+    public static byte[] getBase64DecodeKey(String base64) {
+        byte[] returnValue = null;
+        if (StringUtils.isNotEmpty(base64)) {
+            returnValue = Base64.decodeBase64(base64);
+        }
+
+        return returnValue;
+    }
+
+    /**
      * 使用AES加密原始字符串.
      *
      * @param input 原始输入字符数组
@@ -122,10 +163,10 @@ public class Cryptos {
      * 使用AES加密原始字符串.
      *
      * @param input 原始输入字符数组
-     * @param key 符合AES要求的密钥
+     * @param base64Key 符合AES要求的Base64密钥
      */
-    public static String aesECBEncryptBase64String(String input, String key) {
-        return Base64.encodeBase64String(aesECB(input.getBytes(StandardCharsets.UTF_8), key.getBytes(StandardCharsets.UTF_8), Cipher.ENCRYPT_MODE));
+    public static String aesECBEncryptBase64String(String input, String base64Key) {
+        return Base64.encodeBase64String(aesECB(input.getBytes(StandardCharsets.UTF_8), getBase64DecodeKey(base64Key), Cipher.ENCRYPT_MODE));
     }
     /**
      * 使用AES加密原始字符串.
@@ -175,10 +216,13 @@ public class Cryptos {
      * 使用AES解密字符串, 返回原始字符串.
      *
      * @param input Base64编码的加密字符串
-     * @param key 符合AES要求的密钥
+     * @param base64Key 符合AES要求的base64密钥
      */
-    public static String aesECBDecryptBase64String(String input, String key) {
-        byte[] decryptResult = aesECB(Base64.decodeBase64(input), key.getBytes(), Cipher.DECRYPT_MODE);
+    public static String aesECBDecryptBase64String(String input, String base64Key) {
+        if(StringUtils.isBlank(input)){
+            return input;
+        }
+        byte[] decryptResult = aesECB(Base64.decodeBase64(input), getBase64DecodeKey(base64Key), Cipher.DECRYPT_MODE);
         return new String(decryptResult);
     }
     /**
