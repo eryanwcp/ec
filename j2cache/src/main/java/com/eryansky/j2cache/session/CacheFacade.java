@@ -16,7 +16,6 @@
 package com.eryansky.j2cache.session;
 
 import com.eryansky.j2cache.lettuce.LettuceByteCodec;
-import com.eryansky.j2cache.util.AesSupport;
 import com.eryansky.j2cache.util.IpUtils;
 import io.lettuce.core.AbstractRedisClient;
 import io.lettuce.core.RedisClient;

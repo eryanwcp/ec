@@ -11,6 +11,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -54,12 +55,20 @@ public class J2CacheSessionFilterAutoConfiguration {
         map.put("redis.timeout",redisConfig.getTimeout());
         map.put("redis.password",redisConfig.getPassword());
         map.put("redis.passwordEncrypt",redisConfig.getPasswordEncrypt());
+        map.put("redis.passwordEncryptKey",redisConfig.getPasswordEncryptKey());
 
         String password_encrypt = redisConfig.getPasswordEncrypt();
+        String passwordEncryptKey = redisConfig.getPasswordEncryptKey();//长度16位
         boolean passwordEncrypt = Boolean.parseBoolean(password_encrypt);
         if(passwordEncrypt && !ObjectUtils.isEmpty(redisConfig.getPassword())){
             try {
-                map.put("redis.password",new AesSupport().decrypt(redisConfig.getPassword()));
+                AesSupport aesSupport = null;
+                if(StringUtils.hasText(passwordEncryptKey)){
+                    aesSupport = new AesSupport(StringUtils.trimAllWhitespace(passwordEncryptKey));
+                }else{
+                    aesSupport = new AesSupport();
+                }
+                map.put("redis.password",aesSupport.decrypt(redisConfig.getPassword()));
             } catch (NoSuchAlgorithmException e) {
                 logger.error(e.getMessage(),e);
             }
