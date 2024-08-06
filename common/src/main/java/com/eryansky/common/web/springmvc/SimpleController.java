@@ -68,7 +68,7 @@ public abstract class SimpleController{
      * @param pageName 页面名称(不加后缀)
      * @return 指定JSP页面
      */
-    @GetMapping("/{folder}/{pageName}")
+//    @GetMapping("/{folder}/{pageName}")
     public String redirectJsp(@PathVariable String folder, @PathVariable String pageName) {
         return "/" + folder + "/" + pageName;
     }
@@ -84,7 +84,7 @@ public abstract class SimpleController{
      * @param response
      * @throws Exception
      */
-    @GetMapping("redirect")
+//    @GetMapping("redirect")
     public void redirectJsp(String prefix, String toPage, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         if (StringUtils.isEmpty(prefix)) {
             prefix = "/WEB-INF/views/";
