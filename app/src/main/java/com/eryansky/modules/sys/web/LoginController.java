@@ -685,10 +685,10 @@ public class LoginController extends SimpleController {
      */
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"sessionInfo"})
     @ResponseBody
-    public Result sessionInfo(Boolean reload) {
+    public Result sessionInfo(@RequestParam(name = "reload",defaultValue = "false") boolean reload) {
         Result result = Result.successResult();
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
-        if (null != reload && reload && null != sessionInfo) {
+        if (reload && null != sessionInfo) {
             SecurityUtils.reloadSession(sessionInfo.getUserId());
             sessionInfo = SecurityUtils.getCurrentSessionInfo();
         }

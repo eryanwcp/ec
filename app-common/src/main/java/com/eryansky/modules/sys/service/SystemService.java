@@ -5,6 +5,7 @@
  */
 package com.eryansky.modules.sys.service;
 
+import com.eryansky.common.orm.Page;
 import com.eryansky.common.orm.model.Parameter;
 import com.eryansky.common.orm.mybatis.interceptor.BaseInterceptor;
 import com.eryansky.common.utils.StringUtils;
@@ -14,11 +15,14 @@ import com.eryansky.modules.sys.mapper.Area;
 import com.eryansky.modules.sys.mapper.Organ;
 import com.eryansky.modules.sys.utils.AreaUtils;
 import com.eryansky.modules.sys.utils.OrganUtils;
+import com.eryansky.modules.sys.vo.TableColumnDTO;
+import com.eryansky.modules.sys.vo.TableDTO;
 import com.eryansky.utils.AppConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 系统任务
@@ -168,6 +172,48 @@ public class SystemService extends BaseService {
 //        parameter.put("isLeaf", null == childCount || childCount == 0);
         deleteOrganExtend(parameter);
         insertToOrganExtend(parameter);
+    }
+
+    /**
+     * 查询表清单（安全级别较高慎用）
+     * @param query
+     * @return
+     */
+    public List<TableDTO> findTableList(String query){
+        Parameter parameter = Parameter.newParameter();
+        parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
+        parameter.put("query", query);
+        return systemDao.findTableList(parameter);
+    }
+
+    /**
+     * 根据表名查询字段清单（安全级别较高慎用）
+     * @param tableName 表名称
+     * @return
+     */
+    public List<TableColumnDTO> findTableColumnByTableName(String tableName){
+        Parameter parameter = Parameter.newParameter();
+        parameter.put("tableName", tableName);
+        return systemDao.findTableColumnByTableName(parameter);
+    }
+
+    /**
+     * 根据表名查询数据 （安全级别较高慎用）
+     * @param page
+     * @param tableName 表名称
+     * @param params 自定义参数
+     * @return
+     */
+    public Page<Map<String,Object>> findTableDataByTableName(Page<Map<String,Object>> page, String tableName,Map<String,String> params){
+        Parameter parameter = Parameter.newParameter();
+        parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
+        parameter.put(BaseInterceptor.PAGE, page);
+        parameter.put("list", findTableColumnByTableName(tableName));
+        parameter.put("tableName", tableName);
+        if (null != params) {
+            params.forEach(parameter::putIfAbsent);
+        }
+        return page.setResult(systemDao.findTableDataByTableName(parameter));
     }
 
 }

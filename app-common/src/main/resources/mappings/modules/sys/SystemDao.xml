@@ -184,4 +184,50 @@
 		</where>
 	</delete>
 
+	<select id="findTableList" resultType="com.eryansky.modules.sys.vo.TableDTO">
+		SELECT
+		table_schema AS "tableSchema",
+		table_name AS "tableName",
+		table_comment AS "tableComment"
+		FROM information_schema.tables
+		<where>
+			table_schema = (SELECT database())
+			<if test="query != null and query != ''">
+				AND table_name LIKE
+				<choose>
+					<when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+					<when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+					<when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+					<otherwise>'%'+#{query}+'%'</otherwise>
+				</choose>
+			</if>
+		</where>
+	</select>
+
+
+	<select id="findTableColumnByTableName" resultType="com.eryansky.modules.sys.vo.TableColumnDTO">
+		SELECT
+		column_name AS "columnName",
+		column_comment AS "columnComment",
+		column_type AS "columnType",
+		data_type AS "dataType",
+		is_nullable AS "isNullable",
+		column_key AS "columnKey"
+		FROM information_schema.columns
+		<where>
+			table_schema = (SELECT database())
+			AND table_name = #{tableName}
+		</where>
+		ORDER BY ordinal_position ASC
+	</select>
+
+
+	<select id="findTableDataByTableName" resultType="java.util.Map">
+		SELECT
+		<foreach collection="list" item="item" separator=",">
+			${item.columnName}
+		</foreach>
+		FROM ${tableName}
+	</select>
+
 </mapper>
