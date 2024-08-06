@@ -145,6 +145,8 @@ public class J2CacheSessionProperties {
         private String password;
         private String passwordEncrypt;
         private String passwordEncryptKey;
+        private String sentinelMasterId;
+        private String sentinelPassword;
         private String database;
         private String maxTotal;
         private String maxIdle;
@@ -221,6 +223,22 @@ public class J2CacheSessionProperties {
 
         public void setPasswordEncryptKey(String passwordEncryptKey) {
             this.passwordEncryptKey = passwordEncryptKey;
+        }
+
+        public String getSentinelMasterId() {
+            return sentinelMasterId;
+        }
+
+        public void setSentinelMasterId(String sentinelMasterId) {
+            this.sentinelMasterId = sentinelMasterId;
+        }
+
+        public String getSentinelPassword() {
+            return sentinelPassword;
+        }
+
+        public void setSentinelPassword(String sentinelPassword) {
+            this.sentinelPassword = sentinelPassword;
         }
 
         public String getDatabase() {

@@ -70,9 +70,9 @@
       "description": "Enable SessionFilter.",
       "defaultValue": true
     },{
-      "name": "j2cache.session.redis.mode",
+      "name": "j2cache.session.redis.scheme",
       "type": "java.lang.String",
-      "defaultValue": "single"
+      "defaultValue": "redis"
     },{
       "name": "j2cache.session.redis.hosts",
       "type": "java.lang.String",
@@ -99,6 +99,12 @@
       "name": "j2cache.session.redis.passwordEncryptKey",
       "type": "java.lang.String",
       "defaultValue": ""
+    },{
+      "name": "j2cache.session.redis.sentinelMasterId",
+      "type": "java.lang.String"
+    }    ,{
+      "name": "j2cache.session.redis.sentinelPassword",
+      "type": "java.lang.String"
     },{
       "name": "j2cache.session.redis.database",
       "type": "java.lang.String",
