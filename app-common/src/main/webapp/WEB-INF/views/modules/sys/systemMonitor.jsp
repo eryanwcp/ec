@@ -17,7 +17,7 @@
 				dataType: 'json',
 				success: function (data) {
 					if (data.code === 1) {
-						var html = Mustache.render($("#systemList").html(),data['obj']);
+						var html = Mustache.render($("#systemList").html(),data['data']);
 						$("#systemInfo_div").html(html);
 					} else {
 						$("#systemInfo_div").html(data['msg'] || "加载异常");

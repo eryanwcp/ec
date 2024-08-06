@@ -56,7 +56,7 @@ public class ${entityName}Controller extends SimpleController {
         Page<${entityName}> page = new Page<${entityName}>(request,response);
         if(WebUtils.isAjaxRequest(request)){
             page = ${entityInstance}Service.findPage(page,model);
-            return renderString(response, Result.successResult().setObj(page));
+            return renderString(response, Result.successResult().setData(page));
         }
 
         uiModel.addAttribute("page",page);

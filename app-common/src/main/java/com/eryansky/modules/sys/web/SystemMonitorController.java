@@ -81,7 +81,7 @@ public class SystemMonitorController extends SimpleController {
             ServerStatus serverStatus = null;
             try {
                 serverStatus = SigarUtil.getServerStatus();
-                return renderString(response, Result.successResult().setObj(serverStatus));
+                return renderString(response, Result.successResult().setData(serverStatus));
             } catch (Exception e) {
                 logger.error(e.getMessage());
                 return renderString(response, Result.errorResult().setMsg(e.getMessage()));
@@ -349,10 +349,10 @@ public class SystemMonitorController extends SimpleController {
                     return line;
                 }).collect(Collectors.toList());
                 page.setResult(resultLogs);
-                return renderString(response, Result.successResult().setObj(page).setData(PrettyMemoryUtils.prettyByteSize(file.length())));
+                return renderString(response, Result.successResult().setData(page).setData(PrettyMemoryUtils.prettyByteSize(file.length())));
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
-                return renderString(response, Result.errorResult().setObj(e.getMessage()));
+                return renderString(response, Result.errorResult().setData(e.getMessage()));
             }
         }
         List<String> fileNames = Arrays.stream(Objects.requireNonNull(rootFile.getParentFile().listFiles())).map(File::getName).sorted(Comparator.reverseOrder()).collect(Collectors.toList());
