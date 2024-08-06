@@ -96,6 +96,10 @@
       "type": "java.lang.Boolean",
       "defaultValue": false
     },{
+      "name": "j2cache.session.redis.passwordEncryptKey",
+      "type": "java.lang.String",
+      "defaultValue": ""
+    },{
       "name": "j2cache.session.redis.database",
       "type": "java.lang.String",
       "defaultValue": "0"

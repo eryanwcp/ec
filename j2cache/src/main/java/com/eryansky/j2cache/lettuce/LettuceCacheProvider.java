@@ -15,7 +15,6 @@
  */
 package com.eryansky.j2cache.lettuce;
 
-import com.eryansky.j2cache.util.AesSupport;
 import io.lettuce.core.AbstractRedisClient;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;

@@ -144,6 +144,7 @@ public class J2CacheSessionProperties {
         private String timeout;
         private String password;
         private String passwordEncrypt;
+        private String passwordEncryptKey;
         private String database;
         private String maxTotal;
         private String maxIdle;
@@ -212,6 +213,14 @@ public class J2CacheSessionProperties {
 
         public void setPasswordEncrypt(String passwordEncrypt) {
             this.passwordEncrypt = passwordEncrypt;
+        }
+
+        public String getPasswordEncryptKey() {
+            return passwordEncryptKey;
+        }
+
+        public void setPasswordEncryptKey(String passwordEncryptKey) {
+            this.passwordEncryptKey = passwordEncryptKey;
         }
 
         public String getDatabase() {

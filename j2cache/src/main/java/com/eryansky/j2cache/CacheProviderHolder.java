@@ -21,6 +21,7 @@ import com.eryansky.j2cache.util.AesSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
@@ -65,10 +66,17 @@ public class CacheProviderHolder {
 			throw new CacheException(holder.l2_provider.getClass().getName() + " is not level_2 cache provider");
 		Properties l2_props = config.getL2CacheProperties();
 		String password_encrypt = l2_props.getProperty("passwordEncrypt");
+		String passwordEncryptKey = l2_props.getProperty("passwordEncryptKey");//长度16位
 		boolean passwordEncrypt = Boolean.parseBoolean(password_encrypt);
 		if(passwordEncrypt && !ObjectUtils.isEmpty(l2_props.getProperty("password"))){
 			try {
-				l2_props.put("password",new AesSupport().decrypt(l2_props.getProperty("password")));
+				AesSupport aesSupport = null;
+				if(StringUtils.hasText(passwordEncryptKey)){
+					aesSupport = new AesSupport(StringUtils.trimAllWhitespace(passwordEncryptKey));
+				}else{
+					aesSupport = new AesSupport();
+				}
+				l2_props.put("password",aesSupport.decrypt(l2_props.getProperty("password")));
 			} catch (NoSuchAlgorithmException e) {
 				log.error(e.getMessage(),e);
 			}
