@@ -378,7 +378,7 @@ public class SystemMonitorController extends SimpleController {
         WebUtils.setDownloadableHeader(request, response, file.getName());
         try (OutputStream os = response.getOutputStream();
              FileInputStream fileInputStream = new FileInputStream(file);
-             BufferedInputStream is = new BufferedInputStream(fileInputStream)) {
+             InputStream is = new BufferedInputStream(fileInputStream)) {
              IOUtils.copy(is, os);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
