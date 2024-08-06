@@ -23,9 +23,7 @@ import java.security.Security;
 import java.util.Arrays;
 
 /**
- * 支持HMAC-SHA1消息签名 及 DES/AES对称加密的工具类.
- *
- * 支持Hex与Base64两种编码方式.
+ * 支持AES对称加密的工具类.
  *
  * @author Eryan
  */
@@ -102,12 +100,12 @@ public class Cryptos {
 
     //-- AES funciton --//
     /**
-     * @description: 初始化秘钥
+     * 初始化秘钥
      * @return: byte
      */
-    public static byte[] initKey() throws Exception {
+    public static byte[] initAESKey() throws Exception {
         Security.addProvider(new BouncyCastleProvider());
-        KeyGenerator kg = KeyGenerator.getInstance("AES");
+        KeyGenerator kg = KeyGenerator.getInstance(AES);
         kg.init(128);
         SecretKey secretKey = kg.generateKey();
         return secretKey.getEncoded();
@@ -118,15 +116,13 @@ public class Cryptos {
      * @return: String
      */
     public static String getBase64EncodeKey() throws Exception {
-        byte[] keys = initKey();
+        byte[] keys = initAESKey();
         return EncodeUtils.base64Encode(keys);
     }
 
     /**
      * @description: 秘钥转换
      * @return: String
-     * @author yameng.cui
-     * @date: 2024/7/1 16:00
      */
     public static byte[] getBase64DecodeKey(String base64) {
         byte[] returnValue = null;

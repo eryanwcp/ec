@@ -47,10 +47,19 @@ public class RSAUtils {
      * @return Map 甲方密钥的Map
      */
     public static Map<String, Object> initKey() throws Exception {
+        return initKey(KEY_SIZE);
+    }
+
+    /**
+     * 初始化密钥对
+     *
+     * @return Map 甲方密钥的Map
+     */
+    public static Map<String, Object> initKey(int keySize) throws Exception {
         //实例化密钥生成器
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(KEY_ALGORITHM);
         //初始化密钥生成器
-        keyPairGenerator.initialize(KEY_SIZE);
+        keyPairGenerator.initialize(keySize);
         //生成密钥对
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
         //甲方公钥
