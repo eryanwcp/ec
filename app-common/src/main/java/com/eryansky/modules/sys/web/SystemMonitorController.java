@@ -75,7 +75,7 @@ public class SystemMonitorController extends SimpleController {
      */
     @RequiresPermissions("sys:systemMonitor:view")
     @Logging(value = "系统监控", logType = LogType.access, logging = "!#isAjax")
-    @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = "")
+    @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST}, value = "")
     public String list(HttpServletRequest request, HttpServletResponse response) {
         if (WebUtils.isAjaxRequest(request)) {
             ServerStatus serverStatus = null;
@@ -91,7 +91,6 @@ public class SystemMonitorController extends SimpleController {
     }
 
 
-
     /**
      * 系统监控-缓存管理
      *
@@ -99,7 +98,7 @@ public class SystemMonitorController extends SimpleController {
      */
     @RequiresPermissions("sys:systemMonitor:view")
     @Logging(value = "系统监控-缓存管理", logType = LogType.access, logging = "!#isAjax")
-    @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = "cache")
+    @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST}, value = "cache")
     public String cache(HttpServletRequest request, Model uiModel, HttpServletResponse response) {
         Page<Map<String, Object>> page = new Page<>(request, response);
         if (WebUtils.isAjaxRequest(request)) {
@@ -129,7 +128,7 @@ public class SystemMonitorController extends SimpleController {
      */
     @RequiresPermissions("sys:systemMonitor:view")
     @Logging(value = "系统监控-缓存管理", logType = LogType.access, logging = "!#isAjax")
-    @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = "cacheDetail")
+    @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST}, value = "cacheDetail")
     public String cacheDetail(String region, Model uiModel, HttpServletRequest request, HttpServletResponse response) {
         Page<Map<String, Object>> page = new Page<>(request, response);
         if (WebUtils.isAjaxRequest(request)) {
@@ -161,7 +160,7 @@ public class SystemMonitorController extends SimpleController {
      */
     @RequiresPermissions("sys:systemMonitor:view")
     @Logging(value = "系统监控-缓存管理", logType = LogType.access, logging = "!#isAjax")
-    @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = "cacheKeyDetail")
+    @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST}, value = "cacheKeyDetail")
     public String cacheKeyDetail(String region, String key, Model uiModel, HttpServletRequest request, HttpServletResponse response) {
         Object object = CacheUtils.get(region, key);
         try {
@@ -227,7 +226,6 @@ public class SystemMonitorController extends SimpleController {
     }
 
 
-
     /**
      * 系统监控-缓存管理
      *
@@ -235,7 +233,7 @@ public class SystemMonitorController extends SimpleController {
      */
     @RequiresPermissions("sys:systemMonitor:view")
     @Logging(value = "系统监控-队列管理", logType = LogType.access, logging = "!#isAjax")
-    @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = "queue")
+    @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST}, value = "queue")
     public String queue(HttpServletRequest request, Model uiModel, HttpServletResponse response) {
         Page<Map<String, Object>> page = new Page<>(request, response);
         if (WebUtils.isAjaxRequest(request)) {
@@ -270,7 +268,7 @@ public class SystemMonitorController extends SimpleController {
     @RequiresPermissions("sys:systemMonitor:edit")
     @Logging(value = "系统监控-队列管理:清空队列", logType = LogType.access, logging = "!#isAjax")
     @GetMapping(value = "queueClear")
-    public String queueClear(HttpServletRequest request,RedirectAttributes redirectAttributes,String region, HttpServletResponse response) {
+    public String queueClear(HttpServletRequest request, RedirectAttributes redirectAttributes, String region, HttpServletResponse response) {
         CacheUtils.getCacheChannel().queueClear(region);
         addMessage(redirectAttributes, "操作成功！");
         return "redirect:" + AppConstants.getAdminPath() + "/sys/systemMonitor/queue?repage";
@@ -279,7 +277,7 @@ public class SystemMonitorController extends SimpleController {
     @RequiresPermissions("sys:systemMonitor:edit")
     @Logging(value = "系统监控-队列管理:清空队列", logType = LogType.access, logging = "!#isAjax")
     @GetMapping(value = "clearAllQueue")
-    public String clearAllQueue(HttpServletRequest request,RedirectAttributes redirectAttributes,HttpServletResponse response) {
+    public String clearAllQueue(HttpServletRequest request, RedirectAttributes redirectAttributes, HttpServletResponse response) {
         Collection<CacheChannel.Region> regions = CacheUtils.getCacheChannel().queues();
         for (CacheChannel.Region r : regions) {
             CacheUtils.getCacheChannel().queueClear(r.getName());
@@ -291,9 +289,9 @@ public class SystemMonitorController extends SimpleController {
     /**
      * 系统监控-系统日志
      *
-     * @param pretty 美化
+     * @param pretty    美化
      * @param showTotal 全部显示
-     * @param fileName 文件名称
+     * @param fileName  文件名称
      * @param request
      * @param response
      * @param uiModel
@@ -301,26 +299,26 @@ public class SystemMonitorController extends SimpleController {
      */
     @Logging(value = "系统监控-系统日志", logType = LogType.access, logging = "!#isAjax")
     @RequiresPermissions("sys:systemMonitor:view")
-    @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = "log")
-    public String log(@RequestParam(name = "pretty",defaultValue = "false") boolean pretty,
-                      @RequestParam(name = "showTotal",defaultValue = "false") boolean showTotal,
-                      @RequestParam(name = "fileName",required = false) String fileName,
+    @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST}, value = "log")
+    public String log(@RequestParam(name = "pretty", defaultValue = "false") boolean pretty,
+                      @RequestParam(name = "showTotal", defaultValue = "false") boolean showTotal,
+                      @RequestParam(name = "fileName", required = false) String fileName,
                       HttpServletRequest request, HttpServletResponse response, Model uiModel) {
         Page<String> page = new Page<>(request, response, 5000);
-        if(showTotal){
+        if (showTotal) {
             page.setPageSize(Page.PAGESIZE_ALL);
         }
         String _logPath = AppConstants.getLogPath(findLogFilePath());//读取配置文件配置的路径
         File rootFile = new File(_logPath);
         File file = rootFile;
-        if(StringUtils.isNotBlank(fileName)){
-            file = new File(rootFile.getParentFile(),fileName);
+        if (StringUtils.isNotBlank(fileName)) {
+            file = new File(rootFile.getParentFile(), fileName);
         }
         if (WebUtils.isAjaxRequest(request)) {
             try {
                 // 读取日志
-                page = FileUtils.readFileLineByPage(file.getPath(),page);
-                List<String> resultLogs = page.getResult().parallelStream().map(line->{
+                page = FileUtils.readFileLineByPage(file.getPath(), page);
+                List<String> resultLogs = page.getResult().parallelStream().map(line -> {
                     line = XsslHttpServletRequestWrapper.replaceXSS(line);
                     if (pretty) {
                         //先转义
@@ -342,8 +340,8 @@ public class SystemMonitorController extends SimpleController {
                             String[] split1 = split[1].split("-");
                             if (split1.length == 2) {
                                 line = split[0] + "] " + "<span style='color: #298a8a;'>" + split1[0] + "</span>" + "-" + split1[1];
-                            }else if (split1.length > 2) {
-                                line = split[0] + "] " + "<span style='color: #298a8a;'>" + split1[0] + "</span>" + "-" + StringUtils.substringAfter(split[1],"-");
+                            } else if (split1.length > 2) {
+                                line = split[0] + "] " + "<span style='color: #298a8a;'>" + split1[0] + "</span>" + "-" + StringUtils.substringAfter(split[1], "-");
                             }
                         }
                         return line;
@@ -369,18 +367,21 @@ public class SystemMonitorController extends SimpleController {
     @GetMapping(value = "downloadLogFile")
     public String downloadLogFile(HttpServletRequest request, HttpServletResponse response, String fileName) {
         String _logPath = AppConstants.getLogPath(findLogFilePath());//读取配置文件配置的路径
+        if (null == _logPath) {
+            _logPath = "logs";
+        }
         File rootFile = new File(_logPath);
         File file = rootFile;
-        if(StringUtils.isNotBlank(fileName)){
-            file = new File(rootFile.getParentFile(),fileName);
+        if (StringUtils.isNotBlank(fileName)) {
+            file = new File(rootFile.getParentFile(), FileUtils.getFileName(fileName));
         }
         WebUtils.setDownloadableHeader(request, response, file.getName());
         try (OutputStream os = response.getOutputStream();
              FileInputStream fileInputStream = new FileInputStream(file);
              BufferedInputStream is = new BufferedInputStream(fileInputStream)) {
-            IOUtils.copy(is, os);
+             IOUtils.copy(is, os);
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
         }
         return null;
     }
@@ -419,10 +420,10 @@ public class SystemMonitorController extends SimpleController {
      */
     @RequiresPermissions("sys:systemMonitor:view")
     @Logging(value = "系统监控-异步任务", logType = LogType.access, logging = "!#isAjax")
-    @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = "asyncTask")
+    @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST}, value = "asyncTask")
     public String asyncTask(HttpServletRequest request, Model uiModel, HttpServletResponse response) {
         if (WebUtils.isAjaxRequest(request)) {
-            Map<String,Object> map = Maps.newHashMap();
+            Map<String, Object> map = Maps.newHashMap();
             ThreadPoolTaskExecutor threadTask = (ThreadPoolTaskExecutor) asyncExecutor;
             ThreadPoolExecutor threadPoolExecutor = threadTask.getThreadPoolExecutor();
             map.put("corePoolSize", threadTask.getCorePoolSize());
