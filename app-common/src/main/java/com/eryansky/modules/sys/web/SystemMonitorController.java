@@ -9,6 +9,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.FileAppender;
+import com.eryansky.common.exception.SystemException;
 import com.eryansky.common.model.Result;
 import com.eryansky.common.orm.Page;
 import com.eryansky.common.utils.PrettyMemoryUtils;
@@ -17,6 +18,7 @@ import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.encode.EncodeUtils;
 import com.eryansky.common.utils.io.FileUtils;
 import com.eryansky.common.utils.mapper.JsonMapper;
+import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.filter.XsslHttpServletRequestWrapper;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.utils.WebUtils;
@@ -374,6 +376,14 @@ public class SystemMonitorController extends SimpleController {
         File file = rootFile;
         if (StringUtils.isNotBlank(fileName)) {
             file = new File(rootFile.getParentFile(), FileUtils.getFileName(fileName));
+            try {
+                if (!file.getCanonicalPath().startsWith(rootFile.getParentFile().getPath())) {
+                    logger.warn("危险注入：{} {}", IpUtils.getIpAddr0(request),file.getAbsolutePath());
+                    throw new SystemException("危险注入！");
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         WebUtils.setDownloadableHeader(request, response, file.getName());
         try (OutputStream os = response.getOutputStream();

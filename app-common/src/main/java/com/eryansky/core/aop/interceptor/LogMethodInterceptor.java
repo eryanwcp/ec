@@ -41,7 +41,7 @@ import java.util.List;
  */
 public class LogMethodInterceptor implements MethodInterceptor, InitializingBean {
 
-    private static Logger logger = LoggerFactory.getLogger(LogMethodInterceptor.class);
+    private static final Logger logger = LoggerFactory.getLogger(LogMethodInterceptor.class);
 
     @Autowired
     @Lazy
@@ -111,7 +111,7 @@ public class LogMethodInterceptor implements MethodInterceptor, InitializingBean
         String remark = null;
         String newLogValue = null;
         String _LogType = LogType.operate.getValue();
-        if (logging != null && Boolean.valueOf(SpringUtils.parseSpel(logging.logging(), method, args))) {
+        if (logging != null && Boolean.parseBoolean(SpringUtils.parseSpel(logging.logging(), method, args))) {
             loglog = true;
             _LogType = logging.logType().getValue();
             String logValue = logging.value();
@@ -133,7 +133,7 @@ public class LogMethodInterceptor implements MethodInterceptor, InitializingBean
             }
         }
 
-        if (loglog || (pattendefaultMethod && (logging == null || logging != null && !Boolean.valueOf(SpringUtils.parseSpel(logging.logging(), method, args))))) {
+        if (loglog || (pattendefaultMethod && (logging == null || logging != null && !Boolean.parseBoolean(SpringUtils.parseSpel(logging.logging(), method, args))))) {
             long time = end - start;
             Log log = new Log();
             log.setTitle(newLogValue);
