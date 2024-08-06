@@ -368,7 +368,13 @@ public class SystemMonitorController extends SimpleController {
     public String downloadLogFile(HttpServletRequest request, HttpServletResponse response, String fileName) {
         String _logPath = AppConstants.getLogPath(findLogFilePath());//读取配置文件配置的路径
         if (null == _logPath) {
-            _logPath = "logs";
+            try (OutputStream os = response.getOutputStream();
+                 InputStream is = new ByteArrayInputStream("暂无数据".getBytes(StandardCharsets.UTF_8))) {
+                 IOUtils.copy(is, os);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
+            return null;
         }
         File rootFile = new File(_logPath);
         File file = rootFile;
