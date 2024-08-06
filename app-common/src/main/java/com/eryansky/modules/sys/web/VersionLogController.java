@@ -51,6 +51,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.Date;
 import java.util.List;
 
@@ -287,8 +288,21 @@ public class VersionLogController extends SimpleController {
      * @throws Exception
      */
     @GetMapping(value = {"downloadApp/{versionLogType}"})
-    public ModelAndView downloadApp(HttpServletResponse response,String app, @PathVariable String versionLogType) {
-        return downloadApp(SpringMVCHolder.getRequest(),response,app,versionLogType);
+    public ModelAndView downloadAppType(HttpServletRequest request,HttpServletResponse response,String app, @PathVariable String versionLogType) {
+        return downloadApp(request,response,app,versionLogType);
+    }
+
+    /**
+     * APP下载
+     * @param response
+     * @param app
+     * @param versionLogType
+     * @return
+     * @throws Exception
+     */
+    @GetMapping(value = {"downloadApp/{app}/{versionLogType}"})
+    public ModelAndView downloadAppPath(HttpServletRequest request,HttpServletResponse response, @PathVariable String app, @PathVariable String versionLogType) {
+        return downloadApp(request,response,app,versionLogType);
     }
 
 
@@ -302,7 +316,7 @@ public class VersionLogController extends SimpleController {
      * @throws Exception
      */
     @GetMapping(value = {"downloadApp"})
-    public ModelAndView downloadApp(HttpServletRequest request, HttpServletResponse response,String app, @PathVariable String versionLogType){
+    public ModelAndView downloadApp(HttpServletRequest request, HttpServletResponse response,String app, String versionLogType){
         String _versionLogType = versionLogType;
         if(StringUtils.isBlank(versionLogType)){
             VersionLogType vt = VersionLogUtils.getLatestVersionLogType(request);
@@ -316,7 +330,7 @@ public class VersionLogController extends SimpleController {
             File file = DiskUtils.getFile(model.getFileId());
             WebUtils.setDownloadableHeader(request, response, file.getName());
             java.io.File tempFile = file.getDiskFile();
-            try(InputStream inputStream = new FileInputStream(tempFile);
+            try(InputStream inputStream = Files.newInputStream(tempFile.toPath());
                 OutputStream outputStream = response.getOutputStream()){
                 FileCopyUtils.copy(inputStream,outputStream);
             } catch (IOException e) {
