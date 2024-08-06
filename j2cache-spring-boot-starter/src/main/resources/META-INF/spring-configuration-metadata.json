@@ -121,6 +121,10 @@
       "name": "j2cache.session.redis.minIdle",
       "type": "java.lang.String",
       "defaultValue": "1"
+    },{
+      "name": "j2cache.session.redis.clusterTopologyRefresh",
+      "type": "java.lang.String",
+      "defaultValue": "3000"
     }
   ]
 }

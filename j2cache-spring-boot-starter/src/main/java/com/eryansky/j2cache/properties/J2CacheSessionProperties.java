@@ -151,6 +151,7 @@ public class J2CacheSessionProperties {
         private String maxTotal;
         private String maxIdle;
         private String minIdle;
+        private String clusterTopologyRefresh;
 
 
         public String isEnabled() {
@@ -271,6 +272,14 @@ public class J2CacheSessionProperties {
 
         public void setMinIdle(String minIdle) {
             this.minIdle = minIdle;
+        }
+
+        public String getClusterTopologyRefresh() {
+            return clusterTopologyRefresh;
+        }
+
+        public void setClusterTopologyRefresh(String clusterTopologyRefresh) {
+            this.clusterTopologyRefresh = clusterTopologyRefresh;
         }
     }
 }
