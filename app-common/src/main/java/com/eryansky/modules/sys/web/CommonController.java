@@ -31,33 +31,6 @@ public class CommonController extends SimpleController {
     private SystemService systemService;
 
     /**
-     * 字段校验 TODO
-     *
-     * @param entityName 实体类名称 例如: "Resource"
-     * @param fieldName  属性名称
-     * @param fieldValue 属性值
-     * @param rowId      主键ID
-     * @return
-     */
-    @PostMapping(value = "fieldCheck")
-    @ResponseBody
-    public Result fieldCheck(String entityName, String fieldName, String fieldValue, String rowId) {
-        String entityId = null;
-        boolean isCheck = true;// 是否通过检查
-        if (entityId != null) {
-            if (rowId != null) {
-                if (!rowId.equals(entityId)) {
-                    isCheck = false;
-                }
-            } else {
-                isCheck = false;
-            }
-
-        }
-        return new Result(Result.SUCCESS, null, isCheck);
-    }
-
-    /**
      * JsonP跨域输出示例
      *
      * @param callbackName 回调方法
