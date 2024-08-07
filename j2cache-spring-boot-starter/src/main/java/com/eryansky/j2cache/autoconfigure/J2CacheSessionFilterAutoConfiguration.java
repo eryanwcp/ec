@@ -50,7 +50,7 @@ public class J2CacheSessionFilterAutoConfiguration {
         map.put("redis.scheme",redisConfig.getScheme());
         map.put("redis.hosts",redisConfig.getHosts());
         map.put("redis.channel",redisConfig.getChannel());
-        map.put("redis.cluster_name",redisConfig.getCluster_name());
+        map.put("redis.cluster_name",redisConfig.getClusterName());
         map.put("redis.database",redisConfig.getDatabase());
         map.put("redis.timeout",redisConfig.getTimeout());
         map.put("redis.password",redisConfig.getPassword());
