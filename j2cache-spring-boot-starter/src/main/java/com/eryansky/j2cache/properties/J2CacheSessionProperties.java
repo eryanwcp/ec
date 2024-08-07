@@ -63,6 +63,7 @@ public class J2CacheSessionProperties {
         private String cookieName;
         private String cookieDomain;
         private String cookiePath;
+        private String cookieSecure;
         private String discardNonSerializable;
 
 
@@ -122,6 +123,14 @@ public class J2CacheSessionProperties {
             this.cookiePath = cookiePath;
         }
 
+        public String getCookieSecure() {
+            return cookieSecure;
+        }
+
+        public void setCookieSecure(String cookieSecure) {
+            this.cookieSecure = cookieSecure;
+        }
+
         public String isDiscardNonSerializable() {
             return discardNonSerializable;
         }
@@ -137,7 +146,7 @@ public class J2CacheSessionProperties {
          * Enable SessionFilter.
          */
         private String enabled = "true";
-        private String mode;
+        private String scheme;
         private String hosts;
         private String channel;
         private String cluster_name;
@@ -162,12 +171,12 @@ public class J2CacheSessionProperties {
             this.enabled = enabled;
         }
 
-        public String getMode() {
-            return mode;
+        public String getScheme() {
+            return scheme;
         }
 
-        public void setMode(String mode) {
-            this.mode = mode;
+        public void setScheme(String scheme) {
+            this.scheme = scheme;
         }
 
         public String getHosts() {
