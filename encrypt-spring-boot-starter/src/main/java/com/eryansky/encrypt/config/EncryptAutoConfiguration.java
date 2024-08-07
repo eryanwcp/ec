@@ -1,5 +1,7 @@
 package com.eryansky.encrypt.config;
 
+import com.eryansky.encrypt.advice.DecryptRequestBodyAdvice;
+import com.eryansky.encrypt.advice.EncryptResultResponseBodyAdvice;
 import com.eryansky.encrypt.aspectj.EncryptHandler;
 import com.eryansky.encrypt.badger.HoneyBadgerEncrypt;
 import com.eryansky.encrypt.register.RegisterBeanDefinition;
@@ -144,6 +146,16 @@ public class EncryptAutoConfiguration {
     @ConditionalOnBean(name = "encrypt-SpELExpressionHandler")
     public SpelExpressionParser spelExpressionParser(){
         return new SpelExpressionParser();
+    }
+
+    @Bean
+    public EncryptResultResponseBodyAdvice encryptResultResponseBodyAdvice() {
+        return new EncryptResultResponseBodyAdvice();
+    }
+
+    @Bean
+    public DecryptRequestBodyAdvice decryptRequestBodyAdvice() {
+        return new DecryptRequestBodyAdvice();
     }
 
 }
