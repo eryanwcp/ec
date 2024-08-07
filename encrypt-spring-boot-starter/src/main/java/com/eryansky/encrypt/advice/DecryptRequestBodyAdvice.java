@@ -29,8 +29,8 @@ public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
 
     private static final Logger log = LoggerFactory.getLogger(DecryptRequestBodyAdvice.class);
 
-    public static String  ENCRYPT = "Encrypt";
-    public static String  ENCRYPT_KEY = "Encrypt-Key";
+    public static final String  ENCRYPT = "Encrypt";
+    public static final String  ENCRYPT_KEY = "Encrypt-Key";
 
 
     @Override  

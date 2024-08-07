@@ -27,8 +27,8 @@ public class EncryptResultResponseBodyAdvice implements ResponseBodyAdvice<Resul
 
     private static final Logger log = LoggerFactory.getLogger(EncryptResultResponseBodyAdvice.class);
 
-    public static String  ENCRYPT = "Encrypt";
-    public static String  ENCRYPT_KEY = "Encrypt-Key";
+    public static final String  ENCRYPT = "Encrypt";
+    public static final String  ENCRYPT_KEY = "Encrypt-Key";
 
     @Override  
     public boolean supports(MethodParameter returnType, Class converterType) {
