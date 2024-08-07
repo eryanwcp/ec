@@ -33,7 +33,7 @@ public class EncryptResultResponseBodyAdvice implements ResponseBodyAdvice<Resul
     @Override  
     public boolean supports(MethodParameter returnType, Class converterType) {
         EncryptResponseBody encrypt = returnType.getMethodAnnotation(EncryptResponseBody.class);
-        //如果带有注解且标记为验签，测进行验签操作
+        //如果带有注解且标记为验签，则进行验签操作
         return null != encrypt && encrypt.defaultHandle();
     }  
 
