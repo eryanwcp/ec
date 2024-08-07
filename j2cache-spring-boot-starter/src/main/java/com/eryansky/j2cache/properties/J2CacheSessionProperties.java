@@ -149,7 +149,7 @@ public class J2CacheSessionProperties {
         private String scheme;
         private String hosts;
         private String channel;
-        private String cluster_name;
+        private String clusterName;
         private String timeout;
         private String password;
         private String passwordEncrypt;
@@ -195,12 +195,12 @@ public class J2CacheSessionProperties {
             this.channel = channel;
         }
 
-        public String getCluster_name() {
-            return cluster_name;
+        public String getClusterName() {
+            return clusterName;
         }
 
-        public void setCluster_name(String cluster_name) {
-            this.cluster_name = cluster_name;
+        public void setClusterName(String clusterName) {
+            this.clusterName = clusterName;
         }
 
         public String getTimeout() {

@@ -47,7 +47,7 @@ public class J2CacheSessionFilterAutoConfiguration {
         map.put("session.maxSizeInMemory",sessionProperties.getMaxSizeInMemory());
 
         map.put("redis.enabled",redisConfig.isEnabled());
-        map.put("redis.mode",redisConfig.getMode());
+        map.put("redis.scheme",redisConfig.getScheme());
         map.put("redis.hosts",redisConfig.getHosts());
         map.put("redis.channel",redisConfig.getChannel());
         map.put("redis.cluster_name",redisConfig.getCluster_name());
@@ -77,6 +77,7 @@ public class J2CacheSessionFilterAutoConfiguration {
         map.put("redis.maxTotal",redisConfig.getMaxTotal());
         map.put("redis.maxIdle",redisConfig.getMaxIdle());
         map.put("redis.minIdle",redisConfig.getMinIdle());
+        map.put("redis.clusterTopologyRefresh",redisConfig.getClusterTopologyRefresh());
         Map<String,String> param = map.entrySet().stream().filter(m->m.getValue() != null).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         bean.setInitParameters(param);
         Integer order = filterConfig.getOrder();
