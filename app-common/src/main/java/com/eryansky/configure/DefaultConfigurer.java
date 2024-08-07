@@ -8,6 +8,8 @@ package com.eryansky.configure;
 import com.eryansky.common.utils.ObjectUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.io.PropertiesLoader;
+import com.eryansky.encrypt.advice.DecryptRequestBodyAdvice;
+import com.eryansky.encrypt.advice.EncryptResultResponseBodyAdvice;
 import com.eryansky.modules.sys.mapper.Config;
 import com.eryansky.modules.sys.service.ConfigService;
 import com.eryansky.utils.AppConstants;
@@ -50,6 +52,16 @@ public class DefaultConfigurer {
             });
         }
         return null;
+    }
+
+    @Bean
+    public EncryptResultResponseBodyAdvice encryptResultResponseBodyAdvice() {
+        return new EncryptResultResponseBodyAdvice();
+    }
+
+    @Bean
+    public DecryptRequestBodyAdvice decryptRequestBodyAdvice() {
+        return new DecryptRequestBodyAdvice();
     }
 
 }

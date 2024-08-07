@@ -10,4 +10,15 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface DecryptRequestBody {
+
+    /**
+     * 是否使用默认处理策略
+     * @return
+     */
+    boolean defaultHandle() default true;
+    /**
+     * 处理策略
+     * @return
+     */
+    String handle() default "default";
 }

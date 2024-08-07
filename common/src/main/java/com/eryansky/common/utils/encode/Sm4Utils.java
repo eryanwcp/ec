@@ -2,8 +2,7 @@ package com.eryansky.common.utils.encode;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.pqc.legacy.math.linearalgebra.ByteUtils;
-import org.bouncycastle.util.encoders.Hex;
- 
+
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.spec.IvParameterSpec;
@@ -55,7 +54,7 @@ public final class Sm4Utils {
      * @return
      * @throws Exception
      */
-    public static String generateKeyString() throws Exception {
+    public static String generateHexKeyString() throws Exception {
         return ByteUtils.toHexString(generateKey());
     }
 
@@ -308,7 +307,7 @@ public final class Sm4Utils {
             System.out.println("==========加密前源数据==========");
             System.out.println(paramStr);
             // 生成32位16进制密钥
-            String key = Sm4Utils.generateKeyString();
+            String key = Sm4Utils.generateHexKeyString();
             System.out.println("==========生成key==========");
             System.out.println(key);
             String cipher = Sm4Utils.encryptEcb(key, paramStr);

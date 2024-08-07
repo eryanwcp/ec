@@ -282,6 +282,32 @@
         App.fixIframeCotent();
 
 
+        // $.ajax({
+        //   url: ctxAdmin + '/sys/encrypt/initKey',
+        //   type: 'get',
+        //   dataType: "json",
+        //   cache:false,
+        //   beforeSend: function (jqXHR, settings) {
+        //   },
+        //   success: function (data) {
+        //     console.log(data);
+        //     $.ajax({
+        //       url: ctxAdmin + '/sys/encrypt/data',
+        //       type: 'post',
+        //       dataType: "json",
+        //       contentType: "application/json",
+        //       cache:false,
+        //       headers: {'Encrypt':data['data']['encrypt'],'Encrypt-Key':data['data']['requestKey']},
+        //       data: data['data']['demoEncryptRequestData'],
+        //       beforeSend: function (jqXHR, settings) {
+        //       },
+        //       success: function (data) {
+        //         console.log(data);
+        //       }
+        //     });
+        //   }
+        // });
+
 
         initMenu();
         // 动态创建菜单后，可以重新计算 SlimScroll

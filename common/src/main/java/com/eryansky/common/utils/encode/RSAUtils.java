@@ -153,6 +153,14 @@ public class RSAUtils {
         return EncodeUtils.base64Encode(encrypt(data, base64PublicKey));
     }
 
+    public static String encryptHexString(String data) {
+        return EncodeUtils.hexEncode(encrypt(data, DEFAULT_PUBLIC_KEY));
+    }
+
+    public static String encryptHexString(String data, String base64PublicKey) {
+        return EncodeUtils.hexEncode(encrypt(data, base64PublicKey));
+    }
+
     public static byte[] encrypt(String data) {
         return encrypt(data, DEFAULT_PUBLIC_KEY);
     }
@@ -175,6 +183,17 @@ public class RSAUtils {
         return decrypt(EncodeUtils.base64Decode(base64Data), getPrivateKey(base64PrivateKey));
     }
 
+    public static String decryptHexString(String hexData) {
+        return decryptHexString(hexData, DEFAULT_PRIVATE_KEY);
+    }
+    public static String decryptHexString(String hexData, String base64PrivateKey) {
+        return decrypt(EncodeUtils.hexDecode(hexData), getPrivateKey(base64PrivateKey));
+    }
+
+    public static String decrypt(String data) {
+        return decrypt(data,DEFAULT_PRIVATE_KEY);
+    }
+
     public static String decrypt(String data, String base64PrivateKey) {
         try {
             Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
@@ -183,6 +202,10 @@ public class RSAUtils {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static String decrypt(byte[] data) {
+        return decrypt(data, getPrivateKey(DEFAULT_PRIVATE_KEY));
     }
 
     public static String decrypt(byte[] data, String base64PrivateKey) {

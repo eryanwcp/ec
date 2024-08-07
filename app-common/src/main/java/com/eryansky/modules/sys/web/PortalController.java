@@ -61,6 +61,18 @@ public class PortalController extends SimpleController {
         return modelAnView;
     }
 
+    @GetMapping(value = "east")
+    public ModelAndView east() {
+        ModelAndView modelAnView = new ModelAndView("layout/portal-east");
+        return modelAnView;
+    }
+
+    @GetMapping(value = "about")
+    public ModelAndView about() {
+        ModelAndView modelAnView = new ModelAndView("layout/about");
+        return modelAnView;
+    }
+
     /**
      * 个人消息中心
      *

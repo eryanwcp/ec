@@ -172,6 +172,26 @@ public class Cryptos {
         return EncodeUtils.base64Encode(aesECB(input.getBytes(StandardCharsets.UTF_8), key, Cipher.ENCRYPT_MODE));
     }
 
+    /**
+     * 使用AES加密原始字符串.
+     *
+     * @param input 原始输入字符数组
+     * @param base64Key 符合AES要求的Base64密钥
+     */
+    public static String aesECBEncryptHexString(String input, String base64Key) {
+        return aesECBEncryptHexString(input, getBase64DecodeKey(base64Key));
+    }
+
+    /**
+     * 使用AES加密原始字符串.
+     *
+     * @param input 原始输入字符数组
+     * @param key 符合AES要求的密钥
+     */
+    public static String aesECBEncryptHexString(String input, byte[] key) {
+        return EncodeUtils.hexEncode(aesECB(input.getBytes(StandardCharsets.UTF_8), key, Cipher.ENCRYPT_MODE));
+    }
+
 
     /**
      * 使用AES加密原始字符串.
@@ -228,6 +248,30 @@ public class Cryptos {
             return base64Data;
         }
         byte[] decryptResult = aesECB(EncodeUtils.base64Decode(base64Data), key, Cipher.DECRYPT_MODE);
+        return new String(decryptResult);
+    }
+
+    /**
+     * 使用AES解密字符串, 返回原始字符串.
+     *
+     * @param hexData Hex编码的加密字符串
+     * @param base64Key 符合AES要求的base64密钥
+     */
+    public static String aesECBDecryptHexString(String hexData, String base64Key) {
+        return aesECBDecryptHexString(hexData,getBase64DecodeKey(base64Key));
+    }
+
+    /**
+     * 使用AES解密字符串, 返回原始字符串.
+     *
+     * @param hexData Hex编码的加密字符串
+     * @param key 符合AES要求的密钥
+     */
+    public static String aesECBDecryptHexString(String hexData, byte[] key) {
+        if(StringUtils.isBlank(hexData)){
+            return hexData;
+        }
+        byte[] decryptResult = aesECB(EncodeUtils.hexDecode(hexData), key, Cipher.DECRYPT_MODE);
         return new String(decryptResult);
     }
 

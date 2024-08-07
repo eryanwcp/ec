@@ -2,9 +2,15 @@ package com.eryansky;
 
 import com.eryansky.common.orm.model.Parameter;
 import com.eryansky.common.utils.ThreadUtils;
+import com.eryansky.common.utils.encode.Cryptos;
 import com.eryansky.common.utils.encode.Encrypt;
+import com.eryansky.common.utils.encode.RSAUtils;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.core.rpc.demo.TestAPI;
+import com.eryansky.encrypt.badger.HoneyBadgerEncrypt;
+import com.eryansky.encrypt.config.EncryptProvider;
+import com.eryansky.encrypt.enums.CipherMode;
+import com.eryansky.encrypt.util.EncryptUtils;
 import com.eryansky.modules.sys.mapper.OrganExtend;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.mapper.VersionLog;
@@ -14,6 +20,7 @@ import com.eryansky.modules.sys.utils.SystemSerialNumberUtils;
 import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.client.common.vo.ExtendAttr;
 import com.google.common.collect.Maps;
+import org.apache.commons.codec.digest.Crypt;
 import org.junit.jupiter.api.Test;
 import org.mybatis.dynamic.sql.render.RenderingStrategies;
 import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
@@ -44,7 +51,19 @@ public class ApplicationTests {
 
     @Test
     public void contextLoads() {
-        System.out.println(testProvider.testRpc2("123"));
+        //        System.out.println(Identities.uuid2().substring(0,16).length());
+//        System.out.println(EncodeUtils.base64Decode(Cryptos.getBase64EncodeKey()).length);
+        System.out.println(RSAUtils.getDefaultBase64PublicKey());
+        System.out.println(EncryptProvider.sm4Key());
+        System.out.println(EncryptProvider.aesKey());
+        System.out.println(EncryptUtils.aesEncrypt("123456"));
+        System.out.println(EncryptUtils.aesDecrypt(EncryptUtils.aesEncrypt("123456")));
+        System.out.println(EncryptUtils.aesECBEncrypt("123456",EncryptProvider.aesKey()));
+        System.out.println(EncryptUtils.aesECBEncrypt("123456",EncryptProvider.aesKey()));
+        System.out.println(EncryptUtils.aesECBDecrypt(EncryptUtils.aesECBEncrypt("123456",EncryptProvider.aesKey()),EncryptProvider.aesKey()));
+        System.out.println(Cryptos.aesECBEncryptHexString("123456",EncryptProvider.aesKey().getBytes()));
+        System.out.println(Cryptos.aesECBEncryptHexString("123456",EncryptProvider.aesKey().getBytes()));
+        System.out.println(Cryptos.aesECBDecryptHexString(Cryptos.aesECBEncryptHexString("123456",EncryptProvider.aesKey().getBytes()),EncryptProvider.aesKey().getBytes()));
 
     }
 

@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.eryansky</groupId>
         <artifactId>ec-parent</artifactId>
-        <version>4.2.20240801.03</version>
+        <version>4.2.20240801.04</version>
     </parent>
     <artifactId>ec-app-common</artifactId>
     <version>${ec-app-common.version}</version>
@@ -69,7 +69,11 @@
             <artifactId>ec-j2cache-spring-boot-starter</artifactId>
             <version>${ec-j2cache-spring-boot-starter.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.eryansky</groupId>
+            <artifactId>ec-encrypt-spring-boot-starter</artifactId>
+            <version>${ec-encrypt-spring-boot-starter.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.ant</groupId>

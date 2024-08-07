@@ -52,11 +52,6 @@ public class RegisterBeanDefinition implements BeanFactoryPostProcessor{
         }
 
         @Override
-        public boolean isSingleton() {
-            return true;
-        }
-
-        @Override
         public Class<?> getObjectType() {
             return GeneratorSecretKey.class;
         }
@@ -81,8 +76,8 @@ public class RegisterBeanDefinition implements BeanFactoryPostProcessor{
                     String SM4KEY = UUID.randomUUID().toString().replace("-", "");
                     String SM4IV = UUID.randomUUID().toString().replace("-", "").substring(0,16);
                     Map<String,Object> sm4Map = new HashMap<>();
-                    sm4Map.put("sm4密钥",SM4KEY);
-                    sm4Map.put("sm4偏移量",SM4IV);
+                    sm4Map.put("SM4_KEY",SM4KEY);
+                    sm4Map.put("SM4_IV",SM4IV);
                     return sm4Map;
                 default: throw new RuntimeException("com/eryansky/encrypt/register");
             }
