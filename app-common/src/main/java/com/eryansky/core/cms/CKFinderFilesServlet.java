@@ -22,7 +22,7 @@ import java.io.*;
 public class CKFinderFilesServlet extends HttpServlet {
 
     private static final long serialVersionUID = 4595639013502930224L;
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private static final String userfilesPath = CKFinderConfig.CK_BASH_URL;
     private static final String CLIENT_ABORTEXCEPTION = "ClientAbortException";
