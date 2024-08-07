@@ -1,9 +1,9 @@
 package com.eryansky.encrypt.advice;
 
 import com.eryansky.common.model.Result;
-import com.eryansky.common.orm.mybatis.sensitive.encrypt.AesSupport;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
+import com.eryansky.common.utils.encode.Cryptos;
 import com.eryansky.common.utils.encode.RSAUtils;
 import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.utils.mapper.JsonMapper;
@@ -19,7 +19,9 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-
+/**
+ * 默认加密策略 返回值为Result
+ */
 @RestControllerAdvice
 public class EncryptResultResponseBodyAdvice implements ResponseBodyAdvice<Result> {
 
@@ -32,7 +34,7 @@ public class EncryptResultResponseBodyAdvice implements ResponseBodyAdvice<Resul
     public boolean supports(MethodParameter returnType, Class converterType) {
         EncryptResponseBody encrypt = returnType.getMethodAnnotation(EncryptResponseBody.class);
         //如果带有注解且标记为验签，测进行验签操作
-        return null != encrypt;
+        return null != encrypt && encrypt.defaultHandle();
     }  
 
     @Override  
@@ -49,6 +51,7 @@ public class EncryptResultResponseBodyAdvice implements ResponseBodyAdvice<Resul
                     try {
                         body.setData(Sm4Utils.encrypt(key,data));
                     } catch (Exception e) {
+                        log.error(e.getMessage(),e);
                         throw new RuntimeException(e);
                     }
                 }
@@ -56,21 +59,24 @@ public class EncryptResultResponseBodyAdvice implements ResponseBodyAdvice<Resul
                     try {
                         body.setObj(Sm4Utils.encrypt(key,obj));
                     } catch (Exception e) {
+                        log.error(e.getMessage(),e);
                         throw new RuntimeException(e);
                     }
                 }
             }else if(CipherMode.AES.name().equals(requestEncrypt)){
                 if(StringUtils.isNotBlank(data) && !StringUtils.equals(data,"null")){
                     try {
-                        body.setData(new AesSupport(key).encryptECB(data));
+                        body.setData(Cryptos.aesECBDecryptBase64String(data,key));
                     } catch (Exception e) {
+                        log.error(e.getMessage(),e);
                         throw new RuntimeException(e);
                     }
                 }
                 if(StringUtils.isNotBlank(obj) && !StringUtils.equals(obj,"null")){
                     try {
-                        body.setObj(new AesSupport(key).encryptECB(obj));
+                        body.setObj(Cryptos.aesECBDecryptBase64String(data,key));
                     } catch (Exception e) {
+                        log.error(e.getMessage(),e);
                         throw new RuntimeException(e);
                     }
                 }

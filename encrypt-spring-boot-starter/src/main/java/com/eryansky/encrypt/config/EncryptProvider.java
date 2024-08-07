@@ -11,7 +11,7 @@ public abstract class EncryptProvider {
     /**
      * The constant BADGER.
      */
-    protected  static  final String BADGER = "badger.encrypt";
+    protected  static  final String BADGER = "system.badger.encrypt";
     /**
      * The constant encryptFactory.
      */

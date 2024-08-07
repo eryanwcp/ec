@@ -97,13 +97,13 @@ public class HoneyBadgerEncrypt implements InitializingBean {
         SM4_IV = EncryptProvider.sm4Iv().getBytes(StandardCharsets.UTF_8);
         SM4_KEY = SecureUtil.generateKey(SM4.ALGORITHM_NAME, sm4KeyBytes).getEncoded();
         sm4 = new SM4(Mode.CTS,Padding.PKCS5Padding,SM4_KEY,SM4_IV);
-
-        echo.info("RSA私钥:\n"+PRIVATE_KEY);
-        echo.info("RSA公钥:\n"+PUBLIC_KEY);
-        echo.info("aesKey:\n"+new String(AES_KEY,StandardCharsets.UTF_8));
-        echo.info("aesIv:\n"+new String(AES_IV,StandardCharsets.UTF_8));
-        echo.info("SM4_KEY:\n"+new String(SM4_KEY,StandardCharsets.UTF_8));
-        echo.info("SM4_IV:\n"+new String(SM4_IV,StandardCharsets.UTF_8));
+//
+//        echo.info("RSA私钥:\n"+PRIVATE_KEY);
+//        echo.info("RSA公钥:\n"+PUBLIC_KEY);
+//        echo.info("aesKey:\n"+new String(AES_KEY,StandardCharsets.UTF_8));
+//        echo.info("aesIv:\n"+new String(AES_IV,StandardCharsets.UTF_8));
+//        echo.info("SM4_KEY:\n"+new String(SM4_KEY,StandardCharsets.UTF_8));
+//        echo.info("SM4_IV:\n"+new String(SM4_IV,StandardCharsets.UTF_8));
     }
 
 
