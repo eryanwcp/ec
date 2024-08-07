@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.nio.file.Files;
 
 /**
  * 查看CK上传的图片
@@ -59,7 +60,7 @@ public class CKFinderFilesServlet extends HttpServlet {
             String path = this.getServletConfig().getServletContext().getRealPath("/");
 //            String ctx = req.getContextPath();
             File errorFile = new File(path+"/static/img/image_error.png");
-            try (InputStream inputStream = new FileInputStream(errorFile);
+            try (InputStream inputStream = Files.newInputStream(errorFile.toPath());
                  OutputStream outputStream = resp.getOutputStream()){
                 FileCopyUtils.copy(inputStream, outputStream);
             } catch (IOException e1) {
