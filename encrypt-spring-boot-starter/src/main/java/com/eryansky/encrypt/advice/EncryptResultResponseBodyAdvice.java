@@ -27,8 +27,8 @@ public class EncryptResultResponseBodyAdvice implements ResponseBodyAdvice<Resul
 
     private static final Logger log = LoggerFactory.getLogger(EncryptResultResponseBodyAdvice.class);
 
-    public static String  ENCRYPT = "encrypt";
-    public static String  ENCRYPT_KEY = "encrypt-key";
+    public static String  ENCRYPT = "Encrypt";
+    public static String  ENCRYPT_KEY = "Encrypt-Key";
 
     @Override  
     public boolean supports(MethodParameter returnType, Class converterType) {
@@ -66,7 +66,7 @@ public class EncryptResultResponseBodyAdvice implements ResponseBodyAdvice<Resul
             }else if(CipherMode.AES.name().equals(requestEncrypt)){
                 if(StringUtils.isNotBlank(data) && !StringUtils.equals(data,"null")){
                     try {
-                        body.setData(Cryptos.aesECBDecryptBase64String(data,key));
+                        body.setData(Cryptos.aesECBEncryptBase64String(data,key));
                     } catch (Exception e) {
                         log.error(e.getMessage(),e);
                         throw new RuntimeException(e);
@@ -74,7 +74,7 @@ public class EncryptResultResponseBodyAdvice implements ResponseBodyAdvice<Resul
                 }
                 if(StringUtils.isNotBlank(obj) && !StringUtils.equals(obj,"null")){
                     try {
-                        body.setObj(Cryptos.aesECBDecryptBase64String(data,key));
+                        body.setObj(Cryptos.aesECBEncryptBase64String(data,key));
                     } catch (Exception e) {
                         log.error(e.getMessage(),e);
                         throw new RuntimeException(e);

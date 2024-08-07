@@ -27,7 +27,7 @@
         </div>
 	</div>
 	<div  style="height: 100%;width:200px;overflow: hidden;"
-          data-options="region:'east',title:'日历',href:'${ctxAdmin}/common/layout/portal-east'">
+          data-options="region:'east',title:'日历',href:'${ctxAdmin}/portal/east'">
 	</div>
 </div>
 <div id="jplayer"><embed id="tip_new_msg" height="100" autostart="true" width="100" src="" /></div>

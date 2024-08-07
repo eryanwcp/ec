@@ -20,5 +20,5 @@ public @interface DecryptRequestBody {
      * 处理策略
      * @return
      */
-    String handle() default "";
+    String handle() default "default";
 }
