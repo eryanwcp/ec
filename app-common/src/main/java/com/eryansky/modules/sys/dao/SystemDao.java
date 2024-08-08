@@ -8,6 +8,11 @@ package com.eryansky.modules.sys.dao;
 import com.eryansky.common.orm.model.Parameter;
 import com.eryansky.common.orm.mybatis.MyBatisDao;
 import com.eryansky.common.orm.persistence.BaseDao;
+import com.eryansky.modules.sys.vo.TableColumnDTO;
+import com.eryansky.modules.sys.vo.TableDTO;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * 系统DAO接口
@@ -40,5 +45,11 @@ public interface SystemDao extends BaseDao {
      * @return
      */
     int deleteOrganExtend(Parameter parameter);
+
+    List<TableDTO> findTableList(Parameter parameter);
+
+    List<TableColumnDTO> findTableColumnByTableName(Parameter parameter);
+
+    List<Map<String,Object>> findTableDataByTableName(Parameter parameter);
 
 }

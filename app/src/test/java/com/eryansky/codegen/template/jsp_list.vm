@@ -30,10 +30,10 @@
                 },
                 success: function (data) {
                     $("#btnSubmit").attr("disabled", false);
-                    if (data['code'] == 1 && data['obj']['totalCount'] > 0) {
-                        var html = Mustache.render($("#list_template").html(), data['obj']);
+                    if (data['code'] === 1 && data['data']['totalCount'] > 0) {
+                        var html = Mustache.render($("#list_template").html(), data['data']);
                         $("#list").html(html);
-                        $(".pagination").append(data['obj']['html']);
+                        $(".pagination").append(data['data']['html']);
                     } else {
                         $("#list").html("<div style='color: red;padding: 10px 30px;text-align:center;font-size: 16px;'>查无数据</div>");
                     }

@@ -1,5 +1,7 @@
 package com.eryansky.encrypt.config;
 
+import com.eryansky.encrypt.advice.DecryptRequestBodyAdvice;
+import com.eryansky.encrypt.advice.EncryptResultResponseBodyAdvice;
 import com.eryansky.encrypt.aspectj.EncryptHandler;
 import com.eryansky.encrypt.badger.HoneyBadgerEncrypt;
 import com.eryansky.encrypt.register.RegisterBeanDefinition;
@@ -109,19 +111,6 @@ public class EncryptAutoConfiguration {
     }
 
     /**
-     * 线程池 性能提升不了多少 暂时停用
-     *
-     * @return Executor bean
-     */
-//    @Bean("encryptThreadPoolExecutor")
-    public Executor executor(){
-        return new ThreadPoolExecutor(2,
-                50,30,
-                TimeUnit.MILLISECONDS,new LinkedBlockingQueue<>(10000),
-                new ThreadPoolExecutor.CallerRunsPolicy());
-    }
-
-    /**
      * 线程池后置处理器
      *
      * @return the executor post processor
@@ -159,12 +148,14 @@ public class EncryptAutoConfiguration {
         return new SpelExpressionParser();
     }
 
+    @Bean
+    public EncryptResultResponseBodyAdvice encryptResultResponseBodyAdvice() {
+        return new EncryptResultResponseBodyAdvice();
+    }
 
-    /**
-     * The entry point of application.
-     *
-     * @param args the input arguments
-     */
-    public static void main(String[] args) {}
+    @Bean
+    public DecryptRequestBodyAdvice decryptRequestBodyAdvice() {
+        return new DecryptRequestBodyAdvice();
+    }
 
 }

@@ -1,3 +1,0 @@
-#\u52A0\u5BC6\u5206\u7EC4
-[com.eryansky.encrypt.cron]
-CronServer.run = 1 * * * * *

@@ -1,7 +1,8 @@
 package com.eryansky.encrypt.advice;
 
 import com.eryansky.common.orm.mybatis.sensitive.encrypt.AesSupport;
-import com.eryansky.common.utils.encode.RSAUtil;
+import com.eryansky.common.utils.encode.Cryptos;
+import com.eryansky.common.utils.encode.RSAUtils;
 import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.utils.io.IoUtils;
 import com.eryansky.common.utils.StringUtils;
@@ -28,14 +29,14 @@ public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
 
     private static final Logger log = LoggerFactory.getLogger(DecryptRequestBodyAdvice.class);
 
-    public static String  ENCRYPT = "encrypt";
-    public static String  ENCRYPT_KEY = "encrypt-key";
+    public static final String  ENCRYPT = "Encrypt";
+    public static final String  ENCRYPT_KEY = "Encrypt-Key";
 
 
     @Override  
     public boolean supports(MethodParameter methodParameter, Type type, Class<? extends HttpMessageConverter<?>> aClass) {
         DecryptRequestBody decrypt = methodParameter.getMethodAnnotation(DecryptRequestBody.class);
-        return null != decrypt;
+        return null != decrypt && decrypt.defaultHandle();
     }
 
     @Override  
@@ -49,7 +50,7 @@ public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
         String requestEncrypt = Collections3.getFirst(headers.get(ENCRYPT));
         String requestEncryptKey = Collections3.getFirst(headers.get(ENCRYPT_KEY));
         if (StringUtils.isNotBlank(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey) ){
-            String key = RSAUtil.decryptBase64(requestEncryptKey);
+            String key = RSAUtils.decryptBase64String(requestEncryptKey);
             return new HttpInputMessage() {
                 @Override
                 public InputStream getBody() throws IOException {
@@ -58,10 +59,11 @@ public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
                         if(CipherMode.SM4.name().equals(requestEncrypt)){
                             return IOUtils.toInputStream(Sm4Utils.decrypt(key, content), StandardCharsets.UTF_8);
                         }else if(CipherMode.AES.name().equals(requestEncrypt)){
-                            return IOUtils.toInputStream(new AesSupport(key).decryptECB(content), StandardCharsets.UTF_8);
+                            return IOUtils.toInputStream(Cryptos.aesECBDecryptBase64String(content,key), StandardCharsets.UTF_8);
                         }
                         return IOUtils.toInputStream(content, StandardCharsets.UTF_8);
                     } catch (Exception e) {
+                        log.error(e.getMessage(),e);
                         throw new RuntimeException(e);
                     }
                 }

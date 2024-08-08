@@ -33,9 +33,9 @@
 				dataType: 'json',
 				success: function (data) {
 					if (data.code === 1) {
-						var html = Mustache.render($("#list_template").html(), data['obj']);
+						var html = Mustache.render($("#list_template").html(), data['data']);
 						$("#list").html(html);
-						$(".pagination").append(data['obj']['html']);
+						$(".pagination").append(data['data']['html']);
 						$(".pagination").find("ul").append("<li class=\"disabled controls\"><a>"+data['data']+"</a></li>");
 					} else {
 						$("#list").html(data['msg']);

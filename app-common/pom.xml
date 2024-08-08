@@ -51,12 +51,6 @@
             <groupId>com.eryansky</groupId>
             <artifactId>ec-common</artifactId>
             <version>${ec-common.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.eryansky</groupId>
@@ -68,7 +62,11 @@
             <artifactId>ec-j2cache-spring-boot-starter</artifactId>
             <version>${ec-j2cache-spring-boot-starter.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.eryansky</groupId>
+            <artifactId>ec-encrypt-spring-boot-starter</artifactId>
+            <version>${ec-encrypt-spring-boot-starter.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.ant</groupId>

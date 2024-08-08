@@ -72,7 +72,7 @@
     },{
       "name": "j2cache.session.redis.scheme",
       "type": "java.lang.String",
-      "defaultValue": "single"
+      "defaultValue": "redis"
     },{
       "name": "j2cache.session.redis.hosts",
       "type": "java.lang.String",
@@ -121,6 +121,10 @@
       "name": "j2cache.session.redis.minIdle",
       "type": "java.lang.String",
       "defaultValue": "1"
+    },{
+      "name": "j2cache.session.redis.clusterTopologyRefresh",
+      "type": "java.lang.String",
+      "defaultValue": "3000"
     }
   ]
 }

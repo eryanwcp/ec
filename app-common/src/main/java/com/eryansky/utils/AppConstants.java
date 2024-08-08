@@ -336,6 +336,30 @@ public class AppConstants extends SysConstants {
         return Collections.emptyList();
     }
 
+    /**
+     * 仅限IP白名单访问
+     *
+     * @return
+     */
+    public static Boolean isXssEnable() {
+        String code = "system.security.xssFilter.enable";
+        String value = getAppConfig(code,"true");
+        return Boolean.valueOf(value);
+    }
+
+    /**
+     * #不通过应用集成账号验证的账号 每行一个或多个之间以";"分割
+     * 自动转换成小写
+     *
+     * @return
+     */
+    public static String getXssBlackListURL() {
+        String code = "system.security.xssFilter.blackListURL";
+        String value = getAppConfig(code);
+        return StringUtils.trim(value).replaceAll("\r\n", ";").replaceAll("；", ";");
+    }
+
+
 
     /**
      * URL请求限制
@@ -537,8 +561,8 @@ public class AppConstants extends SysConstants {
      */
     public static int getSessionUserMaxSize() {
         String code = "security.sessionUser.MaxSize";
-        String value = getConfigValue(code);
-        return Integer.valueOf(value);
+        String value = getConfigValue(code,"0");
+        return StringUtils.isBlank(value) ? 0 :Integer.parseInt(value);
     }
 
 
@@ -550,8 +574,8 @@ public class AppConstants extends SysConstants {
      */
     public static int getUserSessionSize() {
         String code = "security.sessionUser.UserSessionSize";
-        String value = getConfigValue(code);
-        return StringUtils.isBlank(value) ? 0 : Integer.valueOf(value);
+        String value = getConfigValue(code,"0");
+        return StringUtils.isBlank(value) ? 0 : Integer.parseInt(value);
     }
 
     /**
@@ -562,7 +586,7 @@ public class AppConstants extends SysConstants {
     public static int getLoginAgainSize() {
         String code = "security.password.loginAgainSize";
         String value = getConfigValue(code);
-        return StringUtils.isBlank(value) ? 3 : Integer.valueOf(value);
+        return StringUtils.isBlank(value) ? 3 : Integer.parseInt(value);
     }
 
     /**
@@ -573,7 +597,7 @@ public class AppConstants extends SysConstants {
     public static int getUserPasswordUpdateCycle() {
         String code = "security.password.updateCycle";
         String value = getConfigValue(code);
-        return StringUtils.isBlank(value) ? 30 : Integer.valueOf(value);
+        return StringUtils.isBlank(value) ? 30 : Integer.parseInt(value);
     }
 
     /**
@@ -584,7 +608,7 @@ public class AppConstants extends SysConstants {
     public static int getUserPasswordRepeatCount() {
         String code = "security.password.repeatCount";
         String value = getConfigValue(code);
-        return StringUtils.isBlank(value) ? 5 : Integer.valueOf(value);
+        return StringUtils.isBlank(value) ? 5 : Integer.parseInt(value);
     }
 
 

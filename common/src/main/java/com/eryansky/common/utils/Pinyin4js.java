@@ -4,7 +4,6 @@
  *  Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.eryansky.common.utils;
-import com.eryansky.common.web.utils.DownloadUtils;
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;

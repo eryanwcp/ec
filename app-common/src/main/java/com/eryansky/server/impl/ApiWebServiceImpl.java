@@ -59,7 +59,7 @@ public class ApiWebServiceImpl implements IApiWebService {
     public WSResult sendMessage(String data, IFunction function) {
         logger.debug(data);
         try {
-            Map<String, Object> map = JsonMapper.getInstance().fromJson(data, HashMap.class);
+            Map<String, Object> map = JsonMapper.getInstance().toMap(data);
             if(map == null){
                 logger.error("请求参数格式错误:" + data);
                 return WSResult.buildResult(WSResult.class, WSResult.PARAMETER_ERROR, "请求参数格式错误:data=" + data);
@@ -192,7 +192,7 @@ public class ApiWebServiceImpl implements IApiWebService {
     public WSResult pushMessage(String data) {
         logger.debug(data);
         try {
-            Map<String, Object> map = JsonMapper.getInstance().fromJson(data, HashMap.class);
+            Map<String, Object> map = JsonMapper.getInstance().toMap(data);
             if(map == null){
                 logger.error("请求参数格式错误:" + data);
                 return WSResult.buildResult(WSResult.class, WSResult.PARAMETER_ERROR, "请求参数格式错误:data=" + data);
@@ -234,7 +234,7 @@ public class ApiWebServiceImpl implements IApiWebService {
     public WSResult getMessage(String data) {
         logger.debug(data);
         try {
-            Map<String, Object> map = JsonMapper.getInstance().fromJson(data, HashMap.class);
+            Map<String, Object> map = JsonMapper.getInstance().toMap(data);
             if(map == null){
                 logger.error("请求参数格式错误:" + data);
                 return WSResult.buildResult(WSResult.class, WSResult.PARAMETER_ERROR, "请求参数格式错误:data=" + data);
@@ -287,7 +287,7 @@ public class ApiWebServiceImpl implements IApiWebService {
     public WSResult sendNotice(String data, IFunction function) {
         logger.debug(data);
         try {
-            Map<String, Object> map = JsonMapper.getInstance().fromJson(data, HashMap.class);
+            Map<String, Object> map = JsonMapper.getInstance().toMap(data);
             if(map == null){
                 logger.error("请求参数格式错误:" + data);
                 return WSResult.buildResult(WSResult.class, WSResult.PARAMETER_ERROR, "请求参数格式错误:data=" + data);

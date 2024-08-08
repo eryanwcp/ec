@@ -98,7 +98,7 @@ public class DBConfigurer {
         sqlSessionFactoryBean.setMapperLocations(resolver.getResources("classpath*:mappings/modules/**/*Dao.xml"));
 
         String mybatisProperties = environment.getProperty("spring.dataSource.mybatis.properties");
-        Map<String,Object> map = JsonMapper.getInstance().toMap(mybatisProperties);
+        Map<String,Object> map =  JsonMapper.getInstance().toMap(mybatisProperties);
         sqlSessionFactoryBean.setConfigurationProperties(AppUtils.mapToProperties(map));
         return sqlSessionFactoryBean.getObject();
     }

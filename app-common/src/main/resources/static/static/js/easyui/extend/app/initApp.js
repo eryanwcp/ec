@@ -121,7 +121,7 @@ $(function () {
             "type":"refresh"
         },{
             "text":"关于",
-            "href":ctxAdmin+"/common/layout/about"
+            "href":ctxAdmin+"/portal/about"
         }
     ];
     var appMenuData = [{

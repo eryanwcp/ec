@@ -130,7 +130,14 @@ public class DownloadFileUtils {
 
         String contentDisposition = response.getHeader("Content-Disposition");
         if(null == contentDisposition){
-            WebUtils.setDownloadableHeader(request, response, _fileName);
+            if(null != downloadType && "inline".equals(downloadType)){
+                WebUtils.setInlineHeader(response, _fileName);
+            }else if("none".equals(downloadType)){
+
+            }else{
+                WebUtils.setDownloadableHeader(request, response, _fileName);
+            }
+
         }
 
         if (request.getParameter("showHeader") != null) {
