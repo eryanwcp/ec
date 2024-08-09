@@ -351,6 +351,15 @@
                             <jvmFlag>-Xmx2g</jvmFlag>
                             <jvmFlag>-Djava.awt.headless=true</jvmFlag>
                             <jvmFlag>-Duser.timezone=GMT+08</jvmFlag>
+                            <jvmFlag>--add-opens=java.base/java.lang=ALL-UNNAMED</jvmFlag>
+                            <jvmFlag>--add-opens java.base/java.lang.reflect=ALL-UNNAMED</jvmFlag>
+                            <jvmFlag>--add-opens java.base/java.lang.invoke=ALL-UNNAMED</jvmFlag>
+                            <jvmFlag>--add-opens=java.base/java.math=ALL-UNNAMED</jvmFlag>
+                            <jvmFlag>--add-opens=java.base/java.util=ALL-UNNAMED</jvmFlag>
+                            <jvmFlag>--add-opens=java.base/java.util.concurrent=ALL-UNNAMED</jvmFlag>
+                            <jvmFlag>--add-opens=java.base/java.net=ALL-UNNAMED</jvmFlag>
+                            <jvmFlag>--add-opens=java.base/java.text=ALL-UNNAMED</jvmFlag>
+                            <jvmFlag>--add-opens=java.sql/java.sql=ALL-UNNAMED</jvmFlag>
                         </jvmFlags>
                         <args>
                         </args>
