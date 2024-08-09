@@ -37,7 +37,7 @@ import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys._enum.YesOrNo;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Lists;
-import org.apache.commons.fileupload.FileUploadBase;
+import org.apache.commons.fileupload2.core.FileUploadSizeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -173,7 +173,7 @@ public class NoticeReceiveController extends SimpleController {
         } catch (InvalidExtensionException e) {
             exception = e;
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
-        } catch (FileUploadBase.FileSizeLimitExceededException e) {
+        } catch (FileUploadSizeException e) {
             exception = e;
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG);
         } catch (FileNameLengthLimitExceededException e) {

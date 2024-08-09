@@ -5,7 +5,7 @@ import com.eryansky.core.web.upload.exception.InvalidExtensionException;
 import com.eryansky.modules.disk._enum.FolderType;
 import com.eryansky.modules.disk.utils.DiskUtils;
 import fr.opensagres.poi.xwpf.converter.core.ImageManager;
-import org.apache.commons.fileupload.FileUploadBase;
+import org.apache.commons.fileupload2.core.FileUploadSizeException;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -29,7 +29,7 @@ public class ImageManagerExtend extends ImageManager {
             imageFile = DiskUtils.saveSystemFile("WORD_IMAGES", FolderType.HIDE.getValue(),null,new ByteArrayInputStream(imageData),imagePath);
         } catch (InvalidExtensionException e) {
             throw new RuntimeException(e);
-        } catch (FileUploadBase.FileSizeLimitExceededException e) {
+        } catch (FileUploadSizeException e) {
             throw new RuntimeException(e);
         } catch (FileNameLengthLimitExceededException e) {
             throw new RuntimeException(e);

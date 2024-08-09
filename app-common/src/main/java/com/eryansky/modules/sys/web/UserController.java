@@ -40,7 +40,7 @@ import com.eryansky.modules.sys.service.*;
 import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.SelectType;
-import org.apache.commons.fileupload.FileUploadBase;
+import org.apache.commons.fileupload2.core.FileUploadSizeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -433,7 +433,7 @@ public class UserController extends SimpleController {
             result = Result.successResult().setObj(file);
         } catch (InvalidExtensionException e) {
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
-        } catch (FileUploadBase.FileSizeLimitExceededException e) {
+        } catch (FileUploadSizeException e) {
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG);
         } catch (FileNameLengthLimitExceededException e) {
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG);

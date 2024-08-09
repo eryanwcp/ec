@@ -21,7 +21,6 @@ import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.core.security.annotation.RequiresPermissions;
 import com.eryansky.core.security.annotation.RestApi;
 import com.eryansky.core.web.upload.FileUploadUtils;
-import org.apache.commons.fileupload.FileUploadBase;
 import com.eryansky.core.web.upload.exception.InvalidExtensionException;
 import com.eryansky.modules.disk.mapper.Folder;
 import com.eryansky.modules.sys.utils.DownloadFileUtils;
@@ -40,6 +39,7 @@ import com.eryansky.modules.disk.service.*;
 import com.eryansky.modules.disk.utils.DiskUtils;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.utils.SelectType;
+import org.apache.commons.fileupload2.core.FileUploadSizeException;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -466,7 +466,7 @@ public class DiskController extends SimpleController {
         } catch (InvalidExtensionException e) {
             exception = e;
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
-        } catch (FileUploadBase.FileSizeLimitExceededException e) {
+        } catch (FileUploadSizeException e) {
             exception = e;
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG);
         } catch (Exception e) {

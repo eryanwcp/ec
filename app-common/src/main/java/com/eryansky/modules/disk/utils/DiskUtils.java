@@ -28,7 +28,7 @@ import com.eryansky.modules.disk.mapper.File;
 import com.eryansky.modules.disk.mapper.Folder;
 import com.eryansky.modules.disk._enum.FolderAuthorize;
 import com.eryansky.utils.AppConstants;
-import org.apache.commons.fileupload.FileUploadBase;
+import org.apache.commons.fileupload2.core.FileUploadSizeException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
@@ -220,7 +220,7 @@ public class DiskUtils {
      */
     public static File saveSystemFile(String folderCode, String userId,
                                       MultipartFile multipartFile) throws InvalidExtensionException,
-            FileUploadBase.FileSizeLimitExceededException,
+            FileUploadSizeException,
             FileNameLengthLimitExceededException, IOException {
         return saveSystemFile(folderCode, FolderType.HIDE.getValue(), userId, multipartFile.getInputStream(), DiskUtils.getMultipartOriginalFilename(multipartFile));
     }
@@ -240,7 +240,7 @@ public class DiskUtils {
      */
     public static File saveSystemFile(String folderCode, String folderType, String userId,
                                       InputStream inputStream, String fileName) throws InvalidExtensionException,
-            FileUploadBase.FileSizeLimitExceededException,
+            FileUploadSizeException,
             FileNameLengthLimitExceededException, IOException {
         String _userId = StringUtils.isBlank(userId) ? User.SUPERUSER_ID : userId;
         String code = FileUploadUtils.encodingFilenamePrefix(_userId + "", fileName);

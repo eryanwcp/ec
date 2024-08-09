@@ -12,7 +12,7 @@ import com.eryansky.core.web.upload.exception.FileNameLengthLimitExceededExcepti
 import com.eryansky.core.web.upload.exception.InvalidExtensionException;
 import com.eryansky.modules.disk.utils.DiskUtils;
 import com.eryansky.utils.AppConstants;
-import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
+import org.apache.commons.fileupload2.core.FileUploadSizeException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -105,9 +105,6 @@ public class FileUploadUtils {
     public static final String upload(HttpServletRequest request, MultipartFile file, BindingResult result, String[] allowedExtension) {
         try {
             return upload(request, getDefaultBaseDir(), file, allowedExtension, DEFAULT_MAX_SIZE, true,null);
-        } catch (IOException e) {
-            LogUtils.logError("file upload error", e);
-            result.reject("upload.server.error");
         } catch (InvalidExtensionException.InvalidImageExtensionException e) {
             result.reject("upload.not.allow.image.extension");
         } catch (InvalidExtensionException.InvalidFlashExtensionException e) {
@@ -116,10 +113,13 @@ public class FileUploadUtils {
             result.reject("upload.not.allow.media.extension");
         } catch (InvalidExtensionException e) {
             result.reject("upload.not.allow.extension");
-        } catch (FileSizeLimitExceededException e) {
+        } catch (FileUploadSizeException e) {
             result.reject("upload.exceed.maxSize");
         } catch (FileNameLengthLimitExceededException e) {
             result.reject("upload.filename.exceed.length");
+        }catch (IOException e) {
+            LogUtils.logError("file upload error", e);
+            result.reject("upload.server.error");
         }
         return null;
     }
@@ -137,14 +137,14 @@ public class FileUploadUtils {
      * @param _prefix 文件名前缀 建议在needDatePathAndRandomName为false时使用
      * @return 返回上传成功的文件名
      * @throws com.eryansky.core.web.upload.exception.InvalidExtensionException            如果MIME类型不允许
-     * @throws org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException       如果超出最大大小
+     * @throws org.apache.commons.fileupload2.core.FileUploadSizeException       如果超出最大大小
      * @throws com.eryansky.core.web.upload.exception.FileNameLengthLimitExceededException 文件名太长
      * @throws java.io.IOException                          比如读写文件出错时
      */
     public static final String upload(HttpServletRequest request, String dir,
                                       MultipartFile file, String[] allowedExtension, long maxSize,
                                       boolean needDatePathAndRandomName, String _prefix)
-            throws InvalidExtensionException, FileSizeLimitExceededException,
+            throws InvalidExtensionException, FileUploadSizeException,
             IOException, FileNameLengthLimitExceededException {
         String originalFilename = DiskUtils.getMultipartOriginalFilename(file);
         int fileNamelength = originalFilename.length();
@@ -175,7 +175,7 @@ public class FileUploadUtils {
     public static final String upload(HttpServletRequest request, String dir,
                                       File file, String[] allowedExtension, long maxSize,
                                       boolean needDatePathAndRandomName, String _prefix)
-            throws InvalidExtensionException, FileSizeLimitExceededException,
+            throws InvalidExtensionException, FileUploadSizeException,
             IOException, FileNameLengthLimitExceededException {
 
         int fileNamelength = file.getName().length();
@@ -376,10 +376,10 @@ public class FileUploadUtils {
      * @param maxSize          最大大小 字节为单位 -1表示不限制
      * @return
      * @throws com.eryansky.core.web.upload.exception.InvalidExtensionException      如果MIME类型不允许
-     * @throws org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException 如果超出最大大小
+     * @throws org.apache.commons.fileupload2.core.FileUploadSizeException 如果超出最大大小
      */
     public static final void assertAllowed(MultipartFile file, String[] allowedExtension, long maxSize)
-            throws InvalidExtensionException, FileSizeLimitExceededException {
+            throws InvalidExtensionException, FileUploadSizeException {
 
         String filename = DiskUtils.getMultipartOriginalFilename(file);
         String extension = FilenameUtils.getExtension(filename);
@@ -398,13 +398,13 @@ public class FileUploadUtils {
 
         long size = file.getSize();
         if (maxSize != -1 && size > maxSize) {
-            throw new FileSizeLimitExceededException("not allowed upload size", size, maxSize);
+            throw new FileUploadSizeException("not allowed upload size", maxSize,size);
         }
     }
 
 
     public static final void assertAllowed(File file, String[] allowedExtension, long maxSize)
-            throws InvalidExtensionException, FileSizeLimitExceededException {
+            throws InvalidExtensionException, FileUploadSizeException {
 
         String filename = file.getName();
         String extension = FilenameUtils.getExtension(file.getName());
@@ -423,7 +423,7 @@ public class FileUploadUtils {
 
         long size = file.length();
         if (maxSize != -1 && size > maxSize) {
-            throw new FileSizeLimitExceededException("not allowed upload size", size, maxSize);
+            throw new FileUploadSizeException("not allowed upload size", maxSize,size);
         }
     }
 

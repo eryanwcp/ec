@@ -5,7 +5,7 @@
  */
 package com.eryansky.core.web.upload.exception;
 
-import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload2.core.FileUploadException;
 
 /**
  * 文件名超长

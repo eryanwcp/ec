@@ -24,12 +24,6 @@
             <artifactId>ec-j2cache</artifactId>
             <version>${ec-j2cache.version}</version>
         </dependency>
-        <dependency>
-            <groupId>jakarta.servlet</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
-            <version>6.1.0</version>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 
     <build>

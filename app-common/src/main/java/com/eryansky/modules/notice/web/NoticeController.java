@@ -43,7 +43,7 @@ import com.eryansky.modules.notice.vo.NoticeQueryVo;
 import com.eryansky.modules.sys._enum.DataScope;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.utils.SelectType;
-import org.apache.commons.fileupload.FileUploadBase;
+import org.apache.commons.fileupload2.core.FileUploadSizeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
@@ -436,7 +436,7 @@ public class NoticeController extends SimpleController {
         } catch (InvalidExtensionException e) {
             exception = e;
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
-        } catch (FileUploadBase.FileSizeLimitExceededException e) {
+        } catch (FileUploadSizeException e) {
             exception = e;
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG);
         } catch (FileNameLengthLimitExceededException e) {

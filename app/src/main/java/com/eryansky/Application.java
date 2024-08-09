@@ -1,6 +1,7 @@
 package com.eryansky;
 
 import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure;
+import com.eryansky.encrypt.anotation.EnableEncrypt;
 import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -16,7 +17,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 
-//@EnableEncrypt
+@EnableEncrypt
 @SpringBootApplication(
         scanBasePackages = {"com.eryansky.j2cache.autoconfigure",
                 "com.eryansky.common.spring",

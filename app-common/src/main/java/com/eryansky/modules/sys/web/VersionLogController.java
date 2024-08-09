@@ -35,7 +35,7 @@ import com.eryansky.modules.sys.utils.VersionLogUtils;
 import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.SelectType;
 import com.google.common.collect.Lists;
-import org.apache.commons.fileupload.FileUploadBase;
+import org.apache.commons.fileupload2.core.FileUploadSizeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -177,7 +177,7 @@ public class VersionLogController extends SimpleController {
         } catch (InvalidExtensionException e) {
             exception = e;
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
-        } catch (FileUploadBase.FileSizeLimitExceededException e) {
+        } catch (FileUploadSizeException e) {
             exception = e;
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG);
         } catch (FileNameLengthLimitExceededException e) {

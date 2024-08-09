@@ -32,11 +32,10 @@ import com.eryansky.modules.sys.utils.VersionLogUtils;
 import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.AppUtils;
 import com.google.common.collect.Maps;
-import org.apache.commons.fileupload.FileUploadBase;
+import org.apache.commons.fileupload2.core.FileUploadSizeException;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.Base64Utils;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -303,7 +302,7 @@ public class MobileIndexController extends SimpleController {
         } catch (InvalidExtensionException e) {
             exception = e;
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
-        } catch (FileUploadBase.FileSizeLimitExceededException e) {
+        } catch (FileUploadSizeException e) {
             exception = e;
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG);
         } catch (FileNameLengthLimitExceededException e) {
@@ -355,7 +354,7 @@ public class MobileIndexController extends SimpleController {
             file = DiskUtils.saveSystemFile(_folderName, sessionInfo.getUserId(), multipartFile);
             DiskUtils.saveFile(file);
             Map<String, Object> _data = Maps.newHashMap();
-            String data = "data:image/jpeg;base64," + Base64Utils.encodeToString(FileCopyUtils.copyToByteArray(Files.newInputStream(file.getDiskFile().toPath())));
+            String data = "data:image/jpeg;base64," + EncodeUtils.base64Encode(FileCopyUtils.copyToByteArray(Files.newInputStream(file.getDiskFile().toPath())));
             _data.put("file", file);
             _data.put("data", data);
             _data.put("url", AppConstants.getAdminPath() + "/disk/fileDownload/" + file.getId());
@@ -363,7 +362,7 @@ public class MobileIndexController extends SimpleController {
         } catch (InvalidExtensionException e) {
             exception = e;
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
-        } catch (FileUploadBase.FileSizeLimitExceededException e) {
+        } catch (FileUploadSizeException e) {
             exception = e;
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG);
         } catch (FileNameLengthLimitExceededException e) {
