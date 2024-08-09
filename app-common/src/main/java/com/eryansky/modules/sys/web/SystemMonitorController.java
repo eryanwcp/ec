@@ -345,7 +345,7 @@ public class SystemMonitorController extends SimpleController {
                     return line;
                 }).collect(Collectors.toList());
                 page.setResult(resultLogs);
-                return renderString(response, Result.successResult().setData(page).setData(PrettyMemoryUtils.prettyByteSize(file.length())));
+                return renderString(response, Result.successResult().setData(page).setObj(PrettyMemoryUtils.prettyByteSize(file.length())));
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 return renderString(response, Result.errorResult().setData(e.getMessage()));
