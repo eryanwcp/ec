@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.Properties;
@@ -113,11 +114,12 @@ public class CacheProviderHolder {
 				return new NullCacheProvider();
 		}
 		try {
-			return (CacheProvider) Class.forName(cacheIdent).newInstance();
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+			return (CacheProvider) Class.forName(cacheIdent).getDeclaredConstructor().newInstance();
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
 			throw new CacheException("Failed to initialize cache providers", e);
 		}
-	}
+    }
 
 	public CacheProvider getL1Provider() {
 		return l1_provider;

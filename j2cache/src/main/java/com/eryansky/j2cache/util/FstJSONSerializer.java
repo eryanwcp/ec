@@ -27,7 +27,7 @@ import java.util.Properties;
  * 使用 FST 的 JSON 对象序列化
  * 用法：
  *
- * j2cache.serialization = json
+ * j2cache.serialization = fst-json
  * json.map.list = java.util.Arrays$ArrayList
  *
  * @author Winter Lau(javayou@gmail.com)
