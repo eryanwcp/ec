@@ -10,6 +10,7 @@ import java.util.Map;
 
 /**
  * 使用 Apache Fury 实现序列化
+ * j2cache.serialization = fury
  */
 public class FurySerializer implements Serializer {
 
