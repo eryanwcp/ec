@@ -87,8 +87,6 @@ public class BeanUtils extends org.apache.commons.beanutils.BeanUtils {
                     try {
                         Object value = PropertyUtils.getSimpleProperty(orig, name);
                         copyProperty(dest, name, value);
-                    } catch (IllegalArgumentException ie) {
-                        // Should not happen
                     } catch (Exception e) {
                         // Should not happen
                     }
@@ -125,8 +123,6 @@ public class BeanUtils extends org.apache.commons.beanutils.BeanUtils {
                     if (value != null) {
                         copyProperty(tobean, name, value);
                     }
-                } catch (IllegalArgumentException ie) {
-                    // Should not happen
                 } catch (Exception e) {
                     // Should not happen
                 }
@@ -156,11 +152,7 @@ public class BeanUtils extends org.apache.commons.beanutils.BeanUtils {
             try {
                 Object propvalue = PropertyUtils.getSimpleProperty(bean, propname);
                 map.put(propname, propvalue);
-            } catch (IllegalAccessException e) {
-                //e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                //e.printStackTrace();
-            } catch (NoSuchMethodException e) {
+            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 //e.printStackTrace();
             }
         }
@@ -341,7 +333,7 @@ public class BeanUtils extends org.apache.commons.beanutils.BeanUtils {
             if (source instanceof StringBuffer) {
                 return (T) new StringBuffer(source.toString());
             }
-            Object dest = source.getClass().newInstance();
+            Object dest = source.getClass().getDeclaredConstructor().newInstance();
             BeanUtilsBean bean = BeanUtilsBean.getInstance();
             PropertyDescriptor[] origDescriptors = bean.getPropertyUtils().getPropertyDescriptors(source);
             for (int i = 0; i < origDescriptors.length; i++) {
@@ -355,6 +347,7 @@ public class BeanUtils extends org.apache.commons.beanutils.BeanUtils {
                         Object value = deepCopyBean(bean.getPropertyUtils().getSimpleProperty(source, name));
                         bean.getPropertyUtils().setSimpleProperty(dest, name, value);
                     } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
                     }
                 }
             }
@@ -366,8 +359,8 @@ public class BeanUtils extends org.apache.commons.beanutils.BeanUtils {
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     private static Collection deepCopyCollection(Collection source)
-            throws InstantiationException, IllegalAccessException {
-        Collection dest = source.getClass().newInstance();
+            throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        Collection dest = source.getClass().getDeclaredConstructor().newInstance();
         for (Object o : source) {
             dest.add(deepCopyBean(o));
         }
@@ -389,8 +382,8 @@ public class BeanUtils extends org.apache.commons.beanutils.BeanUtils {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private static Map deepCopyMap(Map source)
-            throws InstantiationException, IllegalAccessException {
-        Map dest = source.getClass().newInstance();
+            throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        Map dest = source.getClass().getDeclaredConstructor().newInstance();
         for (Object o : source.entrySet()) {
             Map.Entry e = (Map.Entry) o;
             dest.put(deepCopyBean(e.getKey()), deepCopyBean(e.getValue()));

@@ -51,7 +51,7 @@ public class SerializationUtils {
                 g_serializer = new FstJSONSerializer(props);
             } else {
                 try {
-                    g_serializer = (Serializer) Class.forName(ser).newInstance();
+                    g_serializer = (Serializer) Class.forName(ser).getDeclaredConstructor().newInstance();
                 } catch (Exception e) {
                     throw new CacheException("Cannot initialize Serializer named [" + ser + ']', e);
                 }

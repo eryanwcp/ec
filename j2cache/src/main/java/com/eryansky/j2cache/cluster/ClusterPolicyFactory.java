@@ -65,7 +65,7 @@ public class ClusterPolicyFactory {
      */
     private final static ClusterPolicy custom(String classname, Properties props, CacheProviderHolder holder) {
         try {
-            ClusterPolicy policy = (ClusterPolicy)Class.forName(classname).newInstance();
+            ClusterPolicy policy = (ClusterPolicy)Class.forName(classname).getDeclaredConstructor().newInstance();
             policy.connect(props, holder);
             return policy;
         } catch (Exception e) {

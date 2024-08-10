@@ -38,7 +38,7 @@ public class WSResult {
 	 */
 	public static <T extends WSResult> T buildResult(Class<T> resultClass, String resultCode, String resultMessage) {
 		try {
-			T result = resultClass.newInstance();
+			T result = resultClass.getDeclaredConstructor().newInstance();
 			result.setResult(resultCode, resultMessage);
 			return result;
 		} catch (Exception ex) {

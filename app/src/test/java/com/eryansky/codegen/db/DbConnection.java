@@ -3,6 +3,7 @@ package com.eryansky.codegen.db;
 import com.eryansky.codegen.vo.DbConfig;
 import org.apache.commons.lang3.Validate;
 
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -28,16 +29,12 @@ public class DbConnection {
         Validate.notNull(dbConfig, "属性[dbConfig]不能为空.");
         Connection conn = null;
         try {
-            Class.forName(dbConfig.getDriverClassName()).newInstance();
+            Class.forName(dbConfig.getDriverClassName()).getDeclaredConstructor().newInstance();
             conn = DriverManager.getConnection(dbConfig.getUrl(), dbConfig.getUsername(), dbConfig.getPassword());
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | IllegalAccessException | SQLException | InstantiationException e) {
             e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+        } catch (InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException(e);
         }
         return conn;
     }

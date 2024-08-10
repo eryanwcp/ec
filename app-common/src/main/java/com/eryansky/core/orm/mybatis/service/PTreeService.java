@@ -56,7 +56,7 @@ public abstract class PTreeService<D extends PTreeDao<T,PK>, T extends PTreeEnti
 		// 更新子节点 parentIds
 		T o = null;
 		try {
-			o = entityClass.newInstance();
+			o = entityClass.getDeclaredConstructor().newInstance();
 		} catch (Exception e) {
 			throw new ServiceException(e);
 		}

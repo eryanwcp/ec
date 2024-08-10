@@ -18,6 +18,7 @@ import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Properties;
 
@@ -130,12 +131,9 @@ public class MultiTenancyInterceptor extends BaseInterceptor {
         this.properties = properties;
         try {
             Class onwClass = Class.forName(this.properties.getProperty("tenantInfo"));
-            this.tenantInfo = (TenantInfo) onwClass.newInstance();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
+            this.tenantInfo = (TenantInfo) onwClass.getDeclaredConstructor().newInstance();
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
     }

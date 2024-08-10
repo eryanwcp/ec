@@ -18,6 +18,7 @@
         <objenesis.version>3.3</objenesis.version>
         <fst.version>3.0.4-jdk17</fst.version>
         <snappy.version>1.1.10.5</snappy.version>
+        <fury-core.version>0.7.0</fury-core.version>
         <guava.version>33.2.1-jre</guava.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -81,6 +82,13 @@
             <groupId>org.xerial.snappy</groupId>
             <artifactId>snappy-java</artifactId>
             <version>${snappy.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.fury</groupId>
+            <artifactId>fury-core</artifactId>
+            <version>${fury-core.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

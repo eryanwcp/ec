@@ -19,6 +19,7 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
@@ -236,12 +237,9 @@ public class DecryptReadInterceptor implements Interceptor {
             log.debug("properties-encrypt:" + encryptValue);
             try {
                 Class clazz = Class.forName(encryptValue);
-                encrypt = (IEncrypt) clazz.newInstance();
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            } catch (InstantiationException e) {
-                throw new RuntimeException(e);
-            } catch (IllegalAccessException e) {
+                encrypt = (IEncrypt) clazz.getDeclaredConstructor().newInstance();
+            } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException |
+                     InstantiationException | IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
         }
