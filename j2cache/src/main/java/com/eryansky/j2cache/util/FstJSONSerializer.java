@@ -54,7 +54,7 @@ public class FstJSONSerializer implements Serializer {
 
     @Override
     public String name() {
-        return "json";
+        return "fst-json";
     }
 
     @Override
