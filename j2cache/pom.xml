@@ -14,10 +14,10 @@
     <packaging>jar</packaging>
     <properties>
         <caffeine.version>3.1.8</caffeine.version>
-        <lettuce.version>6.3.1.RELEASE</lettuce.version>
+        <lettuce.version>6.4.0.RELEASE</lettuce.version>
         <objenesis.version>3.3</objenesis.version>
         <fst.version>3.0.4-jdk17</fst.version>
-        <snappy.version>1.1.10.5</snappy.version>
+        <snappy.version>1.1.10.6</snappy.version>
         <fury-core.version>0.7.0</fury-core.version>
         <guava.version>33.2.1-jre</guava.version>
 
