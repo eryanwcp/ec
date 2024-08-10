@@ -29,6 +29,7 @@ import java.util.Properties;
  *
  * j2cache.serialization = fst-json
  * json.map.list = java.util.Arrays$ArrayList
+ * json.map.user = com.eryansky.modules.sys.mapper.User
  *
  * @author Winter Lau(javayou@gmail.com)
  */
@@ -53,7 +54,7 @@ public class FstJSONSerializer implements Serializer {
 
     @Override
     public String name() {
-        return "json";
+        return "fst-json";
     }
 
     @Override
