@@ -264,6 +264,9 @@
                 <directory>src/main/resources</directory>
                 <excludes>
                     <exclude>application*.properties</exclude>
+                    <exclude>config*.properties</exclude>
+                    <exclude>j2cache*.properties</exclude>
+                    <exclude>logback*.xml</exclude>
                 </excludes>
             </resource>
             <resource>
@@ -273,6 +276,9 @@
                 <includes>
                     <include>application.properties</include>
                     <include>application-${profileActive}.properties</include>
+                    <include>config-${profileActive}.properties</include>
+                    <include>j2cache-${profileActive}.properties</include>
+                    <include>logback-${profileActive}.xml</include>
                 </includes>
             </resource>
             <resource>
