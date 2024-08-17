@@ -19,10 +19,17 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PrepareOauth2 {
 
+    String DEFAULT_AUTH_TYPE = "user";
     /**
      * 是否启用 是：true 否：false 默认值：true
      * @return
      */
     boolean enable() default true;
+
+    /**
+     * 认证用户类型
+     * @return
+     */
+    String authType() default DEFAULT_AUTH_TYPE;
 
 }

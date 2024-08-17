@@ -12,7 +12,6 @@ import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
 import com.eryansky.core.security.annotation.PrepareOauth2;
-import com.eryansky.core.security.jwt.JWTUtils;
 import com.eryansky.modules.sys._enum.UserType;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.utils.UserUtils;
@@ -61,7 +60,14 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
             if ((prepareOauth2Method != null && !prepareOauth2Method.enable()) || (prepareOauth2Class != null && !prepareOauth2Class.enable())) {
                 return true;
             }
-
+            String authType = null != prepareOauth2Method ? prepareOauth2Method.authType():null;
+            if(null == authType){
+                authType = null != prepareOauth2Class ? prepareOauth2Class.authType():null;
+            }
+            //非内置用户 自动跳过
+            if(!PrepareOauth2.DEFAULT_AUTH_TYPE.equals(authType)){
+                return true;
+            }
             //自动登录
             String authorization = request.getParameter(AuthorityInterceptor.ATTR_AUTHORIZATION);
             if (StringUtils.isBlank(authorization)) {
@@ -85,6 +91,7 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
                 User user = null;
                 try {
                     loginName = SecurityUtils.getLoginNameByToken(token);
+
                     user = UserUtils.getUserByLoginName(loginName);
                     if(null == user){
                         logger.warn("Token校验失败（用户不存在）：{},{},{}", loginName, requestUrl, token);
