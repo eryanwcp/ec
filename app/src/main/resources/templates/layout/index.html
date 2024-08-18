@@ -28,7 +28,8 @@
       var ctx = window.document.location.pathname.substring(0, window.document.location.pathname.indexOf('\/', 1));
       var ctxAdmin = ctx+'/a';
       var ctxStatic = ctx+'/static';
-      var appURL = "[[${T(com.eryansky.utils.AppUtils).getClientAppURL()}]]";
+      // var appURL = "[[${T(com.eryansky.utils.AppUtils).getClientAppURL()}]]";
+      var appURL = "[[${T(com.eryansky.utils.AppUtils).getAdaptiveClientAppURL()}]]";
       var portalPage = "[[${T(com.eryansky.utils.AppConstants).getAppPortalPage()}]]";
       var isMobile = [[${isMobile}]];
     </script>
