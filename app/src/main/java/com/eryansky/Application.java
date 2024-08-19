@@ -16,7 +16,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
-//@EnableEncrypt
+@EnableEncrypt
 @SpringBootApplication(
         scanBasePackages = {"com.eryansky.j2cache.autoconfigure",
                 "com.eryansky.common.spring",

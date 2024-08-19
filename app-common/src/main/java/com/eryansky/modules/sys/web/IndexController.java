@@ -15,6 +15,7 @@ import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
+import com.eryansky.core.security.annotation.PrepareOauth2;
 import com.eryansky.core.security.annotation.RequiresUser;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys._enum.UserPasswordUpdateType;
@@ -38,6 +39,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author Eryan
  * @date 2014-09-16 10:30
  */
+@PrepareOauth2
 @Controller
 @RequestMapping(value = "${adminPath}")
 public class IndexController extends SimpleController {
