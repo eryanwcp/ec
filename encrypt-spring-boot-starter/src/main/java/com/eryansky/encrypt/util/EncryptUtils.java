@@ -154,8 +154,8 @@ public class EncryptUtils {
      * @param encrypt 密文
      * @return 明文 string
      */
-    public static byte[] aesDecrypt(byte[] encrypt){
-        AES aes = new AES(Mode.CTS, Padding.PKCS5Padding,SERVER_KEY,SERVER_IV);
+    public static byte[] aesECBDecrypt(byte[] encrypt){
+        AES aes = new AES(Mode.ECB, Padding.PKCS5Padding,SERVER_KEY,SERVER_IV);
         //解密
         byte[] decrypt = aes.decrypt(encrypt);
         return aes.decrypt(decrypt);
