@@ -30,7 +30,7 @@ public class IpLimitInterceptor implements HandlerInterceptor {
         if(!AppConstants.isLimitIpEnable()){
             return true;
         }
-        String ip = IpUtils.getIpAddr(request);
+        String ip = IpUtils.getIpAddr0(request);
         log.debug("请求IP={},URL={}", ip,request.getRequestURL());
         if (ipIsLock(ip)) {
             log.warn("禁止访问：{} {} {}", ip,request.getRequestURL(), UserAgentUtils.getHTTPUserAgent(request));
