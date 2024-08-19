@@ -128,7 +128,7 @@ public class EncryptUtils {
      * @return 加密数组
      */
     public static byte[] aesECBEncrypt(byte[] data) {
-        AES aes = new AES(Mode.CTS, Padding.PKCS5Padding, SERVER_KEY, SERVER_IV);
+        AES aes = new AES(Mode.ECB, Padding.PKCS5Padding, SERVER_KEY, SERVER_IV);
         if (data.length == 0) {
             throw new RuntimeException("加密内容不能为空");
         }
