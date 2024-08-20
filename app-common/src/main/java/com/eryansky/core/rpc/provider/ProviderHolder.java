@@ -1,18 +1,18 @@
-package com.eryansky.core.rpc;
+package com.eryansky.core.rpc.provider;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
-public class RpcProviderHolder {
+public class ProviderHolder {
 
     /**
      * 保存RpcProvider提供者的信息
      */
-    public static final ConcurrentMap<String, RpcProviderInfo> RPC_PROVIDER_MAP = new ConcurrentHashMap<>();
+    public static final Map<String, RPCProviderInfo> RPC_PROVIDER_MAP = new ConcurrentHashMap<>();
 
-    public static class RpcProviderInfo {
+    public static class RPCProviderInfo {
 
         /**
          * rpc服务提供者应用名称
@@ -27,7 +27,7 @@ public class RpcProviderHolder {
         /**
          * rpc发布服务url核心部分，默认是接口方法名称
          */
-        private List<RpcMethod> urlCoreMethod;
+        private List<RPCMethod> urlCoreMethod;
 
         /**
          * rpc服务注册到spring容器中的beanName
@@ -55,11 +55,11 @@ public class RpcProviderHolder {
             this.urlPrefix = urlPrefix;
         }
 
-        public List<RpcMethod> getUrlCoreMethod() {
+        public List<RPCMethod> getUrlCoreMethod() {
             return urlCoreMethod;
         }
 
-        public void setUrlCoreMethod(List<RpcMethod> urlCoreMethod) {
+        public void setUrlCoreMethod(List<RPCMethod> urlCoreMethod) {
             this.urlCoreMethod = urlCoreMethod;
         }
 
@@ -80,7 +80,7 @@ public class RpcProviderHolder {
         }
     }
 
-    public static class RpcMethod {
+    public static class RPCMethod {
         /**
          * 方法对象
          */

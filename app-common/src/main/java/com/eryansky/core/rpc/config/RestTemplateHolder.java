@@ -1,24 +1,24 @@
-package com.eryansky.core.rpc.client;
+package com.eryansky.core.rpc.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 
-public class RpcRestTemplateUtils {
+public class RestTemplateHolder {
 
-    private static RpcRestTemplateUtils rpcRestTemplateUtils;
+    private static RestTemplateHolder restTemplateHolder;
 
     @Autowired
     private RestTemplate restTemplate;
 
     @PostConstruct
     public void init() {
-        rpcRestTemplateUtils = this;
+        restTemplateHolder = this;
     }
 
     public static RestTemplate restTemplate() {
-        return rpcRestTemplateUtils.restTemplate;
+        return restTemplateHolder.restTemplate;
     }
 
 }

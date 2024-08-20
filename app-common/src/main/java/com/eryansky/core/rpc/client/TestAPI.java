@@ -1,11 +1,11 @@
-package com.eryansky.core.rpc.demo;
+package com.eryansky.core.rpc.client;
 
 
-import com.eryansky.core.rpc.CustomRpcApp;
+import com.eryansky.core.rpc.annotation.RPCApp;
 
 import java.util.Map;
 
-@CustomRpcApp(name = "myrpcdemo", contentPath = "/myrpc")
+@RPCApp(name = "test-service")
 public interface TestAPI {
 
     String testRpc1();

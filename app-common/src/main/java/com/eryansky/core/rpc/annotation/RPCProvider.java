@@ -1,4 +1,4 @@
-package com.eryansky.core.rpc;
+package com.eryansky.core.rpc.annotation;
 
 import java.lang.annotation.*;
 
@@ -8,5 +8,5 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE}) // 作用于类上， 发布整个类的接口
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface CustomRpcProvider {
+public @interface RPCProvider {
 }

@@ -1,6 +1,8 @@
-package com.eryansky.core.rpc.client;
+package com.eryansky.core.rpc.consumer;
 
-import com.eryansky.core.rpc.CustomRpcConsumer;
+import com.eryansky.core.rpc.annotation.RPCConsumer;
+import com.eryansky.core.rpc.utils.FieldAnnotationUtils;
+import com.eryansky.core.rpc.utils.RPCProxyUtils;
 import org.springframework.boot.web.context.WebServerApplicationContext;
 import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.context.ApplicationListener;
@@ -27,7 +29,7 @@ public class ConsumerScanAndFillListener implements ApplicationListener<WebServe
             String[] beanDefinitionNames = applicationContext.getBeanDefinitionNames();
             for (String name : beanDefinitionNames) { // 遍历所有的bean
                 Object bean = applicationContext.getBean(name);
-                List<FieldAnnotationUtils.FieldAnnotationInfo> fieldAnnotationInfos = FieldAnnotationUtils.parseFieldAnnotationInfo(bean, CustomRpcConsumer.class);
+                List<FieldAnnotationUtils.FieldAnnotationInfo> fieldAnnotationInfos = FieldAnnotationUtils.parseFieldAnnotationInfo(bean, RPCConsumer.class);
                 if (!CollectionUtils.isEmpty(fieldAnnotationInfos)) { // 判断bean的字段上是否存在@CustomRpcConsumer注解
                     for (FieldAnnotationUtils.FieldAnnotationInfo fieldAnnotationInfo : fieldAnnotationInfos) {
                         Field field = fieldAnnotationInfo.getField();
@@ -38,7 +40,7 @@ public class ConsumerScanAndFillListener implements ApplicationListener<WebServe
 
                         Class<?> type = field.getType();
                         // 生成代理对象,将代理对象注入到当前bean对象中
-                        Object proxyObj = RpcProxyUtils.createProxyObj(type);
+                        Object proxyObj = RPCProxyUtils.createProxyObj("http://localhost:8080/dev",type);
                         try {
                             field.set(fieldAnnotationInfo.getObj(), proxyObj);
                         } catch (IllegalAccessException e) {

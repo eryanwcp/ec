@@ -1,5 +1,8 @@
-package com.eryansky.core.rpc;
+package com.eryansky.core.rpc.provider;
 
+import com.eryansky.core.rpc.annotation.RPCApp;
+import com.eryansky.core.rpc.annotation.RPCMethodConfig;
+import com.eryansky.core.rpc.annotation.RPCProvider;
 import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.util.CollectionUtils;
@@ -15,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class RpcProviderScanAndReleaseListener implements ApplicationListener<WebServerInitializedEvent> {
+public class ProviderScanAndReleaseListener implements ApplicationListener<WebServerInitializedEvent> {
 
     /**
      * 标识事件监听器是否已经注册，避免重复注册
@@ -24,11 +27,11 @@ public class RpcProviderScanAndReleaseListener implements ApplicationListener<We
 
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
 
-    private final CustomCommonHandlerUrl customCommonHandlerUrl;
+    private final CommonHandlerUrl commonHandlerUrl;
 
-    public RpcProviderScanAndReleaseListener(RequestMappingHandlerMapping requestMappingHandlerMapping, CustomCommonHandlerUrl customCommonHandlerUrl) {
+    public ProviderScanAndReleaseListener(RequestMappingHandlerMapping requestMappingHandlerMapping, CommonHandlerUrl commonHandlerUrl) {
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
-        this.customCommonHandlerUrl = customCommonHandlerUrl;
+        this.commonHandlerUrl = commonHandlerUrl;
     }
 
     @Override
@@ -49,7 +52,7 @@ public class RpcProviderScanAndReleaseListener implements ApplicationListener<We
      */
     private void scanRpcProviderBeans(WebServerInitializedEvent event) {
         // 找到所有标识@CustomRpcProvider注解的bean
-        Map<String, Object> beans = event.getApplicationContext().getBeansWithAnnotation(CustomRpcProvider.class);
+        Map<String, Object> beans = event.getApplicationContext().getBeansWithAnnotation(RPCProvider.class);
         if (!CollectionUtils.isEmpty(beans)) {
             // 遍历所有标识了@CustomRpcProvider注解的bean
             for (Map.Entry<String, Object> entry : beans.entrySet()) {
@@ -59,33 +62,31 @@ public class RpcProviderScanAndReleaseListener implements ApplicationListener<We
                 Class<?>[] interfaces = beanType.getInterfaces();
                 if (interfaces != null && interfaces.length != 0) {
                     for (Class clazz : interfaces) {
-                        CustomRpcApp customRpcApp = (CustomRpcApp) clazz.getAnnotation(CustomRpcApp.class);
-                        if (customRpcApp != null) { // 判断当前类上是否有标识指定发布接口的应用名称
+                        RPCApp RPCApp = (RPCApp) clazz.getAnnotation(RPCApp.class);
+                        if (RPCApp != null) { // 判断当前类上是否有标识指定发布接口的应用名称
                             // 如果符合我们的自定义发布规范
-                            RpcProviderHolder.RpcProviderInfo rpcProviderInfo = new RpcProviderHolder.RpcProviderInfo();
-                            rpcProviderInfo.setName(StringUtils.hasLength(customRpcApp.name()) ?
-                                    customRpcApp.name()
-                                    : event.getApplicationContext().getEnvironment().getProperty("spring.application.name"));
+                            ProviderHolder.RPCProviderInfo rpcProviderInfo = new ProviderHolder.RPCProviderInfo();
+                            rpcProviderInfo.setName("/" +RPCApp.name());
                             rpcProviderInfo.setRpcBeanName(beanName);
-                            rpcProviderInfo.setUrlPrefix("/" + clazz.getSimpleName().toLowerCase()); // url前缀取接口名称
+                            rpcProviderInfo.setUrlPrefix(event.getApplicationContext().getEnvironment().getProperty("server.servlet.context-path")+"/rest/" +RPCApp.name()); // url前缀取接口名称
                             rpcProviderInfo.setRpcBean(bean);
 
                             Method[] methods = clazz.getMethods(); //获取所有方法
                             if (methods != null && methods.length != 0) {
-                                List<RpcProviderHolder.RpcMethod> methodList = new ArrayList<>();
+                                List<ProviderHolder.RPCMethod> methodList = new ArrayList<>();
                                 for (Method m : methods) {
-                                    RpcProviderHolder.RpcMethod rm = null;
-                                    CustomRpcMethodConfig annotation = m.getAnnotation(CustomRpcMethodConfig.class);
+                                    ProviderHolder.RPCMethod rm = null;
+                                    RPCMethodConfig annotation = m.getAnnotation(RPCMethodConfig.class);
                                     if (annotation != null) { // 判断方法是否有@CustomRpcMethodConfig注解
                                         if (annotation.isForbidden()) { // 方法如果禁用，则不保存发布信息
                                             continue;
                                         }
                                         if (StringUtils.hasLength(annotation.alias())) {
-                                            rm = new RpcProviderHolder.RpcMethod();
+                                            rm = new ProviderHolder.RPCMethod();
                                             rm.setAlias(annotation.alias());
                                         }
                                     } else {
-                                        rm = new RpcProviderHolder.RpcMethod();
+                                        rm = new ProviderHolder.RPCMethod();
                                         rm.setAlias(m.getName());
                                     }
                                     rm.setMethod(m);
@@ -94,7 +95,7 @@ public class RpcProviderScanAndReleaseListener implements ApplicationListener<We
                                 rpcProviderInfo.setUrlCoreMethod(methodList);
                             }
 
-                            RpcProviderHolder.RPC_PROVIDER_MAP.put(clazz.getSimpleName().toLowerCase(), rpcProviderInfo);
+                            ProviderHolder.RPC_PROVIDER_MAP.put(clazz.getSimpleName().toLowerCase(), rpcProviderInfo);
                         }
                     }
                 }
@@ -106,20 +107,20 @@ public class RpcProviderScanAndReleaseListener implements ApplicationListener<We
      * 注册所有自定义rpcProvider的url信息
      */
     private void registerUrls() {
-        if (!CollectionUtils.isEmpty(RpcProviderHolder.RPC_PROVIDER_MAP)) {
-            Collection<RpcProviderHolder.RpcProviderInfo> values = RpcProviderHolder.RPC_PROVIDER_MAP.values();
-            for (RpcProviderHolder.RpcProviderInfo rpcProviderInfo : values) {
+        if (!CollectionUtils.isEmpty(ProviderHolder.RPC_PROVIDER_MAP)) {
+            Collection<ProviderHolder.RPCProviderInfo> values = ProviderHolder.RPC_PROVIDER_MAP.values();
+            for (ProviderHolder.RPCProviderInfo rpcProviderInfo : values) {
                 String urlPrefix = rpcProviderInfo.getUrlPrefix();
-                List<RpcProviderHolder.RpcMethod> urlCores = rpcProviderInfo.getUrlCoreMethod();
+                List<ProviderHolder.RPCMethod> urlCores = rpcProviderInfo.getUrlCoreMethod();
                 if (!CollectionUtils.isEmpty(urlCores)) {
-                    for (RpcProviderHolder.RpcMethod rm : urlCores) {
+                    for (ProviderHolder.RPCMethod rm : urlCores) {
                         // 构建请求映射对象
                         RequestMappingInfo requestMappingInfo = RequestMappingInfo
                                 .paths(urlPrefix + "/" + rm.getAlias()) // 请求URL
                                 .methods(RequestMethod.POST) // 请求方法，可以指定多个
                                 .build();
                         // 发布url，指定一下url的处理器
-                        requestMappingHandlerMapping.registerMapping(requestMappingInfo, customCommonHandlerUrl, CustomCommonHandlerUrl.HANDLE_CUSTOM_URL_METHOD);
+                        requestMappingHandlerMapping.registerMapping(requestMappingInfo, commonHandlerUrl, CommonHandlerUrl.HANDLE_CUSTOM_URL_METHOD);
                     }
                 }
             }

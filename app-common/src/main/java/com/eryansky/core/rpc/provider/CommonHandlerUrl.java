@@ -1,7 +1,9 @@
-package com.eryansky.core.rpc;
+package com.eryansky.core.rpc.provider;
 
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
@@ -15,9 +17,10 @@ import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-public class CustomCommonHandlerUrl {
+public class CommonHandlerUrl {
+
+    private static Logger log = LoggerFactory.getLogger(CommonHandlerUrl.class);
 
     public static final Method HANDLE_CUSTOM_URL_METHOD;
 
@@ -25,9 +28,9 @@ public class CustomCommonHandlerUrl {
         // 提前准备方法对象
         Method tempMethod = null;
         try {
-            tempMethod = CustomCommonHandlerUrl.class.getMethod("handlerCustomUrl", HttpServletRequest.class, HttpServletResponse.class);
+            tempMethod = CommonHandlerUrl.class.getMethod("handlerUrl", HttpServletRequest.class, HttpServletResponse.class);
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(),e);
         }
         HANDLE_CUSTOM_URL_METHOD = tempMethod;
     }
@@ -36,7 +39,7 @@ public class CustomCommonHandlerUrl {
     /**
      *  拦截自定义请求的url，可以做成统一的处理器
      */
-    public Object handlerCustomUrl(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public Object handlerUrl(HttpServletRequest request, HttpServletResponse response) throws Exception {
         // 解析请求url
         List<String> pathSegments = UriComponentsBuilder.fromUriString(request.getRequestURI()).build().getPathSegments();
         String rpcService = null;
@@ -69,10 +72,10 @@ public class CustomCommonHandlerUrl {
      */
     private Object execute(String rpcService, String methodName, Object[] params) throws InvocationTargetException, IllegalAccessException {
         // 获取RpcProvider的相关信息
-        RpcProviderHolder.RpcProviderInfo rpcProviderInfo = RpcProviderHolder.RPC_PROVIDER_MAP.get(rpcService);
+        ProviderHolder.RPCProviderInfo rpcProviderInfo = ProviderHolder.RPC_PROVIDER_MAP.get(rpcService);
         Object rpcBean = rpcProviderInfo.getRpcBean();
-        List<RpcProviderHolder.RpcMethod> urlCoreMethod = rpcProviderInfo.getUrlCoreMethod();
-        for (RpcProviderHolder.RpcMethod rm : urlCoreMethod) {
+        List<ProviderHolder.RPCMethod> urlCoreMethod = rpcProviderInfo.getUrlCoreMethod();
+        for (ProviderHolder.RPCMethod rm : urlCoreMethod) {
             if (rm.getAlias().equals(methodName)) {
                 return rm.getMethod().invoke(rpcBean, params); // 找到该方法，然后执行
             }
@@ -95,15 +98,15 @@ public class CustomCommonHandlerUrl {
         }
         List<Object> paramList = new ArrayList<>();
         // 判断当前需要调用的RPCProvider是否存在
-        RpcProviderHolder.RpcProviderInfo rpcProviderInfo = RpcProviderHolder.RPC_PROVIDER_MAP.get(rpcService);
+        ProviderHolder.RPCProviderInfo rpcProviderInfo = ProviderHolder.RPC_PROVIDER_MAP.get(rpcService);
         if (rpcProviderInfo == null) {
             throw new RuntimeException("no service : " + rpcService);
         }
         // 解析参数，默认是JSON数组 TODO
         List<Object> objects = JsonMapper.fromJsonForObjectList(requestBodyJsonString);
-        List<RpcProviderHolder.RpcMethod> urlCoreMethod = rpcProviderInfo.getUrlCoreMethod();
+        List<ProviderHolder.RPCMethod> urlCoreMethod = rpcProviderInfo.getUrlCoreMethod();
         if (!CollectionUtils.isEmpty(urlCoreMethod)) {
-            for (RpcProviderHolder.RpcMethod rm : urlCoreMethod) { // 寻找当前请求对应的需要执行的方法信息
+            for (ProviderHolder.RPCMethod rm : urlCoreMethod) { // 寻找当前请求对应的需要执行的方法信息
                 if (rm.getAlias().equals(methodName)) {
                     Class<?>[] parameterTypes = rm.getMethod().getParameterTypes();
                     if (objects.size() != parameterTypes.length) { // 判断方法参数和方法对象中的参数个数是否匹配

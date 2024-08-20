@@ -1,13 +1,12 @@
-package com.eryansky.core.rpc.client;
+package com.eryansky.core.rpc.config;
 
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import com.eryansky.core.rpc.consumer.ConsumerScanAndFillListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.RestTemplate;
 
 
 @Configuration
-public class CustomRpcConsumerConfig {
+public class ConsumerConfig {
 
     @Bean
     public ConsumerScanAndFillListener consumerScanAndFillListener() {
@@ -20,8 +19,8 @@ public class CustomRpcConsumerConfig {
 //    }
 
     @Bean
-    public RpcRestTemplateUtils rpcRestTemplateUtils() {
-        return new RpcRestTemplateUtils();
+    public RestTemplateHolder restTemplateHolder() {
+        return new RestTemplateHolder();
     }
 
 }

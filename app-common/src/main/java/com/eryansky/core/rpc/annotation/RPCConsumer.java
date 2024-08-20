@@ -1,4 +1,4 @@
-package com.eryansky.core.rpc;
+package com.eryansky.core.rpc.annotation;
 
 import java.lang.annotation.*;
 
@@ -8,5 +8,5 @@ import java.lang.annotation.*;
 @Target(ElementType.FIELD) // 作用于字段上
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface CustomRpcConsumer {
+public @interface RPCConsumer {
 }

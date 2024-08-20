@@ -1,13 +1,14 @@
-package com.eryansky.core.rpc.demo;
+package com.eryansky.core.rpc.server;
 
-import com.eryansky.core.rpc.CustomRpcProvider;
+import com.eryansky.core.rpc.annotation.RPCProvider;
+import com.eryansky.core.rpc.client.TestAPI;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
 @Component
-@CustomRpcProvider
-public class TestAPIImpl implements TestAPI {
+@RPCProvider
+public class TestProvider implements TestAPI {
 
     @Override
     public String testRpc1() {

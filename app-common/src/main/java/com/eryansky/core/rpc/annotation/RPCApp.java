@@ -1,4 +1,4 @@
-package com.eryansky.core.rpc;
+package com.eryansky.core.rpc.annotation;
 
 import java.lang.annotation.*;
 
@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface CustomRpcApp {
+public @interface RPCApp {
     /**
      * 发布接口的应用名称 
      *
@@ -18,10 +18,4 @@ public @interface CustomRpcApp {
 
     String url() default "";
 
-    /**
-     * 应用的contentPath，通过server.servlet.context-path 属性配置
-     *
-     * @return
-     */
-    String contentPath() default "";
 }

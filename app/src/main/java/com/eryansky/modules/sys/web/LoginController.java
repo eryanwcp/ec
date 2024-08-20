@@ -21,6 +21,9 @@ import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.common.web.utils.CookieUtils;
 import com.eryansky.common.web.utils.WebUtils;
+import com.eryansky.core.rpc.annotation.RPCConsumer;
+import com.eryansky.core.rpc.client.TestAPI;
+import com.eryansky.core.rpc.client.TestConsumer;
 import com.eryansky.core.security.annotation.PrepareOauth2;
 import com.eryansky.core.web.annotation.MobileValue;
 import com.eryansky.modules.sys.service.ResourceService;
@@ -72,6 +75,9 @@ public class LoginController extends SimpleController {
     private static final int RESULT_CODE_APP_VERSION_ERROR = 5;//APP版本禁止登录
     private static final int RESULT_CODE_DEVICE_ERROR = 4;//移动设备校验错误码
     private static final int RESULT_CODE_PASSWORD_ERROR = 6;//密码过期等
+    @Autowired
+    private TestConsumer testConsumer;
+
     /**
      * 欢迎页面
      *
@@ -91,6 +97,7 @@ public class LoginController extends SimpleController {
         modelAndView.addObject("securityToken", randomSecurityToken);
         modelAndView.addObject("publicKey", RSAUtils.getDefaultBase64PublicKey());
         CacheUtils.put("securityToken:"+request.getSession().getId(),randomSecurityToken);
+        System.out.println(testConsumer.testRpc2("1"));
         return modelAndView;
     }
 

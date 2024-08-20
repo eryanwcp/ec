@@ -1,26 +1,25 @@
-package com.eryansky.core.rpc.client;
+package com.eryansky.core.rpc.consumer;
 
 import com.eryansky.common.utils.mapper.JsonMapper;
+import com.eryansky.core.rpc.config.RestTemplateHolder;
+import com.eryansky.utils.AppConstants;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.StandardCharsets;
 
-public class RpcConsumerExecutor {
-    /**
-     * 默认是Http协议
-     */
-    private static final String SCHEME = "http://";
+public class ConsumerExecutor {
 
-    private static JsonMapper jsonMapper = JsonMapper.getInstance();
+    public static final String REST_AUTHORITY_HEADER_NAME = "X-Api-Key";
+    private static final JsonMapper jsonMapper = JsonMapper.getInstance();
 
     public static Object execute(String url, Object[] params, Class<?> resultType) throws Exception {
         // 获取RestTemplate对象
-        RestTemplate restTemplate = RpcRestTemplateUtils.restTemplate();
+        RestTemplate restTemplate = RestTemplateHolder.restTemplate();
         // 构建请求体
         HttpEntity<?> httpEntity = createHttpEntity(params);
         // 进行远程rpc请求
-        ResponseEntity responseEntity = restTemplate.exchange(SCHEME + url, HttpMethod.POST, httpEntity, resultType);
+        ResponseEntity responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, resultType);
         // 返回接口
         return responseEntity.getBody();
     }
@@ -34,6 +33,7 @@ public class RpcConsumerExecutor {
     private static HttpEntity<?> createHttpEntity(Object[] params) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        httpHeaders.add(REST_AUTHORITY_HEADER_NAME, AppConstants.getRestDefaultApiKey());
         if (params != null && params.length != 0) {
             StringBuilder builder = new StringBuilder();
             builder.append("[");

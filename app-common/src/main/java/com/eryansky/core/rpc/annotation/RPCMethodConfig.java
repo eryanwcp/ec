@@ -1,4 +1,4 @@
-package com.eryansky.core.rpc;
+package com.eryansky.core.rpc.annotation;
 
 import java.lang.annotation.*;
 
@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 @Target({ElementType.METHOD}) // 作用于方法上
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface CustomRpcMethodConfig {
+public @interface RPCMethodConfig {
 
     /**
      * 发布方法取别名

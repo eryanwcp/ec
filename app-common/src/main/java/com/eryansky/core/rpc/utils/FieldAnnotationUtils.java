@@ -1,4 +1,4 @@
-package com.eryansky.core.rpc.client;
+package com.eryansky.core.rpc.utils;
 
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.ReflectionUtils;
