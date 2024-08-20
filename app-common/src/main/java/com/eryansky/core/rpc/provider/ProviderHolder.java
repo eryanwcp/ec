@@ -10,9 +10,9 @@ public class ProviderHolder {
     /**
      * 保存RpcProvider提供者的信息
      */
-    public static final Map<String, RPCProviderInfo> RPC_PROVIDER_MAP = new ConcurrentHashMap<>();
+    public static final Map<String, ProviderInfo> RPC_PROVIDER_MAP = new ConcurrentHashMap<>();
 
-    public static class RPCProviderInfo {
+    public static class ProviderInfo {
 
         /**
          * rpc服务提供者应用名称

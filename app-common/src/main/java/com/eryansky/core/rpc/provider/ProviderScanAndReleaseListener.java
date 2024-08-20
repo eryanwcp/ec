@@ -1,8 +1,11 @@
 package com.eryansky.core.rpc.provider;
 
+import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.core.rpc.annotation.RPCApp;
 import com.eryansky.core.rpc.annotation.RPCMethodConfig;
 import com.eryansky.core.rpc.annotation.RPCProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.util.CollectionUtils;
@@ -20,6 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ProviderScanAndReleaseListener implements ApplicationListener<WebServerInitializedEvent> {
 
+    private static final Logger log = LoggerFactory.getLogger(ProviderScanAndReleaseListener.class);
     /**
      * 标识事件监听器是否已经注册，避免重复注册
      */
@@ -65,11 +69,11 @@ public class ProviderScanAndReleaseListener implements ApplicationListener<WebSe
                         RPCApp RPCApp = (RPCApp) clazz.getAnnotation(RPCApp.class);
                         if (RPCApp != null) { // 判断当前类上是否有标识指定发布接口的应用名称
                             // 如果符合我们的自定义发布规范
-                            ProviderHolder.RPCProviderInfo rpcProviderInfo = new ProviderHolder.RPCProviderInfo();
-                            rpcProviderInfo.setName("/" +RPCApp.name());
-                            rpcProviderInfo.setRpcBeanName(beanName);
-                            rpcProviderInfo.setUrlPrefix(event.getApplicationContext().getEnvironment().getProperty("server.servlet.context-path")+"/rest/" +RPCApp.name()); // url前缀取接口名称
-                            rpcProviderInfo.setRpcBean(bean);
+                            ProviderHolder.ProviderInfo providerInfo = new ProviderHolder.ProviderInfo();
+                            providerInfo.setName("/" +RPCApp.name());
+                            providerInfo.setRpcBeanName(beanName);
+                            providerInfo.setUrlPrefix(event.getApplicationContext().getEnvironment().getProperty("server.servlet.context-path")+"/rest/" +RPCApp.name()); // url前缀取接口名称
+                            providerInfo.setRpcBean(bean);
 
                             Method[] methods = clazz.getMethods(); //获取所有方法
                             if (methods != null && methods.length != 0) {
@@ -92,10 +96,10 @@ public class ProviderScanAndReleaseListener implements ApplicationListener<WebSe
                                     rm.setMethod(m);
                                     methodList.add(rm);
                                 }
-                                rpcProviderInfo.setUrlCoreMethod(methodList);
+                                providerInfo.setUrlCoreMethod(methodList);
                             }
-
-                            ProviderHolder.RPC_PROVIDER_MAP.put(clazz.getSimpleName().toLowerCase(), rpcProviderInfo);
+                            log.info(JsonMapper.toJsonString(providerInfo));
+                            ProviderHolder.RPC_PROVIDER_MAP.put(clazz.getSimpleName().toLowerCase(), providerInfo);
                         }
                     }
                 }
@@ -108,10 +112,10 @@ public class ProviderScanAndReleaseListener implements ApplicationListener<WebSe
      */
     private void registerUrls() {
         if (!CollectionUtils.isEmpty(ProviderHolder.RPC_PROVIDER_MAP)) {
-            Collection<ProviderHolder.RPCProviderInfo> values = ProviderHolder.RPC_PROVIDER_MAP.values();
-            for (ProviderHolder.RPCProviderInfo rpcProviderInfo : values) {
-                String urlPrefix = rpcProviderInfo.getUrlPrefix();
-                List<ProviderHolder.RPCMethod> urlCores = rpcProviderInfo.getUrlCoreMethod();
+            Collection<ProviderHolder.ProviderInfo> values = ProviderHolder.RPC_PROVIDER_MAP.values();
+            for (ProviderHolder.ProviderInfo providerInfo : values) {
+                String urlPrefix = providerInfo.getUrlPrefix();
+                List<ProviderHolder.RPCMethod> urlCores = providerInfo.getUrlCoreMethod();
                 if (!CollectionUtils.isEmpty(urlCores)) {
                     for (ProviderHolder.RPCMethod rm : urlCores) {
                         // 构建请求映射对象

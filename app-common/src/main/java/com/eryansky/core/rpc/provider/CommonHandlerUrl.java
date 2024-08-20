@@ -20,7 +20,7 @@ import java.util.List;
 
 public class CommonHandlerUrl {
 
-    private static Logger log = LoggerFactory.getLogger(CommonHandlerUrl.class);
+    private static final Logger log = LoggerFactory.getLogger(CommonHandlerUrl.class);
 
     public static final Method HANDLE_CUSTOM_URL_METHOD;
 
@@ -72,9 +72,9 @@ public class CommonHandlerUrl {
      */
     private Object execute(String rpcService, String methodName, Object[] params) throws InvocationTargetException, IllegalAccessException {
         // 获取RpcProvider的相关信息
-        ProviderHolder.RPCProviderInfo rpcProviderInfo = ProviderHolder.RPC_PROVIDER_MAP.get(rpcService);
-        Object rpcBean = rpcProviderInfo.getRpcBean();
-        List<ProviderHolder.RPCMethod> urlCoreMethod = rpcProviderInfo.getUrlCoreMethod();
+        ProviderHolder.ProviderInfo providerInfo = ProviderHolder.RPC_PROVIDER_MAP.get(rpcService);
+        Object rpcBean = providerInfo.getRpcBean();
+        List<ProviderHolder.RPCMethod> urlCoreMethod = providerInfo.getUrlCoreMethod();
         for (ProviderHolder.RPCMethod rm : urlCoreMethod) {
             if (rm.getAlias().equals(methodName)) {
                 return rm.getMethod().invoke(rpcBean, params); // 找到该方法，然后执行
@@ -98,13 +98,13 @@ public class CommonHandlerUrl {
         }
         List<Object> paramList = new ArrayList<>();
         // 判断当前需要调用的RPCProvider是否存在
-        ProviderHolder.RPCProviderInfo rpcProviderInfo = ProviderHolder.RPC_PROVIDER_MAP.get(rpcService);
-        if (rpcProviderInfo == null) {
+        ProviderHolder.ProviderInfo providerInfo = ProviderHolder.RPC_PROVIDER_MAP.get(rpcService);
+        if (providerInfo == null) {
             throw new RuntimeException("no service : " + rpcService);
         }
         // 解析参数，默认是JSON数组 TODO
         List<Object> objects = JsonMapper.fromJsonForObjectList(requestBodyJsonString);
-        List<ProviderHolder.RPCMethod> urlCoreMethod = rpcProviderInfo.getUrlCoreMethod();
+        List<ProviderHolder.RPCMethod> urlCoreMethod = providerInfo.getUrlCoreMethod();
         if (!CollectionUtils.isEmpty(urlCoreMethod)) {
             for (ProviderHolder.RPCMethod rm : urlCoreMethod) { // 寻找当前请求对应的需要执行的方法信息
                 if (rm.getAlias().equals(methodName)) {
