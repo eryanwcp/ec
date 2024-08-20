@@ -66,13 +66,13 @@ public class ProviderScanAndReleaseListener implements ApplicationListener<WebSe
                 Class<?>[] interfaces = beanType.getInterfaces();
                 if (interfaces != null && interfaces.length != 0) {
                     for (Class clazz : interfaces) {
-                        RPCApp RPCApp = (RPCApp) clazz.getAnnotation(RPCApp.class);
-                        if (RPCApp != null) { // 判断当前类上是否有标识指定发布接口的应用名称
+                        RPCApp app = (RPCApp) clazz.getAnnotation(RPCApp.class);
+                        if (app != null) { // 判断当前类上是否有标识指定发布接口的应用名称
                             // 如果符合我们的自定义发布规范
                             ProviderHolder.ProviderInfo providerInfo = new ProviderHolder.ProviderInfo();
-                            providerInfo.setName("/" +RPCApp.name());
+                            providerInfo.setName("/" +app.name());
                             providerInfo.setRpcBeanName(beanName);
-                            providerInfo.setUrlPrefix(event.getApplicationContext().getEnvironment().getProperty("server.servlet.context-path")+"/rest/" +RPCApp.name()); // url前缀取接口名称
+                            providerInfo.setUrlPrefix(app.urlPrefix()+"/" +app.name()); // url前缀取接口名称
                             providerInfo.setRpcBean(bean);
 
                             Method[] methods = clazz.getMethods(); //获取所有方法
@@ -99,7 +99,7 @@ public class ProviderScanAndReleaseListener implements ApplicationListener<WebSe
                                 providerInfo.setUrlCoreMethod(methodList);
                             }
                             log.info(JsonMapper.toJsonString(providerInfo));
-                            ProviderHolder.RPC_PROVIDER_MAP.put(clazz.getSimpleName().toLowerCase(), providerInfo);
+                            ProviderHolder.RPC_PROVIDER_MAP.put(app.name(), providerInfo);
                         }
                     }
                 }
@@ -124,6 +124,7 @@ public class ProviderScanAndReleaseListener implements ApplicationListener<WebSe
                                 .methods(RequestMethod.POST) // 请求方法，可以指定多个
                                 .build();
                         // 发布url，指定一下url的处理器
+                        log.info(JsonMapper.toJsonString(requestMappingInfo.getDirectPaths()));
                         requestMappingHandlerMapping.registerMapping(requestMappingInfo, commonHandlerUrl, CommonHandlerUrl.HANDLE_CUSTOM_URL_METHOD);
                     }
                 }

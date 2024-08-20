@@ -18,18 +18,17 @@ public class RPCProxyUtils {
             RPCApp annotation = (RPCApp) clazz.getAnnotation(RPCApp.class);
             // 获取到@CustomRpcApp注解相关属性拼接出url
             String appName = annotation.name();
-            StringBuilder urlSB = new StringBuilder();
-            urlSB.append(serverUrl).append("/rest/").append(appName).append("/");
+            StringBuilder url = new StringBuilder();
+            url.append(serverUrl).append(annotation.urlPrefix()).append("/").append(appName).append("/");
             RPCMethodConfig RPCMethodConfig = method.getAnnotation(RPCMethodConfig.class);
             // // 获取到@CustomRpcMethodConfig注解相关属性拼接出url
             if (RPCMethodConfig != null && StringUtils.hasLength(RPCMethodConfig.alias())) {
-                urlSB.append(RPCMethodConfig.alias());
+                url.append(RPCMethodConfig.alias());
             } else {
-                urlSB.append(method.getName());
+                url.append(method.getName());
             }
-            String url = urlSB.toString();
             // 由于当前接口在服务消费方并没有实现类，不能对实现类增强，可以增加一个统一的切入点执行逻辑
-            return ConsumerExecutor.execute(url, args, method.getReturnType());
+            return ConsumerExecutor.execute(url.toString(), args, method.getReturnType());
         });
     }
 

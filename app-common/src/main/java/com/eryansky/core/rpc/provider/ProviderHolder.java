@@ -1,5 +1,8 @@
 package com.eryansky.core.rpc.provider;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +15,7 @@ public class ProviderHolder {
      */
     public static final Map<String, ProviderInfo> RPC_PROVIDER_MAP = new ConcurrentHashMap<>();
 
-    public static class ProviderInfo {
+    public static class ProviderInfo implements Serializable {
 
         /**
          * rpc服务提供者应用名称
@@ -80,7 +83,7 @@ public class ProviderHolder {
         }
     }
 
-    public static class RPCMethod {
+    public static class RPCMethod implements Serializable{
         /**
          * 方法对象
          */
@@ -91,6 +94,7 @@ public class ProviderHolder {
          */
         private String alias;
 
+        @JsonIgnore
         public Method getMethod() {
             return method;
         }

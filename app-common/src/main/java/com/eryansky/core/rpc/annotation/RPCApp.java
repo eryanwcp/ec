@@ -14,8 +14,13 @@ public @interface RPCApp {
      *
      * @return
      */
-    String name() default "";
+    String name();
 
-    String url() default "";
+    /**
+     * 前缀
+     * @return
+     */
+
+    String urlPrefix() default "/rest";
 
 }

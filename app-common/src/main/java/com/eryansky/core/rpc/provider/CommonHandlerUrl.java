@@ -45,12 +45,12 @@ public class CommonHandlerUrl {
         String rpcService = null;
         String methodName = null;
         // url默认格式是 接口名称/方法名称
-        if (pathSegments.size() == 2) {
-            rpcService = pathSegments.get(0);
-            methodName = pathSegments.get(1);
-        } else if (pathSegments.size() == 3) { // 可能配置了contentpath，这里偷懒简单判断一下
+        if (pathSegments.size() == 3) {
             rpcService = pathSegments.get(1);
             methodName = pathSegments.get(2);
+        } else if (pathSegments.size() == 4) {
+            rpcService = pathSegments.get(2);
+            methodName = pathSegments.get(3);
         }
         // 获取请求体
         String requestBodyJsonString = StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8);

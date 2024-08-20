@@ -6,6 +6,7 @@ import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
@@ -31,6 +32,7 @@ import javax.servlet.ServletException;
         },
         exclude = {MybatisAutoConfiguration.class,
                 FreeMarkerAutoConfiguration.class,
+                RedisAutoConfiguration.class,
 //                DataSourceAutoConfiguration.class,
 //                DruidDataSourceAutoConfigure.class,
                 DataSourceTransactionManagerAutoConfiguration.class,
