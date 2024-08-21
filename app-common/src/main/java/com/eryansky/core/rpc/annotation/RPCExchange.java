@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface RPCApp {
+public @interface RPCExchange {
     /**
      * 发布接口的应用名称 
      *

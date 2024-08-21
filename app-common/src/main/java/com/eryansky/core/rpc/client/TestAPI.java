@@ -1,11 +1,11 @@
 package com.eryansky.core.rpc.client;
 
 
-import com.eryansky.core.rpc.annotation.RPCApp;
+import com.eryansky.core.rpc.annotation.RPCExchange;
 
 import java.util.Map;
 
-@RPCApp(name = "test-service")
+@RPCExchange(name = "test-service")
 public interface TestAPI {
 
     String testRpc1();

@@ -1,6 +1,6 @@
 package com.eryansky.core.rpc.utils;
 
-import com.eryansky.core.rpc.annotation.RPCApp;
+import com.eryansky.core.rpc.annotation.RPCExchange;
 import com.eryansky.core.rpc.annotation.RPCMethodConfig;
 import com.eryansky.core.rpc.consumer.ConsumerExecutor;
 import org.springframework.util.StringUtils;
@@ -15,7 +15,7 @@ public class RPCProxyUtils {
         }
         return (T) Proxy.newProxyInstance(RPCProxyUtils.class.getClassLoader(), new Class[]{clazz}, (proxy, method, args) -> {
             // 获取服务发布接口上的@CustomRpcApp注解
-            RPCApp annotation = (RPCApp) clazz.getAnnotation(RPCApp.class);
+            RPCExchange annotation = (RPCExchange) clazz.getAnnotation(RPCExchange.class);
             // 获取到@CustomRpcApp注解相关属性拼接出url
             String appName = annotation.name();
             StringBuilder url = new StringBuilder();

@@ -1,7 +1,7 @@
 package com.eryansky.core.rpc.provider;
 
 import com.eryansky.common.utils.mapper.JsonMapper;
-import com.eryansky.core.rpc.annotation.RPCApp;
+import com.eryansky.core.rpc.annotation.RPCExchange;
 import com.eryansky.core.rpc.annotation.RPCMethodConfig;
 import com.eryansky.core.rpc.annotation.RPCProvider;
 import org.slf4j.Logger;
@@ -66,7 +66,7 @@ public class ProviderScanAndReleaseListener implements ApplicationListener<WebSe
                 Class<?>[] interfaces = beanType.getInterfaces();
                 if (interfaces != null && interfaces.length != 0) {
                     for (Class clazz : interfaces) {
-                        RPCApp app = (RPCApp) clazz.getAnnotation(RPCApp.class);
+                        RPCExchange app = (RPCExchange) clazz.getAnnotation(RPCExchange.class);
                         if (app != null) { // 判断当前类上是否有标识指定发布接口的应用名称
                             // 如果符合我们的自定义发布规范
                             ProviderHolder.ProviderInfo providerInfo = new ProviderHolder.ProviderInfo();

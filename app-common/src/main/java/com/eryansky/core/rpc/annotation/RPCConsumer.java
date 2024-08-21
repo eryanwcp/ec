@@ -9,4 +9,9 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface RPCConsumer {
+
+    /**
+     * 服务地址
+     */
+    String serverUrl() default "";
 }
