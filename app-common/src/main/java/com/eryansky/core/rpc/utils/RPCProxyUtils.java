@@ -1,6 +1,6 @@
 package com.eryansky.core.rpc.utils;
 
-import com.eryansky.core.rpc.annotation.RPCExchange;
+import com.eryansky.client.common.rpc.RPCExchange;
 import com.eryansky.core.rpc.annotation.RPCMethodConfig;
 import com.eryansky.core.rpc.consumer.ConsumerExecutor;
 import org.springframework.util.StringUtils;

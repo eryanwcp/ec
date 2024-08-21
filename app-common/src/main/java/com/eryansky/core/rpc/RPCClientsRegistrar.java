@@ -13,9 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.eryansky.core.rpc.annotation.RPCConsumer;
-import com.eryansky.core.rpc.config.ConsumerConfig;
-import com.eryansky.core.rpc.config.ProviderConfig;
+import com.eryansky.client.common.rpc.RPCConsumer;
 import com.eryansky.core.rpc.utils.RPCProxyUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
@@ -44,7 +42,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
-public class RPCClientsRegistrar implements ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware, ImportSelector {
+public class RPCClientsRegistrar implements ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware{
 
 
 	private ResourceLoader resourceLoader;
@@ -54,56 +52,6 @@ public class RPCClientsRegistrar implements ImportBeanDefinitionRegistrar, Resou
 	RPCClientsRegistrar() {
 	}
 
-	static String getName(String name) {
-		if (!StringUtils.hasText(name)) {
-			return "";
-		}
-
-		String host = null;
-		try {
-			String url;
-			if (!name.startsWith("http://") && !name.startsWith("https://")) {
-				url = "http://" + name;
-			}
-			else {
-				url = name;
-			}
-			host = new URI(url).getHost();
-
-		}
-		catch (URISyntaxException e) {
-		}
-		Assert.state(host != null, "Service id not legal hostname (" + name + ")");
-		return name;
-	}
-
-	static String getUrl(String url) {
-		if (StringUtils.hasText(url) && !(url.startsWith("#{") && url.contains("}"))) {
-			if (!url.contains("://")) {
-				url = "http://" + url;
-			}
-			try {
-				new URL(url);
-			}
-			catch (MalformedURLException e) {
-				throw new IllegalArgumentException(url + " is malformed", e);
-			}
-		}
-		return url;
-	}
-
-	static String getPath(String path) {
-		if (StringUtils.hasText(path)) {
-			path = path.trim();
-			if (!path.startsWith("/")) {
-				path = "/" + path;
-			}
-			if (path.endsWith("/")) {
-				path = path.substring(0, path.length() - 1);
-			}
-		}
-		return path;
-	}
 
 	@Override
 	public void setResourceLoader(ResourceLoader resourceLoader) {
@@ -141,7 +89,7 @@ public class RPCClientsRegistrar implements ImportBeanDefinitionRegistrar, Resou
 				// verify annotated class is an interface
 				AnnotatedBeanDefinition beanDefinition = (AnnotatedBeanDefinition) candidateComponent;
 				AnnotationMetadata annotationMetadata = beanDefinition.getMetadata();
-				Assert.isTrue(annotationMetadata.isInterface(), "@RPCClient can only be specified on an interface");
+				Assert.isTrue(annotationMetadata.isInterface(), "@RPCConsumer can only be specified on an interface");
 
 				Map<String, Object> attributes = annotationMetadata
 						.getAnnotationAttributes(RPCConsumer.class.getCanonicalName());
@@ -200,15 +148,6 @@ public class RPCClientsRegistrar implements ImportBeanDefinitionRegistrar, Resou
 		return value;
 	}
 
-	private String getUrl(ConfigurableBeanFactory beanFactory, Map<String, Object> attributes) {
-		String url = resolve(beanFactory, (String) attributes.get("url"));
-		return getUrl(url);
-	}
-
-	private String getPath(ConfigurableBeanFactory beanFactory, Map<String, Object> attributes) {
-		String path = resolve(beanFactory, (String) attributes.get("path"));
-		return getPath(path);
-	}
 
 	protected ClassPathScanningCandidateComponentProvider getScanner() {
 		return new ClassPathScanningCandidateComponentProvider(false, this.environment) {
@@ -303,10 +242,4 @@ public class RPCClientsRegistrar implements ImportBeanDefinitionRegistrar, Resou
 		this.environment = environment;
 	}
 
-
-	@NonNull
-	@Override
-	public String[] selectImports(@NonNull AnnotationMetadata importingClassMetadata) {
-		return new String[]{ConsumerConfig.class.getName()};
-	}
 }

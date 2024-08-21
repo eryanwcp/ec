@@ -1,6 +1,6 @@
 package com.eryansky.core.rpc.consumer;
 
-import com.eryansky.core.rpc.annotation.RPCConsumer;
+import com.eryansky.client.common.rpc.RPCConsumer;
 import com.eryansky.core.rpc.utils.FieldAnnotationUtils;
 import com.eryansky.core.rpc.utils.RPCProxyUtils;
 import org.springframework.boot.web.context.WebServerApplicationContext;
@@ -16,7 +16,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * 扫描到@RPCConsumer，并注入动态代理对象
  * 通过@EnableRPCClients 指定
  */
-@Deprecated
 public class ConsumerScanAndFillListener implements ApplicationListener<WebServerInitializedEvent> {
 
     /**

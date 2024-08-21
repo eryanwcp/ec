@@ -1,13 +1,14 @@
 package com.eryansky.core.rpc.provider;
 
 import com.eryansky.common.utils.mapper.JsonMapper;
-import com.eryansky.core.rpc.annotation.RPCExchange;
+import com.eryansky.client.common.rpc.RPCExchange;
 import com.eryansky.core.rpc.annotation.RPCMethodConfig;
 import com.eryansky.core.rpc.annotation.RPCProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -63,7 +64,8 @@ public class ProviderScanAndReleaseListener implements ApplicationListener<WebSe
                 String beanName = entry.getKey();
                 Object bean = entry.getValue();
                 Class beanType = bean.getClass();
-                Class<?>[] interfaces = beanType.getInterfaces();
+//                Class<?>[] interfaces = beanType.getInterfaces();
+                Class<?>[] interfaces = ClassUtils.getAllInterfaces(bean);
                 if (interfaces != null && interfaces.length != 0) {
                     for (Class clazz : interfaces) {
                         RPCExchange app = (RPCExchange) clazz.getAnnotation(RPCExchange.class);

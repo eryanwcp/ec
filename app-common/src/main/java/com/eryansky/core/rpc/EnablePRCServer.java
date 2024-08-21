@@ -1,6 +1,5 @@
 package com.eryansky.core.rpc;
 
-import com.eryansky.encrypt.config.EncryptImportSelector;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -14,5 +13,5 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import(RPCImportSelector.class)
+@Import(RPCProviderImportSelector.class)
 public @interface EnablePRCServer {}
