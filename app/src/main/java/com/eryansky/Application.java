@@ -16,8 +16,6 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
-@EnablePRCServer
-@EnableRPCClients(serverUrl = "")
 @EnableEncrypt
 @SpringBootApplication(
         scanBasePackages = {"com.eryansky.j2cache.autoconfigure",
