@@ -16,7 +16,6 @@ import java.util.Set;
 import com.eryansky.core.rpc.annotation.EnableRPCClients;
 import com.eryansky.core.rpc.annotation.RPCConsumer;
 import com.eryansky.core.rpc.utils.RPCProxyUtils;
-import org.springframework.aop.scope.ScopedProxyUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
