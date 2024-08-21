@@ -1,7 +1,7 @@
 package com.eryansky;
 
-import com.eryansky.core.rpc.annotation.EnableRPCClients;
-import com.eryansky.core.rpc.client.TestAPI;
+import com.eryansky.core.rpc.EnablePRCServer;
+import com.eryansky.core.rpc.EnableRPCClients;
 import com.eryansky.encrypt.anotation.EnableEncrypt;
 import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
 import org.springframework.boot.SpringApplication;
@@ -16,7 +16,8 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
-@EnableRPCClients(serverUrl = "http://localhost:8080/dev",clients = {TestAPI.class})
+@EnablePRCServer
+@EnableRPCClients(serverUrl = "")
 @EnableEncrypt
 @SpringBootApplication(
         scanBasePackages = {"com.eryansky.j2cache.autoconfigure",

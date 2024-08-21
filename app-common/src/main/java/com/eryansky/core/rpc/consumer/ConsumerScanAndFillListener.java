@@ -13,8 +13,10 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * 扫描到@CustomRpcConsumer，并注入动态代理对象
+ * 扫描到@RPCConsumer，并注入动态代理对象
+ * 通过@EnableRPCClients 指定
  */
+@Deprecated
 public class ConsumerScanAndFillListener implements ApplicationListener<WebServerInitializedEvent> {
 
     /**
@@ -40,7 +42,7 @@ public class ConsumerScanAndFillListener implements ApplicationListener<WebServe
 
                         Class<?> type = field.getType();
                         // 生成代理对象,将代理对象注入到当前bean对象中
-                        Object proxyObj = RPCProxyUtils.createProxyObj("http://localhost:8080/dev",type);
+                        Object proxyObj = RPCProxyUtils.createProxyObj("",type);
                         try {
                             field.set(fieldAnnotationInfo.getObj(), proxyObj);
                         } catch (IllegalAccessException e) {

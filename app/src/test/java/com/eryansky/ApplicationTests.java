@@ -4,7 +4,6 @@ import com.eryansky.common.orm.model.Parameter;
 import com.eryansky.common.utils.ThreadUtils;
 import com.eryansky.common.utils.encode.Encrypt;
 import com.eryansky.common.utils.mapper.JsonMapper;
-import com.eryansky.core.rpc.client.TestAPI;
 import com.eryansky.modules.sys.mapper.OrganExtend;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.mapper.VersionLog;
@@ -39,12 +38,9 @@ public class ApplicationTests {
     private PostService postService;
     @Autowired
     private VersionLogService versionLogService;
-    @Autowired
-    private TestAPI testAPI;
 
     @Test
     public void contextLoads() {
-        System.out.println(testAPI.testRpc2("1"));
 
     }
 

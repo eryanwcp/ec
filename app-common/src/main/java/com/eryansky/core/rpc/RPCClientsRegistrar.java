@@ -1,4 +1,4 @@
-package com.eryansky.core.rpc.config;
+package com.eryansky.core.rpc;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -13,8 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.eryansky.core.rpc.annotation.EnableRPCClients;
 import com.eryansky.core.rpc.annotation.RPCConsumer;
+import com.eryansky.core.rpc.config.ConsumerConfig;
+import com.eryansky.core.rpc.config.ProviderConfig;
 import com.eryansky.core.rpc.utils.RPCProxyUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
@@ -32,17 +33,18 @@ import org.springframework.context.EnvironmentAware;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
-import org.springframework.core.annotation.AnnotationAttributes;
+import org.springframework.context.annotation.ImportSelector;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
+import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
-public class RPCClientsRegistrar implements ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware {
+public class RPCClientsRegistrar implements ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware, ImportSelector {
 
 
 	private ResourceLoader resourceLoader;
@@ -302,5 +304,9 @@ public class RPCClientsRegistrar implements ImportBeanDefinitionRegistrar, Resou
 	}
 
 
-
+	@NonNull
+	@Override
+	public String[] selectImports(@NonNull AnnotationMetadata importingClassMetadata) {
+		return new String[]{ConsumerConfig.class.getName()};
+	}
 }

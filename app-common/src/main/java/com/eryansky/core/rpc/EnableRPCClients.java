@@ -1,4 +1,4 @@
-package com.eryansky.core.rpc.annotation;
+package com.eryansky.core.rpc;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -6,18 +6,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.eryansky.core.rpc.config.RPCClientsRegistrar;
 import org.springframework.context.annotation.Import;
 
 /**
- * Scans for interfaces that declare they are feign clients (via
- * Configures component scanning directives for use with
- * {@link org.springframework.context.annotation.Configuration}
- * <code>@Configuration</code> classes.
+ * RPC客户端开启 默认值true 为false 则关闭
  *
- * @author Spencer Gibb
- * @author Dave Syer
- * @since 1.0
+ * @author : 尔演@Eryan
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
