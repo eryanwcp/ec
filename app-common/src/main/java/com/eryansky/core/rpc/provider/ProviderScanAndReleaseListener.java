@@ -100,7 +100,7 @@ public class ProviderScanAndReleaseListener implements ApplicationListener<WebSe
                                 }
                                 providerInfo.setUrlCoreMethod(methodList);
                             }
-                            log.info(JsonMapper.toJsonString(providerInfo));
+                            log.debug(JsonMapper.toJsonString(providerInfo));
                             ProviderHolder.RPC_PROVIDER_MAP.put(app.name(), providerInfo);
                         }
                     }
@@ -126,7 +126,7 @@ public class ProviderScanAndReleaseListener implements ApplicationListener<WebSe
                                 .methods(RequestMethod.POST) // 请求方法，可以指定多个
                                 .build();
                         // 发布url，指定一下url的处理器
-                        log.info(JsonMapper.toJsonString(requestMappingInfo.getDirectPaths()));
+                        log.debug(JsonMapper.toJsonString(requestMappingInfo.getDirectPaths()));
                         requestMappingHandlerMapping.registerMapping(requestMappingInfo, commonHandlerUrl, CommonHandlerUrl.HANDLE_CUSTOM_URL_METHOD);
                     }
                 }

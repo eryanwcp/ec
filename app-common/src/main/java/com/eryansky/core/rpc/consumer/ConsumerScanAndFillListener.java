@@ -22,6 +22,7 @@ public class ConsumerScanAndFillListener implements ApplicationListener<WebServe
      * 标识事件监听器是否已经注册，避免重复注册
      */
     private final AtomicBoolean flag = new AtomicBoolean(false);
+    private String serverUrl;
 
     @Override
     public void onApplicationEvent(WebServerInitializedEvent event) {
@@ -41,7 +42,7 @@ public class ConsumerScanAndFillListener implements ApplicationListener<WebServe
 
                         Class<?> type = field.getType();
                         // 生成代理对象,将代理对象注入到当前bean对象中
-                        Object proxyObj = RPCProxyUtils.createProxyObj("",type);
+                        Object proxyObj = RPCProxyUtils.createProxyObj(serverUrl, type);
                         try {
                             field.set(fieldAnnotationInfo.getObj(), proxyObj);
                         } catch (IllegalAccessException e) {
@@ -54,5 +55,14 @@ public class ConsumerScanAndFillListener implements ApplicationListener<WebServe
             }
 
         }
+    }
+
+    public String getServerUrl() {
+        return serverUrl;
+    }
+
+    public ConsumerScanAndFillListener setServerUrl(String serverUrl) {
+        this.serverUrl = serverUrl;
+        return this;
     }
 }

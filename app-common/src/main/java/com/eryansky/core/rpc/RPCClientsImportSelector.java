@@ -5,7 +5,7 @@ import org.springframework.context.annotation.ImportSelector;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.lang.NonNull;
 
-public class RPCConsumerImportSelector implements ImportSelector {
+public class RPCClientsImportSelector implements ImportSelector {
 
     @NonNull
     @Override

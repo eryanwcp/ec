@@ -15,6 +15,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
@@ -353,6 +354,21 @@ public class JsonMapper  extends ObjectMapper{
         }
         try {
             return this.readTree(jsonString);
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
+        return null;
+    }
+
+    /**
+     * 转ArrayNode
+     */
+    public ArrayNode toArrayNode(String jsonString) {
+        if (StringUtils.isEmpty(jsonString)) {
+            return null;
+        }
+        try {
+            return (ArrayNode)this.readTree(jsonString);
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }

@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Import;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented
-@Import({RPCClientsRegistrar.class,RPCConsumerImportSelector.class})
+@Import({RPCClientsRegistrar.class, RPCClientsImportSelector.class})
 public @interface EnableRPCClients {
 
 	String serverUrl();

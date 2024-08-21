@@ -10,6 +10,7 @@ public class ConsumerConfig {
 
 //    @Bean
 //    public ConsumerScanAndFillListener consumerScanAndFillListener() {
+//        //需要设置serverUrl
 //        return new ConsumerScanAndFillListener();
 //    }
     @Bean

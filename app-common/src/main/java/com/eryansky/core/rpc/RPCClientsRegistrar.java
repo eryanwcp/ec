@@ -31,12 +31,10 @@ import org.springframework.context.EnvironmentAware;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
-import org.springframework.context.annotation.ImportSelector;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
-import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
@@ -52,7 +50,56 @@ public class RPCClientsRegistrar implements ImportBeanDefinitionRegistrar, Resou
 	RPCClientsRegistrar() {
 	}
 
+	static String getName(String name) {
+		if (!StringUtils.hasText(name)) {
+			return "";
+		}
 
+		String host = null;
+		try {
+			String url;
+			if (!name.startsWith("http://") && !name.startsWith("https://")) {
+				url = "http://" + name;
+			}
+			else {
+				url = name;
+			}
+			host = new URI(url).getHost();
+
+		}
+		catch (URISyntaxException e) {
+		}
+		Assert.state(host != null, "Service id not legal hostname (" + name + ")");
+		return name;
+	}
+
+	static String getUrl(String url) {
+		if (StringUtils.hasText(url) && !(url.startsWith("#{") && url.contains("}"))) {
+			if (!url.contains("://")) {
+				url = "http://" + url;
+			}
+			try {
+				new URL(url);
+			}
+			catch (MalformedURLException e) {
+				throw new IllegalArgumentException(url + " is malformed", e);
+			}
+		}
+		return url;
+	}
+
+	static String getPath(String path) {
+		if (StringUtils.hasText(path)) {
+			path = path.trim();
+			if (!path.startsWith("/")) {
+				path = "/" + path;
+			}
+			if (path.endsWith("/")) {
+				path = path.substring(0, path.length() - 1);
+			}
+		}
+		return path;
+	}
 	@Override
 	public void setResourceLoader(ResourceLoader resourceLoader) {
 		this.resourceLoader = resourceLoader;
@@ -60,11 +107,11 @@ public class RPCClientsRegistrar implements ImportBeanDefinitionRegistrar, Resou
 
 	@Override
 	public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
-		registerFeignClients(metadata, registry);
+		registerRPCClients(metadata, registry);
 	}
 
 
-	public void registerFeignClients(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
+	public void registerRPCClients(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
 
 		LinkedHashSet<BeanDefinition> candidateComponents = new LinkedHashSet<>();
 		Map<String, Object> attrs = metadata.getAnnotationAttributes(EnableRPCClients.class.getName());
@@ -94,19 +141,18 @@ public class RPCClientsRegistrar implements ImportBeanDefinitionRegistrar, Resou
 				Map<String, Object> attributes = annotationMetadata
 						.getAnnotationAttributes(RPCConsumer.class.getCanonicalName());
 
-				registerFeignClient(registry, annotationMetadata, attrs,attributes);
+				registerRPCClient(registry, annotationMetadata, attrs,attributes);
 			}
 		}
 	}
 
-	private void registerFeignClient(BeanDefinitionRegistry registry, AnnotationMetadata annotationMetadata,
-			Map<String, Object> attrs,Map<String, Object> attributes) {
+	private void registerRPCClient(BeanDefinitionRegistry registry, AnnotationMetadata annotationMetadata,
+								   Map<String, Object> attrs, Map<String, Object> attributes) {
 		String className = annotationMetadata.getClassName();
 		Class clazz = ClassUtils.resolveClassName(className, null);
 		BeanDefinitionBuilder definition = BeanDefinitionBuilder.genericBeanDefinition(clazz, () -> {
 			// 生成代理对象,将代理对象注入到当前bean对象中
-			Object proxyObj = RPCProxyUtils.createProxyObj((String) attrs.get("serverUrl"),clazz);
-			return proxyObj;
+            return RPCProxyUtils.createProxyObj(getServerUrl(attrs),clazz);
 		});
 		definition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);
 		definition.setLazyInit(true);
@@ -126,6 +172,11 @@ public class RPCClientsRegistrar implements ImportBeanDefinitionRegistrar, Resou
 		BeanDefinitionHolder holder = new BeanDefinitionHolder(beanDefinition, className, qualifiers);
 		BeanDefinitionReaderUtils.registerBeanDefinition(holder, registry);
 
+	}
+
+	private String getServerUrl(Map<String, Object> attributes) {
+		String serverUrl = (String) attributes.get("serverUrl");
+		return resolve(null, serverUrl);
 	}
 
 
@@ -212,29 +263,6 @@ public class RPCClientsRegistrar implements ImportBeanDefinitionRegistrar, Resou
 		}
 		return !qualifierList.isEmpty() ? qualifierList.toArray(new String[0]) : null;
 	}
-
-	private String getClientName(Map<String, Object> client) {
-		if (client == null) {
-			return null;
-		}
-		String value = (String) client.get("contextId");
-		if (!StringUtils.hasText(value)) {
-			value = (String) client.get("value");
-		}
-		if (!StringUtils.hasText(value)) {
-			value = (String) client.get("name");
-		}
-		if (!StringUtils.hasText(value)) {
-			value = (String) client.get("serviceId");
-		}
-		if (StringUtils.hasText(value)) {
-			return value;
-		}
-
-		throw new IllegalStateException(
-				"Either 'name' or 'value' must be provided in @" + RPCConsumer.class.getSimpleName());
-	}
-
 
 
 	@Override

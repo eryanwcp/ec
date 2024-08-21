@@ -14,7 +14,7 @@ public class RPCProxyUtils {
             throw new IllegalArgumentException(clazz + " is not a interface!");
         }
         return (T) Proxy.newProxyInstance(RPCProxyUtils.class.getClassLoader(), new Class[]{clazz}, (proxy, method, args) -> {
-            // 获取服务发布接口上的@CustomRpcApp注解
+            // 获取服务发布接口上的注解
             RPCExchange annotation = (RPCExchange) clazz.getAnnotation(RPCExchange.class);
             // 获取到@CustomRpcApp注解相关属性拼接出url
             String appName = annotation.name();
