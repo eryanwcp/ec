@@ -19,7 +19,7 @@ public class RPCProxyUtils {
             // 获取到@CustomRpcApp注解相关属性拼接出url
             String appName = annotation.name();
             StringBuilder url = new StringBuilder();
-            url.append(serverUrl).append("/").append(appName).append("/");
+            url.append(serverUrl).append(annotation.urlPrefix()).append("/").append(appName).append("/");
             RPCMethodConfig RPCMethodConfig = method.getAnnotation(RPCMethodConfig.class);
             // // 获取到@CustomRpcMethodConfig注解相关属性拼接出url
             if (RPCMethodConfig != null && StringUtils.hasLength(RPCMethodConfig.alias())) {
