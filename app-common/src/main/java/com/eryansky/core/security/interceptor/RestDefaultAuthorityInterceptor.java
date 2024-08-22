@@ -35,7 +35,9 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
     public static final String CACHE_REST_PREFIX = "Rest_Authority_";
-    public static final String REST_AUTHORITY_HEADER_NAME = "X-Api-Key";
+    public static final String AUTH_TYPE = "apiKey";
+    public static final String HEADER_AUTH_TYPE = "Auth-Type";
+    public static final String HEADER_X_API_KEY = "X-Api-Key";
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) throws Exception {
@@ -93,7 +95,12 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                 if (!restApi.required()) {
                     return true;
                 }
-                String apiKey = request.getHeader(REST_AUTHORITY_HEADER_NAME);
+                String authType = request.getHeader(HEADER_AUTH_TYPE);
+                if (!AUTH_TYPE.equals(authType)) {
+                    return true;
+                }
+
+                String apiKey = request.getHeader(HEADER_X_API_KEY);
                 if (null == apiKey) {
                     notPermittedPermission(request, response, requestUrl, "未识别参数:Header['X-API-Key']=" + apiKey);
                     return false;

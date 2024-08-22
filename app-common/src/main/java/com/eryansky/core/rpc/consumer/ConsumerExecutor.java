@@ -10,7 +10,9 @@ import java.nio.charset.StandardCharsets;
 
 public class ConsumerExecutor {
 
-    public static final String REST_AUTHORITY_HEADER_NAME = "X-Api-Key";
+    public static final String AUTH_TYPE = "apiKey";
+    public static final String HEADER_AUTH_TYPE = "Auth-Type";
+    public static final String HEADER_X_API_KEY = "X-Api-Key";
     private static final JsonMapper jsonMapper = JsonMapper.getInstance();
 
     public static Object execute(String url, Object[] params, Class<?> resultType) throws Exception {
@@ -19,7 +21,7 @@ public class ConsumerExecutor {
         // 构建请求体
         HttpEntity<?> httpEntity = createHttpEntity(params);
         // 进行远程rpc请求
-        ResponseEntity responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, resultType);
+        ResponseEntity<?> responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, resultType);
         // 返回接口
         return responseEntity.getBody();
     }
@@ -33,7 +35,8 @@ public class ConsumerExecutor {
     private static HttpEntity<?> createHttpEntity(Object[] params) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        httpHeaders.add(REST_AUTHORITY_HEADER_NAME, AppConstants.getRPCClientApiKey());
+        httpHeaders.add(HEADER_AUTH_TYPE, AUTH_TYPE);
+        httpHeaders.add(HEADER_X_API_KEY, AppConstants.getRPCClientApiKey());
         if (params != null && params.length != 0) {
             StringBuilder builder = new StringBuilder();
             builder.append("[");
