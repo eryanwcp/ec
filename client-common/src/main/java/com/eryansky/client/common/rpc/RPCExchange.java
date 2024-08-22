@@ -23,4 +23,6 @@ public @interface RPCExchange {
 
     String urlPrefix() default "/rest";
 
+    String serverUrl() default "";
+
 }

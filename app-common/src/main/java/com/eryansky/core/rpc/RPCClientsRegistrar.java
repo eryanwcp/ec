@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.eryansky.client.common.rpc.RPCConsumer;
+import com.eryansky.client.common.rpc.RPCExchange;
 import com.eryansky.core.rpc.utils.RPCProxyUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
@@ -152,7 +153,9 @@ public class RPCClientsRegistrar implements ImportBeanDefinitionRegistrar, Resou
 		Class clazz = ClassUtils.resolveClassName(className, null);
 		BeanDefinitionBuilder definition = BeanDefinitionBuilder.genericBeanDefinition(clazz, () -> {
 			// 生成代理对象,将代理对象注入到当前bean对象中
-            return RPCProxyUtils.createProxyObj(getServerUrl(attrs),clazz);
+			RPCExchange annotation = (RPCExchange) clazz.getAnnotation(RPCExchange.class);
+			//单个或全局服务地址
+            return RPCProxyUtils.createProxyObj(StringUtils.hasText(annotation.serverUrl()) ? resolve(null,annotation.serverUrl()):getServerUrl(attrs),clazz);
 		});
 		definition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);
 		definition.setLazyInit(true);

@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Import;
 @Import({RPCClientsRegistrar.class, RPCClientsImportSelector.class})
 public @interface EnableRPCClients {
 
-	String serverUrl();
+	String serverUrl() default "";
 
 	/**
 	 * Alias for the {@link #basePackages()} attribute. Allows for more concise annotation
