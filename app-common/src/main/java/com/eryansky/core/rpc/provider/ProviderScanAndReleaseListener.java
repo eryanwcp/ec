@@ -5,11 +5,11 @@ import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.client.common.rpc.RPCExchange;
 import com.eryansky.client.common.rpc.RPCMethodConfig;
 import com.eryansky.core.rpc.annotation.RPCProvider;
-import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.web.context.WebServerInitializedEvent;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class ProviderScanAndReleaseListener implements ApplicationListener<WebServerInitializedEvent> {
+public class ProviderScanAndReleaseListener implements ApplicationListener<ApplicationReadyEvent> {
 
     private static final Logger log = LoggerFactory.getLogger(ProviderScanAndReleaseListener.class);
     /**
@@ -45,24 +45,24 @@ public class ProviderScanAndReleaseListener implements ApplicationListener<WebSe
     }
 
     @Override
-    public void onApplicationEvent(WebServerInitializedEvent event) {
+    public void onApplicationEvent(ApplicationReadyEvent event) {
+        log.info("ApplicationReadyEvent#onApplicationEvent:{}",flag);
         if (flag.compareAndSet(false, true)) {
             // 扫描所有rpcProvider注册的bean
-            scanRpcProviderBeans(event);
+            scanRpcProviderBeans(event.getApplicationContext());
             // 注册所有扫描到的自定义rpcProvider
             registerUrls();
         }
-
     }
-
     /**
      * 扫描所有rpcProvider bean信息
      *
-     * @param event
+     * @param applicationContext
      */
-    private void scanRpcProviderBeans(WebServerInitializedEvent event) {
+    private void scanRpcProviderBeans(ApplicationContext applicationContext) {
         // 找到所有标识@CustomRpcProvider注解的bean
-        Map<String, Object> beans = event.getApplicationContext().getBeansWithAnnotation(RPCProvider.class);
+        Map<String, Object> beans = applicationContext.getBeansWithAnnotation(RPCProvider.class);
+        log.info("RPC服务端:{}",beans.size());
         if (!CollectionUtils.isEmpty(beans)) {
             // 遍历所有标识了@CustomRpcProvider注解的bean
             for (Map.Entry<String, Object> entry : beans.entrySet()) {
@@ -148,4 +148,6 @@ public class ProviderScanAndReleaseListener implements ApplicationListener<WebSe
 
         }
     }
+
+
 }

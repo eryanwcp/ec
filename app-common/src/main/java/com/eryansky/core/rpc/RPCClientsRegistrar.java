@@ -14,7 +14,10 @@ import java.util.Map;
 import java.util.Set;
 
 import com.eryansky.client.common.rpc.RPCExchange;
+import com.eryansky.core.rpc.provider.ProviderScanAndReleaseListener;
 import com.eryansky.core.rpc.utils.RPCProxyUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
@@ -42,7 +45,7 @@ import org.springframework.util.StringUtils;
 
 public class RPCClientsRegistrar implements ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware{
 
-
+	private static final Logger log = LoggerFactory.getLogger(RPCClientsRegistrar.class);
 	private ResourceLoader resourceLoader;
 
 	private Environment environment;
@@ -136,7 +139,7 @@ public class RPCClientsRegistrar implements ImportBeanDefinitionRegistrar, Resou
 				// verify annotated class is an interface
 				AnnotatedBeanDefinition beanDefinition = (AnnotatedBeanDefinition) candidateComponent;
 				AnnotationMetadata annotationMetadata = beanDefinition.getMetadata();
-				Assert.isTrue(annotationMetadata.isInterface(), "@RPCConsumer can only be specified on an interface");
+				Assert.isTrue(annotationMetadata.isInterface(), "@RPCExchange can only be specified on an interface");
 
 				Map<String, Object> attributes = annotationMetadata
 						.getAnnotationAttributes(RPCExchange.class.getCanonicalName());
@@ -144,6 +147,7 @@ public class RPCClientsRegistrar implements ImportBeanDefinitionRegistrar, Resou
 				registerRPCClient(registry, annotationMetadata, attrs,attributes);
 			}
 		}
+		log.info("RPC服务数量：{}",candidateComponents.size());
 	}
 
 	private void registerRPCClient(BeanDefinitionRegistry registry, AnnotationMetadata annotationMetadata,
