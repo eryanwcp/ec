@@ -1,6 +1,7 @@
 package com.eryansky.core.rpc.provider;
 
 import com.eryansky.common.utils.mapper.JsonMapper;
+import com.eryansky.core.security.annotation.RestApi;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.slf4j.Logger;
@@ -15,9 +16,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static com.fasterxml.jackson.core.JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION;
 
@@ -40,6 +42,7 @@ public class CommonHandlerUrl {
         HANDLE_CUSTOM_URL_METHOD = tempMethod;
     }
 
+    @RestApi
     @ResponseBody
     /**
      *  拦截自定义请求的url，可以做成统一的处理器
@@ -96,7 +99,7 @@ public class CommonHandlerUrl {
      * @param methodName
      * @return
      */
-    private Object[] resolveParams(String requestBodyJsonString, String rpcService, String methodName) {
+    private Object[] resolveParams(String requestBodyJsonString, String rpcService, String methodName) throws ClassNotFoundException {
         // 如果没有请求体，参数直接返回null
         if (!StringUtils.hasLength(requestBodyJsonString)) {
             return null;
@@ -115,19 +118,21 @@ public class CommonHandlerUrl {
             for (ProviderHolder.RPCMethod rm : urlCoreMethod) { // 寻找当前请求对应的需要执行的方法信息
                 if (rm.getAlias().equals(methodName)) {
                     Class<?>[] parameterTypes = rm.getMethod().getParameterTypes();
+                    Type[] genericParameterTypes = rm.getMethod().getGenericParameterTypes();
                     if (objects.size() != parameterTypes.length) { // 判断方法参数和方法对象中的参数个数是否匹配
                         throw new RuntimeException(rpcService + " method : " + methodName + " match error!");
                     }
                     for (int i = 0; i < objects.size(); i++) { // 通过参数类型去解析参数，并保存到list中进行返回，后续执行真正的调用
                         JsonNode obj = objects.get(i);
-                        Object parse = null == obj ? null : jsonmapper.toJavaObject(obj, parameterTypes[i]);
+                        Object parse = null;
+                        if(null != obj){
+                            if (genericParameterTypes[i] instanceof ParameterizedType) {//泛型
+                                parse = jsonmapper.toJavaObject(obj, jsonmapper.getTypeFactory().constructType(genericParameterTypes[i]));
+                            } else {
+                                parse = jsonmapper.toJavaObject(obj, parameterTypes[i]);
+                            }
+                        }
                         paramList.add(parse);
-//                        if (obj instanceof ObjectNode) {
-//                            Object parse = jsonmapper.toJavaObject(obj, parameterTypes[i]);
-//                            paramList.add(parse);
-//                        } else {
-//                            paramList.add(obj.asText());
-//                        }
                     }
                     return paramList.toArray();
                 }

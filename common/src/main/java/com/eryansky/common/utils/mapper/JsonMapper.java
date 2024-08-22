@@ -422,8 +422,8 @@ public class JsonMapper  extends ObjectMapper{
         return JsonMapper.getInstance().fromJson(jsonString, clazz);
     }
 
-    public <T> T toJavaObject(String value, Class<T> tClass) {
-        return StringUtils.isNotBlank(value) ? toJavaObject(value, tClass, () -> null) : null;
+    public <T> T toJavaObject(String obj, Class<T> tClass) {
+        return StringUtils.isNotBlank(obj) ? toJavaObject(obj, tClass, () -> null) : null;
     }
 
     public <T> T toJavaObject(Object obj, Class<T> tClass) {
@@ -440,6 +440,29 @@ public class JsonMapper  extends ObjectMapper{
             logger.error(String.format("toJavaObject exception: \n %s\n %s", value, tClass), e);
         }
         return defaultSupplier.get();
+    }
+
+    public <T> T toJavaObject(Object obj, TypeReference<T> typeReference) {
+        return obj != null ? toJavaObject(toJsonString(obj), typeReference) : null;
+    }
+    public <T> T toJavaObject(String value, TypeReference<T> typeReference) {
+        try {
+            return this.readValue(value, typeReference);
+        } catch (Throwable e) {
+            logger.error(String.format("toJavaObject exception: \n %s\n %s", value, typeReference), e);
+        }
+        return null;
+    }
+    public <T> T toJavaObject(Object obj, JavaType valueType) {
+        return obj != null ? toJavaObject(toJsonString(obj), valueType) : null;
+    }
+    public <T> T toJavaObject(String value, JavaType valueType) {
+        try {
+            return this.readValue(value, valueType);
+        } catch (Throwable e) {
+            logger.error(String.format("toJavaObject exception: \n %s\n %s", value, valueType), e);
+        }
+        return null;
     }
 
     public <T> List<T> toJavaObjectList(String value, Class<T> tClass) {
