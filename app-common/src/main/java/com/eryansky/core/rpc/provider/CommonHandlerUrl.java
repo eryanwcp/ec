@@ -110,27 +110,21 @@ public class CommonHandlerUrl {
         if (providerInfo == null) {
             throw new RuntimeException("no service : " + rpcService);
         }
-        // 解析参数，默认是JSON数组 TODO
-//        List<Object> objects = JsonMapper.fromJsonForObjectList(requestBodyJsonString);
+        // 解析参数，默认是JSON数组
         ArrayNode objects = jsonmapper.toArrayNode(requestBodyJsonString);
         List<ProviderHolder.RPCMethod> urlCoreMethod = providerInfo.getUrlCoreMethod();
         if (!CollectionUtils.isEmpty(urlCoreMethod)) {
             for (ProviderHolder.RPCMethod rm : urlCoreMethod) { // 寻找当前请求对应的需要执行的方法信息
                 if (rm.getAlias().equals(methodName)) {
-                    Class<?>[] parameterTypes = rm.getMethod().getParameterTypes();
                     Type[] genericParameterTypes = rm.getMethod().getGenericParameterTypes();
-                    if (objects.size() != parameterTypes.length) { // 判断方法参数和方法对象中的参数个数是否匹配
+                    if (objects.size() != genericParameterTypes.length) { // 判断方法参数和方法对象中的参数个数是否匹配
                         throw new RuntimeException(rpcService + " method : " + methodName + " match error!");
                     }
                     for (int i = 0; i < objects.size(); i++) { // 通过参数类型去解析参数，并保存到list中进行返回，后续执行真正的调用
                         JsonNode obj = objects.get(i);
                         Object parse = null;
                         if(null != obj){
-                            if (genericParameterTypes[i] instanceof ParameterizedType) {//泛型
-                                parse = jsonmapper.toJavaObject(obj, jsonmapper.getTypeFactory().constructType(genericParameterTypes[i]));
-                            } else {
-                                parse = jsonmapper.toJavaObject(obj, parameterTypes[i]);
-                            }
+                            parse = jsonmapper.toJavaObject(obj, jsonmapper.getTypeFactory().constructType(genericParameterTypes[i]));
                         }
                         paramList.add(parse);
                     }
