@@ -3,7 +3,6 @@ package com.eryansky.core.rpc.provider;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -20,11 +19,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.fasterxml.jackson.core.JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION;
+
 public class CommonHandlerUrl {
 
     private static final Logger log = LoggerFactory.getLogger(CommonHandlerUrl.class);
 
     public static final Method HANDLE_CUSTOM_URL_METHOD;
+
+    public static final JsonMapper jsonmapper = new JsonMapper().enable(INCLUDE_SOURCE_IN_LOCATION);
 
     static {
         // 提前准备方法对象
@@ -105,7 +108,8 @@ public class CommonHandlerUrl {
             throw new RuntimeException("no service : " + rpcService);
         }
         // 解析参数，默认是JSON数组 TODO
-        ArrayNode objects = JsonMapper.getInstance().toArrayNode(requestBodyJsonString);
+//        List<Object> objects = JsonMapper.fromJsonForObjectList(requestBodyJsonString);
+        ArrayNode objects = jsonmapper.toArrayNode(requestBodyJsonString);
         List<ProviderHolder.RPCMethod> urlCoreMethod = providerInfo.getUrlCoreMethod();
         if (!CollectionUtils.isEmpty(urlCoreMethod)) {
             for (ProviderHolder.RPCMethod rm : urlCoreMethod) { // 寻找当前请求对应的需要执行的方法信息
@@ -116,12 +120,14 @@ public class CommonHandlerUrl {
                     }
                     for (int i = 0; i < objects.size(); i++) { // 通过参数类型去解析参数，并保存到list中进行返回，后续执行真正的调用
                         JsonNode obj = objects.get(i);
-                        if (obj instanceof ObjectNode) {
-                            Object parse = JsonMapper.getInstance().toJavaObject(parameterTypes[i], parameterTypes[i].getClass());
-                            paramList.add(parse);
-                        } else {
-                            paramList.add(obj);
-                        }
+                        Object parse = null == obj ? null : jsonmapper.toJavaObject(obj, parameterTypes[i]);
+                        paramList.add(parse);
+//                        if (obj instanceof ObjectNode) {
+//                            Object parse = jsonmapper.toJavaObject(obj, parameterTypes[i]);
+//                            paramList.add(parse);
+//                        } else {
+//                            paramList.add(obj.asText());
+//                        }
                     }
                     return paramList.toArray();
                 }

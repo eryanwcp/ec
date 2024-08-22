@@ -1,4 +1,4 @@
-package com.eryansky.core.rpc.annotation;
+package com.eryansky.client.common.rpc;
 
 import java.lang.annotation.*;
 

@@ -74,6 +74,7 @@ public class ProviderHolder {
             this.rpcBeanName = rpcBeanName;
         }
 
+        @JsonIgnore
         public Object getRpcBean() {
             return rpcBean;
         }

@@ -1,9 +1,12 @@
 package com.eryansky.core.rpc.provider;
 
+import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.client.common.rpc.RPCExchange;
-import com.eryansky.core.rpc.annotation.RPCMethodConfig;
+import com.eryansky.client.common.rpc.RPCMethodConfig;
 import com.eryansky.core.rpc.annotation.RPCProvider;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.compress.utils.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.context.WebServerInitializedEvent;
@@ -21,6 +24,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class ProviderScanAndReleaseListener implements ApplicationListener<WebServerInitializedEvent> {
 
@@ -72,7 +77,7 @@ public class ProviderScanAndReleaseListener implements ApplicationListener<WebSe
                         if (app != null) { // 判断当前类上是否有标识指定发布接口的应用名称
                             // 如果符合我们的自定义发布规范
                             ProviderHolder.ProviderInfo providerInfo = new ProviderHolder.ProviderInfo();
-                            providerInfo.setName("/" +app.name());
+                            providerInfo.setName(app.name());
                             providerInfo.setRpcBeanName(beanName);
                             providerInfo.setUrlPrefix(app.urlPrefix()+"/" +app.name()); // url前缀取接口名称
                             providerInfo.setRpcBean(bean);
@@ -115,22 +120,32 @@ public class ProviderScanAndReleaseListener implements ApplicationListener<WebSe
     private void registerUrls() {
         if (!CollectionUtils.isEmpty(ProviderHolder.RPC_PROVIDER_MAP)) {
             Collection<ProviderHolder.ProviderInfo> values = ProviderHolder.RPC_PROVIDER_MAP.values();
+            List<String> urlMappingList = Lists.newArrayList();
             for (ProviderHolder.ProviderInfo providerInfo : values) {
                 String urlPrefix = providerInfo.getUrlPrefix();
                 List<ProviderHolder.RPCMethod> urlCores = providerInfo.getUrlCoreMethod();
                 if (!CollectionUtils.isEmpty(urlCores)) {
                     for (ProviderHolder.RPCMethod rm : urlCores) {
                         // 构建请求映射对象
+                        String path = urlPrefix + "/" + rm.getAlias();
                         RequestMappingInfo requestMappingInfo = RequestMappingInfo
-                                .paths(urlPrefix + "/" + rm.getAlias()) // 请求URL
+                                .paths(path) // 请求URL
                                 .methods(RequestMethod.POST) // 请求方法，可以指定多个
                                 .build();
+                        urlMappingList.add(path);
                         // 发布url，指定一下url的处理器
                         log.debug(JsonMapper.toJsonString(requestMappingInfo.getDirectPaths()));
                         requestMappingHandlerMapping.registerMapping(requestMappingInfo, commonHandlerUrl, CommonHandlerUrl.HANDLE_CUSTOM_URL_METHOD);
                     }
                 }
             }
+            List<String> checkUrlMappingList =  urlMappingList.stream().collect(Collectors.groupingBy(Function.identity(), Collectors.counting())).entrySet().stream().filter(entry -> entry.getValue() > 1)
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
+            if(Collections3.isNotEmpty(checkUrlMappingList)){
+                log.error("映射路径重复：{}",JsonMapper.toJsonString(checkUrlMappingList));
+            }
+
         }
     }
 }

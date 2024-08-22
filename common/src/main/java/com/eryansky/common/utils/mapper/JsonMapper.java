@@ -99,6 +99,12 @@ public class JsonMapper  extends ObjectMapper{
     }
 
 
+    @Override
+    public JsonMapper enable(JsonParser.Feature... features) {
+        super.enable(features);
+        return this;
+    }
+
     /**
      * 允许单引号
      * 允许不带引号的字段名称

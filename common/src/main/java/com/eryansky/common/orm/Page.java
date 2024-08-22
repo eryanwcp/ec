@@ -342,12 +342,13 @@ public class Page<T> implements Serializable{
 
 		//检查order字符串的合法值
 		String[] orders = StringUtils.split(lowcaseOrder, ',');
-		for (String orderStr : orders) {
-			if (!StringUtils.equals(DESC, orderStr) && !StringUtils.equals(ASC, orderStr)) {
-				throw new IllegalArgumentException("排序方向" + orderStr + "不是合法值");
+		if(null != orders){
+			for (String orderStr : orders) {
+				if (!StringUtils.equals(DESC, orderStr) && !StringUtils.equals(ASC, orderStr)) {
+					throw new IllegalArgumentException("排序方向" + orderStr + "不是合法值");
+				}
 			}
 		}
-
 		this.order = lowcaseOrder;
 		return this;
 	}
