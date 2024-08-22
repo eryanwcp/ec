@@ -14,6 +14,4 @@ public @interface RPCConsumer {
      * 服务地址
      */
     String serverUrl() default "";
-
-    String qualifier() default "";
 }

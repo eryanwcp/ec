@@ -23,6 +23,16 @@ public @interface RPCExchange {
 
     String urlPrefix() default "/rest";
 
+    /**
+     * 服务地址
+     * @return
+     */
     String serverUrl() default "";
+    /**
+     *
+     * @return
+     */
+
+    String[] qualifiers() default {};
 
 }

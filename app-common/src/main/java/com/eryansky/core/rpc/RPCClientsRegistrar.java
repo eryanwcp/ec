@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.eryansky.client.common.rpc.RPCConsumer;
 import com.eryansky.client.common.rpc.RPCExchange;
 import com.eryansky.core.rpc.utils.RPCProxyUtils;
 import org.springframework.beans.factory.FactoryBean;
@@ -120,7 +119,7 @@ public class RPCClientsRegistrar implements ImportBeanDefinitionRegistrar, Resou
 		if (clients == null || clients.length == 0) {
 			ClassPathScanningCandidateComponentProvider scanner = getScanner();
 			scanner.setResourceLoader(this.resourceLoader);
-			scanner.addIncludeFilter(new AnnotationTypeFilter(RPCConsumer.class));
+			scanner.addIncludeFilter(new AnnotationTypeFilter(RPCExchange.class));
 			Set<String> basePackages = getBasePackages(metadata);
 			for (String basePackage : basePackages) {
 				candidateComponents.addAll(scanner.findCandidateComponents(basePackage));
@@ -140,7 +139,7 @@ public class RPCClientsRegistrar implements ImportBeanDefinitionRegistrar, Resou
 				Assert.isTrue(annotationMetadata.isInterface(), "@RPCConsumer can only be specified on an interface");
 
 				Map<String, Object> attributes = annotationMetadata
-						.getAnnotationAttributes(RPCConsumer.class.getCanonicalName());
+						.getAnnotationAttributes(RPCExchange.class.getCanonicalName());
 
 				registerRPCClient(registry, annotationMetadata, attrs,attributes);
 			}
