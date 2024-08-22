@@ -767,6 +767,16 @@ public class AppConstants extends SysConstants {
         return Collections.emptyList();
     }
 
+
+    /**
+     * RPC 服务认证客户端密钥
+     * @return
+     */
+    public static String getRPCClientApiKey() {
+        String code = "system.rpc.client.apiKey";
+        return getConfigValue(code, "");
+    }
+
     /**
      * 统预警消息推送（运维账号） 接收消息账号
      * @return

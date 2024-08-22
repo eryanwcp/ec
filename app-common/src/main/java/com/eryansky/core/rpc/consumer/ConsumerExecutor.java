@@ -33,7 +33,7 @@ public class ConsumerExecutor {
     private static HttpEntity<?> createHttpEntity(Object[] params) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        httpHeaders.add(REST_AUTHORITY_HEADER_NAME, AppConstants.getRestDefaultApiKey());
+        httpHeaders.add(REST_AUTHORITY_HEADER_NAME, AppConstants.getRPCClientApiKey());
         if (params != null && params.length != 0) {
             StringBuilder builder = new StringBuilder();
             builder.append("[");
