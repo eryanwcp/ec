@@ -3,6 +3,7 @@ package com.eryansky.core.rpc.consumer;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.core.rpc.config.RestTemplateHolder;
 import com.eryansky.utils.AppConstants;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -15,13 +16,13 @@ public class ConsumerExecutor {
     public static final String HEADER_X_API_KEY = "X-Api-Key";
     private static final JsonMapper jsonMapper = JsonMapper.getInstance();
 
-    public static Object execute(String url, Object[] params, Class<?> resultType) throws Exception {
+    public static <T> T  execute(String url, Object[] params, ParameterizedTypeReference responseType) throws Exception {
         // 获取RestTemplate对象
         RestTemplate restTemplate = RestTemplateHolder.restTemplate();
         // 构建请求体
         HttpEntity<?> httpEntity = createHttpEntity(params);
         // 进行远程rpc请求
-        ResponseEntity<?> responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, resultType);
+        ResponseEntity<T> responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, responseType);
         // 返回接口
         return responseEntity.getBody();
     }

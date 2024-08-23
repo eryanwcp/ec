@@ -3,13 +3,15 @@ package com.eryansky.core.rpc.utils;
 import com.eryansky.client.common.rpc.RPCExchange;
 import com.eryansky.client.common.rpc.RPCMethodConfig;
 import com.eryansky.core.rpc.consumer.ConsumerExecutor;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
 
 public class RPCProxyUtils {
 
-    public static <T> T createProxyObj(String serverUrl,Class clazz) {
+    public static <T> T createProxyObj(String serverUrl, Class clazz) {
         if (!clazz.isInterface()) { // 接口才可以进行代理
             throw new IllegalArgumentException(clazz + " is not a interface!");
         }
@@ -20,15 +22,18 @@ public class RPCProxyUtils {
             String appName = annotation.name();
             StringBuilder url = new StringBuilder();
             url.append(serverUrl).append(annotation.urlPrefix()).append("/").append(appName).append("/");
-            RPCMethodConfig RPCMethodConfig = method.getAnnotation(RPCMethodConfig.class);
+            RPCMethodConfig methodAnnotation = method.getAnnotation(RPCMethodConfig.class);
             // // 获取到@CustomRpcMethodConfig注解相关属性拼接出url
-            if (RPCMethodConfig != null && StringUtils.hasLength(RPCMethodConfig.alias())) {
-                url.append(RPCMethodConfig.alias());
+            if (methodAnnotation != null && StringUtils.hasLength(methodAnnotation.alias())) {
+                url.append(methodAnnotation.alias());
             } else {
                 url.append(method.getName());
             }
+            Type returnType = method.getGenericReturnType();
+
+            ParameterizedTypeReference<T> reference = ParameterizedTypeReference.forType(returnType);
             // 由于当前接口在服务消费方并没有实现类，不能对实现类增强，可以增加一个统一的切入点执行逻辑
-            return ConsumerExecutor.execute(url.toString(), args, method.getReturnType());
+            return ConsumerExecutor.execute(url.toString(), args, reference);
         });
     }
 
