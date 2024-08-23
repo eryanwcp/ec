@@ -8,6 +8,7 @@ package com.eryansky.core.security.interceptor;
 import com.eryansky.common.model.Result;
 import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.utils.WebUtils;
+import com.eryansky.core.rpc.utils.RPCUtils;
 import com.eryansky.core.security.annotation.RestApi;
 import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.CacheUtils;
@@ -35,9 +36,6 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
     public static final String CACHE_REST_PREFIX = "Rest_Authority_";
-    public static final String AUTH_TYPE = "apiKey";
-    public static final String HEADER_AUTH_TYPE = "Auth-Type";
-    public static final String HEADER_X_API_KEY = "X-Api-Key";
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) throws Exception {
@@ -79,6 +77,10 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
      * @throws Exception
      */
     private Boolean defaultHndler(HttpServletRequest request, HttpServletResponse response, Object handler, String requestUrl) throws Exception {
+        String authType = request.getHeader(RPCUtils.HEADER_AUTH_TYPE);
+        if (!RPCUtils.AUTH_TYPE.equals(authType)) {
+            return true;
+        }
         HandlerMethod handlerMethod = null;
         //注解处理 满足设置不拦截
         if(handler instanceof HandlerMethod) {
@@ -95,12 +97,8 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                 if (!restApi.required()) {
                     return true;
                 }
-                String authType = request.getHeader(HEADER_AUTH_TYPE);
-                if (!AUTH_TYPE.equals(authType)) {
-                    return true;
-                }
 
-                String apiKey = request.getHeader(HEADER_X_API_KEY);
+                String apiKey = request.getHeader(RPCUtils.HEADER_X_API_KEY);
                 if (null == apiKey) {
                     notPermittedPermission(request, response, requestUrl, "未识别参数:Header['X-API-Key']=" + apiKey);
                     return false;

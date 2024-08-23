@@ -28,6 +28,12 @@ public @interface RPCExchange {
      * @return
      */
     String serverUrl() default "";
+
+    /**
+     * 密钥
+     * @return
+     */
+    String apiKey() default "";
     /**
      *
      * @return

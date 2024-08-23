@@ -14,4 +14,4 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Import(RPCProviderImportSelector.class)
-public @interface EnablePRCServer {}
+public @interface EnableRPCServer {}

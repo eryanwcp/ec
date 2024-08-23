@@ -8,19 +8,18 @@ import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 public class ConsumerExecutor {
 
-    public static final String AUTH_TYPE = "apiKey";
-    public static final String HEADER_AUTH_TYPE = "Auth-Type";
-    public static final String HEADER_X_API_KEY = "X-Api-Key";
+
     private static final JsonMapper jsonMapper = JsonMapper.getInstance();
 
-    public static <T> T  execute(String url, Object[] params, ParameterizedTypeReference responseType) throws Exception {
+    public static <T> T  execute(String url, Map<String,String> headers, Object[] params, ParameterizedTypeReference responseType) throws Exception {
         // 获取RestTemplate对象
         RestTemplate restTemplate = RestTemplateHolder.restTemplate();
         // 构建请求体
-        HttpEntity<?> httpEntity = createHttpEntity(params);
+        HttpEntity<?> httpEntity = createHttpEntity(params,headers);
         // 进行远程rpc请求
         ResponseEntity<T> responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, responseType);
         // 返回接口
@@ -33,11 +32,13 @@ public class ConsumerExecutor {
      * @param params
      * @return
      */
-    private static HttpEntity<?> createHttpEntity(Object[] params) {
+    private static HttpEntity<?> createHttpEntity(Object[] params, Map<String,String> headers) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        httpHeaders.add(HEADER_AUTH_TYPE, AUTH_TYPE);
-        httpHeaders.add(HEADER_X_API_KEY, AppConstants.getRPCClientApiKey());
+        if(null != headers){
+            headers.forEach(httpHeaders::add);
+        }
+
         if (params != null && params.length != 0) {
             StringBuilder builder = new StringBuilder();
             builder.append("[");

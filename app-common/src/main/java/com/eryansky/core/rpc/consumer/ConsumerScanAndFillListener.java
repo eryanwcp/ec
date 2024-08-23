@@ -2,7 +2,7 @@ package com.eryansky.core.rpc.consumer;
 
 import com.eryansky.client.common.rpc.RPCConsumer;
 import com.eryansky.core.rpc.utils.FieldAnnotationUtils;
-import com.eryansky.core.rpc.utils.RPCProxyUtils;
+import com.eryansky.core.rpc.utils.RPCUtils;
 import org.springframework.boot.web.context.WebServerApplicationContext;
 import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.context.ApplicationListener;
@@ -42,7 +42,7 @@ public class ConsumerScanAndFillListener implements ApplicationListener<WebServe
 
                         Class<?> type = field.getType();
                         // 生成代理对象,将代理对象注入到当前bean对象中
-                        Object proxyObj = RPCProxyUtils.createProxyObj(serverUrl, type);
+                        Object proxyObj = RPCUtils.createProxyObj(serverUrl, type);
                         try {
                             field.set(fieldAnnotationInfo.getObj(), proxyObj);
                         } catch (IllegalAccessException e) {
