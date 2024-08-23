@@ -46,7 +46,8 @@ public class RPCUtils {
 
             Map<String,String> headers = Maps.newHashMap();
             headers.put(HEADER_AUTH_TYPE,AUTH_TYPE);
-            headers.put(HEADER_X_API_KEY, StringUtils.hasLength(annotation.apiKey()) ? resolve(null,annotation.apiKey()):AppConstants.getRPCClientApiKey());
+            String apiKey = resolve(null,annotation.apiKey());
+            headers.put(HEADER_X_API_KEY, StringUtils.hasText(apiKey) ? apiKey:AppConstants.getRPCClientApiKey());
 
             // 由于当前接口在服务消费方并没有实现类，不能对实现类增强，可以增加一个统一的切入点执行逻辑
             return ConsumerExecutor.execute(url.toString(),headers, args, reference);
