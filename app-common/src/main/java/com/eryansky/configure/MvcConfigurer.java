@@ -75,7 +75,7 @@ public class MvcConfigurer implements WebMvcConfigurer {
               .excludePathPatterns("/static/**")
               .order(Ordered.HIGHEST_PRECEDENCE + 100);
 
-      if(Boolean.TRUE.equals(AppConstants.getIsSystemRestEnable())){
+      if(Boolean.TRUE.equals(AppConstants.isRestDefaultInterceptorEnable())){
          registry.addInterceptor(new RestDefaultAuthorityInterceptor())
                  .addPathPatterns("/rest/**")
                  .order(Ordered.HIGHEST_PRECEDENCE + 145);

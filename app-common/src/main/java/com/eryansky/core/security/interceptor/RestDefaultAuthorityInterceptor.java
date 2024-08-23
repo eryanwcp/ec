@@ -77,10 +77,6 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
      * @throws Exception
      */
     private Boolean defaultHndler(HttpServletRequest request, HttpServletResponse response, Object handler, String requestUrl) throws Exception {
-        String authType = request.getHeader(RPCUtils.HEADER_AUTH_TYPE);
-        if (!RPCUtils.AUTH_TYPE.equals(authType)) {
-            return true;
-        }
         HandlerMethod handlerMethod = null;
         //注解处理 满足设置不拦截
         if(handler instanceof HandlerMethod) {
@@ -98,6 +94,26 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                     return true;
                 }
 
+                //IP访问限制
+                boolean isRestLimitEnable = AppConstants.getIsSystemRestLimitEnable();
+                if (isRestLimitEnable) {
+                    boolean ipLimit = true;
+                    String ip = IpUtils.getIpAddr0(request);
+                    List<String> ipList = AppConstants.getRestLimitIpWhiteList();
+                    if (null == ipList.stream().filter(v -> "*".equals(v) || com.eryansky.j2cache.util.IpUtils.checkIPMatching(v, ip)).findAny().orElse(null)) {
+                        ipLimit  = false;
+                    }
+                    if(ipLimit && ("127.0.0.1".equals(ip) || "localhost".equals(ip))){
+                        ipLimit  = false;
+                    }
+
+                    if (ipLimit) {
+                        notPermittedPermission(request, response, requestUrl, "REST禁止访问：" + ip);
+                        return false;
+                    }
+                }
+                //请求密钥
+                String authType = request.getHeader(RPCUtils.HEADER_AUTH_TYPE);
                 String apiKey = request.getHeader(RPCUtils.HEADER_X_API_KEY);
                 if (null == apiKey) {
                     notPermittedPermission(request, response, requestUrl, "未识别参数:Header['X-API-Key']=" + apiKey);
@@ -110,19 +126,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                     return false;
                 }
 
-                //IP访问限制
-                boolean isRestLimitEnable = AppConstants.getIsSystemRestLimitEnable();
-                if (isRestLimitEnable) {
-                    String ip = IpUtils.getIpAddr0(request);
-                    if("127.0.0.1".equals(ip) || "localhost".equals(ip)){
-                        return true;
-                    }
-                    List<String> ipList = AppConstants.getRestLimitIpWhiteList();
-                    if (null == ipList.stream().filter(v -> "*".equals(v) || com.eryansky.j2cache.util.IpUtils.checkIPMatching(v, ip)).findAny().orElse(null)) {
-                        notPermittedPermission(request, response, requestUrl, "REST禁止访问：" + ip);
-                        return false;
-                    }
-                }
+
                 return true;
             }
 

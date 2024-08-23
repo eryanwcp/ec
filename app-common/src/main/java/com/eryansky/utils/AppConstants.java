@@ -733,6 +733,16 @@ public class AppConstants extends SysConstants {
         return "true".equals(value) || "1".equals(value);
     }
 
+    /**
+     * REST 服务默认拦截器是否启用
+     * @return
+     */
+    public static boolean isRestDefaultInterceptorEnable() {
+        String code = "system.rest.defaultInterceptor.enable";
+        String value = getConfigValue(code, "true");
+        return "true".equals(value) || "1".equals(value);
+    }
+
 
     /**
      * REST 服务访问密钥
