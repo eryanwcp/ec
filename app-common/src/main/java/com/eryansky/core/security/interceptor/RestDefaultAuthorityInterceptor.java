@@ -9,6 +9,7 @@ import com.eryansky.common.model.Result;
 import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.rpc.utils.RPCUtils;
+import com.eryansky.core.security.annotation.RequiresUser;
 import com.eryansky.core.security.annotation.RestApi;
 import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.CacheUtils;
@@ -86,11 +87,16 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
         if (handlerMethod != null) {
             //权限校验
             RestApi restApi = handlerMethod.getMethodAnnotation(RestApi.class);
+            RequiresUser requiresUser = handlerMethod.getMethodAnnotation(RequiresUser.class);
             if (restApi == null) {
                 restApi = this.getAnnotation(handlerMethod.getBean().getClass(), RestApi.class);
             }
             if (restApi != null) {//方法注解处理
                 if (!restApi.required()) {
+                    return true;
+                }
+
+                if (null != requiresUser && !requiresUser.required()) {
                     return true;
                 }
 

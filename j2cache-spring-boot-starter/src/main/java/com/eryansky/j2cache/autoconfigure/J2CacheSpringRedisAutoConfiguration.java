@@ -58,12 +58,6 @@ public class J2CacheSpringRedisAutoConfiguration {
 
 	private static final Logger log = LoggerFactory.getLogger(J2CacheSpringRedisAutoConfiguration.class);
 
-//    @Autowired(required = false)
-//    private JedisConnectionFactory jedisConnectionFactory;
-
-//    @Autowired(required = false)
-//    private LettuceConnectionFactory lettuceConnectionFactory;
-
 	@Primary
 	@Bean("j2CahceRedisConnectionFactory")
 	@ConditionalOnMissingBean(name = "j2CahceRedisConnectionFactory")

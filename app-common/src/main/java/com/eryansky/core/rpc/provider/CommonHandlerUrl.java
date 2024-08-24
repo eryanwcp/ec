@@ -1,6 +1,7 @@
 package com.eryansky.core.rpc.provider;
 
 import com.eryansky.common.utils.mapper.JsonMapper;
+import com.eryansky.core.rpc.utils.RPCUtils;
 import com.eryansky.core.security.annotation.RestApi;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -48,18 +49,8 @@ public class CommonHandlerUrl {
      *  拦截自定义请求的url，可以做成统一的处理器
      */
     public Object handlerUrl(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        // 解析请求url
-        List<String> pathSegments = UriComponentsBuilder.fromUriString(request.getRequestURI()).build().getPathSegments();
-        String rpcService = null;
-        String methodName = null;
-        // url默认格式是 接口名称/方法名称
-        if (pathSegments.size() == 3) {
-            rpcService = pathSegments.get(1);
-            methodName = pathSegments.get(2);
-        } else if (pathSegments.size() == 4) {
-            rpcService = pathSegments.get(2);
-            methodName = pathSegments.get(3);
-        }
+        String rpcService = request.getHeader(RPCUtils.HEADER_API_SERVICE_NAME);
+        String methodName = request.getHeader(RPCUtils.HEADER_API_SERVICE_METHOD);
         // 获取请求体
         String requestBodyJsonString = StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8);
         // 解析参数
@@ -78,14 +69,14 @@ public class CommonHandlerUrl {
      * @throws InvocationTargetException
      * @throws IllegalAccessException
      */
-    private Object execute(String rpcService, String methodName, Object[] params) throws InvocationTargetException, IllegalAccessException {
+    private Object execute(String rpcService, String methodName, Object[] params) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         // 获取RpcProvider的相关信息
         ProviderHolder.ProviderInfo providerInfo = ProviderHolder.RPC_PROVIDER_MAP.get(rpcService);
         Object rpcBean = providerInfo.getRpcBean();
         List<ProviderHolder.RPCMethod> urlCoreMethod = providerInfo.getUrlCoreMethod();
         for (ProviderHolder.RPCMethod rm : urlCoreMethod) {
             if (rm.getAlias().equals(methodName)) {
-                return rm.getMethod().invoke(rpcBean, params); // 找到该方法，然后执行
+                return rm.getMethod().invoke(rpcBean, params);
             }
         }
         return null;

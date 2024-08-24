@@ -146,7 +146,7 @@ public class RPCClientsRegistrar implements ImportBeanDefinitionRegistrar, Resou
 				registerRPCClient(registry, annotationMetadata, attrs,attributes);
 			}
 		}
-		log.info("RPC客户端数量：{}",candidateComponents.size());
+		log.info("RPC客户端启动：{}",candidateComponents.size());
 	}
 
 	private void registerRPCClient(BeanDefinitionRegistry registry, AnnotationMetadata annotationMetadata,

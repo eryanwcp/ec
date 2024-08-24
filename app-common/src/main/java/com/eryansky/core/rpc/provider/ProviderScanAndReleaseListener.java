@@ -46,12 +46,13 @@ public class ProviderScanAndReleaseListener implements ApplicationListener<Appli
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        log.info("ApplicationReadyEvent#onApplicationEvent:{}",flag);
+        log.debug("ApplicationReadyEvent#onApplicationEvent:{}",flag);
         if (flag.compareAndSet(false, true)) {
             // 扫描所有rpcProvider注册的bean
             scanRpcProviderBeans(event.getApplicationContext());
             // 注册所有扫描到的自定义rpcProvider
             registerUrls();
+            log.info("RPC服务端启动:{}",ProviderHolder.RPC_PROVIDER_MAP.size());
         }
     }
     /**
@@ -62,7 +63,6 @@ public class ProviderScanAndReleaseListener implements ApplicationListener<Appli
     private void scanRpcProviderBeans(ApplicationContext applicationContext) {
         // 找到所有标识@CustomRpcProvider注解的bean
         Map<String, Object> beans = applicationContext.getBeansWithAnnotation(RPCProvider.class);
-        log.info("RPC服务端:{}",beans.size());
         if (!CollectionUtils.isEmpty(beans)) {
             // 遍历所有标识了@CustomRpcProvider注解的bean
             for (Map.Entry<String, Object> entry : beans.entrySet()) {
@@ -86,18 +86,18 @@ public class ProviderScanAndReleaseListener implements ApplicationListener<Appli
                             if (methods != null && methods.length != 0) {
                                 List<ProviderHolder.RPCMethod> methodList = new ArrayList<>();
                                 for (Method m : methods) {
-                                    ProviderHolder.RPCMethod rm = null;
+                                    ProviderHolder.RPCMethod rm = new ProviderHolder.RPCMethod();
                                     RPCMethodConfig annotation = m.getAnnotation(RPCMethodConfig.class);
                                     if (annotation != null) { // 判断方法是否有@CustomRpcMethodConfig注解
                                         if (annotation.isForbidden()) { // 方法如果禁用，则不保存发布信息
                                             continue;
                                         }
                                         if (StringUtils.hasLength(annotation.alias())) {
-                                            rm = new ProviderHolder.RPCMethod();
                                             rm.setAlias(annotation.alias());
+                                        }else {
+                                            rm.setAlias(m.getName());
                                         }
                                     } else {
-                                        rm = new ProviderHolder.RPCMethod();
                                         rm.setAlias(m.getName());
                                     }
                                     rm.setMethod(m);
@@ -134,7 +134,7 @@ public class ProviderScanAndReleaseListener implements ApplicationListener<Appli
                                 .build();
                         urlMappingList.add(path);
                         // 发布url，指定一下url的处理器
-                        log.debug(JsonMapper.toJsonString(requestMappingInfo.getDirectPaths()));
+                        log.debug("{}",JsonMapper.toJsonString(requestMappingInfo.getDirectPaths()));
                         requestMappingHandlerMapping.registerMapping(requestMappingInfo, commonHandlerUrl, CommonHandlerUrl.HANDLE_CUSTOM_URL_METHOD);
                     }
                 }

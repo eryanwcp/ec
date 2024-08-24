@@ -1,5 +1,7 @@
 package com.eryansky;
 
+import com.eryansky.core.rpc.EnableRPCClients;
+import com.eryansky.core.rpc.EnableRPCServer;
 import com.eryansky.encrypt.anotation.EnableEncrypt;
 import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
 import org.springframework.boot.SpringApplication;
@@ -15,8 +17,11 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
 @EnableEncrypt
+@EnableRPCServer
+@EnableRPCClients(basePackages = {"com.eryansky.server"})
 @SpringBootApplication(
         scanBasePackages = {"com.eryansky.j2cache.autoconfigure",
+                "com.eryansky.server",
                 "com.eryansky.common.spring",
                 "com.eryansky.configure",
                 "com.eryansky.modules.**.aop",
@@ -28,7 +33,7 @@ import javax.servlet.ServletException;
         },
         exclude = {MybatisAutoConfiguration.class,
                 FreeMarkerAutoConfiguration.class,
-                RedisAutoConfiguration.class,
+//                RedisAutoConfiguration.class,
 //                DataSourceAutoConfiguration.class,
 //                DruidDataSourceAutoConfigure.class,
                 DataSourceTransactionManagerAutoConfiguration.class,
@@ -50,3 +55,4 @@ public class Application extends SpringBootServletInitializer {
         super.onStartup(servletContext);
     }
 }
+
