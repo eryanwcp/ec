@@ -5,7 +5,9 @@
  */
 package com.eryansky.core.security.interceptor;
 
-import com.eryansky.common.model.Result;
+import com.eryansky.common.model.R;
+import com.eryansky.common.utils.collections.Collections3;
+import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.rpc.utils.RPCUtils;
@@ -48,12 +50,12 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
         }
         String requestUrl = request.getRequestURI().replaceAll("//", "/");
         if (logger.isDebugEnabled()) {
-            logger.debug("{} {} {}",request.getSession().getId(),request.getHeader("Authorization"),requestUrl);
+            logger.debug("{} {}",request.getSession().getId(),requestUrl);
         }
         boolean restEnable = AppConstants.getIsSystemRestEnable();
         if (!restEnable) {
-            Result result = Result.errorApiResult().setMsg("系统维护中，请稍后再试！");
-            logger.warn("{} {} {}",IpUtils.getIpAddr0(request) ,result,requestUrl);
+            R<Boolean> result = R.rest(false).setMsg("系统维护中，请稍后再试！");
+            logger.warn("{} {} {}",IpUtils.getIpAddr0(request) ,JsonMapper.toJsonString(request),requestUrl);
             WebUtils.renderJson(response, result);
             return false;
         }
@@ -101,22 +103,10 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                 }
 
                 //IP访问限制
-                boolean isRestLimitEnable = AppConstants.getIsSystemRestLimitEnable();
-                if (isRestLimitEnable) {
-                    boolean ipLimit = true;
-                    String ip = IpUtils.getIpAddr0(request);
-                    List<String> ipList = AppConstants.getRestLimitIpWhiteList();
-                    if (null == ipList.stream().filter(v -> "*".equals(v) || com.eryansky.j2cache.util.IpUtils.checkIPMatching(v, ip)).findAny().orElse(null)) {
-                        ipLimit  = false;
-                    }
-                    if(ipLimit && ("127.0.0.1".equals(ip) || "localhost".equals(ip))){
-                        ipLimit  = false;
-                    }
-
-                    if (ipLimit) {
-                        notPermittedPermission(request, response, requestUrl, "REST禁止访问：" + ip);
-                        return false;
-                    }
+                String ip = IpUtils.getIpAddr0(request);
+                if (checkIpLimit(ip)) {
+                    notPermittedPermission(request, response, requestUrl, "REST禁止访问：" + ip);
+                    return false;
                 }
                 //请求密钥
                 String authType = request.getHeader(RPCUtils.HEADER_AUTH_TYPE);
@@ -132,12 +122,30 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                     return false;
                 }
 
-
                 return true;
             }
 
         }
         return null;
+    }
+
+    private boolean checkIpLimit(String ip){
+        //IP访问限制
+        boolean isRestLimitEnable = AppConstants.getIsSystemRestLimitEnable();
+        boolean isLimit = false;
+        if (isRestLimitEnable) {
+            isLimit = true;
+            List<String> ipList = AppConstants.getRestLimitIpWhiteList();
+            if (Collections3.isNotEmpty(ipList) && (null == ipList.stream().filter(v -> "*".equals(v) || com.eryansky.j2cache.util.IpUtils.checkIPMatching(v, ip)).findAny().orElse(null))) {
+                isLimit = false;
+            }
+            if("127.0.0.1".equals(ip) || "localhost".equals(ip)){
+                isLimit = false;
+            }
+
+
+        }
+        return  isLimit;
     }
 
     /**
@@ -150,8 +158,8 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
      */
     private void notPermittedPermission(HttpServletRequest request, HttpServletResponse response, String requestUrl, String msg) throws ServletException, IOException {
 //        response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        Result result = Result.noPermissionResult().setMsg(msg);
-        logger.warn(IpUtils.getIpAddr0(request) + " " + result.toString() + " " + requestUrl);
+        R<Boolean> result = new R<>(false).setCode(R.NO_PERMISSION).setMsg(msg);
+        logger.warn("{} {} {}",IpUtils.getIpAddr0(request) , JsonMapper.toJsonString(result),requestUrl);
         WebUtils.renderJson(response, result);
     }
 
