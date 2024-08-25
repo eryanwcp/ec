@@ -3,6 +3,8 @@ package com.eryansky.core.rpc.consumer;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.core.rpc.config.RestTemplateHolder;
 import com.eryansky.utils.AppConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
@@ -12,7 +14,7 @@ import java.util.Map;
 
 public class ConsumerExecutor {
 
-
+    private static final Logger log = LoggerFactory.getLogger(ConsumerExecutor.class);
     private static final JsonMapper jsonMapper = JsonMapper.getInstance();
 
     public static <T> T  execute(String url, Map<String,String> headers, Object[] params, ParameterizedTypeReference responseType) throws Exception {
@@ -22,6 +24,9 @@ public class ConsumerExecutor {
         HttpEntity<?> httpEntity = createHttpEntity(params,headers);
         // 进行远程rpc请求
         ResponseEntity<T> responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, responseType);
+        if(!HttpStatus.OK.equals(responseEntity.getStatusCode())){
+            log.error("{}",JsonMapper.toJsonString(responseEntity.getBody()));
+        }
         // 返回接口
         return responseEntity.getBody();
     }

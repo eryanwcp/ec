@@ -17,6 +17,7 @@ import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.CacheUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -157,7 +158,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
      * @throws IOException
      */
     private void notPermittedPermission(HttpServletRequest request, HttpServletResponse response, String requestUrl, String msg) throws ServletException, IOException {
-//        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setStatus(HttpStatus.FORBIDDEN.value());
         R<Boolean> result = new R<>(false).setCode(R.NO_PERMISSION).setMsg(msg);
         logger.warn("{} {} {}",IpUtils.getIpAddr0(request) , JsonMapper.toJsonString(result),requestUrl);
         WebUtils.renderJson(response, result);
