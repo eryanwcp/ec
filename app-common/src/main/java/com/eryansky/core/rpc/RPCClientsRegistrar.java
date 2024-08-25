@@ -12,8 +12,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.eryansky.client.common.rpc.RPCExchange;
+import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.core.rpc.utils.RPCUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,6 +148,7 @@ public class RPCClientsRegistrar implements ImportBeanDefinitionRegistrar, Resou
 				registerRPCClient(registry, annotationMetadata, attrs,attributes);
 			}
 		}
+		log.info("{}", JsonMapper.toJsonString(candidateComponents.stream().map(BeanDefinition::getBeanClassName).collect(Collectors.toList())));
 		log.info("RPC客户端启动：{}",candidateComponents.size());
 	}
 
