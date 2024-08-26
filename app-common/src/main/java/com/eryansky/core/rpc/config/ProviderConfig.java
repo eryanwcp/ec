@@ -20,7 +20,7 @@ public class ProviderConfig {
 
     @Bean
     public ProviderScanAndReleaseListener providerScanAndReleaseListener(RequestMappingHandlerMapping requestMappingHandlerMapping, CommonHandlerUrl commonHandlerUrl) {
-        log.info("RPC服务端启动。");
+
         return new ProviderScanAndReleaseListener(requestMappingHandlerMapping, commonHandlerUrl);
     }
 

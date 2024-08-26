@@ -1,6 +1,7 @@
 package com.eryansky.core.rpc.provider;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -111,5 +112,6 @@ public class ProviderHolder {
         public void setAlias(String alias) {
             this.alias = alias;
         }
+
     }
 }

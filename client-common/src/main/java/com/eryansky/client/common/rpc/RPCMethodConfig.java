@@ -1,5 +1,7 @@
 package com.eryansky.client.common.rpc;
 
+import org.springframework.web.bind.annotation.RequestMethod;
+
 import java.lang.annotation.*;
 
 /**

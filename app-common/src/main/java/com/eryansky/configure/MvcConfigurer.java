@@ -31,6 +31,8 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import java.util.*;
 
+import static com.fasterxml.jackson.core.JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION;
+
 @Configuration
 public class MvcConfigurer implements WebMvcConfigurer {
 
@@ -129,6 +131,7 @@ public class MvcConfigurer implements WebMvcConfigurer {
       final MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
       //设置日期格式
       JsonMapper objectMapper = new JsonMapper();
+      objectMapper.enable(INCLUDE_SOURCE_IN_LOCATION);
 
       SimpleModule module = new SimpleModule();
       // XSS反序列化
@@ -179,7 +182,17 @@ public class MvcConfigurer implements WebMvcConfigurer {
 
    @Bean
    public RestTemplate restTemplate(RestTemplateBuilder builder){
-      return builder.build();
+      // 创建一个 ObjectMapper 实例
+      JsonMapper objectMapper = new JsonMapper();
+      // 设置 INCLUDE_SOURCE_IN_LOCATION 特性
+      objectMapper.enable(INCLUDE_SOURCE_IN_LOCATION);
+
+      // 创建一个 MappingJackson2HttpMessageConverter 实例，并使用自定义的 ObjectMapper
+      MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+      converter.setObjectMapper(objectMapper);
+      RestTemplate restTemplate = builder.build();
+      restTemplate.getMessageConverters().add(converter);
+      return restTemplate;
    }
 
 

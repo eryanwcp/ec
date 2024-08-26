@@ -7,6 +7,7 @@ package com.eryansky.core.security;
 
 import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.utils.mapper.JsonMapper;
+import com.eryansky.common.web.utils.WebUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
@@ -43,7 +44,7 @@ public class LogUtils {
         String userAgent = request.getHeader("User-Agent");
         String url = request.getRequestURI();
         String params = getParams(request);
-        String headers = getHeaders(request);
+        String headers = JsonMapper.toJsonString(WebUtils.getHeaders(request));
 
         StringBuilder s = new StringBuilder();
         s.append(getBlock(username));
@@ -126,22 +127,6 @@ public class LogUtils {
     protected static String getParams(HttpServletRequest request) {
         Map<String, String[]> params = request.getParameterMap();
         return JsonMapper.nonDefaultMapper().toJson(params);
-    }
-
-
-    private static String getHeaders(HttpServletRequest request) {
-        Map<String, List<String>> headers = Maps.newHashMap();
-        Enumeration<String> namesEnumeration = request.getHeaderNames();
-        while(namesEnumeration.hasMoreElements()) {
-            String name = namesEnumeration.nextElement();
-            Enumeration<String> valueEnumeration = request.getHeaders(name);
-            List<String> values = Lists.newArrayList();
-            while(valueEnumeration.hasMoreElements()) {
-                values.add(valueEnumeration.nextElement());
-            }
-            headers.put(name, values);
-        }
-        return JsonMapper.nonDefaultMapper().toJson(headers);
     }
 
 

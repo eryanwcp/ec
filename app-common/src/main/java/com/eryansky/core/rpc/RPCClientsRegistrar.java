@@ -12,8 +12,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.eryansky.client.common.rpc.RPCExchange;
+import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.core.rpc.utils.RPCUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,7 +148,8 @@ public class RPCClientsRegistrar implements ImportBeanDefinitionRegistrar, Resou
 				registerRPCClient(registry, annotationMetadata, attrs,attributes);
 			}
 		}
-		log.info("RPC客户端数量：{}",candidateComponents.size());
+		log.info("{}", JsonMapper.toJsonString(candidateComponents.stream().map(BeanDefinition::getBeanClassName).collect(Collectors.toList())));
+		log.info("RPC客户端启动：{}",candidateComponents.size());
 	}
 
 	private void registerRPCClient(BeanDefinitionRegistry registry, AnnotationMetadata annotationMetadata,
@@ -157,7 +160,7 @@ public class RPCClientsRegistrar implements ImportBeanDefinitionRegistrar, Resou
 			// 生成代理对象,将代理对象注入到当前bean对象中
 			RPCExchange annotation = (RPCExchange) clazz.getAnnotation(RPCExchange.class);
 			//单个或全局服务地址
-            return RPCUtils.createProxyObj(StringUtils.hasText(annotation.serverUrl()) ? resolve(null,annotation.serverUrl()):getServerUrl(attrs),clazz);
+            return RPCUtils.createProxyObj(StringUtils.hasText(annotation.serverUrl()) ? RPCUtils.resolve(null,annotation.serverUrl()):getServerUrl(attrs),clazz);
 		});
 		definition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);
 		definition.setLazyInit(true);
@@ -181,27 +184,7 @@ public class RPCClientsRegistrar implements ImportBeanDefinitionRegistrar, Resou
 
 	private String getServerUrl(Map<String, Object> attributes) {
 		String serverUrl = (String) attributes.get("serverUrl");
-		return resolve(null, serverUrl);
-	}
-
-
-	private String resolve(ConfigurableBeanFactory beanFactory, String value) {
-		if (StringUtils.hasText(value)) {
-			if (beanFactory == null) {
-				return this.environment.resolvePlaceholders(value);
-			}
-			BeanExpressionResolver resolver = beanFactory.getBeanExpressionResolver();
-			String resolved = beanFactory.resolveEmbeddedValue(value);
-			if (resolver == null) {
-				return resolved;
-			}
-			Object evaluateValue = resolver.evaluate(resolved, new BeanExpressionContext(beanFactory, null));
-			if (evaluateValue != null) {
-				return String.valueOf(evaluateValue);
-			}
-			return null;
-		}
-		return value;
+		return RPCUtils.resolve(null, serverUrl);
 	}
 
 

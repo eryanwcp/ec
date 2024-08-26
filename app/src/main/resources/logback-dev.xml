@@ -4,6 +4,7 @@
     <logger name="org.springframework" level="WARN"/>
     <logger name="com.alibaba.druid" level="info"/>
     <logger name="com.eryansky" level="info"/>
+    <logger name="com.eryansky.core.rpc" level="DEBUG"/>
     <!--<logger name="com.eryansky.common.orm.mybatis" level="DEBUG"/>-->
     <logger name="com.eryansky.modules.sys.dao" level="debug"/>
     <contextName>ec</contextName>
