@@ -72,10 +72,10 @@ public class MvcConfigurer implements WebMvcConfigurer {
                  .order(Ordered.HIGHEST_PRECEDENCE + 90);
       }
 
-      registry.addInterceptor(new LogInterceptor(requestMappingHandlerAdapter))
-              .addPathPatterns("/**")
-              .excludePathPatterns("/static/**")
-              .order(Ordered.HIGHEST_PRECEDENCE + 100);
+//      registry.addInterceptor(new LogInterceptor(requestMappingHandlerAdapter))
+//              .addPathPatterns("/**")
+//              .excludePathPatterns("/static/**")
+//              .order(Ordered.HIGHEST_PRECEDENCE + 100);
 
       if(Boolean.TRUE.equals(AppConstants.isRestDefaultInterceptorEnable())){
          registry.addInterceptor(new RestDefaultAuthorityInterceptor())

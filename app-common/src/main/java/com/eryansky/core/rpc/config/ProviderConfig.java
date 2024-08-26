@@ -20,7 +20,6 @@ public class ProviderConfig {
 
     @Bean
     public ProviderScanAndReleaseListener providerScanAndReleaseListener(RequestMappingHandlerMapping requestMappingHandlerMapping, CommonHandlerUrl commonHandlerUrl) {
-
         return new ProviderScanAndReleaseListener(requestMappingHandlerMapping, commonHandlerUrl);
     }
 

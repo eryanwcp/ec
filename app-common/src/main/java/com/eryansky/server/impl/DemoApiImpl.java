@@ -2,7 +2,9 @@ package com.eryansky.server.impl;
 
 import com.eryansky.common.model.R;
 import com.eryansky.common.orm.Page;
+import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.rpc.annotation.RPCProvider;
+import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.server.DemoApi;
 import com.google.common.collect.Maps;
@@ -14,6 +16,8 @@ import java.util.Map;
 @RPCProvider
 @Component
 public class DemoApiImpl implements DemoApi {
+
+    @Logging(value = "rest1",logType = LogType.API)
     @Override
     public String test1(String param1) {
         return param1;
