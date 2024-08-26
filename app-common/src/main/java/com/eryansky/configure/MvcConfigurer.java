@@ -36,79 +36,81 @@ import static com.fasterxml.jackson.core.JsonParser.Feature.INCLUDE_SOURCE_IN_LO
 @Configuration
 public class MvcConfigurer implements WebMvcConfigurer {
 
-   @Lazy
-   @Autowired
-   private RequestMappingHandlerAdapter requestMappingHandlerAdapter;
+    @Lazy
+    @Autowired
+    private RequestMappingHandlerAdapter requestMappingHandlerAdapter;
 
-   @Override
-   public void addResourceHandlers(ResourceHandlerRegistry registry) {
-      registry.addResourceHandler(
-              "/webjars/**",
-              "/img/**",
-              "/css/**",
-              "/js/**")
-              .addResourceLocations(
-                      "classpath:/webjars/",
-                      "classpath:/META-INF/resources/webjars/",
-                      "classpath:/static/img/",
-                      "classpath:/static/css/",
-                      "classpath:/static/js/")
-              .resourceChain(false);
-   }
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler(
+                        "/webjars/**",
+                        "/img/**",
+                        "/css/**",
+                        "/js/**")
+                .addResourceLocations(
+                        "classpath:/webjars/",
+                        "classpath:/META-INF/resources/webjars/",
+                        "classpath:/static/img/",
+                        "classpath:/static/css/",
+                        "classpath:/static/js/")
+                .resourceChain(false);
+    }
 
-   /**
-    * 配置拦截器
-    * @param registry
-    */
-   @Override
-   public void addInterceptors(InterceptorRegistry registry) {
-      registry.addInterceptor(new IpLimitInterceptor())
-              .addPathPatterns("/**")
-              .order(Ordered.HIGHEST_PRECEDENCE + 90);
+    /**
+     * 配置拦截器
+     *
+     * @param registry
+     */
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new IpLimitInterceptor())
+                .addPathPatterns("/**")
+                .order(Ordered.HIGHEST_PRECEDENCE + 90);
 
-      if(Boolean.TRUE.equals(AppConstants.isLimitUrlEnable())){
-         registry.addInterceptor(new UrlLimitInterceptor())
-                 .addPathPatterns("/**")
-                 .order(Ordered.HIGHEST_PRECEDENCE + 90);
-      }
+        if (Boolean.TRUE.equals(AppConstants.isLimitUrlEnable())) {
+            registry.addInterceptor(new UrlLimitInterceptor())
+                    .addPathPatterns("/**")
+                    .order(Ordered.HIGHEST_PRECEDENCE + 90);
+        }
 
-//      registry.addInterceptor(new LogInterceptor(requestMappingHandlerAdapter))
-//              .addPathPatterns("/**")
-//              .excludePathPatterns("/static/**")
-//              .order(Ordered.HIGHEST_PRECEDENCE + 100);
+        registry.addInterceptor(new LogInterceptor(requestMappingHandlerAdapter))
+                .addPathPatterns("/**")
+                .excludePathPatterns("/static/**")
+                .order(Ordered.HIGHEST_PRECEDENCE + 100);
 
-      if(Boolean.TRUE.equals(AppConstants.isRestDefaultInterceptorEnable())){
-         registry.addInterceptor(new RestDefaultAuthorityInterceptor())
-                 .addPathPatterns("/rest/**")
-                 .order(Ordered.HIGHEST_PRECEDENCE + 145);
-      }
+        if (AppConstants.getIsSystemRestEnable() && AppConstants.isRestDefaultInterceptorEnable()) {
+            registry.addInterceptor(new RestDefaultAuthorityInterceptor())
+                    .addPathPatterns("/rest/**")
+                    .order(Ordered.HIGHEST_PRECEDENCE + 145);
+        }
 
-      if(Boolean.TRUE.equals(AppConstants.isOauth2Enable())){
-         List<String> dList = Lists.newArrayList("/jump.jsp","/index.html","/web/**","/mweb/**","/assets/**","/icons/**","/static/**","/**/*.css","/**/*.js","/**/*.png","/**/*.ico","/**/*.json","favicon**","/userfiles/**","/servlet/**","/error/**","/api/**","/rest/**");
-         List<String> cList = AppConstants.getOauth2ExcludePathList();
-         registry.addInterceptor(new AuthorityOauth2Interceptor()).addPathPatterns("/**")
-                 .excludePathPatterns(Collections3.aggregate(dList,cList))
-                 .order(Ordered.HIGHEST_PRECEDENCE + 195);
-      }
+        List<String> dList = Lists.newArrayList("/jump.jsp", "/index.html", "/web/**", "/mweb/**", "/assets/**", "/icons/**", "/static/**", "/**/*.css", "/**/*.js", "/**/*.png", "/**/*.ico", "/**/*.json", "favicon**", "/userfiles/**", "/servlet/**", "/error/**", "/api/**", "/rest/**");
+
+        if (Boolean.TRUE.equals(AppConstants.isOauth2Enable())) {
+            List<String> cList = AppConstants.getOauth2ExcludePathList();
+            registry.addInterceptor(new AuthorityOauth2Interceptor()).addPathPatterns("/**")
+                    .excludePathPatterns(Collections3.aggregate(dList, cList))
+                    .order(Ordered.HIGHEST_PRECEDENCE + 195);
+        }
+
+        List<String> authExcludePathList = AppConstants.getAuthExcludePathList();
+        AuthorityInterceptor authorityInterceptor = new AuthorityInterceptor();
+        authorityInterceptor.setRedirectURL("/jump.jsp");
+        registry.addInterceptor(authorityInterceptor).addPathPatterns("/**")
+                .excludePathPatterns(Collections3.aggregate(dList, authExcludePathList))
+                .order(Ordered.HIGHEST_PRECEDENCE + 200);
 
 
-      AuthorityInterceptor authorityInterceptor = new AuthorityInterceptor();
-      authorityInterceptor.setRedirectURL("/jump.jsp");
-      registry.addInterceptor(authorityInterceptor).addPathPatterns("/**")
-              .excludePathPatterns(Lists.newArrayList("/jump.jsp","/index.html","/web/**","/mweb/**","/assets/**","/icons/**","/static/**","/**/*.css","/**/*.js","/**/*.png","/**/*.ico","/**/*.json","favicon**","/userfiles/**","/servlet/**","/error/**","/api/**","/rest/**"))
-              .order(Ordered.HIGHEST_PRECEDENCE + 200);
+        registry.addInterceptor(new MobileInterceptor())
+                .addPathPatterns("/**")
+                .excludePathPatterns(Lists.newArrayList("/static/**","/api/**","/rest/**"))
+                .order(Ordered.HIGHEST_PRECEDENCE + 300);
+    }
 
-
-
-      registry.addInterceptor(new MobileInterceptor())
-              .addPathPatterns("/**")
-              .order(Ordered.HIGHEST_PRECEDENCE + 300);
-   }
-
-   /**
-    * 跨域配置
-    * @param registry
-    */
+    /**
+     * 跨域配置
+     * @param registry
+     */
 //   @Override
 //   public void addCorsMappings(CorsRegistry registry) {
 //      registry.addMapping("/**")
@@ -120,53 +122,52 @@ public class MvcConfigurer implements WebMvcConfigurer {
 //   }
 
 
+    /**
+     * Json解析
+     *
+     * @return
+     */
+    @Bean
+    public MappingJackson2HttpMessageConverter getMappingJackson2HttpMessageConverter() {
+        final MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
+        //设置日期格式
+        JsonMapper objectMapper = new JsonMapper();
+        objectMapper.enable(INCLUDE_SOURCE_IN_LOCATION);
 
+        SimpleModule module = new SimpleModule();
+        // XSS反序列化
+        module.addDeserializer(String.class, new XssDefaultJsonDeserializer());
+        // XSS序列化
+        module.addSerializer(String.class, new XssDefaultJsonSerializer());
 
-   /**
-    * Json解析
-    * @return
-    */
-   @Bean
-   public MappingJackson2HttpMessageConverter getMappingJackson2HttpMessageConverter() {
-      final MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
-      //设置日期格式
-      JsonMapper objectMapper = new JsonMapper();
-      objectMapper.enable(INCLUDE_SOURCE_IN_LOCATION);
-
-      SimpleModule module = new SimpleModule();
-      // XSS反序列化
-      module.addDeserializer(String.class, new XssDefaultJsonDeserializer());
-      // XSS序列化
-      module.addSerializer(String.class, new XssDefaultJsonSerializer());
-
-      //序列换成json时,将所有的long变成string 因为js中得数字类型不能包含所有的java long值
+        //序列换成json时,将所有的long变成string 因为js中得数字类型不能包含所有的java long值
 //      module.addSerializer(Long.class, ToStringSerializer.instance);
 //      module.addSerializer(Long.TYPE, ToStringSerializer.instance);
 
-      // 注册自定义的序列化和反序列化器
-      objectMapper.registerModule(module);
+        // 注册自定义的序列化和反序列化器
+        objectMapper.registerModule(module);
 
-      mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper);
+        mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper);
 
-      //设置中文编码格式
-      List<MediaType> mediaTypes = Arrays.asList(
-              MediaType.APPLICATION_JSON,
-              MediaType.TEXT_PLAIN,
-              MediaType.TEXT_HTML,
-              MediaType.TEXT_XML,
-              MediaType.APPLICATION_OCTET_STREAM,
-              MediaType.valueOf("application/vnd.spring-boot.actuator.v3+json"));
+        //设置中文编码格式
+        List<MediaType> mediaTypes = Arrays.asList(
+                MediaType.APPLICATION_JSON,
+                MediaType.TEXT_PLAIN,
+                MediaType.TEXT_HTML,
+                MediaType.TEXT_XML,
+                MediaType.APPLICATION_OCTET_STREAM,
+                MediaType.valueOf("application/vnd.spring-boot.actuator.v3+json"));
 
-      mappingJackson2HttpMessageConverter.setSupportedMediaTypes(mediaTypes);
-      return mappingJackson2HttpMessageConverter;
-   }
+        mappingJackson2HttpMessageConverter.setSupportedMediaTypes(mediaTypes);
+        return mappingJackson2HttpMessageConverter;
+    }
 
 
-   @Bean("fileManager")
-   @ConditionalOnProperty(name = "system.disk.type", havingValue = "disk", matchIfMissing = true)
-   public IFileManager fileManager() {
-      return new DISKManager();
-   }
+    @Bean("fileManager")
+    @ConditionalOnProperty(name = "system.disk.type", havingValue = "disk", matchIfMissing = true)
+    public IFileManager fileManager() {
+        return new DISKManager();
+    }
 
 //
 //   @Bean
@@ -174,26 +175,26 @@ public class MvcConfigurer implements WebMvcConfigurer {
 //      return new LayoutDialect();
 //   }
 
-   @Bean
-   public ShiroDialect shiroDialect() {
-      return new ShiroDialect();
-   }
+    @Bean
+    public ShiroDialect shiroDialect() {
+        return new ShiroDialect();
+    }
 
 
-   @Bean
-   public RestTemplate restTemplate(RestTemplateBuilder builder){
-      // 创建一个 ObjectMapper 实例
-      JsonMapper objectMapper = new JsonMapper();
-      // 设置 INCLUDE_SOURCE_IN_LOCATION 特性
-      objectMapper.enable(INCLUDE_SOURCE_IN_LOCATION);
+    @Bean
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+        // 创建一个 ObjectMapper 实例
+        JsonMapper objectMapper = new JsonMapper();
+        // 设置 INCLUDE_SOURCE_IN_LOCATION 特性
+        objectMapper.enable(INCLUDE_SOURCE_IN_LOCATION);
 
-      // 创建一个 MappingJackson2HttpMessageConverter 实例，并使用自定义的 ObjectMapper
-      MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-      converter.setObjectMapper(objectMapper);
-      RestTemplate restTemplate = builder.build();
-      restTemplate.getMessageConverters().add(converter);
-      return restTemplate;
-   }
+        // 创建一个 MappingJackson2HttpMessageConverter 实例，并使用自定义的 ObjectMapper
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        converter.setObjectMapper(objectMapper);
+        RestTemplate restTemplate = builder.build();
+        restTemplate.getMessageConverters().add(converter);
+        return restTemplate;
+    }
 
 
 }

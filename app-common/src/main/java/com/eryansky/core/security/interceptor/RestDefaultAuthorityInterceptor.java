@@ -88,12 +88,17 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
         }
 
         if (handlerMethod != null) {
+            Object bean = handlerMethod.getBean();
             //权限校验
             RestApi restApi = handlerMethod.getMethodAnnotation(RestApi.class);
-            RequiresUser requiresUser = handlerMethod.getMethodAnnotation(RequiresUser.class);
             if (restApi == null) {
-                restApi = this.getAnnotation(handlerMethod.getBean().getClass(), RestApi.class);
+                restApi = this.getAnnotation(bean.getClass(), RestApi.class);
             }
+            RequiresUser requiresUser = handlerMethod.getMethodAnnotation(RequiresUser.class);
+            if (requiresUser == null) {
+                requiresUser = this.getAnnotation(bean.getClass(), RequiresUser.class);
+            }
+
             if (restApi != null) {//方法注解处理
                 if (!restApi.required()) {
                     return true;
@@ -102,7 +107,6 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                 if (null != requiresUser && !requiresUser.required()) {
                     return true;
                 }
-
                 //IP访问限制
                 String ip = IpUtils.getIpAddr0(request);
                 if (checkIpLimit(ip)) {
