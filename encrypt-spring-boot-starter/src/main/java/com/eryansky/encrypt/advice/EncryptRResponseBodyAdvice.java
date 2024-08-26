@@ -24,7 +24,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
  * 默认加密策略 返回值为R
  */
 @RestControllerAdvice
-public class EncryptRResponseBodyAdvice implements ResponseBodyAdvice<R<String>> {
+public class EncryptRResponseBodyAdvice implements ResponseBodyAdvice<R<Object>> {
 
     private static final Logger log = LoggerFactory.getLogger(EncryptRResponseBodyAdvice.class);
 
@@ -39,7 +39,7 @@ public class EncryptRResponseBodyAdvice implements ResponseBodyAdvice<R<String>>
     }  
 
     @Override
-    public R<String> beforeBodyWrite(R<String> body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
+    public R<Object> beforeBodyWrite(R<Object> body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
         HttpHeaders headers = request.getHeaders();
         String requestEncrypt = Collections3.getFirst(headers.get(ENCRYPT));
         String requestEncryptKey = Collections3.getFirst(headers.get(ENCRYPT_KEY));
