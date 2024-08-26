@@ -12,6 +12,11 @@ import java.lang.annotation.*;
 @Documented
 public @interface EncryptResponseBody {
     /**
+     * 是否启用
+     * @return
+     */
+    String enable() default "true";
+    /**
      * 是否使用默认处理策略
      * @return
      */

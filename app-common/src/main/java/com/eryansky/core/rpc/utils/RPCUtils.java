@@ -24,6 +24,9 @@ public class RPCUtils {
     public static final String HEADER_AUTH_TYPE = "Auth-Type";
     public static final String HEADER_X_API_KEY = "X-Api-Key";
 
+    public static final String  HEADER_ENCRYPT = "Encrypt";
+    public static final String  HEADER_ENCRYPT_KEY = "Encrypt-Key";
+
 
     public static <T> T createProxyObj(String serverUrl, Class clazz) {
         if (!clazz.isInterface()) { // 接口才可以进行代理
