@@ -182,6 +182,27 @@ public class AppConstants extends SysConstants {
         return value;
     }
 
+    /**
+     * auth 排除URL 多个之间以“,”分割
+     * @return
+     */
+    public static String getAuthExcludePaths() {
+        String code = "system.security.auth.excludePaths";
+        return getConfigValue(code,"");
+    }
+
+    /**
+     * auth 排除URL 多个之间以“,”分割
+     * @return
+     */
+    public static List<String> getAuthExcludePathList() {
+        String value = getAuthExcludePaths();
+        if(StringUtils.isNotBlank(value)){
+            return Arrays.asList(value.split(","));
+        }
+        return Collections.emptyList();
+    }
+
 
     /**
      * Oauth2拦截器是否启用
