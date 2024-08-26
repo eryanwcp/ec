@@ -7,6 +7,7 @@ package com.eryansky;
 
 import com.eryansky.common.orm.mybatis.sensitive.IEncrypt;
 import com.eryansky.common.orm.mybatis.sensitive.encrypt.AesSupport;
+import com.eryansky.common.utils.Identities;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.encode.*;
 
@@ -16,6 +17,7 @@ import com.eryansky.common.utils.encode.*;
  */
 public class Main {
     public static void main(String[] args) throws Exception {
+        System.out.println(Identities.uuid2());
         Encryption as = new Encryption();
         System.out.println(as.encrypt("1","key"));//7e0cd7be3e66d4a8
         System.out.println(as.decrypt(as.encrypt("1","key"),"key"));

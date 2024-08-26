@@ -5,11 +5,12 @@
  */
 package com.eryansky.core.security.interceptor;
 
-import com.eryansky.common.model.Result;
+import com.eryansky.common.model.R;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.common.web.utils.WebUtils;
+import com.eryansky.core.security.annotation.RestApi;
 import com.google.common.collect.Lists;
 import com.eryansky.core.security.SecurityConstants;
 import com.eryansky.core.security.SecurityUtils;
@@ -104,6 +105,7 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
         if(null == handlerMethod){
             return null;
         }
+
         //需要登录
         RequiresUser methodRequiresUser = handlerMethod.getMethodAnnotation(RequiresUser.class);
         if (methodRequiresUser != null && !methodRequiresUser.required()) {
@@ -115,6 +117,14 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
             if (classRequiresUser != null && !classRequiresUser.required()) {
                 return true;
             }
+        }
+
+        RestApi restApi = handlerMethod.getMethodAnnotation(RestApi.class);
+        if (restApi == null) {
+            restApi = this.getAnnotation(handlerMethod.getBean().getClass(), RestApi.class);
+        }
+        if(null != restApi && !restApi.checkDefaultPermission()){
+            return true;
         }
 
         //角色注解
@@ -264,8 +274,9 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
                         authorization = SpringMVCHolder.getRequest().getParameter("Authorization");
                     }
                     if(WebUtils.isAjaxRequest(request) || StringUtils.startsWith(authorization,"Bearer ")){
-                        response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                        WebUtils.renderJson(response, new Result().setCode(401).setMsg("未授权或会话信息已失效"));
+                        response.setStatus(HttpStatus.FORBIDDEN.value());
+                        R<Boolean> r = new R<>(false).setCode(R.NO_PERMISSION).setMsg("未授权或会话信息已失效!");
+                        WebUtils.renderJson(response, r);
                     }else{
                         //返回校验不通过页面
                         response.sendRedirect(request.getContextPath()+redirectURL);
