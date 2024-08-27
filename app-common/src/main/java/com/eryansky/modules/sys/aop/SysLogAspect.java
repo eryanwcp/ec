@@ -89,7 +89,7 @@ public class SysLogAspect {
             log.setType(logging.logType().getValue());
             log.setUserId(null != sessionInfo ? sessionInfo.getUserId() : User.SUPERUSER_ID);
             log.setModule(className + "-" + methodName);
-            log.setIp(null != sessionInfo ? sessionInfo.getIp() : (null != request ? IpUtils.getIpAddr0(request):StringUtils.EMPTY));
+            log.setIp(null != request ? IpUtils.getIpAddr0(request) : (null != sessionInfo ? sessionInfo.getIp():StringUtils.EMPTY));
             log.setTitle(SpringUtils.parseSpel(logging.value(), method, args));
             log.setParams(null != request ? request.getParameterMap(): null);
             log.setAction(null != request ? request.getMethod():StringUtils.EMPTY);
