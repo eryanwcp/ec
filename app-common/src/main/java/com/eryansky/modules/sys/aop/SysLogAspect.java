@@ -101,9 +101,11 @@ public class SysLogAspect {
                 extendAttr.put("userMobile",sessionInfo.getMobile());
                 log.setExtendAttr(extendAttr);
             }else {
-                log.setUserAgent(UserAgentUtils.getHTTPUserAgent(request));
-                log.setDeviceType(UserAgentUtils.getDeviceType(request).toString());
-                log.setBrowserType(UserAgentUtils.getBrowser(request).getName());
+                if(null != request){
+                    log.setUserAgent(UserAgentUtils.getHTTPUserAgent(request));
+                    log.setDeviceType(UserAgentUtils.getDeviceType(request).toString());
+                    log.setBrowserType(UserAgentUtils.getBrowser(request).getName());
+                }
                 extendAttr.put("userType","S");//自定义 系统
                 extendAttr.put("userName","系统");
                 extendAttr.put("userLoginName",request.getHeaders("appCode"));
