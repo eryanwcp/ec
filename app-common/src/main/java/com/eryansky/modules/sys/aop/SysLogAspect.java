@@ -10,6 +10,7 @@ import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.common.utils.Exceptions;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.UserAgentUtils;
+import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.common.web.utils.WebUtils;
@@ -34,6 +35,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -101,14 +104,17 @@ public class SysLogAspect {
                 extendAttr.put("userMobile",sessionInfo.getMobile());
                 log.setExtendAttr(extendAttr);
             }else {
+                String userLoginName = null;
                 if(null != request){
                     log.setUserAgent(UserAgentUtils.getHTTPUserAgent(request));
                     log.setDeviceType(UserAgentUtils.getDeviceType(request).toString());
                     log.setBrowserType(UserAgentUtils.getBrowser(request).getName());
+                    Map<String, List<String>> headers = WebUtils.getHeaders(request);
+                    userLoginName = Collections3.getFirst(headers.get("appCode"));
                 }
                 extendAttr.put("userType","S");//自定义 系统
                 extendAttr.put("userName","系统");
-                extendAttr.put("userLoginName",request.getHeaders("appCode"));
+                extendAttr.put("userLoginName", userLoginName);
                 log.setExtendAttr(extendAttr);
             }
 
