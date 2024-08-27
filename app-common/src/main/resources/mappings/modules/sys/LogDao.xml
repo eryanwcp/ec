@@ -308,6 +308,13 @@
                 <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
                 <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
                 <otherwise>'%'+#{query}+'%'</otherwise>
+            </choose>
+            OR  TRIM('"' FROM JSON_EXTRACT(extend_attr,'$.userMobile')) LIKE
+            <choose>
+                <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+                <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+                <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+                <otherwise>'%'+#{query}+'%'</otherwise>
             </choose>)
         </if>
         <choose>
