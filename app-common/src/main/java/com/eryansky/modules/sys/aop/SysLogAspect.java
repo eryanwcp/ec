@@ -9,6 +9,7 @@ import com.eryansky.client.common.vo.ExtendAttr;
 import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.common.utils.Exceptions;
 import com.eryansky.common.utils.StringUtils;
+import com.eryansky.common.utils.UserAgentUtils;
 import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.common.web.utils.WebUtils;
@@ -89,18 +90,28 @@ public class SysLogAspect {
             log.setTitle(SpringUtils.parseSpel(logging.value(), method, args));
             log.setParams(null != request ? request.getParameterMap(): null);
             log.setAction(null != request ? request.getMethod():StringUtils.EMPTY);
-
+            ExtendAttr extendAttr = new ExtendAttr();
             if(null != sessionInfo){
                 log.setUserAgent(sessionInfo.getUserAgent());
                 log.setDeviceType(sessionInfo.getDeviceType());
                 log.setBrowserType(sessionInfo.getBrowserType());
-                ExtendAttr extendAttr = new ExtendAttr();
                 extendAttr.put("userType",sessionInfo.getUserType());
                 extendAttr.put("userName",sessionInfo.getName());
                 extendAttr.put("userLoginName",sessionInfo.getLoginName());
                 extendAttr.put("userMobile",sessionInfo.getMobile());
                 log.setExtendAttr(extendAttr);
+            }else {
+                log.setUserAgent(UserAgentUtils.getHTTPUserAgent(request));
+                log.setDeviceType(UserAgentUtils.getDeviceType(request).toString());
+                log.setBrowserType(UserAgentUtils.getBrowser(request).getName());
+                extendAttr.put("userType","S");//自定义 系统
+                extendAttr.put("userName","系统");
+                extendAttr.put("userLoginName",request.getHeaders("appCode"));
+                log.setExtendAttr(extendAttr);
             }
+
+
+            log.setExtendAttr(extendAttr);
             log.setRemark(SpringUtils.parseSpel(logging.remark(), method, args));
             log.setOperTime(Calendar.getInstance().getTime());
             //将当前实体保存到threadLocal

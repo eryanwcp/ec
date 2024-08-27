@@ -115,7 +115,7 @@ public class User extends DataEntity<User> implements IUser {
      */
     private Integer sort;
     /**
-     * 用户类型 ${@link UserType}以及 {@link Organ#DIC_ORGAN_TYPE}
+     * 用户类型 ${@link UserType}以及 {@link User#DIC_USER_TYPE}
      */
     private String userType;
     /**
