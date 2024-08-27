@@ -24,12 +24,12 @@ $(function () {
             {field: 'ck', checkbox: true, width: 60},
             {field: 'typeView', title: '日志类型', width: 80},
             {field: 'userId', title: '用户标识', width: 260},
-            {field: 'userName', title: '用户名称', width: 100},
-            {field: 'userLoginName', title: '账号', width: 120,hidden: true},
-            {field: 'userMobile', title: '手机号', width: 120,hidden: true}
+            {field: 'userName', title: '用户名称', width: 100}
         ]],
         columns: [[
             {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
+            {field: 'userLoginName', title: '账号', width: 120,hidden: true},
+            {field: 'userMobile', title: '手机号', width: 120,hidden: true},
             {
                 field: 'title', title: '标题', width: 200, hidden: false, formatter: function (value, rowData, rowIndex) {
                     return "<a target='_blank' href='" + ctxAdmin + "/sys/log/detail?id=" + rowData['id'] + "'>" + rowData['title'] + "</a>";
