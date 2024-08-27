@@ -1,8 +1,6 @@
 package com.eryansky.core.rpc.provider;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.web.bind.annotation.RequestMethod;
-
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -95,6 +93,14 @@ public class ProviderHolder {
          * 方法别名
          */
         private String alias;
+        /**
+         * 加密方式
+         */
+        private String encrypt;
+        /**
+         * 加密密钥
+         */
+        private String encryptKey;
 
         @JsonIgnore
         public Method getMethod() {
@@ -113,5 +119,20 @@ public class ProviderHolder {
             this.alias = alias;
         }
 
+        public String getEncrypt() {
+            return encrypt;
+        }
+
+        public void setEncrypt(String encrypt) {
+            this.encrypt = encrypt;
+        }
+
+        public String getEncryptKey() {
+            return encryptKey;
+        }
+
+        public void setEncryptKey(String encryptKey) {
+            this.encryptKey = encryptKey;
+        }
     }
 }

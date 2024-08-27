@@ -5,7 +5,7 @@ import java.lang.annotation.*;
 /**
  * RPC方法发布配置注解
  */
-@Target({ElementType.METHOD}) // 作用于方法上
+@Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface RPCMethodConfig {
@@ -23,5 +23,15 @@ public @interface RPCMethodConfig {
      * @return
      */
     boolean isForbidden() default false;
+
+    /**
+     * 加密方式
+     * @see CipherMode
+     */
+    String encrypt() default "";
+    /**
+     * 加密密钥
+     */
+    String encryptKey() default "";;
 
 }
