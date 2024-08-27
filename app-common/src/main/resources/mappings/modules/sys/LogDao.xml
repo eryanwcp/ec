@@ -23,10 +23,12 @@
 		a.action AS "action",
 		a.remark AS "remark",
 		a.exception AS "exception",
-		u.name AS "userName",
 		a.longitude AS "longitude",
 		a.latitude AS "latitude",
-		a.extend_attr AS "extendAttr"
+		a.extend_attr AS "extendAttr",
+		TRIM('"' FROM JSON_EXTRACT(extend_attr,'$.userName')) AS "userName",
+		TRIM('"' FROM JSON_EXTRACT(extend_attr,'$.userLoginName')) AS "userLoginName",
+		TRIM('"' FROM JSON_EXTRACT(extend_attr,'$.userMobie')) AS "userMobie"
 	</sql>
 
     <sql id="sysLogJoins">
@@ -35,25 +37,14 @@
 
     <select id="get" resultType="Log">
         SELECT
-        <include refid="sysLogColumns"/>,
-        o.name AS "userOrganName",
-        c.name AS "userCompanyName"
+        <include refid="sysLogColumns"/>
         FROM t_sys_log a
-        LEFT JOIN t_sys_user u ON u.id = a.user_id
-        LEFT JOIN t_sys_organ_extend o ON o.id = u.default_organ_id
-        LEFT JOIN t_sys_organ_extend c ON c.id = o.company_id
         WHERE a.id = #{id}
     </select>
 
     <select id="findList" resultType="Log">
         SELECT
-        <include refid="sysLogColumns"/>,
-        o.name AS "userOrganName",
-        c.name AS "userCompanyName"
-        FROM t_sys_log a
-        LEFT JOIN t_sys_user u ON u.id = a.user_id
-        LEFT JOIN t_sys_organ_extend o ON o.id = u.default_organ_id
-        LEFT JOIN t_sys_organ_extend c ON c.id = o.company_id
+        <include refid="sysLogColumns"/>
         <where>
             a.status = #{STATUS_NORMAL}
             <if test="query != null and query != ''">
@@ -106,13 +97,8 @@
 
     <select id="findQueryList" resultType="Log">
         SELECT
-        <include refid="sysLogColumns"/>,
-        o.name AS "userOrganName",
-        c.name AS "userCompanyName"
+        <include refid="sysLogColumns"/>
         FROM t_sys_log a
-        LEFT JOIN t_sys_user u ON u.id = a.user_id
-        LEFT JOIN t_sys_organ_extend o ON o.id = u.default_organ_id
-        LEFT JOIN t_sys_organ_extend c ON c.id = o.company_id
         <where>
             a.status = '0'
             <if test="query != null and query != ''">
@@ -138,29 +124,28 @@
                     <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
                     <otherwise>'%'+#{query}+'%'</otherwise>
                 </choose>
-                OR a.user_id = #{query}
                 )
             </if>
             <if test="type != null and type != ''">
                 AND a.type = #{type}
             </if>
             <if test="userInfo != null and userInfo != ''">
-                AND ( u.name LIKE
+                AND ( TRIM('"' FROM JSON_EXTRACT(extend_attr,'$.userName')) LIKE
                 <choose>
                     <when test="dbName == 'db2'">'%'||#{userInfo}||'%'</when>
                     <when test="dbName == 'mysql'">CONCAT('%', #{userInfo}, '%')</when>
                     <when test="dbName == 'oracle'">'%'||#{userInfo}||'%'</when>
                     <otherwise>'%'+#{userInfo}+'%'</otherwise>
                 </choose>
-                OR u.login_name LIKE
+                OR TRIM('"' FROM JSON_EXTRACT(extend_attr,'$.userLoginName')) LIKE
                 <choose>
                     <when test="dbName == 'db2'">'%'||#{userInfo}||'%'</when>
                     <when test="dbName == 'mysql'">CONCAT('%', #{userInfo}, '%')</when>
                     <when test="dbName == 'oracle'">'%'||#{userInfo}||'%'</when>
                     <otherwise>'%'+#{userInfo}+'%'</otherwise>
                 </choose>
-                OR u.mobile = #{query}
-                OR a.user_id = #{query}
+                OR TRIM('"' FROM JSON_EXTRACT(extend_attr,'$.userMobile')) = #{userInfo}
+                OR a.user_id = #{userInfo}
                 )
             </if>
             <choose>
@@ -174,7 +159,6 @@
                     AND a.create_time <![CDATA[<=]]> #{endTime}
                 </when>
             </choose>
-            ${sqlMap.dsf}
         </where>
         <choose>
             <when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
@@ -188,13 +172,8 @@
 
     <select id="findAllList" resultType="Log">
         SELECT
-        <include refid="sysLogColumns"/>,
-        o.name AS "userOrganName",
-        c.name AS "userCompanyName"
+        <include refid="sysLogColumns"/>
         FROM t_sys_log a
-        LEFT JOIN t_sys_user u ON u.id = a.user_id
-        LEFT JOIN t_sys_organ_extend o ON o.id = u.default_organ_id
-        LEFT JOIN t_sys_organ_extend c ON c.id = o.company_id
         <where>
             a.status = #{STATUS_NORMAL}
         </where>
@@ -299,18 +278,11 @@
     <select id="getLoginStatistics" resultType="java.util.Map">
         SELECT
         a.user_id AS "userId",
-        u.login_name AS "userName",
-        u.name AS "name",
-        o.id AS "organId",
-        o.name AS "organName",
-        c.id AS "companyId",
-        c.name AS "companyName",
+        TRIM('"' FROM JSON_EXTRACT(extend_attr,'$.userLoginName')) AS "userLoginName",
+        TRIM('"' FROM JSON_EXTRACT(extend_attr,'$.userName')) AS "userName",
         count(*) AS "count"
         FROM
         t_sys_log a
-        LEFT JOIN t_sys_user u ON u.id = a.user_id
-        LEFT JOIN t_sys_organ_extend o ON o.id = u.default_organ_id
-        LEFT JOIN t_sys_organ_extend c ON c.id = o.company_id
         WHERE
         a.status = '0'
         AND a.title LIKE
@@ -322,15 +294,22 @@
         </choose>
         <if test="query != null and query !=''">
             AND (
-            u.user_id = #{query}
-            AND u.login_name LIKE
+            a.user_id = #{query}
+            AND  TRIM('"' FROM JSON_EXTRACT(extend_attr,'$.userLoginName')) LIKE
             <choose>
                 <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
                 <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
                 <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
                 <otherwise>'%'+#{query}+'%'</otherwise>
             </choose>
-            OR u.name LIKE
+            OR  TRIM('"' FROM JSON_EXTRACT(extend_attr,'$.userName')) LIKE
+            <choose>
+                <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+                <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+                <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+                <otherwise>'%'+#{query}+'%'</otherwise>
+            </choose>
+            OR  TRIM('"' FROM JSON_EXTRACT(extend_attr,'$.userMobile')) LIKE
             <choose>
                 <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
                 <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
@@ -350,9 +329,9 @@
             </when>
         </choose>
         GROUP BY
-        a.user_id,u.login_name,u.name,o.id,o.name,c.id,c.name
+        a.user_id,TRIM('"' FROM JSON_EXTRACT(extend_attr,'$.userLoginName')),TRIM('"' FROM JSON_EXTRACT(extend_attr,'$.userName'))
         ORDER BY
-        5 DESC
+        4 DESC
     </select>
 
     <!--查询模块访问统计-->

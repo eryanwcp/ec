@@ -64,7 +64,7 @@ public class LogReportController extends SimpleController {
         page = logService.getLoginStatistics(page, query, startTime, endTime);
         Datagrid<Map<String, Object>> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
         List<Map<String, Object>> footer = Lists.newArrayList();
-        long totalSize = page.getResult().parallelStream().mapToLong(r-> (Long) r.get("count")).sum();
+        long totalSize = page.getResult().parallelStream().mapToLong(r -> (Long) r.get("count")).sum();
         Map<String, Object> map = Maps.newHashMap();
         map.put("name", "总计");
         map.put("count", totalSize);
@@ -74,7 +74,7 @@ public class LogReportController extends SimpleController {
     }
 
     @RequiresPermissions(value = "sys:log:loginStatistics")
-    @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"loginStatisticsExportExcel"})
+    @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST}, value = {"loginStatisticsExportExcel"})
     @ResponseBody
     public void loginStatisticsExportExcel(String query, String startTime, String endTime, HttpServletResponse response, HttpServletRequest request) throws Exception {
         Page<Map<String, Object>> page = new Page<>(1, -1);
@@ -82,8 +82,8 @@ public class LogReportController extends SimpleController {
         String fileName = "登录次数统计";
         Page<Map<String, Object>> pageMap = logService.getLoginStatistics(page.pageSize(-1), query, startTime, endTime);
         List<Map<String, Object>> result = pageMap.getResult();
-        String[] hearders = {"单位/部门", "部门", "姓名", "用户ID", "账号", "登录次数"};//表头数组
-        String[] fields = new String[]{"company", "department", "name", "userId", "userName", "count"};//People对象属性数组
+        String[] hearders = {"用户标识", "账号", "姓名", "登录次数"};//表头数组
+        String[] fields = new String[]{"userId", "userLoginName", "userName", "count"};//People对象属性数组
 
         if (page.getResult().size() < 65531) {
             //导出Excel
@@ -114,40 +114,40 @@ public class LogReportController extends SimpleController {
      */
     @Logging(value = "日志统计-每日登陆次数分析", logType = LogType.access)
     @RequiresPermissions(value = "sys:log:dayLoginStatistics")
-    @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"dayLoginStatistics"})
-    public String dayLoginStatistics(@RequestParam(value = "export",defaultValue = "false") Boolean export,
+    @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST}, value = {"dayLoginStatistics"})
+    public String dayLoginStatistics(@RequestParam(value = "export", defaultValue = "false") Boolean export,
                                      Date startTime,
                                      Date endTime,
                                      Model uiModel,
                                      HttpServletRequest request,
                                      HttpServletResponse response) {
-        Page<Map<String, Object>> page = new Page<>(request,response);
-        Date _startTime = null == startTime ? AppDateUtils.getCurrentYearStartTime():startTime;
-        if(WebUtils.isAjaxRequest(request) || export){
-            if(export){
+        Page<Map<String, Object>> page = new Page<>(request, response);
+        Date _startTime = null == startTime ? AppDateUtils.getCurrentYearStartTime() : startTime;
+        if (WebUtils.isAjaxRequest(request) || export) {
+            if (export) {
                 page.setPageSize(Page.PAGESIZE_ALL);
             }
-            List<Map<String,Object>> list = logService.findDayLoginStatistics(_startTime, endTime);
+            List<Map<String, Object>> list = logService.findDayLoginStatistics(_startTime, endTime);
             page.setResult(list);
             page.setTotalCount(list.size());
-            if(export){
+            if (export) {
                 String title = "每日登陆次数分析";
-                String[] hearders = new String[] {"日期", "访问量",};//表头数组
-                String[] fields = new String[] {"loginDate", "count"};//对象属性数组
-                TableData td = ExcelUtils.createTableData(page.getResult(), ExcelUtils.createTableHeader(hearders,0),fields);
+                String[] hearders = new String[]{"日期", "访问量",};//表头数组
+                String[] fields = new String[]{"loginDate", "count"};//对象属性数组
+                TableData td = ExcelUtils.createTableData(page.getResult(), ExcelUtils.createTableHeader(hearders, 0), fields);
                 try {
                     JsGridReportBase report = new JsGridReportBase(request, response);
                     report.exportToExcel(title, SecurityUtils.getCurrentUserName(), td);
                 } catch (Exception e) {
-                    logger.error(e.getMessage(),e);
+                    logger.error(e.getMessage(), e);
                 }
                 return null;
             }
-            return renderString(response,page);
+            return renderString(response, page);
         }
-        uiModel.addAttribute("page",page);
-        uiModel.addAttribute("startTime",_startTime);
-        uiModel.addAttribute("endTime",endTime);
+        uiModel.addAttribute("page", page);
+        uiModel.addAttribute("startTime", _startTime);
+        uiModel.addAttribute("endTime", endTime);
         return "modules/sys/log-dayLoginStatistics";
     }
 
@@ -165,7 +165,7 @@ public class LogReportController extends SimpleController {
      */
     @Logging(value = "日志统计-模块访问统计", logType = LogType.access)
     @RequiresPermissions(value = "sys:log:moduleStatistics")
-    @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"moduleStatistics"})
+    @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST}, value = {"moduleStatistics"})
     public String moduleStatistics(String userId, String organId, String postCode, @RequestParam(defaultValue = "false") Boolean onlyCompany, String startTime, String endTime,
                                    HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
         Page<Map<String, Object>> page = new Page<>(request, response);
@@ -188,7 +188,7 @@ public class LogReportController extends SimpleController {
     }
 
     @RequiresPermissions(value = "sys:log:moduleStatistics")
-    @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"moduleStatisticsExportExcel"})
+    @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST}, value = {"moduleStatisticsExportExcel"})
     public void moduleStatisticsExportExcel(String userId, String organId, String postCode, @RequestParam(defaultValue = "false") Boolean onlyCompany, String startTime, String endTime,
                                             HttpServletResponse response, HttpServletRequest request) throws Exception {
         Page<Map<String, Object>> page = new Page<Map<String, Object>>(request, response);

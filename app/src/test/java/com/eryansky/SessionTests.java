@@ -1,20 +1,14 @@
 package com.eryansky;
 
-import com.eryansky.common.utils.Identities;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.service.UserService;
-import com.eryansky.utils.CacheUtils;
-import com.google.common.collect.Lists;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.redis.core.RedisTemplate;
 
-import java.io.Serializable;
-import java.util.List;
 
 @SpringBootTest(classes = Application.class)
 public class SessionTests {

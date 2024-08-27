@@ -36,7 +36,7 @@
 						var html = Mustache.render($("#list_template").html(), data['data']);
 						$("#list").html(html);
 						$(".pagination").append(data['data']['html']);
-						$(".pagination").find("ul").append("<li class=\"disabled controls\"><a>"+data['data']+"</a></li>");
+						$(".pagination").find("ul").append("<li class=\"disabled controls\"><a>"+data['obj']+"</a></li>");
 					} else {
 						$("#list").html(data['msg']);
 					}

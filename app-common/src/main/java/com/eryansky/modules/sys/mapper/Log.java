@@ -101,13 +101,14 @@ public class Log extends DataEntity<Log> {
      */
     private String userName;
     /**
-     * 操作人部门名称
+     * 操作人账号
      */
-    private String userOrganName;
+    private String userLoginName;
     /**
-     * 操作人单位名称
+     * 操作人手机号
      */
-    private String userCompanyName;
+    private String userMobile;
+
     /**
      * 开始时间
      */
@@ -302,22 +303,21 @@ public class Log extends DataEntity<Log> {
         this.userName = userName;
     }
 
-    public String getUserOrganName() {
-        return userOrganName;
+    public String getUserLoginName() {
+        return userLoginName;
     }
 
-    public void setUserOrganName(String userOrganName) {
-        this.userOrganName = userOrganName;
+    public void setUserLoginName(String userLoginName) {
+        this.userLoginName = userLoginName;
     }
 
-    public String getUserCompanyName() {
-        return userCompanyName;
+    public String getUserMobile() {
+        return userMobile;
     }
 
-    public void setUserCompanyName(String userCompanyName) {
-        this.userCompanyName = userCompanyName;
+    public void setUserMobile(String userMobile) {
+        this.userMobile = userMobile;
     }
-
     public Long getStartTime() {
         return startTime;
     }

@@ -65,7 +65,7 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
                 authType = null != prepareOauth2Class ? prepareOauth2Class.authType():null;
             }
             //非内置用户 自动跳过
-            if(!PrepareOauth2.DEFAULT_AUTH_TYPE.equals(authType)){
+            if(null != authType && !PrepareOauth2.DEFAULT_AUTH_TYPE.equals(authType)){
                 return true;
             }
             //自动登录
@@ -91,7 +91,6 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
                 User user = null;
                 try {
                     loginName = SecurityUtils.getLoginNameByToken(token);
-
                     user = UserUtils.getUserByLoginName(loginName);
                     if(null == user){
                         logger.warn("Token校验失败（用户不存在）：{},{},{}", loginName, requestUrl, token);

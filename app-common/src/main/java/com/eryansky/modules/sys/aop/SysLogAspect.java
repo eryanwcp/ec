@@ -9,6 +9,11 @@ import com.eryansky.client.common.vo.ExtendAttr;
 import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.common.utils.Exceptions;
 import com.eryansky.common.utils.StringUtils;
+import com.eryansky.common.utils.UserAgentUtils;
+import com.eryansky.common.utils.collections.Collections3;
+import com.eryansky.common.utils.net.IpUtils;
+import com.eryansky.common.web.springmvc.SpringMVCHolder;
+import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
@@ -16,15 +21,22 @@ import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys.event.SysLogEvent;
 import com.eryansky.modules.sys.mapper.Log;
 import com.eryansky.modules.sys.mapper.User;
+import com.eryansky.utils.SpringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
+import java.lang.reflect.Method;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -32,8 +44,9 @@ import java.util.Objects;
  *
  * @author Eryan
  */
-//@Component
-//@Aspect
+@Order(1)
+@Component
+@Aspect
 public class SysLogAspect {
 
     private static Logger logger = LoggerFactory.getLogger(SysLogAspect.class);
@@ -57,43 +70,58 @@ public class SysLogAspect {
     @Before(value = "sysLogAspect()&&@annotation(logging)")
     public void recordLog(JoinPoint joinPoint, Logging logging) throws Throwable {
         Log log = new Log();
-
-
         Long start = System.currentTimeMillis();
         log.setStartTime(start);
-        // 执行方法名
-        String methodName = null;
-        String className = null;
-        if (joinPoint != null) {
-            methodName = joinPoint.getSignature().getName();
-            className = joinPoint.getTarget().getClass().getSimpleName();
-        }
+        MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
+        Method method = methodSignature.getMethod();
+        Object[] args = joinPoint.getArgs();
+        String methodName = joinPoint.getSignature().getName();
+        String className = joinPoint.getTarget().getClass().getSimpleName();
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         HttpServletRequest request = null;
         try {
-            request = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();
+            request = SpringMVCHolder.getRequest();
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage());
         }
         // 执行方法所消耗的时间
         try {
-
             log.setType(logging.logType().getValue());
             log.setUserId(null != sessionInfo ? sessionInfo.getUserId() : User.SUPERUSER_ID);
             log.setModule(className + "-" + methodName);
-            log.setIp(null != sessionInfo ? sessionInfo.getIp() : null);
-            log.setTitle(logging.value());
-            log.setAction(null != request ? request.getMethod() : StringUtils.EMPTY);
-            log.setUserAgent(null != sessionInfo ? sessionInfo.getUserAgent() : StringUtils.EMPTY);
-            log.setDeviceType(null != sessionInfo ? sessionInfo.getDeviceType() : StringUtils.EMPTY);
-            log.setBrowserType(null != sessionInfo ? sessionInfo.getBrowserType() : StringUtils.EMPTY);
-            log.setOperTime(Calendar.getInstance().getTime());
+            log.setIp(null != request ? IpUtils.getIpAddr0(request) : (null != sessionInfo ? sessionInfo.getIp():StringUtils.EMPTY));
+            log.setTitle(SpringUtils.parseSpel(logging.value(), method, args));
+            log.setParams(null != request ? request.getParameterMap(): null);
+            log.setAction(null != request ? request.getMethod():StringUtils.EMPTY);
+            ExtendAttr extendAttr = new ExtendAttr();
             if(null != sessionInfo){
-                ExtendAttr extendAttr = new ExtendAttr();
+                log.setUserAgent(sessionInfo.getUserAgent());
+                log.setDeviceType(sessionInfo.getDeviceType());
+                log.setBrowserType(sessionInfo.getBrowserType());
                 extendAttr.put("userType",sessionInfo.getUserType());
+                extendAttr.put("userName",sessionInfo.getName());
+                extendAttr.put("userLoginName",sessionInfo.getLoginName());
+                extendAttr.put("userMobile",sessionInfo.getMobile());
+                log.setExtendAttr(extendAttr);
+            }else {
+                String userLoginName = null;
+                if(null != request){
+                    log.setUserAgent(UserAgentUtils.getHTTPUserAgent(request));
+                    log.setDeviceType(UserAgentUtils.getDeviceType(request).toString());
+                    log.setBrowserType(UserAgentUtils.getBrowser(request).getName());
+                    Map<String, List<String>> headers = WebUtils.getHeaders(request);
+                    userLoginName = Collections3.getFirst(headers.get("appCode"));
+                }
+                extendAttr.put("userType","S");//自定义 系统
+                extendAttr.put("userName","系统");
+                extendAttr.put("userLoginName", userLoginName);
                 log.setExtendAttr(extendAttr);
             }
-            log.setRemark(logging.remark());
+
+
+            log.setExtendAttr(extendAttr);
+            log.setRemark(SpringUtils.parseSpel(logging.remark(), method, args));
+            log.setOperTime(Calendar.getInstance().getTime());
             //将当前实体保存到threadLocal
             sysLogThreadLocal.set(log);
         } catch (Exception e) {
@@ -114,6 +142,7 @@ public class SysLogAspect {
         long end = System.currentTimeMillis();
         long opTime = end - log.getStartTime();
         log.setActionTime(String.valueOf(opTime));
+        log.setEndTime(end);
         log.prePersist();
         // 发布事件
         SpringContextHolder.publishEvent(new SysLogEvent(log));

@@ -182,6 +182,27 @@ public class AppConstants extends SysConstants {
         return value;
     }
 
+    /**
+     * auth 排除URL 多个之间以“,”分割
+     * @return
+     */
+    public static String getAuthExcludePaths() {
+        String code = "system.security.auth.excludePaths";
+        return getConfigValue(code,"");
+    }
+
+    /**
+     * auth 排除URL 多个之间以“,”分割
+     * @return
+     */
+    public static List<String> getAuthExcludePathList() {
+        String value = getAuthExcludePaths();
+        if(StringUtils.isNotBlank(value)){
+            return Arrays.asList(value.split(","));
+        }
+        return Collections.emptyList();
+    }
+
 
     /**
      * Oauth2拦截器是否启用
@@ -733,6 +754,16 @@ public class AppConstants extends SysConstants {
         return "true".equals(value) || "1".equals(value);
     }
 
+    /**
+     * REST 服务默认拦截器是否启用
+     * @return
+     */
+    public static boolean isRestDefaultInterceptorEnable() {
+        String code = "system.rest.defaultInterceptor.enable";
+        String value = getConfigValue(code, "true");
+        return "true".equals(value) || "1".equals(value);
+    }
+
 
     /**
      * REST 服务访问密钥
@@ -765,6 +796,16 @@ public class AppConstants extends SysConstants {
             return Arrays.asList(StringUtils.split(StringUtils.trim(value).replaceAll("\r\n", ",").replaceAll("，", ",").replaceAll("；", ",").replaceAll(";", ","), ","));
         }
         return Collections.emptyList();
+    }
+
+
+    /**
+     * RPC 服务认证客户端密钥
+     * @return
+     */
+    public static String getRPCClientApiKey() {
+        String code = "system.rpc.client.apiKey";
+        return getConfigValue(code, "");
     }
 
     /**

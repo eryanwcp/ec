@@ -13,10 +13,11 @@ import org.springframework.context.annotation.Configuration;
 import jakarta.servlet.*;
 import java.io.IOException;
 
-//@Configuration
-//@ConditionalOnWebApplication
-//@AutoConfigureAfter(DruidDataSourceAutoConfigure.class)
-//@ConditionalOnProperty(name = "spring.datasource.druid.stat-view-servlet.enabled", havingValue = "true", matchIfMissing = true)
+@Configuration
+@ConditionalOnWebApplication
+@AutoConfigureAfter(DruidDataSourceAutoConfigure.class)
+@ConditionalOnProperty(name = "spring.datasource.druid.stat-view-servlet.enabled",
+        havingValue = "true", matchIfMissing = true)
 public class DruidConfigurer {
 
     /**
@@ -38,27 +39,16 @@ public class DruidConfigurer {
         final String filePath = "support/http/resources/js/common.js";
 
         //创建filter进行过滤
-        Filter filter = new Filter() {
-            @Override
-            public void init(FilterConfig filterConfig) throws ServletException {
-            }
-
-            @Override
-            public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-                chain.doFilter(request, response);
-                // 重置缓冲区，响应头不会被重置
-                response.resetBuffer();
-                // 获取common.js
-                String text = Utils.readFromResource(filePath);
-                // 正则替换banner, 除去底部的广告信息
-                text = text.replaceAll("<a.*?banner\"></a><br/>", "");
-                text = text.replaceAll("powered.*?shrek.wang</a>", "");
-                response.getWriter().write(text);
-            }
-
-            @Override
-            public void destroy() {
-            }
+        Filter filter = (request, response, chain) -> {
+            chain.doFilter(request, response);
+            // 重置缓冲区，响应头不会被重置
+            response.resetBuffer();
+            // 获取common.js
+            String text = Utils.readFromResource(filePath);
+            // 正则替换banner, 除去底部的广告信息
+            text = text.replaceAll("<a.*?banner\"></a><br/>", "");
+            text = text.replaceAll("powered.*?shrek.wang</a>", "");
+            response.getWriter().write(text);
         };
 
         FilterRegistrationBean registrationBean = new FilterRegistrationBean();

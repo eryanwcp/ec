@@ -29,6 +29,12 @@ public @interface RestApi {
      */
     boolean required() default true;
 
+    /**
+     * 检查默认权限拦截
+     * @return
+     */
+    boolean checkDefaultPermission() default false;
+
     String[] value() default {};
 
     Logical logical() default AND;

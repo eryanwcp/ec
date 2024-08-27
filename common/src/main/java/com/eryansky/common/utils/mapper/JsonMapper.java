@@ -15,6 +15,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
@@ -97,6 +98,12 @@ public class JsonMapper  extends ObjectMapper{
         return new JsonMapper(Include.NON_DEFAULT);
     }
 
+
+    @Override
+    public JsonMapper enable(JsonParser.Feature... features) {
+        super.enable(features);
+        return this;
+    }
 
     /**
      * 允许单引号
@@ -360,6 +367,21 @@ public class JsonMapper  extends ObjectMapper{
     }
 
     /**
+     * 转ArrayNode
+     */
+    public ArrayNode toArrayNode(String jsonString) {
+        if (StringUtils.isEmpty(jsonString)) {
+            return null;
+        }
+        try {
+            return (ArrayNode)this.readTree(jsonString);
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
+        return null;
+    }
+
+    /**
      * 转ObjectNode
      */
     public ObjectNode toObjectNode(String text) {
@@ -400,8 +422,8 @@ public class JsonMapper  extends ObjectMapper{
         return JsonMapper.getInstance().fromJson(jsonString, clazz);
     }
 
-    public <T> T toJavaObject(String value, Class<T> tClass) {
-        return StringUtils.isNotBlank(value) ? toJavaObject(value, tClass, () -> null) : null;
+    public <T> T toJavaObject(String obj, Class<T> tClass) {
+        return StringUtils.isNotBlank(obj) ? toJavaObject(obj, tClass, () -> null) : null;
     }
 
     public <T> T toJavaObject(Object obj, Class<T> tClass) {
@@ -418,6 +440,29 @@ public class JsonMapper  extends ObjectMapper{
             logger.error(String.format("toJavaObject exception: \n %s\n %s", value, tClass), e);
         }
         return defaultSupplier.get();
+    }
+
+    public <T> T toJavaObject(Object obj, TypeReference<T> typeReference) {
+        return obj != null ? toJavaObject(toJsonString(obj), typeReference) : null;
+    }
+    public <T> T toJavaObject(String value, TypeReference<T> typeReference) {
+        try {
+            return this.readValue(value, typeReference);
+        } catch (Throwable e) {
+            logger.error(String.format("toJavaObject exception: \n %s\n %s", value, typeReference), e);
+        }
+        return null;
+    }
+    public <T> T toJavaObject(Object obj, JavaType valueType) {
+        return obj != null ? toJavaObject(toJsonString(obj), valueType) : null;
+    }
+    public <T> T toJavaObject(String value, JavaType valueType) {
+        try {
+            return this.readValue(value, valueType);
+        } catch (Throwable e) {
+            logger.error(String.format("toJavaObject exception: \n %s\n %s", value, valueType), e);
+        }
+        return null;
     }
 
     public <T> List<T> toJavaObjectList(String value, Class<T> tClass) {

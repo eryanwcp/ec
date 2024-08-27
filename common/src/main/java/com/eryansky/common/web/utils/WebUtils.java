@@ -10,6 +10,8 @@ import com.eryansky.common.utils.UserAgentUtils;
 import com.eryansky.common.utils.encode.EncodeUtils;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +23,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.zip.GZIPOutputStream;
@@ -501,5 +505,18 @@ public class WebUtils extends org.springframework.web.util.WebUtils {
         return url.toString();
     }
 
-
+    public static Map<String, List<String>> getHeaders(HttpServletRequest request) {
+        Map<String, List<String>> headers = Maps.newHashMap();
+        Enumeration<String> namesEnumeration = request.getHeaderNames();
+        while(namesEnumeration.hasMoreElements()) {
+            String name = namesEnumeration.nextElement();
+            Enumeration<String> valueEnumeration = request.getHeaders(name);
+            List<String> values = Lists.newArrayList();
+            while(valueEnumeration.hasMoreElements()) {
+                values.add(valueEnumeration.nextElement());
+            }
+            headers.put(name, values);
+        }
+        return headers;
+    }
 }

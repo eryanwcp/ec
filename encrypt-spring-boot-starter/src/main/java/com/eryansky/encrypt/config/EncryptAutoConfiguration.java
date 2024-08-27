@@ -1,6 +1,7 @@
 package com.eryansky.encrypt.config;
 
 import com.eryansky.encrypt.advice.DecryptRequestBodyAdvice;
+import com.eryansky.encrypt.advice.EncryptRResponseBodyAdvice;
 import com.eryansky.encrypt.advice.EncryptResultResponseBodyAdvice;
 import com.eryansky.encrypt.aspectj.EncryptHandler;
 import com.eryansky.encrypt.badger.HoneyBadgerEncrypt;
@@ -152,6 +153,12 @@ public class EncryptAutoConfiguration {
     public EncryptResultResponseBodyAdvice encryptResultResponseBodyAdvice() {
         return new EncryptResultResponseBodyAdvice();
     }
+
+    @Bean
+    public EncryptRResponseBodyAdvice encryptRResponseBodyAdvice() {
+        return new EncryptRResponseBodyAdvice();
+    }
+
 
     @Bean
     public DecryptRequestBodyAdvice decryptRequestBodyAdvice() {

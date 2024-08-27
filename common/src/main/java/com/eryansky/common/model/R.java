@@ -46,32 +46,36 @@ public class R<T> implements Serializable {
         return msg;
     }
 
-    public void setMsg(String msg) {
+    public R<T> setMsg(String msg) {
         this.msg = msg;
+        return this;
     }
 
     public int getCode() {
         return code;
     }
 
-    public void setCode(int code) {
+    public R<T> setCode(int code) {
         this.code = code;
+        return this;
     }
 
     public T getData() {
         return data;
     }
 
-    public void setData(T data) {
+    public R<T> setData(T data) {
         this.data = data;
+        return this;
     }
 
     public static R<Boolean> rest(boolean result) {
-        R<Boolean> r = new R<Boolean>();
+        R<Boolean> r = new R<>();
         if (!result) {
             r.setCode(R.FAIL);
             r.setData(false);
         }
         return r;
     }
+
 }

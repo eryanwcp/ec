@@ -121,6 +121,19 @@ public class EncryptUtils {
         return aes.encryptHex(encrypt);
     }
 
+    /**
+     * aes加密
+     *
+     * @param data 数据
+     * @return 加密数组
+     */
+    public static byte[] aesECBEncrypt(byte[] data) {
+        AES aes = new AES(Mode.ECB, Padding.PKCS5Padding, SERVER_KEY);
+        if (data.length == 0) {
+            throw new RuntimeException("加密内容不能为空");
+        }
+        return aes.encrypt(data);
+    }
 
     /**
      * aes解密
@@ -133,6 +146,19 @@ public class EncryptUtils {
         //解密
         byte[] decrypt = aes.decrypt(encrypt);
         return aes.decryptStr(decrypt);
+    }
+
+    /**
+     * aes解密
+     *
+     * @param encrypt 密文
+     * @return 明文 string
+     */
+    public static byte[] aesECBDecrypt(byte[] encrypt){
+        AES aes = new AES(Mode.ECB, Padding.PKCS5Padding,SERVER_KEY);
+        //解密
+        byte[] decrypt = aes.decrypt(encrypt);
+        return aes.decrypt(decrypt);
     }
 
     /**

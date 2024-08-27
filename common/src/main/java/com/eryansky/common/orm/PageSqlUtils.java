@@ -76,7 +76,4 @@ public class PageSqlUtils {
         return selectIndex + (selectDistinctIndex == selectIndex ? 15 : 6);
     }
 
-    public static void main(String[] args) {
-
-    }
 }

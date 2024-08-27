@@ -22,33 +22,33 @@ $(function () {
         idField: 'id',
         frozenColumns: [[
             {field: 'ck', checkbox: true, width: 60},
-            {field: 'typeView', title: '日志类型', width: 80}
+            {field: 'typeView', title: '日志类型', width: 80},
+            {field: 'userId', title: '用户标识', width: 260},
+            {field: 'userName', title: '用户名称', width: 100}
         ]],
         columns: [[
             {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
+            {field: 'userLoginName', title: '账号', width: 120,hidden: true},
+            {field: 'userMobile', title: '手机号', width: 120,hidden: true},
             {
                 field: 'title', title: '标题', width: 200, hidden: false, formatter: function (value, rowData, rowIndex) {
                     return "<a target='_blank' href='" + ctxAdmin + "/sys/log/detail?id=" + rowData['id'] + "'>" + rowData['title'] + "</a>";
                 }
             },
-            {field: 'userCompanyName', title: '单位', width: 200, hidden: false},
-            {field: 'userOrganName', title: '部门', width: 150, hidden: false},
-            {field: 'userName', title: '姓名', width: 80},
-            {field: 'userId', title: '用户标识', width: 200, hidden: true},
+            {field: 'module', title: '模块', width: 300},
+            {field: 'deviceType', title: '设备类型', width: 100},
+            {field: 'browserType', title: '浏览器', width: 100},
+            {field: 'userAgent', title: '客户端', width: 300, hidden: true},
             {field: 'ip', title: 'IP地址', width: 100},
-            {field: 'userAgent', title: '客户端', width: 100, hidden: true},
-            {field: 'browserType', title: '浏览器', width: 100, hidden: true},
-            {field: 'deviceType', title: '设备', width: 80, hidden: true},
-            {field: 'module', title: '模块', width: 200},
-            {field: 'action', title: '操作', width: 100, hidden: true},
-            {field: 'operTime', title: '操作时间', width: 136, sortable: true},
-            {field: 'actionTime', title: '操作耗时(ms)', width: 100},
+            {field: 'action', title: '操作', width: 80},
             {field: 'longitude', title: '经度', width: 100, hidden: true},
             {field: 'latitude', title: '纬度', width: 100, hidden: true},
             {field: 'remark', title: '备注', width: 260, hidden: true},
             {field: 'extendAttr', title: '自定义参数', width: 200,hidden: true,formatter: function (value, rowData, rowIndex) {
                     return value ? JSON.stringify(value) : value;
-                }}
+            }},
+            {field: 'actionTime', title: '操作耗时(ms)', width: 100,align: 'right'},
+            {field: 'operTime', title: '操作时间', width: 136, sortable: true}
         ]],
         toolbar: [
             {

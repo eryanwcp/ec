@@ -13,6 +13,6 @@ public class DruidPassword {
         AesSupport a = new AesSupport();
         System.out.println(a.encrypt("password"));
         System.out.println(a.decrypt(a.encrypt("password")));
-        System.out.println(a.decrypt("6c6a6e9194f90785296e0a794dedf34d1f300ec703cf2b4e"));
+        System.out.println(a.decrypt("d61e0c08056e2dde35a8af83579c7b93e1423ce0ec29b354"));
     }
 }

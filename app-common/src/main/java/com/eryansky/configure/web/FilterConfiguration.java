@@ -77,7 +77,7 @@ public class FilterConfiguration {
         FilterRegistrationBean<XssFilter> bean = new FilterRegistrationBean<>(filter);
         bean.setFilter(filter);
         String xssBlackUrl = environment.getProperty("system.security.xssFilter.blackListURL");
-        bean.addInitParameter("blackListURL", "/static/**;/api/**;/druid/**" + (StringUtils.isNotBlank(xssBlackUrl) ? (";" + xssBlackUrl) : ""));
+        bean.addInitParameter("blackListURL", "/static/**;/druid/**" + (StringUtils.isNotBlank(xssBlackUrl) ? (";" + xssBlackUrl) : ""));
         bean.addInitParameter("whiteListURL", "/**");
         bean.setOrder(Ordered.HIGHEST_PRECEDENCE + 80);
         return bean;

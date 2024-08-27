@@ -7,7 +7,6 @@ package com.eryansky.common.web.springmvc;
 
 import com.eryansky.common.utils.BeanValidators;
 import com.eryansky.common.utils.DateUtils;
-import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.utils.WebUtils;
 import org.slf4j.Logger;
@@ -19,9 +18,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
@@ -57,49 +53,6 @@ public abstract class SimpleController{
         responseHeaders.setContentType(MediaType.TEXT_PLAIN);
         return responseHeaders;
     }
-
-
-    /**
-     * 用户跳转JSP页面
-     * <p/>
-     * 此方法不考虑权限控制
-     *
-     * @param folder 路径
-     * @param pageName 页面名称(不加后缀)
-     * @return 指定JSP页面
-     */
-    @GetMapping("/{folder}/{pageName}")
-    public String redirectJsp(@PathVariable String folder, @PathVariable String pageName) {
-        return "/" + folder + "/" + pageName;
-    }
-
-    /**
-     * 用户跳转JSP页面
-     * <p/>
-     * 此方法不考虑权限控制
-     *
-     * @param prefix   前缀
-     * @param toPage   跳转页面名称（包含目录以及后缀）
-     * @param request
-     * @param response
-     * @throws Exception
-     */
-    @GetMapping("redirect")
-    public void redirectJsp(String prefix, String toPage, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        if (StringUtils.isEmpty(prefix)) {
-            prefix = "/WEB-INF/views/";
-        }
-        if (StringUtils.isBlank(toPage)) {
-            logger.warn("重定向页面为空!");
-            response.sendError(404);
-        } else {
-            if (this.logger.isDebugEnabled()) {
-                this.logger.debug("重定向到页面:{}" , prefix + toPage);
-            }
-            request.getRequestDispatcher(prefix + toPage).forward(request, response);
-        }
-    }
-
 
     /**
      * 服务端参数有效性验证
