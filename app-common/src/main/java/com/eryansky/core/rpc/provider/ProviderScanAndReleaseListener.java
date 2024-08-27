@@ -46,7 +46,6 @@ public class ProviderScanAndReleaseListener implements ApplicationListener<Appli
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        log.debug("ApplicationReadyEvent#onApplicationEvent:{}",flag);
         if (flag.compareAndSet(false, true)) {
             // 扫描所有rpcProvider注册的bean
             scanRpcProviderBeans(event.getApplicationContext());
@@ -135,7 +134,7 @@ public class ProviderScanAndReleaseListener implements ApplicationListener<Appli
                                 .build();
                         urlMappingList.add(path);
                         // 发布url，指定一下url的处理器
-                        log.debug("{}",JsonMapper.toJsonString(requestMappingInfo.getDirectPaths()));
+//                        log.debug("{}",JsonMapper.toJsonString(requestMappingInfo.getDirectPaths()));
                         requestMappingHandlerMapping.registerMapping(requestMappingInfo, commonHandlerUrl, CommonHandlerUrl.HANDLE_CUSTOM_URL_METHOD);
                     }
                 }

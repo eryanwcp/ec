@@ -15,7 +15,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <commons-cli.version>1.8.0</commons-cli.version>
+        <commons-cli.version>1.9.0</commons-cli.version>
         <commons-io.version>2.16.1</commons-io.version>
         <commons-fileupload.version>1.5</commons-fileupload.version>
         <commons-text.version>1.12.0</commons-text.version>
@@ -34,7 +34,7 @@
         <cglib-nodep.version>3.3.0</cglib-nodep.version>
         <slf4j.version>1.7.36</slf4j.version>
 
-        <guava.version>33.2.1-jre</guava.version>
+        <guava.version>33.3.0-jre</guava.version>
         <dozer.version>6.5.2</dozer.version>
         <freemarker.version>2.3.33</freemarker.version>
 
