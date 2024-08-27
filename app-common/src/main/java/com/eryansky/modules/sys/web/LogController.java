@@ -94,15 +94,15 @@ public class LogController extends SimpleController {
             if (export) {
                 page.setPageSize(Page.PAGESIZE_ALL);
             }
-            page = logService.findQueryPage(page, type, userInfo, query, _startTime, endTime, true);
+            page = logService.findQueryPage(page, type, userInfo, query, _startTime, endTime, false);
             if (export) {
                 List<Object[]> data = Lists.newArrayList();
-                page.getResult().forEach(o -> data.add(new Object[]{o.getTypeView(), o.getTitle(), o.getUserCompanyName(), o.getUserOrganName(), o.getUserName(),o.getUserId(), o.getIp(), o.getDeviceType(),o.getUserAgent(),o.getBrowserType(), o.getModule(), DateUtils.formatDateTime(o.getOperTime()), o.getActionTime(),o.getRemark(),o.getExtendAttr()}));
+                page.getResult().forEach(o -> data.add(new Object[]{o.getTypeView(), o.getTitle(), o.getUserId(),o.getUserLoginName(),o.getUserName(), o.getIp(), o.getDeviceType(),o.getUserAgent(),o.getBrowserType(), o.getModule(), DateUtils.formatDateTime(o.getOperTime()), o.getActionTime(),o.getRemark(),o.getExtendAttr()}));
 
 
                 String title = "审计日志-" + DateUtils.getCurrentDate();
                 //Sheet2
-                String[] hearders = new String[]{"日志类型", "标题", "单位", "部门", "姓名",  "用户标识","IP地址", "设备", "客户端","浏览器","模块", "操作时间", "操作耗时(ms)","备注","自定义参数"};//表头数组
+                String[] hearders = new String[]{"日志类型", "标题",  "用户标识",  "账号","姓名","IP地址", "设备", "客户端","浏览器","模块", "操作时间", "操作耗时(ms)","备注","自定义参数"};//表头数组
 
                 if (page.getResult().size() < 65531) {
                     //导出Excel

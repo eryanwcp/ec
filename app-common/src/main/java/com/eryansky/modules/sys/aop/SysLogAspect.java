@@ -96,6 +96,9 @@ public class SysLogAspect {
                 log.setBrowserType(sessionInfo.getBrowserType());
                 ExtendAttr extendAttr = new ExtendAttr();
                 extendAttr.put("userType",sessionInfo.getUserType());
+                extendAttr.put("userName",sessionInfo.getName());
+                extendAttr.put("userLoginName",sessionInfo.getLoginName());
+                extendAttr.put("userMobile",sessionInfo.getMobile());
                 log.setExtendAttr(extendAttr);
             }
             log.setRemark(SpringUtils.parseSpel(logging.remark(), method, args));

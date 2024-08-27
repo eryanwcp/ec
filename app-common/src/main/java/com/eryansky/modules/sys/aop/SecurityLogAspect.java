@@ -7,6 +7,7 @@ package com.eryansky.modules.sys.aop;
 
 import com.eryansky.client.common.vo.ExtendAttr;
 import com.eryansky.common.spring.SpringContextHolder;
+import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.core.security.SecurityType;
 import com.eryansky.core.security.SecurityUtils;
@@ -95,7 +96,12 @@ public class SecurityLogAspect {
             methodName = "logout";
         }
         String user = null;
-
+        HttpServletRequest request = null;
+        try {
+            request = SpringMVCHolder.getRequest();
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
         // 执行方法所消耗的时间
         try {
             Log log = new Log();
@@ -104,20 +110,17 @@ public class SecurityLogAspect {
             log.setModule(className + "-" + methodName);
             log.setIp(sessionInfo.getIp());
             log.setTitle(securityType.getDescription());
-            log.setAction("[" + sessionInfo.getLoginName() + "]" + securityType.getDescription());
+            log.setAction(null != request ? request.getMethod(): StringUtils.EMPTY);
             log.setUserAgent(sessionInfo.getUserAgent());
             log.setDeviceType(sessionInfo.getDeviceType());
             log.setBrowserType(sessionInfo.getBrowserType());
             log.setOperTime(new Date());
             ExtendAttr extendAttr = new ExtendAttr();
             extendAttr.put("userType",sessionInfo.getUserType());
+            extendAttr.put("userName",sessionInfo.getName());
+            extendAttr.put("userLoginName",sessionInfo.getLoginName());
+            extendAttr.put("userMobile",sessionInfo.getMobile());
             log.setExtendAttr(extendAttr);
-            try {
-                HttpServletRequest request = SpringMVCHolder.getRequest();
-                log.setParams(request.getParameterMap());
-            } catch (Exception e) {
-                logger.error(e.getMessage());
-            }
             end = System.currentTimeMillis();
             long opTime = end - start;
             log.setActionTime(String.valueOf(opTime));

@@ -23,11 +23,9 @@
             showFooter: true,
             //idField: 'id',
             columns: [ [
-                {field: 'companyName', title: '单位', width: 235, hidden: false},
-                {field: 'organName', title: '部门', width: 235, hidden: false},
-                {field: 'name', title: '姓名', width: 100},
-                {field: 'userId', title: '用户标识', width: 235, hidden: false},
-                {field: 'userName', title: '账号', width: 120, hidden: false},
+                {field: 'userId', title: '用户标识', width: 260, hidden: false},
+                {field: 'userName', title: '姓名', width: 100},
+                {field: 'userLoginName', title: '账号', width: 120, hidden: false},
                 {field: 'count', title: '登录次数', width: 100,align:'right', hidden: false, sortable: true}
             ]]
         }).datagrid("showTooltip");
@@ -44,7 +42,7 @@
          style="padding: 0px; height: 70px;width:100%; overflow-y: hidden;">
         <form id="log_search_form" style="padding: 5px;">
 
-            &nbsp;用户信息：<input type="text" id="query" name="query"
+            &nbsp;关键字：<input type="text" id="query" name="query"
                                class="easyui-validatebox textbox eu-input" placeholder="用户信息..."  onkeydown="if(event.keyCode==13)search()"
                                maxLength="36" style="width: 160px" />
             &nbsp;起始时间：<input type="text" id="startTime" name="startTime" class="easyui-my97" placeholder="起始时间..."/>
