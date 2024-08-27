@@ -5,7 +5,7 @@ import java.lang.annotation.*;
 /**
  * 声明一个消费者注解
  */
-@Target(ElementType.FIELD) // 作用于字段上
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface RPCConsumer {

@@ -35,7 +35,7 @@ public @interface RPCExchange {
      */
     String apiKey() default "";
     /**
-     *
+     * 别名
      * @return
      */
 
