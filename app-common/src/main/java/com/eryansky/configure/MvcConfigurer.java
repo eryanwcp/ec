@@ -29,6 +29,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
+import java.time.Duration;
 import java.util.*;
 
 import static com.fasterxml.jackson.core.JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION;
@@ -191,7 +192,8 @@ public class MvcConfigurer implements WebMvcConfigurer {
         // 创建一个 MappingJackson2HttpMessageConverter 实例，并使用自定义的 ObjectMapper
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
         converter.setObjectMapper(objectMapper);
-        RestTemplate restTemplate = builder.build();
+        RestTemplate restTemplate = builder.setConnectTimeout(Duration.ofSeconds(10))
+                .setReadTimeout(Duration.ofMinutes(30)).build();
         restTemplate.getMessageConverters().add(converter);
         return restTemplate;
     }
