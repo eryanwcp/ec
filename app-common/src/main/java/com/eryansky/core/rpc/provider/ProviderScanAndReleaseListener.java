@@ -98,7 +98,6 @@ public class ProviderScanAndReleaseListener implements ApplicationListener<Appli
                                             rm.setAlias(m.getName());
                                         }
                                         rm.setEncrypt(annotation.encrypt());
-                                        rm.setEncryptKey(annotation.encryptKey());
                                     } else {
                                         rm.setAlias(m.getName());
                                     }

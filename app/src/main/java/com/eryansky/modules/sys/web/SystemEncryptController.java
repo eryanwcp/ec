@@ -89,4 +89,5 @@ public class SystemEncryptController extends SimpleController {
         return Result.successResult().setData(data);
     }
 
+
 }

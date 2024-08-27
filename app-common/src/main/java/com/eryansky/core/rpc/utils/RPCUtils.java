@@ -3,7 +3,11 @@ package com.eryansky.core.rpc.utils;
 import com.eryansky.client.common.rpc.RPCExchange;
 import com.eryansky.client.common.rpc.RPCMethodConfig;
 import com.eryansky.common.spring.SpringContextHolder;
+import com.eryansky.common.utils.encode.Cryptos;
+import com.eryansky.common.utils.encode.RSAUtils;
+import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.core.rpc.consumer.ConsumerExecutor;
+import com.eryansky.encrypt.enums.CipherMode;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Maps;
 import org.springframework.beans.factory.config.BeanExpressionContext;
@@ -52,6 +56,12 @@ public class RPCUtils {
             headers.put(HEADER_API_SERVICE_METHOD,requestMethodName);
             headers.put(HEADER_AUTH_TYPE,AUTH_TYPE);
             headers.put(HEADER_X_API_KEY, StringUtils.hasLength(annotation.apiKey()) ? resolve(null,annotation.apiKey()):AppConstants.getRPCClientApiKey());
+
+            //加密参数 加密方式
+            if(null != methodAnnotation){
+                String encrypt = resolve(null,methodAnnotation.encrypt());
+                headers.put(HEADER_ENCRYPT, encrypt);
+            }
             // 由于当前接口在服务消费方并没有实现类，不能对实现类增强，可以增加一个统一的切入点执行逻辑
             return  ConsumerExecutor.execute(url.toString(),headers, objects, reference);
         });

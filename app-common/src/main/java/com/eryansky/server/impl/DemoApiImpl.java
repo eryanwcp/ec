@@ -53,4 +53,9 @@ public class DemoApiImpl implements DemoApi {
     public Page<User> test12(Page<User> page) {
         return page;
     }
+
+    @Override
+    public R<Object> encrypt(String param1) {
+        return new R<>().setData(new User(User.SUPERUSER_ID)).setCode(R.SUCCESS);
+    }
 }

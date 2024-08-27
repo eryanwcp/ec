@@ -20,15 +20,16 @@ public class ApiTests {
     @Test
     public void contextLoads() {
 
-        System.out.println(demoApi.test1("1"));
-        System.out.println(demoApi.test1("1","2"));
-        System.out.println(demoApi.test2("1"));
-        System.out.println(JsonMapper.toJsonString(demoApi.test10("1")));
-
-        Map<String,Object> map = Maps.newHashMap();
-        map.put("str","maps");
-        map.put("user",new User(User.SUPERUSER_ID));
-        System.out.println(JsonMapper.toJsonString(demoApi.test11("1",1,map, Lists.newArrayList(new User(User.SUPERUSER_ID)),new Page<User>(1,2))));
+        System.out.println(JsonMapper.toJsonString(demoApi.encrypt("1")));
+//        System.out.println(demoApi.test1("1"));
+//        System.out.println(demoApi.test1("1","2"));
+//        System.out.println(demoApi.test2("1"));
+//        System.out.println(JsonMapper.toJsonString(demoApi.test10("1")));
+//
+//        Map<String,Object> map = Maps.newHashMap();
+//        map.put("str","maps");
+//        map.put("user",new User(User.SUPERUSER_ID));
+//        System.out.println(JsonMapper.toJsonString(demoApi.test11("1",1,map, Lists.newArrayList(new User(User.SUPERUSER_ID)),new Page<User>(1,2))));
 
 
     }

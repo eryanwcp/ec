@@ -12,12 +12,15 @@ import java.util.Map;
 
 @RPCExchange(name = "demo-service", serverUrl = "${ec.api.serverUrl}")
 public interface DemoApi {
-
     String test1(String param1);
+
     @RPCMethodConfig(alias = "test120")
     String test1(String param1,String param2);
     int test2(String param1);
     R<Boolean> test10(String param1);
     R<Map<String,Object>> test11(String str, int pint, Map<String,Object> map, List<User> list, Page<User> page);
     Page<User> test12(Page<User> page);
+
+    @RPCMethodConfig(encrypt = RPCMethodConfig.ENCRYPT_SM4)
+    R<Object> encrypt(String param1);
 }

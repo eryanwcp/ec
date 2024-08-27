@@ -97,10 +97,6 @@ public class ProviderHolder {
          * 加密方式
          */
         private String encrypt;
-        /**
-         * 加密密钥
-         */
-        private String encryptKey;
 
         @JsonIgnore
         public Method getMethod() {
@@ -127,12 +123,5 @@ public class ProviderHolder {
             this.encrypt = encrypt;
         }
 
-        public String getEncryptKey() {
-            return encryptKey;
-        }
-
-        public void setEncryptKey(String encryptKey) {
-            this.encryptKey = encryptKey;
-        }
     }
 }

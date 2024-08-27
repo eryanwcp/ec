@@ -1,5 +1,6 @@
 package com.eryansky.core.rpc.config;
 
+import com.eryansky.core.rpc.advice.EncryptRPCResponseBodyAdvice;
 import com.eryansky.core.rpc.provider.CommonHandlerUrl;
 import com.eryansky.core.rpc.provider.ProviderScanAndReleaseListener;
 import org.slf4j.Logger;
@@ -23,4 +24,8 @@ public class ProviderConfig {
         return new ProviderScanAndReleaseListener(requestMappingHandlerMapping, commonHandlerUrl);
     }
 
+    @Bean
+    public EncryptRPCResponseBodyAdvice encryptRPCResponseBodyAdvice() {
+        return new EncryptRPCResponseBodyAdvice();
+    }
 }

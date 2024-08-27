@@ -1,23 +1,26 @@
 package com.eryansky.core.rpc.provider;
 
+import com.eryansky.common.utils.StringUtils;
+import com.eryansky.common.utils.encode.Cryptos;
+import com.eryansky.common.utils.encode.RSAUtils;
+import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.core.rpc.utils.RPCUtils;
 import com.eryansky.core.security.annotation.RestApi;
+import com.eryansky.encrypt.anotation.EncryptResponseBody;
+import com.eryansky.encrypt.enums.CipherMode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StreamUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -44,6 +47,7 @@ public class CommonHandlerUrl {
     }
 
     @RestApi
+    @EncryptResponseBody(defaultHandle = false,handle = "RPC")
     @ResponseBody
     /**
      *  拦截自定义请求的url，可以做成统一的处理器
@@ -51,8 +55,22 @@ public class CommonHandlerUrl {
     public Object handlerUrl(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String rpcService = request.getHeader(RPCUtils.HEADER_API_SERVICE_NAME);
         String methodName = request.getHeader(RPCUtils.HEADER_API_SERVICE_METHOD);
+        String encrypt = request.getHeader(RPCUtils.HEADER_ENCRYPT);
+        String encryptKey = request.getHeader(RPCUtils.HEADER_ENCRYPT_KEY);
         // 获取请求体
         String requestBodyJsonString = StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8);
+        //请求体解密
+        if (StringUtils.isNotBlank(encrypt) && StringUtils.isNotBlank(encryptKey) ){
+            String key = null;
+            if(CipherMode.SM4.name().equals(encrypt)){
+                key = RSAUtils.decryptHexString(encryptKey);
+                requestBodyJsonString = Sm4Utils.decrypt(key, requestBodyJsonString);
+            }else if(CipherMode.AES.name().equals(encrypt)){
+                key = RSAUtils.decryptBase64String(encryptKey);
+                requestBodyJsonString = Cryptos.aesECBDecryptBase64String(requestBodyJsonString,key);
+            }
+        }
+
         // 解析参数
         Object[] params = resolveParams(requestBodyJsonString, rpcService, methodName);
         // 执行方法
@@ -92,7 +110,7 @@ public class CommonHandlerUrl {
      */
     private Object[] resolveParams(String requestBodyJsonString, String rpcService, String methodName) throws ClassNotFoundException {
         // 如果没有请求体，参数直接返回null
-        if (!StringUtils.hasLength(requestBodyJsonString)) {
+        if (!StringUtils.isNotBlank(requestBodyJsonString)) {
             return null;
         }
         List<Object> paramList = new ArrayList<>();

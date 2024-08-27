@@ -10,6 +10,9 @@ import java.lang.annotation.*;
 @Documented
 public @interface RPCMethodConfig {
 
+    String ENCRYPT_AES = "AES";
+    String ENCRYPT_SM4 = "SM4";
+
     /**
      * 发布方法取别名
      *
@@ -25,13 +28,10 @@ public @interface RPCMethodConfig {
     boolean isForbidden() default false;
 
     /**
-     * 加密方式
+     * 加密方式 默认:不加密 支持的加密方式AES、SM4
+     *
      * @see CipherMode
      */
     String encrypt() default "";
-    /**
-     * 加密密钥
-     */
-    String encryptKey() default "";;
 
 }
