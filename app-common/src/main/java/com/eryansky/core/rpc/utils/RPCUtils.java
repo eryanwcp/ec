@@ -10,6 +10,8 @@ import com.eryansky.core.rpc.consumer.ConsumerExecutor;
 import com.eryansky.encrypt.enums.CipherMode;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanExpressionContext;
 import org.springframework.beans.factory.config.BeanExpressionResolver;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -22,6 +24,8 @@ import java.lang.reflect.Type;
 import java.util.Map;
 
 public class RPCUtils {
+
+    private static final Logger log = LoggerFactory.getLogger(RPCUtils.class);
     public static final String AUTH_TYPE = "apiKey";
     public static final String HEADER_API_SERVICE_NAME = "Api-Service-Name";
     public static final String HEADER_API_SERVICE_METHOD = "Api-Service-method";
@@ -58,10 +62,18 @@ public class RPCUtils {
             headers.put(HEADER_X_API_KEY, StringUtils.hasLength(annotation.apiKey()) ? resolve(null,annotation.apiKey()):AppConstants.getRPCClientApiKey());
 
             //加密参数 加密方式
+            String encrypt = null;
             if(null != methodAnnotation){
-                String encrypt = resolve(null,methodAnnotation.encrypt());
-                headers.put(HEADER_ENCRYPT, encrypt);
+                encrypt = resolve(null,methodAnnotation.encrypt());
             }
+            if(!StringUtils.hasLength(encrypt) && !RPCExchange.ENCRYPT_NONE.equals(encrypt) && null != annotation){
+                encrypt = resolve(null,annotation.encrypt());
+            }
+            if(StringUtils.hasLength(encrypt) && !RPCExchange.ENCRYPT_NONE.equals(encrypt)){
+                headers.put(HEADER_ENCRYPT, encrypt);
+                log.debug("RPC服务传输数据加密：{} {}",url,encrypt);
+            }
+
             // 由于当前接口在服务消费方并没有实现类，不能对实现类增强，可以增加一个统一的切入点执行逻辑
             return  ConsumerExecutor.execute(url.toString(),headers, objects, reference);
         });
