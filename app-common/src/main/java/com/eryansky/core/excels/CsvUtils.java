@@ -19,9 +19,9 @@ public class CsvUtils {
      * @param data     数据内容
      * @param filePath 创建的csv文件路径
      **/
-    public static void writeCsv(String[] headers, List<Object[]> data, String filePath) throws IOException {
+    public static void writeCsv(Object[] headers, List<Object[]> data, String filePath) throws IOException {
         //初始化csvformat
-        CSVFormat formator = CSVFormat.DEFAULT.withRecordSeparator("\n");
+        CSVFormat formator = CSVFormat.Builder.create(CSVFormat.DEFAULT).setRecordSeparator("\n").build();
         //创建FileWriter对象
         try(FileWriter fileWriter = new FileWriter(filePath, true);
             //创建CSVPrinter对象
@@ -45,12 +45,12 @@ public class CsvUtils {
      * @param data     数据内容
      * @param outputStream 创建的csv文件路径
      **/
-    public static void writeCsv(String[] headers, List<Object[]> data, OutputStream outputStream) throws IOException {
+    public static void writeCsv(Object[] headers, List<Object[]> data, OutputStream outputStream) throws IOException {
         // 写入bom, 防止中文乱码
         byte[] bytes = {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF};
         outputStream.write(bytes);
         //初始化csvformat
-        CSVFormat formator = CSVFormat.DEFAULT.withRecordSeparator("\n");
+        CSVFormat formator = CSVFormat.Builder.create(CSVFormat.DEFAULT).setRecordSeparator("\n").build();
         try(//创建FileWriter对象
             Writer outputStreamWriter = new OutputStreamWriter(outputStream);
             //创建CSVPrinter对象
@@ -78,7 +78,7 @@ public class CsvUtils {
      * @param request
      * @param response
      **/
-    public static void exportToCsv(String title, String[] headers, List<Object[]> data, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public static void exportToCsv(String title, Object[] headers, List<Object[]> data, HttpServletRequest request, HttpServletResponse response) throws IOException {
         String sFileName = title + ".csv";
         WebUtils.setDownloadableHeader(request, response, sFileName);
         response.setHeader("Connection", "close");
@@ -88,7 +88,7 @@ public class CsvUtils {
         byte[] bytes = {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF};
         outputStream.write(bytes);
         //初始化csvformat
-        CSVFormat formator = CSVFormat.DEFAULT.withRecordSeparator("\n");
+        CSVFormat formator = CSVFormat.Builder.create(CSVFormat.DEFAULT).setRecordSeparator("\n").build();
         try(//创建FileWriter对象
             Writer outputStreamWriter = new OutputStreamWriter(outputStream);
             //创建CSVPrinter对象
@@ -114,7 +114,7 @@ public class CsvUtils {
      * @param request
      * @param response
      **/
-    public static void exportToCsv(String title, String[] headers, List<Object[]> data, HttpServletRequest request, HttpServletResponse response, String charsetName) throws IOException {
+    public static void exportToCsv(String title, Object[] headers, List<Object[]> data, HttpServletRequest request, HttpServletResponse response, String charsetName) throws IOException {
         String sFileName = title + ".csv";
         WebUtils.setDownloadableHeader(request, response, sFileName);
         response.setHeader("Connection", "close");
@@ -124,7 +124,7 @@ public class CsvUtils {
         byte[] bytes = {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF};
         outputStream.write(bytes);
         //初始化csvformat
-        CSVFormat formator = CSVFormat.DEFAULT.withRecordSeparator("\n");
+        CSVFormat formator = CSVFormat.Builder.create(CSVFormat.DEFAULT).setRecordSeparator("\n").build();
         try(
             //创建FileWriter对象
             Writer outputStreamWriter = new OutputStreamWriter(outputStream,charsetName);
