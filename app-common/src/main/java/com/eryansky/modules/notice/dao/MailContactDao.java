@@ -1,5 +1,5 @@
 /**
-*  Copyright (c) 2012-2022 https://www.eryansky.com
+*  Copyright (c) 2012-2024 https://www.eryansky.com
 *
 */
 package com.eryansky.modules.notice.dao;
