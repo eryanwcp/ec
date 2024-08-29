@@ -274,7 +274,7 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
                         authorization = SpringMVCHolder.getRequest().getParameter("Authorization");
                     }
                     if(WebUtils.isAjaxRequest(request) || StringUtils.startsWith(authorization,"Bearer ")){
-//                        response.setStatus(HttpStatus.FORBIDDEN.value());
+//                        response.setStatus(HttpStatus.UNAUTHORIZED.value());
                         R<Boolean> r = new R<>(false).setCode(R.NO_PERMISSION).setMsg("未授权或会话信息已失效!");
                         WebUtils.renderJson(response, r);
                     }else{
