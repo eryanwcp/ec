@@ -40,7 +40,7 @@ public class DefaultConfigurer {
         PropertiesLoader propertiesLoader = AppConstants.getConfig();
         String[] resourcesPaths = propertiesLoader.getResourcesPaths();
         Properties properties = AppConstants.getConfig().getProperties();
-        logger.info("系统参数读取模式：{}", AppConstants.isdevMode() ? "配置文件" + resourcesPaths[0] : "数据库t_sys_config");
+        logger.info("系统参数读取模式：{}", AppConstants.isdevMode() ? "配置文件" + resourcesPaths[0] : "数据库");
         if (Collections3.isNotEmpty(dbConfigs) && null != properties) {
             dbConfigs.forEach(v -> {
                 Map.Entry<Object, Object> r = properties.entrySet().stream().filter(p -> p.getKey().toString().equals(v.getCode())).findFirst().orElse(null);
