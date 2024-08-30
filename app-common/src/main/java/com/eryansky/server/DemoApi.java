@@ -2,8 +2,10 @@ package com.eryansky.server;
 
 import com.eryansky.client.common.rpc.RPCExchange;
 import com.eryansky.client.common.rpc.RPCMethodConfig;
+import com.eryansky.client.common.rpc.RPCPermissions;
 import com.eryansky.common.model.R;
 import com.eryansky.common.orm.Page;
+import com.eryansky.core.security.annotation.RequiresPermissions;
 import com.eryansky.modules.sys.mapper.User;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -15,6 +17,7 @@ import java.util.Map;
 public interface DemoApi {
     String test1(String param1);
 
+    @RPCPermissions(value = {"123"})
     @RPCMethodConfig(alias = "test120",encrypt = RPCMethodConfig.ENCRYPT_NONE)
     String test1(String param1,String param2);
     int test2(String param1);

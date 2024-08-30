@@ -1,5 +1,6 @@
 package com.eryansky.core.rpc;
 
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -15,7 +16,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.eryansky.client.common.rpc.RPCExchange;
+import com.eryansky.client.common.rpc.RPCMethodConfig;
 import com.eryansky.common.utils.mapper.JsonMapper;
+import com.eryansky.core.rpc.consumer.ConsumerHolder;
 import com.eryansky.core.rpc.utils.RPCUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -156,12 +159,50 @@ public class RPCClientsRegistrar implements ImportBeanDefinitionRegistrar, Resou
 								   Map<String, Object> attrs, Map<String, Object> attributes) {
 		String className = annotationMetadata.getClassName();
 		Class clazz = ClassUtils.resolveClassName(className, null);
-		BeanDefinitionBuilder definition = BeanDefinitionBuilder.genericBeanDefinition(clazz, () -> {
-			// 生成代理对象,将代理对象注入到当前bean对象中
-			RPCExchange annotation = (RPCExchange) clazz.getAnnotation(RPCExchange.class);
-			//单个或全局服务地址
-            return RPCUtils.createProxyObj(StringUtils.hasText(annotation.serverUrl()) ? RPCUtils.resolve(null,annotation.serverUrl()):getServerUrl(attrs),clazz);
-		});
+
+		// 生成代理对象,将代理对象注入到当前bean对象中
+		RPCExchange annotation = (RPCExchange) clazz.getAnnotation(RPCExchange.class);
+
+		String serverUrl = StringUtils.hasText(annotation.serverUrl()) ? resolve(null,annotation.serverUrl()): getServerUrl(attrs);
+		//单个或全局服务地址
+		String apiKey = resolve(null,annotation.apiKey());
+		String encrypt = resolve(null,annotation.encrypt());
+
+		ConsumerHolder.ConsumerInfo consumerInfo = new ConsumerHolder.ConsumerInfo();
+		consumerInfo.setName(annotation.name());
+		consumerInfo.setUrlPrefix(annotation.urlPrefix());
+		consumerInfo.setServerUrl(serverUrl);
+		consumerInfo.setApiKey(apiKey);
+		consumerInfo.setEncrypt(encrypt);
+
+
+		Method[] methods = clazz.getMethods(); //获取所有方法
+		if (methods != null && methods.length != 0) {
+			List<ConsumerHolder.RPCMethod> methodList = new ArrayList<>();
+			for (Method m : methods) {
+				ConsumerHolder.RPCMethod rm = new ConsumerHolder.RPCMethod();
+				RPCMethodConfig rpcMethodConfig = m.getAnnotation(RPCMethodConfig.class);
+				if (rpcMethodConfig != null) { // 判断方法是否有@CustomRpcMethodConfig注解
+					if (rpcMethodConfig.isForbidden()) { // 方法如果禁用，则不保存发布信息
+						continue;
+					}
+					if (StringUtils.hasLength(rpcMethodConfig.alias())) {
+						rm.setAlias(rpcMethodConfig.alias());
+					}else {
+						rm.setAlias(m.getName());
+					}
+					rm.setEncrypt(resolve(null,rpcMethodConfig.encrypt()));
+				} else {
+					rm.setAlias(m.getName());
+				}
+				rm.setMethod(m);
+				methodList.add(rm);
+			}
+			consumerInfo.setUrlCoreMethod(methodList);
+		}
+
+
+		BeanDefinitionBuilder definition = BeanDefinitionBuilder.genericBeanDefinition(clazz, () -> RPCUtils.createProxyObj(serverUrl,clazz));
 		definition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);
 		definition.setLazyInit(true);
 
@@ -180,11 +221,16 @@ public class RPCClientsRegistrar implements ImportBeanDefinitionRegistrar, Resou
 		BeanDefinitionHolder holder = new BeanDefinitionHolder(beanDefinition, className, qualifiers);
 		BeanDefinitionReaderUtils.registerBeanDefinition(holder, registry);
 
+
+
+		consumerInfo.setRpcProxy(definition.getBeanDefinition());
+		ConsumerHolder.RPC_CONSUMER_MAP.put(annotation.name(), consumerInfo);
+
 	}
 
 	private String getServerUrl(Map<String, Object> attributes) {
 		String serverUrl = (String) attributes.get("serverUrl");
-		return RPCUtils.resolve(null, serverUrl);
+		return resolve(null, serverUrl);
 	}
 
 
@@ -250,6 +296,26 @@ public class RPCClientsRegistrar implements ImportBeanDefinitionRegistrar, Resou
 			qualifierList = Collections.singletonList(getQualifier(client));
 		}
 		return !qualifierList.isEmpty() ? qualifierList.toArray(new String[0]) : null;
+	}
+
+
+	private String resolve(ConfigurableBeanFactory beanFactory, String value) {
+		if (StringUtils.hasText(value)) {
+			if (beanFactory == null) {
+				return this.environment.resolvePlaceholders(value);
+			}
+			BeanExpressionResolver resolver = beanFactory.getBeanExpressionResolver();
+			String resolved = beanFactory.resolveEmbeddedValue(value);
+			if (resolver == null) {
+				return resolved;
+			}
+			Object evaluateValue = resolver.evaluate(resolved, new BeanExpressionContext(beanFactory, null));
+			if (evaluateValue != null) {
+				return String.valueOf(evaluateValue);
+			}
+			return null;
+		}
+		return value;
 	}
 
 

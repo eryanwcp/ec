@@ -11,6 +11,7 @@ import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.security.annotation.RestApi;
+import com.eryansky.utils.AppUtils;
 import com.google.common.collect.Lists;
 import com.eryansky.core.security.SecurityConstants;
 import com.eryansky.core.security.SecurityUtils;
@@ -113,7 +114,7 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
         }
 
         if(methodRequiresUser == null){//类注解处理
-            RequiresUser classRequiresUser =  this.getAnnotation(handlerMethod.getBean().getClass(),RequiresUser.class);
+            RequiresUser classRequiresUser =  AppUtils.getAnnotation(handlerMethod.getBean().getClass(),RequiresUser.class);
             if (classRequiresUser != null && !classRequiresUser.required()) {
                 return true;
             }
@@ -121,7 +122,7 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
 
         RestApi restApi = handlerMethod.getMethodAnnotation(RestApi.class);
         if (restApi == null) {
-            restApi = this.getAnnotation(handlerMethod.getBean().getClass(), RestApi.class);
+            restApi = AppUtils.getAnnotation(handlerMethod.getBean().getClass(), RestApi.class);
         }
         if(null != restApi && !restApi.checkDefaultPermission()){
             return true;
@@ -130,7 +131,7 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
         //角色注解
         RequiresRoles requiresRoles = handlerMethod.getMethodAnnotation(RequiresRoles.class);
         if(requiresRoles == null){
-            requiresRoles = this.getAnnotation(handlerMethod.getBean().getClass(),RequiresRoles.class);
+            requiresRoles = AppUtils.getAnnotation(handlerMethod.getBean().getClass(),RequiresRoles.class);
         }
         if (requiresRoles != null) {//方法注解处理
             String[] roles = requiresRoles.value();
@@ -157,7 +158,7 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
         //资源/权限注解
         RequiresPermissions requiresPermissions = handlerMethod.getMethodAnnotation(RequiresPermissions.class);
         if(requiresPermissions == null){
-            requiresPermissions = this.getAnnotation(handlerMethod.getBean().getClass(),RequiresPermissions.class);
+            requiresPermissions = AppUtils.getAnnotation(handlerMethod.getBean().getClass(),RequiresPermissions.class);
         }
         if (requiresPermissions != null) {//方法注解处理
             String[] permissions = requiresPermissions.value();
@@ -275,7 +276,7 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
                     }
                     if(WebUtils.isAjaxRequest(request) || StringUtils.startsWith(authorization,"Bearer ")){
                         response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                        R<Boolean> r = new R<>(false).setCode(R.NO_PERMISSION).setMsg("未授权或会话信息已失效!");
+                        R<Boolean> r = new R<>(false).setCode(R.NO_PERMISSION).setMsg("未授权或会话信息已失效！");
                         WebUtils.renderJson(response, r);
                     }else{
                         //返回校验不通过页面
@@ -307,20 +308,6 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
             logger.warn("用户[{},{}]无权访问URL:{}，未被授权角色:{}", new Object[]{loginName,SpringMVCHolder.getIp(), requestUrl,role});
         }
         request.getRequestDispatcher(SecurityConstants.SESSION_UNAUTHORITY_PAGE).forward(request, response);
-    }
-
-    private <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> annotationType) {
-        T result = clazz.getAnnotation(annotationType);
-        if (result == null) {
-            Class<?> superclass = clazz.getSuperclass();
-            if (superclass != null) {
-                return getAnnotation(superclass, annotationType);
-            } else {
-                return null;
-            }
-        } else {
-            return result;
-        }
     }
 
     @Override

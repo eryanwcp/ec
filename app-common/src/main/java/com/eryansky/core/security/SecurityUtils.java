@@ -15,6 +15,11 @@ import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.security._enum.DeviceType;
+import com.eryansky.core.security._enum.Logical;
+import com.eryansky.core.security.annotation.RequiresPermissions;
+import com.eryansky.core.security.annotation.RequiresRoles;
+import com.eryansky.core.security.annotation.RequiresUser;
+import com.eryansky.core.security.annotation.RestApi;
 import com.eryansky.core.security.interceptor.AuthorityInterceptor;
 import com.eryansky.core.security.jwt.JWTUtils;
 import com.eryansky.modules.sys._enum.DataScope;
@@ -33,6 +38,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -63,6 +70,79 @@ public class SecurityUtils {
         private static ApplicationSessionContext applicationSessionContext = ApplicationSessionContext.getInstance();
     }
 
+    public static Boolean isPermitted(Class clazz,Method method){
+        //需要登录
+        RequiresUser methodRequiresUser = method.getAnnotation(RequiresUser.class);
+        if (methodRequiresUser != null && !methodRequiresUser.required()) {
+            return true;
+        }
+
+        if(methodRequiresUser == null){//类注解处理
+            RequiresUser classRequiresUser =  method.getAnnotation(RequiresUser.class);
+            if (classRequiresUser != null && !classRequiresUser.required()) {
+                return true;
+            }
+        }
+
+        RestApi restApi = method.getAnnotation(RestApi.class);
+        if (restApi == null) {
+            restApi = AppUtils.getAnnotation(clazz, RestApi.class);
+        }
+        if(null != restApi && !restApi.checkDefaultPermission()){
+            return true;
+        }
+
+        //角色注解
+        RequiresRoles requiresRoles = method.getAnnotation(RequiresRoles.class);
+        if(requiresRoles == null){
+            requiresRoles = AppUtils.getAnnotation(clazz,RequiresRoles.class);
+        }
+        if (requiresRoles != null) {//方法注解处理
+            String[] roles = requiresRoles.value();
+            boolean permittedRole = false;
+            for (String role : roles) {
+                permittedRole = SecurityUtils.isPermittedRole(role);
+                if (Logical.AND.equals(requiresRoles.logical())) {
+                    if (!permittedRole) {
+                        return false;
+                    }
+                } else {
+                    if (permittedRole) {
+                        break;
+                    }
+                }
+            }
+            if(!permittedRole){
+                return false;
+            }
+        }
+
+        //资源/权限注解
+        RequiresPermissions requiresPermissions = method.getAnnotation(RequiresPermissions.class);
+        if(requiresPermissions == null){
+            requiresPermissions = AppUtils.getAnnotation(clazz,RequiresPermissions.class);
+        }
+        if (requiresPermissions != null) {//方法注解处理
+            String[] permissions = requiresPermissions.value();
+            boolean permittedResource = false;
+            for (String permission : permissions) {
+                permittedResource = SecurityUtils.isPermitted(permission);
+                if (Logical.AND.equals(requiresPermissions.logical())) {
+                    if (!permittedResource) {
+                        return false;
+                    }
+                } else {
+                    if (permittedResource) {
+                        break;
+                    }
+                }
+            }
+            if(!permittedResource){
+                return false;
+            }
+        }
+        return null;
+    }
     /**
      * 是否授权某个资源
      *

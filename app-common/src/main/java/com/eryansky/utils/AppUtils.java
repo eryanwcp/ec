@@ -26,6 +26,7 @@ import org.springframework.core.io.DefaultResourceLoader;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
+import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -617,4 +618,17 @@ public class AppUtils {
         System.clearProperty("https.proxyPort");
     }
 
+    public static <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> annotationType) {
+        T result = clazz.getAnnotation(annotationType);
+        if (result == null) {
+            Class<?> superclass = clazz.getSuperclass();
+            if (superclass != null) {
+                return getAnnotation(superclass, annotationType);
+            } else {
+                return null;
+            }
+        } else {
+            return result;
+        }
+    }
 }
