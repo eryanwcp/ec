@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 //@RPCExchange(name = "demo-service", serverUrl = "${ec.api.serverUrl:http://localhost:8080}",apiKey = "${ec.api.apiKey:}",encrypt = RPCExchange.ENCRYPT_AES)
-@RPCExchange(name = "demo-service", serverUrl = "${ec.api.serverUrl:}",apiKey = "${ec.api.apiKey:}",encrypt = "${ec.api.encrypt:}")
+@RPCExchange(name = "demo-service", serverUrl = "${ec.api.serverUrl:http://localhost:8080/ec}",apiKey = "${ec.api.apiKey:}",encrypt = "${ec.api.encrypt:}")
 public interface DemoApi {
     String test1(String param1);
 
