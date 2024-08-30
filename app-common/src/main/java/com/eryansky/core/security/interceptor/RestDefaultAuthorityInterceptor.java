@@ -144,7 +144,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
             if (Collections3.isNotEmpty(ipList) && (null == ipList.stream().filter(v -> "*".equals(v) || com.eryansky.j2cache.util.IpUtils.checkIPMatching(v, ip)).findAny().orElse(null))) {
                 isLimit = false;
             }
-            if("127.0.0.1".equals(ip) || "localhost".equals(ip)){
+            if("127.0.0.1".equals(ip) || "localhost".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip)){
                 isLimit = false;
             }
 

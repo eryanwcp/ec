@@ -1,5 +1,6 @@
 package com.eryansky.core.rpc.consumer;
 
+import com.eryansky.common.orm.Page;
 import com.eryansky.core.security.SecurityUtils;
 
 import java.io.Serializable;
@@ -12,15 +13,11 @@ import javax.servlet.http.HttpServletResponse;
 
 public class EcHttpContext extends EcBaseContext implements Serializable {
 
-  private static final ThreadLocal<EcHttpContext> currentEcpHttpContext = new ThreadLocal<EcHttpContext>() {
-      protected EcHttpContext initialValue() {
-        return new EcHttpContext();
-      }
-    };
+  private static final ThreadLocal<EcHttpContext> currentEcpHttpContext = ThreadLocal.withInitial(EcHttpContext::new);
   
-  private HashMap<String, Object> parameters = new HashMap<>();
+  private final Map<String, Object> parameters = new HashMap<>();
   
-  private HashMap<String, Object> attributes = new HashMap<>();
+  private final Map<String, Object> attributes = new HashMap<>();
   
   private HttpServletRequest request;
   
@@ -29,7 +26,7 @@ public class EcHttpContext extends EcBaseContext implements Serializable {
   private String target;
   
   private String method;
-  
+
   private boolean disPrintOut = false;
   
   private String printOut;
@@ -52,17 +49,15 @@ public class EcHttpContext extends EcBaseContext implements Serializable {
     this.request = request;
     this.response = response;
     if (null != this.request) {
-      this.rows = request.getParameter("rows");
-      this.page = request.getParameter("page");
-      this.orderbyfield = request.getParameter("orderbyfield");
-      HashMap<Object, Object> param = new HashMap<>();
+      this.page = new Page(request,response);
+      Map<String, Object> param = new HashMap<>();
       Enumeration<String> names = request.getParameterNames();
       while (names.hasMoreElements()) {
         String pname = names.nextElement();
         String pvalue = request.getParameter(pname);
         param.put(pname, pvalue);
       } 
-      addParamterMap((HashMap)param);
+      addParamterMap(param);
     } 
   }
   
@@ -74,18 +69,11 @@ public class EcHttpContext extends EcBaseContext implements Serializable {
   public void setRequest(HttpServletRequest request) {
     this.request = request;
     if (null != this.request) {
-      this.rows = request.getParameter("rows");
-      this.page = request.getParameter("page");
-      this.orderbyfield = request.getParameter("orderbyfield");
+      this.page = new Page(request,response);
     } 
   }
   
-  public boolean isPageQuery() {
-    if (null != this.rows && !"".equals(this.rows) && !"-1".equals(this.rows))
-      return true; 
-    return false;
-  }
-  
+
   public void setResponse(HttpServletResponse response) {
     this.response = response;
   }
@@ -106,14 +94,10 @@ public class EcHttpContext extends EcBaseContext implements Serializable {
     this.parameters.put(key, value);
   }
   
-  public void addParamterMap(HashMap<String, Object> map) {
+  public void addParamterMap(Map<String, Object> map) {
     if (null == map)
-      return; 
-    Iterator<Map.Entry<String, Object>> it = map.entrySet().iterator();
-    while (it.hasNext()) {
-      Map.Entry<String, Object> entry = it.next();
-      this.parameters.put(entry.getKey(), entry.getValue());
-    } 
+      return;
+      this.parameters.putAll(map);
   }
   
   public String getString(String name) {
@@ -142,8 +126,8 @@ public class EcHttpContext extends EcBaseContext implements Serializable {
     return param;
   }
   
-  public HashMap<String, Object> getParameterMapObject() {
-    HashMap<String, Object> param = new HashMap<>();
+  public Map<String, Object> getParameterMapObject() {
+    Map<String, Object> param = new HashMap<>();
     Enumeration<String> names = getRequest().getParameterNames();
     while (names.hasMoreElements()) {
       String pname = names.nextElement();

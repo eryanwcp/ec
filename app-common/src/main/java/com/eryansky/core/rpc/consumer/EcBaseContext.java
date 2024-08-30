@@ -1,42 +1,26 @@
 package com.eryansky.core.rpc.consumer;
 
+import com.eryansky.common.orm.Page;
+
 public class EcBaseContext {
   public static final String CONTEXTNAME_HTTP = "http";
   
-  public static final String CONTEXTNAME_Service = "service";
-  
   protected String type;
-  
-  protected String rows;
-  
-  protected String page;
-  
-  protected String orderbyfield;
-  
-  public String getRows() {
-    return this.rows;
+
+  protected Page page;
+
+  public EcBaseContext() {
+    this.type = CONTEXTNAME_HTTP;
   }
-  
-  public void setRows(String rows) {
-    this.rows = rows;
-  }
-  
-  public String getPage() {
+
+  public Page getPage() {
     return this.page;
   }
   
-  public void setPage(String page) {
+  public void setPage(Page page) {
     this.page = page;
   }
-  
-  public String getOrderbyfield() {
-    return this.orderbyfield;
-  }
-  
-  public void setOrderbyfield(String orderbyfield) {
-    this.orderbyfield = orderbyfield;
-  }
-  
+
   public String getType() {
     return this.type;
   }
