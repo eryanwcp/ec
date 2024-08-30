@@ -20,9 +20,13 @@ public interface DemoApi {
     @RPCPermissions(value = {"123"})
     @RPCMethodConfig(alias = "test120",encrypt = RPCMethodConfig.ENCRYPT_NONE)
     String test1(String param1,String param2);
+
     int test2(String param1);
+
     R<Boolean> test10(String param1);
+
     R<Map<String,Object>> test11(String str, int pint, Map<String,Object> map, List<User> list, Page<User> page);
+
     Page<User> test12(Page<User> page);
 
     R<Object> encrypt(String param1);
