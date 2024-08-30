@@ -16,6 +16,7 @@ import com.eryansky.core.security.annotation.RestApi;
 import com.eryansky.encrypt.anotation.DecryptRequestBody;
 import com.eryansky.encrypt.anotation.EncryptResponseBody;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,14 +54,22 @@ public class EcServiceController extends SimpleController {
             EcServiceClient ecpServiceClient = SpringContextHolder.getBean(EcServiceClient.class);
             ecpServiceClient.init(serviceName, serviceMethod);
 
-            List<Object> params = new ArrayList<>();
-            // 遍历 JsonNode 并将其添加到 LinkedHashMap
-            Iterator<Map.Entry<String, JsonNode>> fields = data.fields();
-            while (fields.hasNext()) {
-                Map.Entry<String, JsonNode> entry = fields.next();
-                params.add(JsonMapper.getInstance().toJavaObject(entry.getValue(),Object.class));
+            ArrayNode arrayNode= null;
+            if (null != data) {
+                StringBuilder builder = new StringBuilder();
+                builder.append("[");
+                Iterator<Map.Entry<String, JsonNode>> fields = data.fields();
+                while (fields.hasNext()) {
+                    Map.Entry<String, JsonNode> entry = fields.next();
+                    builder.append(JsonMapper.toJsonString(entry.getValue()));
+                    if (fields.hasNext()) {
+                        builder.append(",");
+                    }
+                }
+                builder.append("]");
+                arrayNode = JsonMapper.getInstance().toArrayNode(builder.toString());
             }
-            ecpResultBean = ecpServiceClient.callService(ecpHttpContext.getServiceContext(), params.toArray());
+            ecpResultBean = ecpServiceClient.callService(ecpHttpContext.getServiceContext(), arrayNode);
         } finally {
             EcHttpContext.removeInstance();
         }

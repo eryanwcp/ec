@@ -17,7 +17,7 @@ import java.util.Map;
 public interface DemoApi {
     String test1(String param1);
 
-    @RPCPermissions(value = {"123"})
+
     @RPCMethodConfig(alias = "test120",encrypt = RPCMethodConfig.ENCRYPT_NONE)
     String test1(String param1,String param2);
 
@@ -28,6 +28,12 @@ public interface DemoApi {
     R<Map<String,Object>> test11(String str, int pint, Map<String,Object> map, List<User> list, Page<User> page);
 
     Page<User> test12(Page<User> page);
+
+    @RPCPermissions(value = {"123"})
+    Page<User> test001(Page<User> page,User user);
+
+    String test002();
+    void test003();
 
     R<Object> encrypt(String param1);
 }
