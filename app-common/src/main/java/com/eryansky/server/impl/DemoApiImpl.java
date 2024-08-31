@@ -6,8 +6,10 @@ import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.rpc.annotation.RPCProvider;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys.mapper.User;
+import com.eryansky.modules.sys.service.UserService;
 import com.eryansky.server.DemoApi;
 import com.google.common.collect.Maps;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -16,6 +18,9 @@ import java.util.Map;
 @RPCProvider
 @Component
 public class DemoApiImpl implements DemoApi {
+
+    @Autowired
+    private UserService userService;
 
     @Logging(value = "rest1",logType = LogType.API)
     @Override
@@ -52,6 +57,22 @@ public class DemoApiImpl implements DemoApi {
     @Override
     public Page<User> test12(Page<User> page) {
         return page;
+    }
+
+    @Override
+    public Page<User> test001(Page<User> page, User user) {
+        page = userService.findPage(page,user);
+        return page;
+    }
+
+    @Override
+    public String test002() {
+        return "test002";
+    }
+
+    @Override
+    public void test003() {
+        System.out.println("test003");
     }
 
     @Override
