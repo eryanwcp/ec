@@ -2,11 +2,18 @@ package com.eryansky.core.rpc.utils;
 
 import com.eryansky.client.common.rpc.RPCExchange;
 import com.eryansky.client.common.rpc.RPCMethodConfig;
+import com.eryansky.client.common.rpc.RPCPermissions;
 import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.common.utils.encode.Cryptos;
 import com.eryansky.common.utils.encode.RSAUtils;
 import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.core.rpc.consumer.ConsumerExecutor;
+import com.eryansky.core.security.SecurityUtils;
+import com.eryansky.core.security._enum.Logical;
+import com.eryansky.core.security.annotation.RequiresPermissions;
+import com.eryansky.core.security.annotation.RequiresRoles;
+import com.eryansky.core.security.annotation.RequiresUser;
+import com.eryansky.core.security.annotation.RestApi;
 import com.eryansky.encrypt.enums.CipherMode;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Maps;
@@ -20,6 +27,8 @@ import org.springframework.cglib.proxy.MethodInterceptor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.util.StringUtils;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Map;
 
@@ -98,6 +107,50 @@ public class RPCUtils {
             return null;
         }
         return value;
+    }
+
+
+
+    private static <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> annotationType) {
+        T result = clazz.getAnnotation(annotationType);
+        if (result == null) {
+            Class<?> superclass = clazz.getSuperclass();
+            if (superclass != null) {
+                return getAnnotation(superclass, annotationType);
+            } else {
+                return null;
+            }
+        } else {
+            return result;
+        }
+    }
+
+    public static Boolean isPermitted(Class clazz, Method method){
+        //资源/权限注解
+        RPCPermissions requiresPermissions = method.getAnnotation(RPCPermissions.class);
+        if(requiresPermissions == null){
+            requiresPermissions = getAnnotation(clazz,RPCPermissions.class);
+        }
+        if (requiresPermissions != null) {//方法注解处理
+            String[] permissions = requiresPermissions.value();
+            boolean permittedResource = false;
+            for (String permission : permissions) {
+                permittedResource = SecurityUtils.isPermitted(permission);
+                if (Logical.AND.equals(requiresPermissions.logical())) {
+                    if (!permittedResource) {
+                        return false;
+                    }
+                } else {
+                    if (permittedResource) {
+                        break;
+                    }
+                }
+            }
+            if(!permittedResource){
+                return false;
+            }
+        }
+        return null;
     }
 
 }
