@@ -50,7 +50,7 @@
 			<tr><td>jvmTotalMem</td><td>{{jvmTotalMem}} M</td></tr>
 			<tr><td>jvmMaxMem</td><td>{{jvmMaxMem}} M</td></tr>
 			<tr><td>jvmFreeMem</td><td>{{jvmFreeMem}} M</td></tr>
-			<tr><td>JSON</td><td style="white-space: pre-line;"><pre>{{content}}</pre>></td></tr>
+			<tr><td>JSON</td><td><pre>{{content}}</pre>></td></tr>
 			<tr><td>内存</td><td>{{usedMem}} M / {{totalMem}}M</td></tr>
 
 			<tr><td>内存交换区</td><td>{{usedSwap}} M / {{totalSwap}} M</td></tr>
