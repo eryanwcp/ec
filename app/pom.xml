@@ -17,7 +17,6 @@
 
     <properties>
         <velocity.version>2.3</velocity.version>
-        <ckfinder.version>2.3</ckfinder.version>
         <liquibase.version>4.29.0</liquibase.version>
         <commons-cli.version>1.9.0</commons-cli.version>
 
