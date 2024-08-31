@@ -65,7 +65,7 @@ public class CommonController extends SimpleController {
     @PostMapping(value = {"service"})
     public R service(HttpServletRequest request, HttpServletResponse response, @RequestBody JsonNode requestData) {
         EcHttpContext ecpHttpContext = EcHttpContext.getInstance();
-        R ecpResultBean = null;
+        R r = null;
         try {
             if (null == requestData) {
                 return R.rest(false).setMsg("参数错误：requestData");
@@ -93,11 +93,11 @@ public class CommonController extends SimpleController {
                 builder.append("]");
                 arrayNode = JsonMapper.getInstance().toArrayNode(builder.toString());
             }
-            ecpResultBean = ecpServiceClient.callService(ecpHttpContext.getServiceContext(), arrayNode);
+            r = ecpServiceClient.callService(ecpHttpContext.getServiceContext(), arrayNode);
         } finally {
             EcHttpContext.removeInstance();
         }
-        return ecpResultBean;
+        return r;
     }
 
 }
