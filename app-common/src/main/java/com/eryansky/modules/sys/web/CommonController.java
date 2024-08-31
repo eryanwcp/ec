@@ -22,8 +22,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.Collections;
-import java.util.Map;
+
+import java.util.*;
 
 /**
  * 提供公共方法的Controller.
