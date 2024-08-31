@@ -40,7 +40,9 @@ public class ServerStatus implements Serializable{
 	
 	private String cpuUsage;//CPU使用率
 	private String ip;//本机ＩＰ
-	
+
+	private String content;
+
 	
 	private List<CpuInfoVo> cpuInfos = new ArrayList<CpuInfoVo>();
 	
@@ -382,6 +384,14 @@ public class ServerStatus implements Serializable{
 
 	public void setIp(String ip) {
 		this.ip = ip;
+	}
+
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
 	}
 
 	public long getJvmMaxMem() {

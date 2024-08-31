@@ -4,10 +4,19 @@
 <head>
 	<title>系统监控</title>
 	<meta name="decorator" content="default_sys"/>
+	<style type="text/css">
+		pre {
+			white-space: pre-wrap;       /* css-3 */
+			white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+			white-space: -pre-wrap;      /* Opera 4-6 */
+			white-space: -o-pre-wrap;    /* Opera 7 */
+			word-wrap: break-word;       /* Internet Explorer 5.5+ */
+		}
+	</style>
 	<script type="text/javascript">
 		$(function(){
 			reLoad();
-            window.setInterval('reLoad()',10*1000);
+            window.setInterval('reLoad()',60*1000);
 		});
 		function reLoad(){
 			$.ajax({
@@ -41,11 +50,10 @@
 			<tr><td>jvmTotalMem</td><td>{{jvmTotalMem}} M</td></tr>
 			<tr><td>jvmMaxMem</td><td>{{jvmMaxMem}} M</td></tr>
 			<tr><td>jvmFreeMem</td><td>{{jvmFreeMem}} M</td></tr>
-
+			<tr><td>JSON</td><td style="white-space: pre-line;"><pre>{{content}}</pre>></td></tr>
 			<tr><td>内存</td><td>{{usedMem}} M / {{totalMem}}M</td></tr>
 
 			<tr><td>内存交换区</td><td>{{usedSwap}} M / {{totalSwap}} M</td></tr>
-
 			<tr><td>CPU使用率</td><td>{{cpuUsage}}%</td></tr>
 
 			<tr><td>CPU</td><td>

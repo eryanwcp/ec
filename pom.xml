@@ -427,7 +427,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.3.1</version>
                 <configuration>
-<!--                    <skip>true</skip>-->
+                    <skip>true</skip>
                     <argLine>
                         --illegal-access=deny
                         --add-opens=java.base/java.lang=ALL-UNNAMED

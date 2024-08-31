@@ -74,12 +74,10 @@ public class SystemMonitorController extends SimpleController {
     @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST}, value = "")
     public String list(HttpServletRequest request, HttpServletResponse response) {
         if (WebUtils.isAjaxRequest(request)) {
-            ServerStatus serverStatus = null;
             try {
-                serverStatus = SigarUtil.getServerStatus();
-                return renderString(response, Result.successResult().setData(serverStatus));
+                return renderString(response, Result.successResult().setData(SigarUtil.getServerStatus()));
             } catch (Exception e) {
-                logger.error(e.getMessage());
+                logger.error(e.getMessage(),e);
                 return renderString(response, Result.errorResult().setMsg(e.getMessage()));
             }
         }
