@@ -1,8 +1,8 @@
 package com.eryansky.core.rpc.consumer;
 
 import java.io.Serializable;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import com.eryansky.core.security.SessionInfo;
 import org.slf4j.Logger;
