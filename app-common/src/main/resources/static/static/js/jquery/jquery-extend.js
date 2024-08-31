@@ -738,20 +738,6 @@ $.copyToClipboard = function(elem,text,success,error) {
 };
 
 /**
- * 检测是否允许运行Flash
- * @returns {boolean}
- */
-$.hasUsableFlash = function () {
-	var flashObj;
-	if (typeof window.ActiveXObject != "undefined") {
-		flashObj = new ActiveXObject("ShockwaveFlash.ShockwaveFlash");
-	} else {
-		flashObj = navigator.plugins['Shockwave Flash'];
-	}
-	return !!flashObj;
-};
-
-/**
  * 四舍五入保留2位小数（若第二位小数为0，则保留一位小数）
  * @param num
  * @returns {boolean|number}
