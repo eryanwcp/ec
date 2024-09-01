@@ -16,7 +16,7 @@
 	<version>4.2.20240801.19</version>
     <name>在线报表模块</name>
 	<properties>
-		<ureport2.version>2.7.1</ureport2.version>
+		<ec-ureport2.version>2.7.1</ec-ureport2.version>
 	</properties>
 
 	<dependencyManagement>
@@ -24,17 +24,17 @@
 	      <dependency>
 	      	<groupId>com.eryansky</groupId>
 	        <artifactId>ureport2-consol</artifactId>
-			  <version>${ureport2.version}</version>
+			  <version>${ec-ureport2.version}</version>
 	      </dependency>
 	      <dependency>
 	        <groupId>com.eryansky</groupId>
 	        <artifactId>ureport2-font</artifactId>
-			<version>${ureport2.version}</version>
+			<version>${ec-ureport2.version}</version>
 	      </dependency>
 	      <dependency>
 	        <groupId>com.eryansky</groupId>
 	        <artifactId>ureport2-core</artifactId>
-			<version>${ureport2.version}</version>
+			<version>${ec-ureport2.version}</version>
 	      </dependency>
 	    </dependencies>
   </dependencyManagement>

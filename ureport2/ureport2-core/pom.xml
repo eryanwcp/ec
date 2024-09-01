@@ -11,12 +11,12 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>ec-ureport2-core</artifactId>
-    <version>${ureport2.version}</version>
+    <version>${ec-ureport2.version}</version>
 
     <name>报表底层</name>
     <packaging>jar</packaging>
     <properties>
-        <ureport2.version>2.7.1</ureport2.version>
+        <ec-ureport2.version>2.7.1</ec-ureport2.version>
     </properties>
     <dependencies>
 
