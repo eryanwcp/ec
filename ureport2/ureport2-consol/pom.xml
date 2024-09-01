@@ -10,7 +10,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>ureport2-consol</artifactId>
+    <artifactId>ec-ureport2-consol</artifactId>
     <version>${ureport2.version}</version>
     <packaging>jar</packaging>
     <name>报表业务</name>
@@ -41,7 +41,7 @@
         </dependency>
         <dependency>
             <groupId>com.eryansky</groupId>
-            <artifactId>ureport2-font</artifactId>
+            <artifactId>ec-ureport2-font</artifactId>
             <version>${ureport2.version}</version>
         </dependency>
         

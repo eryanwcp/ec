@@ -54,8 +54,9 @@
         </dependency>
         <dependency>
             <groupId>com.eryansky</groupId>
-            <artifactId>ec-ureport2</artifactId>
-            <version>${ec-common.version}</version>
+            <artifactId>ec-ureport2-consol</artifactId>
+            <version>2.7.1</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.eryansky</groupId>
@@ -211,12 +212,7 @@
             <artifactId>commons-csv</artifactId>
             <version>${commons-csv.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.eryansky</groupId>
-            <artifactId>ureport2-consol</artifactId>
-            <version>2.7.1</version>
-            <scope>compile</scope>
-        </dependency>
+
     </dependencies>
     <build>
         <resources>
