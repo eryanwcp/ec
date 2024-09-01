@@ -14,7 +14,7 @@
     <artifactId>ec-ureport2</artifactId>
     <packaging>pom</packaging>
 	<version>4.2.20240801.19</version>
-    <name>在线报表模块</name>
+    <name>ec-ureport2</name>
 	<properties>
 		<ec-ureport2.version>2.7.1</ec-ureport2.version>
 	</properties>

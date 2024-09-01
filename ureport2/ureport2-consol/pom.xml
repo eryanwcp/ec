@@ -13,7 +13,7 @@
     <artifactId>ec-ureport2-consol</artifactId>
     <version>${ec-ureport2.version}</version>
     <packaging>jar</packaging>
-    <name>报表业务</name>
+    <name>ec-ureport2-consol</name>
     <properties>
         <ec-ureport2.version>2.7.1</ec-ureport2.version>
     </properties>

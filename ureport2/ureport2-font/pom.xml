@@ -13,7 +13,7 @@
     <artifactId>ec-ureport2-font</artifactId>
     <version>${ec-ureport2.version}</version>
     <packaging>jar</packaging>
-    <name>报表字体设置</name>
+    <name>ec-ureport2-font</name>
     <properties>
         <ec-ureport2.version>2.7.1</ec-ureport2.version>
     </properties>

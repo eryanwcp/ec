@@ -13,7 +13,7 @@
     <artifactId>ec-ureport2-core</artifactId>
     <version>${ec-ureport2.version}</version>
 
-    <name>报表底层</name>
+    <name>ec-ureport2-core</name>
     <packaging>jar</packaging>
     <properties>
         <ec-ureport2.version>2.7.1</ec-ureport2.version>
