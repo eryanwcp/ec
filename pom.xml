@@ -15,6 +15,7 @@
         <module>app-common</module>
         <module>client-common</module>
         <module>encrypt-spring-boot-starter</module>
+        <module>ureport2</module>
     </modules>
     <packaging>pom</packaging>
     <!--<parent>-->

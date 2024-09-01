@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+		<groupId>com.eryansky</groupId>
+		<artifactId>ec-parent</artifactId>
+		<version>4.2.20240801.19</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>ec-ureport2</artifactId>
+    <packaging>pom</packaging>
+	<version>4.2.20240801.19</version>
+    <name>在线报表模块</name>
+	<properties>
+		<ureport2.version>2.7.1</ureport2.version>
+	</properties>
+
+	<dependencyManagement>
+	    <dependencies>
+	      <dependency>
+	      	<groupId>com.eryansky</groupId>
+	        <artifactId>ureport2-consol</artifactId>
+			  <version>${ureport2.version}</version>
+	      </dependency>
+	      <dependency>
+	        <groupId>com.eryansky</groupId>
+	        <artifactId>ureport2-font</artifactId>
+			<version>${ureport2.version}</version>
+	      </dependency>
+	      <dependency>
+	        <groupId>com.eryansky</groupId>
+	        <artifactId>ureport2-core</artifactId>
+			<version>${ureport2.version}</version>
+	      </dependency>
+	    </dependencies>
+  </dependencyManagement>
+	
+	
+    <modules>
+        <module>ureport2-core</module>
+        <module>ureport2-font</module>
+        <module>ureport2-consol</module>
+    </modules>
+
+</project>

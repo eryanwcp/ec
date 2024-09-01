@@ -287,7 +287,6 @@
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity-engine-core</artifactId>
             <version>${velocity.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.liquibase</groupId>
