@@ -15,11 +15,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
 /**
  * The type Encrypt auto configuration.
  * 加密容器
@@ -37,7 +32,7 @@ public class EncryptAutoConfiguration {
      */
     @Bean
     @ConditionalOnBean(value = {EncryptProvider.class})
-    public EncryptHandler encryptHandler(HoneyBadgerEncrypt honeyBadgerEncrypt){
+    public EncryptHandler encryptHandler(HoneyBadgerEncrypt honeyBadgerEncrypt) {
         return new EncryptHandler(honeyBadgerEncrypt);
     }
 
@@ -48,7 +43,7 @@ public class EncryptAutoConfiguration {
      */
     @Bean
     @ConditionalOnBean(EncryptHandler.class)
-    public ScenarioSchedule scenarioEncryptSchedule(){
+    public ScenarioSchedule scenarioEncryptSchedule() {
         ScenarioSchedule scenarioEncryptSchedule = new ScenarioEncryptSchedule();
         ScenarioHolder.scenarioSchedules.add(scenarioEncryptSchedule);
         return scenarioEncryptSchedule;
@@ -61,7 +56,7 @@ public class EncryptAutoConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean(StorageScenario.class)
-    public StorageScenario storageScenario(){
+    public StorageScenario storageScenario() {
         return new StorageScenario();
     }
 
@@ -72,7 +67,7 @@ public class EncryptAutoConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean(TransmitScenario.class)
-    public TransmitScenario transmitScenario(){
+    public TransmitScenario transmitScenario() {
         return new TransmitScenario();
     }
 
@@ -83,7 +78,7 @@ public class EncryptAutoConfiguration {
      */
     @Bean
     @ConditionalOnBean(ScenarioHandler.class)
-    public ScenarioPostProcessor scenarioPostProcessor(){
+    public ScenarioPostProcessor scenarioPostProcessor() {
         return new ScenarioPostProcessor();
     }
 
@@ -93,7 +88,7 @@ public class EncryptAutoConfiguration {
      * @return the register bean definition
      */
     @Bean
-    public RegisterBeanDefinition beanFactoryPostProcessor(){
+    public RegisterBeanDefinition beanFactoryPostProcessor() {
         return new RegisterBeanDefinition();
     }
 
@@ -105,7 +100,7 @@ public class EncryptAutoConfiguration {
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     @ConditionalOnBean(EncryptHandler.class)
-    public HoneyBadgerEncrypt getHoneyBadgerEncrypt(){
+    public HoneyBadgerEncrypt getHoneyBadgerEncrypt() {
         HoneyBadgerEncrypt honeyBadgerEncrypt = new HoneyBadgerEncrypt();
         ScenarioHandler.honeyBadgerEncrypt = honeyBadgerEncrypt;
         return honeyBadgerEncrypt;
@@ -118,7 +113,7 @@ public class EncryptAutoConfiguration {
      */
     @Bean("executorPostProcessor")
     @ConditionalOnBean(name = "encryptThreadPoolExecutor")
-    public ExecutorPostProcessor executorPostProcessor(){
+    public ExecutorPostProcessor executorPostProcessor() {
         return new ExecutorPostProcessor();
     }
 
@@ -132,7 +127,7 @@ public class EncryptAutoConfiguration {
 //spel表达式 解析处理
     @Bean("encrypt-SpELExpressionHandler")
     @ConditionalOnBean(value = {EncryptHandler.class})
-    public SpELExpressionHandler spELExpressionHandler(SpelExpressionParser spelExpressionParser){
+    public SpELExpressionHandler spELExpressionHandler(SpelExpressionParser spelExpressionParser) {
         SpELExpressionHandler spELExpressionHandler = new SpELExpressionHandler();
         spELExpressionHandler.setSpelExpressionParser(spelExpressionParser);
         return spELExpressionHandler;
@@ -145,7 +140,7 @@ public class EncryptAutoConfiguration {
      */
     @Bean("encrypt-SpelExpressionParser")
     @ConditionalOnBean(name = "encrypt-SpELExpressionHandler")
-    public SpelExpressionParser spelExpressionParser(){
+    public SpelExpressionParser spelExpressionParser() {
         return new SpelExpressionParser();
     }
 
@@ -154,10 +149,10 @@ public class EncryptAutoConfiguration {
         return new EncryptResultResponseBodyAdvice();
     }
 
-    @Bean
-    public EncryptRResponseBodyAdvice encryptRResponseBodyAdvice() {
-        return new EncryptRResponseBodyAdvice();
-    }
+//    @Bean
+//    public EncryptRResponseBodyAdvice encryptRResponseBodyAdvice() {
+//        return new EncryptRResponseBodyAdvice();
+//    }
 
 
     @Bean
