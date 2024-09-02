@@ -64,7 +64,7 @@
 				<table class="table table-striped table-bordered table-condensed">
 					<tbody>
 					{{#sysFiles}}
-					<tr><td>{{typeName}} {{dirName}} {{used}} / {{total}} {{free}} {{sysTypeName}}</td></tr>
+					<tr><td>{{typeName}} {{dirName}} {{used}} / {{total}} 剩余{{free}} {{sysTypeName}}</td></tr>
 					{{/sysFiles}}
 					</tbody>
 				</table>

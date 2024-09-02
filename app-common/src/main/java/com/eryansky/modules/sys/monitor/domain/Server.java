@@ -54,6 +54,10 @@ public class Server
      * 磁盘相关信息
      */
     private List<SysFileEntity> sysFiles = new LinkedList<SysFileEntity>();
+    /**
+     * 系统参数
+     */
+    private Properties sysProperties =  System.getProperties();
 
     public CpuEntity getCpu()
     {
@@ -212,5 +216,13 @@ public class Server
             }
             sysFiles.add(sysFile);
         }
+    }
+
+    public Properties getSysProperties() {
+        return sysProperties;
+    }
+
+    public void setSysProperties(Properties sysProperties) {
+        this.sysProperties = sysProperties;
     }
 }
