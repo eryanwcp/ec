@@ -78,17 +78,9 @@
 			<label class="control-label">消息内容：</label>
 			<div class="controls">
 				<form:textarea id="content" htmlEscape="true" path="content" rows="6" maxlength="512" class="input-xxlarge required"/>
-				<%--<tags:ckeditor replace="content" uploadPath="/notice/message" height="200" />--%>
 			</div>
 		</div>
-		<%--<div class="control-group">--%>
-			<%--<label class="control-label">图片：</label>--%>
-			<%--<div class="controls">--%>
-				<%--<input type="hidden" id="image" name="image" value="${model.image}" />--%>
-				<%--<tags:ckfinder input="image" type="images" uploadPath="/notice/message"  selectMultiple="false"/>--%>
-				<%--<span class="help-inline">建议首页图大小：300 × 400（像素）</span>--%>
-			<%--</div>--%>
-		<%--</div>--%>
+
 		<div class="control-group">
 			<label class="control-label">链接地址：</label>
 			<div class="controls">

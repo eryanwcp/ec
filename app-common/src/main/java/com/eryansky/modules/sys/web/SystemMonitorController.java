@@ -28,6 +28,7 @@ import com.eryansky.core.security.annotation.RequiresPermissions;
 import com.eryansky.j2cache.CacheChannel;
 import com.eryansky.j2cache.util.SerializationUtils;
 import com.eryansky.modules.sys._enum.LogType;
+import com.eryansky.modules.sys.monitor.domain.Server;
 import com.eryansky.utils.*;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -74,12 +75,12 @@ public class SystemMonitorController extends SimpleController {
     @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST}, value = "")
     public String list(HttpServletRequest request, HttpServletResponse response) {
         if (WebUtils.isAjaxRequest(request)) {
-            ServerStatus serverStatus = null;
+            Server server = new Server();
             try {
-                serverStatus = SigarUtil.getServerStatus();
-                return renderString(response, Result.successResult().setData(serverStatus));
+                server.copyTo();
+                return renderString(response, Result.successResult().setData(server));
             } catch (Exception e) {
-                logger.error(e.getMessage());
+                logger.error(e.getMessage(),e);
                 return renderString(response, Result.errorResult().setMsg(e.getMessage()));
             }
         }
