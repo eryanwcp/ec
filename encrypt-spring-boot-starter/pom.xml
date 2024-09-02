@@ -15,7 +15,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <hutool-crypto.version>5.8.31</hutool-crypto.version>
+        <hutool.version>5.8.31</hutool.version>
         <java.version>1.8</java.version>
     </properties>
 
@@ -30,7 +30,7 @@
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
-            <version>${hutool-crypto.version}</version>
+            <version>${hutool.version}</version>
         </dependency>
     </dependencies>
 
