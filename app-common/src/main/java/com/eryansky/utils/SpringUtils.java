@@ -5,6 +5,7 @@
  */
 package com.eryansky.utils;
 
+import cn.hutool.extra.spring.SpringUtil;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.security.SecurityUtils;
@@ -20,7 +21,7 @@ import java.lang.reflect.Method;
  * @author Eryan
  * @date 2016-04-13
  */
-public class SpringUtils {
+public class SpringUtils extends SpringUtil {
 
     public static final String PARAM_SESSION = "sessionInfo";
     public static final String PARAM_IS_AJAX = "isAjax";
