@@ -128,7 +128,8 @@
     },{
       "name": "j2cache.session.redis.protocolVersion",
       "type": "java.lang.String",
-      "defaultValue": "RESP3"
+      "defaultValue": "",
+      "sourceType": "io.lettuce.core.protocol.ProtocolVersion"
     }
   ]
 }
