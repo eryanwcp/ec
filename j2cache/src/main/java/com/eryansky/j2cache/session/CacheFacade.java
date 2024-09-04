@@ -18,12 +18,14 @@ package com.eryansky.j2cache.session;
 import com.eryansky.j2cache.lettuce.LettuceByteCodec;
 import com.eryansky.j2cache.util.IpUtils;
 import io.lettuce.core.AbstractRedisClient;
+import io.lettuce.core.ClientOptions;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
 import io.lettuce.core.api.StatefulConnection;
 import io.lettuce.core.cluster.ClusterClientOptions;
 import io.lettuce.core.cluster.ClusterTopologyRefreshOptions;
 import io.lettuce.core.cluster.RedisClusterClient;
+import io.lettuce.core.protocol.ProtocolVersion;
 import io.lettuce.core.pubsub.RedisPubSubAdapter;
 import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 import io.lettuce.core.pubsub.api.async.RedisPubSubAsyncCommands;
@@ -34,6 +36,7 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -91,6 +94,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         String sentinelMasterId = redisConf.getProperty("sentinelMasterId");
         String sentinelPassword = redisConf.getProperty("sentinelPassword");
         long clusterTopologyRefreshMs = Long.valueOf(redisConf.getProperty("clusterTopologyRefresh", "3000"));
+        String protocolVersion = redisConf.getProperty("protocolVersion");
 
         if("redis-cluster".equalsIgnoreCase(scheme)) {
             scheme = "redis";
@@ -113,7 +117,11 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
                     //开启定时刷新,时间间隔根据实际情况修改
                     .enablePeriodicRefresh(Duration.ofMillis(clusterTopologyRefreshMs))
                     .build();
-            ((RedisClusterClient)redisClient).setOptions(ClusterClientOptions.builder().topologyRefreshOptions(topologyRefreshOptions).build());
+            ClusterClientOptions.Builder builder = ClusterClientOptions.builder().topologyRefreshOptions(topologyRefreshOptions);
+            if(StringUtils.hasText(protocolVersion)){
+                builder.protocolVersion(ProtocolVersion.valueOf(protocolVersion));
+            }
+            ((RedisClusterClient)redisClient).setOptions(builder.build());
         } else if("redis-sentinel".equalsIgnoreCase(scheme)) {
             scheme = "redis";
             String[] hostArray = hosts.split(",");
@@ -145,6 +153,11 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             uri.setPassword(password);
             redisClient = io.lettuce.core.RedisClient.create(uri);
         }
+
+        if(StringUtils.hasText(protocolVersion) && redisClient instanceof RedisClient){
+            ((RedisClient)redisClient).setOptions(ClientOptions.builder().protocolVersion(ProtocolVersion.valueOf(protocolVersion)).build());
+        }
+
         try {
             int timeout = Integer.parseInt(redisConf.getProperty("timeout", "10000"));
             redisClient.setDefaultTimeout(Duration.ofMillis(timeout));

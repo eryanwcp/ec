@@ -16,12 +16,14 @@
 package com.eryansky.j2cache.lettuce;
 
 import io.lettuce.core.AbstractRedisClient;
+import io.lettuce.core.ClientOptions;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
 import io.lettuce.core.api.StatefulConnection;
 import io.lettuce.core.cluster.ClusterClientOptions;
 import io.lettuce.core.cluster.ClusterTopologyRefreshOptions;
 import io.lettuce.core.cluster.RedisClusterClient;
+import io.lettuce.core.protocol.ProtocolVersion;
 import io.lettuce.core.pubsub.RedisPubSubAdapter;
 import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 import io.lettuce.core.pubsub.api.async.RedisPubSubAsyncCommands;
@@ -109,6 +111,7 @@ public class LettuceCacheProvider extends RedisPubSubAdapter<String, String> imp
         String sentinelMasterId = props.getProperty("sentinelMasterId");
         String sentinelPassword = props.getProperty("sentinelPassword");
         long clusterTopologyRefreshMs = Long.valueOf(props.getProperty("clusterTopologyRefresh", "3000"));
+        String protocolVersion = props.getProperty("protocolVersion");
 
         if("redis-cluster".equalsIgnoreCase(scheme)) {
             scheme = "redis";
@@ -131,7 +134,11 @@ public class LettuceCacheProvider extends RedisPubSubAdapter<String, String> imp
                     //开启定时刷新,时间间隔根据实际情况修改
                     .enablePeriodicRefresh(Duration.ofMillis(clusterTopologyRefreshMs))
                     .build();
-            ((RedisClusterClient)redisClient).setOptions(ClusterClientOptions.builder().topologyRefreshOptions(topologyRefreshOptions).build());
+            ClusterClientOptions.Builder builder = ClusterClientOptions.builder().topologyRefreshOptions(topologyRefreshOptions);
+            if(StringUtils.hasText(protocolVersion)){
+                builder.protocolVersion(ProtocolVersion.valueOf(protocolVersion));
+            }
+            ((RedisClusterClient)redisClient).setOptions(builder.build());
         } else if("redis-sentinel".equalsIgnoreCase(scheme)) {
             scheme = "redis";
             String[] hostArray = hosts.split(",");
@@ -156,12 +163,18 @@ public class LettuceCacheProvider extends RedisPubSubAdapter<String, String> imp
 
             RedisURI uri = builder.build();
             redisClient = RedisClient.create(uri);
+            if(StringUtils.hasText(protocolVersion)){
+                ((RedisClient)redisClient).setOptions(ClientOptions.builder().protocolVersion(ProtocolVersion.valueOf(protocolVersion)).build());
+            }
         }else {
             String[] redisArray = hosts.split(":");
             RedisURI uri = RedisURI.create(redisArray[0], Integer.valueOf(redisArray[1]));
             uri.setDatabase(database);
             uri.setPassword(password);
             redisClient = RedisClient.create(uri);
+            if(StringUtils.hasText(protocolVersion)){
+                ((RedisClient)redisClient).setOptions(ClientOptions.builder().protocolVersion(ProtocolVersion.valueOf(protocolVersion)).build());
+            }
         }
         try {
             int timeout = Integer.parseInt(props.getProperty("timeout", "10000"));
@@ -175,6 +188,9 @@ public class LettuceCacheProvider extends RedisPubSubAdapter<String, String> imp
         poolConfig.setMaxTotal(Integer.parseInt(props.getProperty("maxTotal", "100")));
         poolConfig.setMaxIdle(Integer.parseInt(props.getProperty("maxIdle", "10")));
         poolConfig.setMinIdle(Integer.parseInt(props.getProperty("minIdle", "10")));
+
+
+
 
         pool = ConnectionPoolSupport.createGenericObjectPool(() -> {
             if(redisClient instanceof RedisClient)

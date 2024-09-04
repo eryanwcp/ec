@@ -8,6 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import io.lettuce.core.ClientOptions;
+import io.lettuce.core.cluster.ClusterClientOptions;
+import io.lettuce.core.cluster.ClusterTopologyRefreshOptions;
+import io.lettuce.core.protocol.ProtocolVersion;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,12 +81,15 @@ public class J2CacheSpringRedisAutoConfiguration {
 		String scheme = l2CacheProperties.getProperty("scheme") == null ? "null" : l2CacheProperties.getProperty("scheme");
 		String clusterName = l2CacheProperties.getProperty("cluster_name","j2cache");
 		String password = l2CacheProperties.getProperty("password");
+		long clusterTopologyRefreshMs = Long.valueOf(l2CacheProperties.getProperty("clusterTopologyRefresh", "3000"));
+		String protocolVersion = l2CacheProperties.getProperty("protocolVersion");
 		int database = l2CacheProperties.getProperty("database") == null ? 0
 				: Integer.parseInt(l2CacheProperties.getProperty("database"));
 		LettuceConnectionFactory connectionFactory = null;
 		LettucePoolingClientConfigurationBuilder config = LettucePoolingClientConfiguration.builder();
 		config.commandTimeout(Duration.ofMillis(CONNECT_TIMEOUT));
 		config.poolConfig(getGenericRedisPool(l2CacheProperties, null));
+
 		List<RedisNode> nodes = new ArrayList<>();
 		if (hosts != null && !"".equals(hosts)) {
 			for (String node : hosts.split(",")) {
@@ -107,6 +114,10 @@ public class J2CacheSpringRedisAutoConfiguration {
 			sentinel.setPassword(paw);
 			sentinel.setMaster(clusterName);
 			sentinel.setSentinels(nodes);
+			//兼容redis5-
+			if(StringUtils.hasText(protocolVersion)){
+				config.clientOptions(ClientOptions.builder().protocolVersion(ProtocolVersion.valueOf(protocolVersion)).build());
+			}
 			connectionFactory = new LettuceConnectionFactory(sentinel, config.build());
 			break;
 		case "redis-cluster":
@@ -114,6 +125,20 @@ public class J2CacheSpringRedisAutoConfiguration {
 			cluster.setClusterNodes(nodes);
 			cluster.setMaxRedirects(MAX_ATTEMPTS);
 			cluster.setPassword(paw);
+			ClusterTopologyRefreshOptions topologyRefreshOptions = ClusterTopologyRefreshOptions.builder()
+					//开启自适应刷新
+					.enableAdaptiveRefreshTrigger(ClusterTopologyRefreshOptions.RefreshTrigger.MOVED_REDIRECT, ClusterTopologyRefreshOptions.RefreshTrigger.PERSISTENT_RECONNECTS)
+					.enableAllAdaptiveRefreshTriggers()
+					.adaptiveRefreshTriggersTimeout(Duration.ofMillis(clusterTopologyRefreshMs))
+					//开启定时刷新,时间间隔根据实际情况修改
+					.enablePeriodicRefresh(Duration.ofMillis(clusterTopologyRefreshMs))
+					.build();
+			ClusterClientOptions.Builder builder = ClusterClientOptions.builder().topologyRefreshOptions(topologyRefreshOptions);
+			//兼容redis5-
+			if(StringUtils.hasText(protocolVersion)){
+				builder.protocolVersion(ProtocolVersion.valueOf(protocolVersion));
+			}
+			config.clientOptions(builder.build());
 			connectionFactory = new LettuceConnectionFactory(cluster, config.build());
 			break;
 		case "redis-sharded":
@@ -125,9 +150,14 @@ public class J2CacheSpringRedisAutoConfiguration {
 				RedisStandaloneConfiguration single = new RedisStandaloneConfiguration(host, port);
 				single.setDatabase(database);
 				single.setPassword(paw);
+				//兼容redis5-
+				if(StringUtils.hasText(protocolVersion)){
+					config.clientOptions(ClientOptions.builder().protocolVersion(ProtocolVersion.valueOf(protocolVersion)).build());
+				}
 				connectionFactory = new LettuceConnectionFactory(single, config.build());
 				break;
 			}
+
 			if (!"redis".equalsIgnoreCase(scheme) && !"rediss".equalsIgnoreCase(scheme))
 				log.warn("Redis scheme [" + scheme + "] not defined. Using 'redis'.");
 			break;

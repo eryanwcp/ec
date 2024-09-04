@@ -125,6 +125,10 @@
       "name": "j2cache.session.redis.clusterTopologyRefresh",
       "type": "java.lang.String",
       "defaultValue": "3000"
+    },{
+      "name": "j2cache.session.redis.protocolVersion",
+      "type": "java.lang.String",
+      "defaultValue": "RESP3"
     }
   ]
 }
