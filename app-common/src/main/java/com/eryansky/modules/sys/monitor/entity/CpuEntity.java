@@ -8,6 +8,10 @@ import cn.hutool.core.util.NumberUtil;
  *
  */
 public class CpuEntity {
+    /**
+     * CPU信号
+     */
+    private String cpuModel;
 	/**
        * 核心数
      */
@@ -37,7 +41,15 @@ public class CpuEntity {
      * CPU当前空闲率
      */
     private double free;
-    
+
+    public String getCpuModel() {
+        return cpuModel;
+    }
+
+    public void setCpuModel(String cpuModel) {
+        this.cpuModel = cpuModel;
+    }
+
     public int getCpuNum()
     {
         return cpuNum;

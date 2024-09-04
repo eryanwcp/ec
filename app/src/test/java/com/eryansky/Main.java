@@ -11,6 +11,7 @@ import com.eryansky.common.utils.Identities;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.encode.*;
 import com.eryansky.common.utils.mapper.JsonMapper;
+import com.eryansky.modules.sys.monitor.domain.Server;
 import com.google.common.collect.Maps;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
@@ -24,13 +25,9 @@ import java.util.Map;
  */
 public class Main {
     public static void main(String[] args) throws Exception {
-        SystemInfo si = new SystemInfo();
-        HardwareAbstractionLayer hal = si.getHardware();
-        CentralProcessor cpu = hal.getProcessor();
-        Map<String,Object> map = Maps.newHashMap();
-        map.put("hal",hal);
-        map.put("cpu",cpu);
-        System.out.println(JsonMapper.toJsonString(map));
+       Server server = new Server();
+       server.copyTo();
+        System.out.println(JsonMapper.toJsonString(server.getJvm()));
 
     }
 }

@@ -42,14 +42,15 @@
 			<tr><td>IP地址</td><td>{{sys.computerIp}}</td></tr>
 			<tr><td>操作系统</td><td>{{sys.osName}} {{sys.osArch}}</td></tr>
 			<tr><td>服务器时间</td><td>{{sys.serverTime}}</td></tr>
+			<tr><td>CPU型号</td><td>{{cpu.cpuModel}}</td></tr>
 			<tr><td>CPU核心数</td><td>{{cpu.cpuNum}}</td></tr>
-			<tr><td>CPU用户使用率</td><td>{{cpu.used}}%</td></tr>
-			<tr><td>CPU系统使用率</td><td>{{cpu.sys}}%</td></tr>
-			<tr><td>CPU当前等待率</td><td>{{cpu.wait}}%</td></tr>
-			<tr><td>CPU当前空闲率</td><td>{{cpu.free}}%</td></tr>
-			<tr><td>内存总量</td><td>{{mem.total}}GB</td></tr>
-			<tr><td>已用内存</td><td>{{mem.used}}GB</td></tr>
-			<tr><td>剩余内存</td><td>{{mem.free}}GB</td></tr>
+			<tr><td>CPU用户使用率</td><td>{{cpu.used}} %</td></tr>
+			<tr><td>CPU系统使用率</td><td>{{cpu.sys}} %</td></tr>
+			<tr><td>CPU当前等待率</td><td>{{cpu.wait}} %</td></tr>
+			<tr><td>CPU当前空闲率</td><td>{{cpu.free}} %</td></tr>
+			<tr><td>内存总量</td><td>{{mem.total}} GB</td></tr>
+			<tr><td>已用内存</td><td>{{mem.used}} GB</td></tr>
+			<tr><td>剩余内存</td><td>{{mem.free}} GB</td></tr>
 			<tr><td>内存使用率</td><td>{{mem.usage}}%</td></tr>
 			<tr><td>javaVersion</td><td>{{jvm.name}} {{jvm.version}}</td></tr>
 			<tr><td>javaHome</td><td>{{jvm.home}}</td></tr>
@@ -64,7 +65,7 @@
 				<table class="table table-striped table-bordered table-condensed">
 					<tbody>
 					{{#sysFiles}}
-					<tr><td>{{typeName}} {{dirName}} {{used}} / {{total}} 剩余{{free}} {{sysTypeName}}</td></tr>
+					<tr><td>{{typeName}}|{{sysTypeName}} {{dirName}}     {{used}} / {{total}} 剩余{{free}}</td></tr>
 					{{/sysFiles}}
 					</tbody>
 				</table>
