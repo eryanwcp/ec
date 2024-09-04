@@ -150,6 +150,7 @@ public class Server
         cpu.setUsed(user);
         cpu.setWait(iowait);
         cpu.setFree(idle);
+        cpu.setCpuModel(processor.toString());
     }
 
     /**
