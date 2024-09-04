@@ -61,7 +61,7 @@
 			<tr><td>当前JVM占用的内存总数</td><td>{{jvm.total}} M</td></tr>
 			<tr><td>JVM最大可用内存总数</td><td>{{jvm.max}} M</td></tr>
 			<tr><td>JVM使用</td><td>{{jvm.used}} M</td></tr>
-			<tr><td>JVM使用率</td><td>{{jvm.usage}}%</td></tr>
+			<tr><td>JVM使用率</td><td>{{jvm.usage}} %</td></tr>
 			<tr><td>JVM空闲内存</td><td>{{jvm.free}} M</td></tr>
 			<tr><td>jvm运行时间</td><td>{{jvm.startTime}} {{jvm.runTime}}</td></tr>
 			<tr><td>文件系统</td><td>
@@ -72,10 +72,7 @@
 					{{/sysFiles}}
 					</tbody>
 				</table>
-
 			</td></tr>
-
-
 			</tbody>
 		</table>
 	</script>
