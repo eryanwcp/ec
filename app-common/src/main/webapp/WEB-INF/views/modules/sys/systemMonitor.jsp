@@ -24,6 +24,9 @@
 				type: 'post',
 				cache:false,
 				dataType: 'json',
+				beforeSend: function (jqXHR, settings) {
+					$("#systemInfo_div").html("<div style='padding: 10px 30px;text-align:center;font-size: 16px;'><img src='${ctxStatic}/js/easyui/themes/bootstrap/images/loading.gif' />数据加载中...</div>");
+				},
 				success: function (data) {
 					if (data.code === 1) {
 						var html = Mustache.render($("#systemList").html(),data['data']);
@@ -65,7 +68,7 @@
 				<table class="table table-striped table-bordered table-condensed">
 					<tbody>
 					{{#sysFiles}}
-					<tr><td>{{typeName}}|{{sysTypeName}} {{dirName}}     {{used}} / {{total}} 剩余{{free}}</td></tr>
+					<tr><td>{{typeName}}|{{sysTypeName}} {{dirName}}     {{used}} / {{total}}  剩余{{free}}</td></tr>
 					{{/sysFiles}}
 					</tbody>
 				</table>

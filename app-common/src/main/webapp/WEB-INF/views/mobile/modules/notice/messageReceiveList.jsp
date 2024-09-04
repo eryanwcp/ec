@@ -46,7 +46,7 @@
                 data: queryParam,
                 cache: false,
                 beforeSend: function (jqXHR, settings) {
-                    $("#list").html("<div style='padding: 10px 30px;text-align:center;font-size: 16px;'>数据加载中...</div>");
+                    $("#list").html("<div style='padding: 10px 30px;text-align:center;font-size: 16px;'><img src='${ctxStatic}/js/easyui/themes/bootstrap/images/loading.gif' />数据加载中...</div>");
                 },
                 success: function (data) {
                     data = data['obj'];
