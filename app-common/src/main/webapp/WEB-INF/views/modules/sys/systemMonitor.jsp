@@ -54,7 +54,7 @@
 			<tr><td>内存总量</td><td>{{mem.total}} GB</td></tr>
 			<tr><td>已用内存</td><td>{{mem.used}} GB</td></tr>
 			<tr><td>剩余内存</td><td>{{mem.free}} GB</td></tr>
-			<tr><td>内存使用率</td><td>{{mem.usage}}%</td></tr>
+			<tr><td>内存使用率</td><td>{{mem.usage}} %</td></tr>
 			<tr><td>javaVersion</td><td>{{jvm.name}} {{jvm.version}}</td></tr>
 			<tr><td>javaHome</td><td>{{jvm.home}}</td></tr>
 			<tr><td>javaTmpPath</td><td>{{jvm.tmpPath}}</td></tr>
@@ -68,7 +68,7 @@
 				<table class="table table-striped table-bordered table-condensed">
 					<tbody>
 					{{#sysFiles}}
-					<tr><td>{{typeName}}|{{sysTypeName}} {{dirName}}     {{used}} / {{total}}  剩余{{free}}</td></tr>
+					<tr><td>{{typeName}} {{dirName}}    {{used}} / {{total}}  剩余{{free}}  {{sysTypeName}}</td></tr>
 					{{/sysFiles}}
 					</tbody>
 				</table>
