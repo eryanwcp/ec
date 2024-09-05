@@ -15,13 +15,11 @@
  */
 package com.eryansky.j2cache;
 
-import com.eryansky.j2cache.util.FurySerializer;
-import com.eryansky.j2cache.util.Serializer;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 
 /**
@@ -50,10 +48,10 @@ public class Command implements java.io.Serializable{
 	private String region;
 	private String[] keys;
 
-	private static final Serializer serializer;
+	private static final JsonMapper serializer;
 
 	static {
-		serializer = new FurySerializer();
+		serializer = new JsonMapper();
 	}
 
 	public static int genRandomSrc() {
@@ -80,7 +78,7 @@ public class Command implements java.io.Serializable{
 
 	public String json() {
 		try {
-			return new String(serializer.serialize(this),StandardCharsets.UTF_8);
+			return serializer.writeValueAsString(this);
 		} catch (IOException e) {
 			logger.warn("Failed to json j2cache command", e);
 		}
@@ -89,7 +87,7 @@ public class Command implements java.io.Serializable{
 
 	public static Command parse(String json) {
 		try {
-			return (Command) serializer.deserialize(json.getBytes(StandardCharsets.UTF_8));
+			return serializer.readValue(json,Command.class);
 		} catch (IOException e) {
 			logger.warn("Failed to parse j2cache command: {}", json, e);
 		}
@@ -133,4 +131,8 @@ public class Command implements java.io.Serializable{
 		return json();
 	}
 
+	public static void main(String[] args) throws IOException {
+		System.out.println(new Command(OPT_JOIN, null).toString());
+		System.out.println(parse(new Command(OPT_JOIN, null).toString()));
+	}
 }
