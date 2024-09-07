@@ -62,7 +62,7 @@
         <ec-j2cache.version>4.3.20240801.03</ec-j2cache.version>
         <ec-j2cache-spring-boot-starter.version>4.3.20240801.03</ec-j2cache-spring-boot-starter.version>
         <ec-fastweixin.version>4.3.20240801.03</ec-fastweixin.version>
-        <ec-encrypt-spring-boot-starter.version>4.2.20240801.02</ec-encrypt-spring-boot-starter.version>
+        <ec-encrypt-spring-boot-starter.version>4.3.20240801.03</ec-encrypt-spring-boot-starter.version>
 
         <jackson.version>2.17.2</jackson.version>
     </properties>
