@@ -81,7 +81,7 @@ public class Command implements java.io.Serializable{
 
 	public String json() {
 		try {
-			return new String(jsonMapper.writeValueAsBytes(this));
+			return jsonMapper.writeValueAsString(this);
 		} catch (IOException e) {
 			logger.warn("Failed to json j2cache command", e);
 		}
@@ -138,7 +138,7 @@ public class Command implements java.io.Serializable{
 		System.out.println(new Command(OPT_JOIN, null).toString());
 		System.out.println(parse(new Command(OPT_JOIN, null).toString()));
 
-		Command cmd = Command.parse(new String(new Command(OPT_JOIN, null).toString().getBytes(StandardCharsets.UTF_8)));
+		Command cmd = Command.parse(new String(new Command(OPT_JOIN, "123").toString().getBytes(StandardCharsets.UTF_8)));
 		System.out.println(cmd);
 	}
 }
