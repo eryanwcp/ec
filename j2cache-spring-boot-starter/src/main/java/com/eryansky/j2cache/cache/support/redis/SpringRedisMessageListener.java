@@ -42,7 +42,8 @@ public class SpringRedisMessageListener implements MessageListener{
 			return;
 		}
         try {
-            Command cmd = Command.parse(String.valueOf(SerializationUtils.deserialize(messageBody)));
+//            Command cmd = Command.parse(String.valueOf(SerializationUtils.deserialize(messageBody)));
+            Command cmd = Command.parse(new String(messageBody));
             if (cmd == null || isLocalCommand(cmd))
                 return;
 

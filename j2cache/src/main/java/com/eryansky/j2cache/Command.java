@@ -15,14 +15,15 @@
  */
 package com.eryansky.j2cache;
 
-import com.eryansky.j2cache.util.FurySerializer;
-import com.eryansky.j2cache.util.Serializer;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+
+import static com.fasterxml.jackson.core.JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION;
 
 /**
  * 命令消息封装
@@ -32,7 +33,7 @@ import java.security.SecureRandom;
  * 第4、N 为 region 值，长度为 [R_LEN]
  * 第N+1、N+2 为 key 长度，长度2 [K_LEN]
  * 第N+3、M为 key值，长度为 [K_LEN]
- * 
+ *
  * @author Winter Lau(javayou@gmail.com)
  */
 public class Command implements java.io.Serializable{
@@ -44,16 +45,16 @@ public class Command implements java.io.Serializable{
 	public final static byte OPT_EVICT_KEY = 0x02; 	//删除缓存
 	public final static byte OPT_CLEAR_KEY = 0x03; 	//清除缓存
 	public final static byte OPT_QUIT 	   = 0x04;	//退出集群
-	
+
 	private int src;
 	private int operator;
 	private String region;
 	private String[] keys;
-
-	private static final Serializer serializer;
+	private static final JsonMapper jsonMapper;
 
 	static {
-		serializer = new FurySerializer();
+		jsonMapper = new JsonMapper();
+//		jsonMapper.enable(INCLUDE_SOURCE_IN_LOCATION);
 	}
 
 	public static int genRandomSrc() {
@@ -80,7 +81,7 @@ public class Command implements java.io.Serializable{
 
 	public String json() {
 		try {
-			return new String(serializer.serialize(this),StandardCharsets.UTF_8);
+			return new String(jsonMapper.writeValueAsBytes(this));
 		} catch (IOException e) {
 			logger.warn("Failed to json j2cache command", e);
 		}
@@ -89,7 +90,7 @@ public class Command implements java.io.Serializable{
 
 	public static Command parse(String json) {
 		try {
-			return (Command) serializer.deserialize(json.getBytes(StandardCharsets.UTF_8));
+			return jsonMapper.readValue(json,Command.class);
 		} catch (IOException e) {
 			logger.warn("Failed to parse j2cache command: {}", json, e);
 		}
@@ -136,5 +137,8 @@ public class Command implements java.io.Serializable{
 	public static void main(String[] args) throws IOException {
 		System.out.println(new Command(OPT_JOIN, null).toString());
 		System.out.println(parse(new Command(OPT_JOIN, null).toString()));
+
+		Command cmd = Command.parse(new String(new Command(OPT_JOIN, null).toString().getBytes(StandardCharsets.UTF_8)));
+		System.out.println(cmd);
 	}
 }
