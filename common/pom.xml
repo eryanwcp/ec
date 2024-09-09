@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.eryansky</groupId>
         <artifactId>ec-parent</artifactId>
-        <version>4.3.20240801.03</version>
+        <version>4.3.20240801.04</version>
     </parent>
 
     <artifactId>ec-common</artifactId>
