@@ -54,7 +54,7 @@ public class Command implements java.io.Serializable{
 
 	static {
 		jsonMapper = new JsonMapper();
-//		jsonMapper.enable(INCLUDE_SOURCE_IN_LOCATION);
+		jsonMapper.enable(INCLUDE_SOURCE_IN_LOCATION);
 	}
 
 	public static int genRandomSrc() {
