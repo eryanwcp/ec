@@ -112,6 +112,7 @@ public class JsonMapper  extends ObjectMapper{
     public JsonMapper enableSimple() {
         this.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
         this.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+        this.configure(JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION,true);
         return this;
     }
 
@@ -120,7 +121,7 @@ public class JsonMapper  extends ObjectMapper{
      * @author ThinkGem
      */
     public JsonMapper enabledNullValueToEmpty(){
-        this.getSerializerProvider().setNullValueSerializer(new JsonSerializer<Object>(){
+        this.getSerializerProvider().setNullValueSerializer(new JsonSerializer<>() {
             @Override
             public void serialize(Object value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
                 jgen.writeString(StringUtils.EMPTY);
