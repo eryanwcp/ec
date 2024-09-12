@@ -472,6 +472,22 @@ public class AppUtils {
      *
      * @return
      */
+    public static String getClientROOTAppURL() {
+        try {
+            return WebUtils.getROOTAppURL(SpringMVCHolder.getRequest());
+        } catch (Exception e) {
+        }
+        String value = AppConstants.getAppURL();
+        if(StringUtils.isNotBlank(value)){
+            return value;
+        }
+        return value;
+    }
+
+    /**
+     *
+     * @return
+     */
     public static String getAdaptiveClientAppURL() {
         try {
             return WebUtils.getAppURL(SpringMVCHolder.getRequest(),true);
