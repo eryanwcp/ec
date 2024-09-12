@@ -76,9 +76,9 @@ public class SpringRedisPubSubPolicy implements ClusterPolicy {
 			ConfigureNotifyKeyspaceEventsAction action = new ConfigureNotifyKeyspaceEventsAction();
 			action.config(listenerContainer.getConnectionFactory().getConnection());
 			listenerContainer.addMessageListener(new SpringRedisActiveMessageListener(this, namespace), topics);
-			listenerContainer.addMessageListener(new SpringRedisMessageListener(this, this.channel,LOCAL_COMMAND_ID), new PatternTopic(this.channel));
+			listenerContainer.addMessageListener(new SpringRedisMessageListener(this, this.channel,LOCAL_COMMAND_ID,redisTemplate.getDefaultSerializer()), new PatternTopic(this.channel));
 		}else {
-			listenerContainer.addMessageListener(new SpringRedisMessageListener(this, this.channel,LOCAL_COMMAND_ID), new PatternTopic(this.channel));
+			listenerContainer.addMessageListener(new SpringRedisMessageListener(this, this.channel,LOCAL_COMMAND_ID,redisTemplate.getDefaultSerializer()), new PatternTopic(this.channel));
 		}
 
 	}
@@ -104,7 +104,7 @@ public class SpringRedisPubSubPolicy implements ClusterPolicy {
 	public void publish(Command cmd) {
 		if(!isActive && config.isL2CacheOpen()) {
 			cmd.setSrc(LOCAL_COMMAND_ID);
-			redisTemplate.convertAndSend(this.channel, cmd.json());
+			redisTemplate.convertAndSend(this.channel, cmd);
 		}
 	}
 
@@ -114,7 +114,7 @@ public class SpringRedisPubSubPolicy implements ClusterPolicy {
 			Command cmd = new Command();
 			cmd.setSrc(LOCAL_COMMAND_ID);
 			cmd.setOperator(Command.OPT_QUIT);
-			redisTemplate.convertAndSend(this.channel, cmd.json());
+			redisTemplate.convertAndSend(this.channel, cmd);
 		}
 	}
 

@@ -52,8 +52,10 @@ public class SerializationUtils {
                     g_serializer = Class.forName("com.eryansky.j2cache.util.FstJSONSerializer").asSubclass(Serializer.class).getConstructor(Properties.class).newInstance(props);
                 } else if("fury".equals(ser)){
                     g_serializer = Class.forName("com.eryansky.j2cache.util.FurySerializer").asSubclass(Serializer.class).getDeclaredConstructor().newInstance();
-                }else {
-                g_serializer = (Serializer) Class.forName(ser).getDeclaredConstructor().newInstance();
+                } else if("jackson".equals(ser)){
+                    g_serializer = Class.forName("com.eryansky.j2cache.util.JacksonSerializer").asSubclass(Serializer.class).getDeclaredConstructor().newInstance();
+                } else {
+                    g_serializer = (Serializer) Class.forName(ser).getDeclaredConstructor().newInstance();
                 }
             } catch (Exception e) {
                 throw new CacheException("Cannot initialize Serializer named [" + ser + ']', e);

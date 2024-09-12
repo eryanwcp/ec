@@ -27,6 +27,12 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>com.eryansky</groupId>
+            <artifactId>ec-common</artifactId>
+            <version>${ec-common.version}</version>
+            <scope>compile</scope>
+        </dependency>
         <!--Cache-->
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
