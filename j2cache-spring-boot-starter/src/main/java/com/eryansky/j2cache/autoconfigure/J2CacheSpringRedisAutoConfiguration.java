@@ -71,6 +71,7 @@ public class J2CacheSpringRedisAutoConfiguration {
 		String scheme = l2CacheProperties.getProperty("scheme") == null ? "null" : l2CacheProperties.getProperty("scheme");
 		String clusterName = l2CacheProperties.getProperty("cluster_name","j2cache");
 		String password = l2CacheProperties.getProperty("password");
+		long clusterTopologyRefreshMs = Long.valueOf(l2CacheProperties.getProperty("clusterTopologyRefresh", "3000"));
 		int database = l2CacheProperties.getProperty("database") == null ? 0
 				: Integer.parseInt(l2CacheProperties.getProperty("database"));
 		LettuceConnectionFactory connectionFactory = null;

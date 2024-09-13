@@ -53,9 +53,15 @@ public class J2CacheSessionFilterAutoConfiguration {
         map.put("redis.cluster_name",redisConfig.getClusterName());
         map.put("redis.database",redisConfig.getDatabase());
         map.put("redis.timeout",redisConfig.getTimeout());
+        map.put("redis.maxTotal",redisConfig.getMaxTotal());
+        map.put("redis.maxIdle",redisConfig.getMaxIdle());
+        map.put("redis.minIdle",redisConfig.getMinIdle());
         map.put("redis.password",redisConfig.getPassword());
         map.put("redis.passwordEncrypt",redisConfig.getPasswordEncrypt());
         map.put("redis.passwordEncryptKey",redisConfig.getPasswordEncryptKey());
+        map.put("redis.sentinelMasterId",redisConfig.getSentinelMasterId());
+        map.put("redis.sentinelPassword",redisConfig.getSentinelPassword());
+        map.put("redis.clusterTopologyRefresh",redisConfig.getClusterTopologyRefresh());
 
         String password_encrypt = redisConfig.getPasswordEncrypt();
         String passwordEncryptKey = redisConfig.getPasswordEncryptKey();//长度16位
