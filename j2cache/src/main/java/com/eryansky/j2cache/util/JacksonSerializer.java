@@ -16,21 +16,22 @@ import java.util.TimeZone;
  */
 public class JacksonSerializer extends GenericJackson2JsonRedisSerializer implements Serializer {
 
-    private  ObjectMapper objectMapper = new ObjectMapper();
+    private  ObjectMapper mapper = new ObjectMapper();
     public JacksonSerializer() {
         super();
-        objectMapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
-        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-        objectMapper.configure(JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION, true);
-        objectMapper.setTimeZone(TimeZone.getTimeZone("GMT+08:00"));
-        objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
-        objectMapper.setFilterProvider(new SimpleFilterProvider().setFailOnUnknownId(false));
-        //设置输入时忽略在JSON字符串中存在但Java对象实际没有的属性
-        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
     }
 
-    public JacksonSerializer(ObjectMapper mapper, ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+    public JacksonSerializer(ObjectMapper mapper) {
+        super(mapper);
+        mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
+        mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+        mapper.configure(JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION, true);
+        mapper.setTimeZone(TimeZone.getTimeZone("GMT+08:00"));
+        mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+        mapper.setFilterProvider(new SimpleFilterProvider().setFailOnUnknownId(false));
+        //设置输入时忽略在JSON字符串中存在但Java对象实际没有的属性
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
     @Override
