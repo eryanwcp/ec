@@ -16,10 +16,8 @@ import java.util.TimeZone;
  */
 public class JacksonSerializer extends GenericJackson2JsonRedisSerializer implements Serializer {
 
-    private  ObjectMapper mapper = new ObjectMapper();
     public JacksonSerializer() {
         super();
-
     }
 
     public JacksonSerializer(ObjectMapper mapper) {
