@@ -61,7 +61,7 @@ public class JsonMapper  extends ObjectMapper{
         // 设置默认日期格式
         this.setTimeZone(TimeZone.getTimeZone("GMT+08:00"));
         this.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
-        this.setFilters(new SimpleFilterProvider().setFailOnUnknownId(false));
+        this.setFilterProvider(new SimpleFilterProvider().setFailOnUnknownId(false));
         //设置输入时忽略在JSON字符串中存在但Java对象实际没有的属性
         this.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);// 空值处理为空串
 //        this.getSerializerProvider().setNullValueSerializer(new JsonSerializer<Object>(){
@@ -112,6 +112,7 @@ public class JsonMapper  extends ObjectMapper{
     public JsonMapper enableSimple() {
         this.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
         this.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+        this.configure(JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION,true);
         return this;
     }
 
@@ -120,7 +121,7 @@ public class JsonMapper  extends ObjectMapper{
      * @author ThinkGem
      */
     public JsonMapper enabledNullValueToEmpty(){
-        this.getSerializerProvider().setNullValueSerializer(new JsonSerializer<Object>(){
+        this.getSerializerProvider().setNullValueSerializer(new JsonSerializer<>() {
             @Override
             public void serialize(Object value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
                 jgen.writeString(StringUtils.EMPTY);

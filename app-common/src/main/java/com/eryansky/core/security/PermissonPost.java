@@ -31,6 +31,9 @@ public class PermissonPost implements Serializable {
     private String organId;
 
 
+    public PermissonPost() {
+    }
+
     public PermissonPost(String code) {
         this.code = code;
     }

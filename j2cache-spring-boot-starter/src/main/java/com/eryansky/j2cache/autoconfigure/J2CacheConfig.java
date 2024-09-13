@@ -31,7 +31,7 @@ public class J2CacheConfig {
     private boolean allowNullValues = false;
     
     /**
-     * 使用哪种redis客户端,默认：jedis
+     * 使用哪种redis客户端,默认：lettuce
      * <ul>
      * <li><a href ='https://github.com/xetorthio/jedis'>jedis: https://github.com/xetorthio/jedis</a></li>
      * <li><a href ='https://github.com/lettuce-io/lettuce-core'>lettuce: https://github.com/lettuce-io/lettuce-core</a></li>
