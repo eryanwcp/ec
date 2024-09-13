@@ -30,7 +30,7 @@ public class J2CacheSerializer implements RedisSerializer<Object>{
 	@Override
 	public Object deserialize(byte[] bytes) throws SerializationException {
 		try {
-			//动态方序列化式序列化 ，当使用Fury容易出现CPU100%，临时强制指定Jackson方式
+			//动态序列化方式，当使用Fury容易出现CPU100%，临时强制指定Jackson方式
 //			return SerializationUtils.deserialize(bytes);
 			return jacksonSerializer.deserialize(bytes);
 		} catch (Exception e) {
