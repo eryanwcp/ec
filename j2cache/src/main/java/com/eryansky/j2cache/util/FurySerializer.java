@@ -16,13 +16,13 @@ public class FurySerializer implements Serializer {
     private final ThreadSafeFury fury;
 
     public FurySerializer(){
+        LoggerFactory.useSlf4jLogging(true);
         this.fury = Fury.builder().withLanguage(Language.JAVA)
                 // Allow to deserialize objects unknown types, more flexible
                 // but may be insecure if the classes contains malicious code.
                 .withRefTracking(true)
                 .requireClassRegistration(false)
                 .buildThreadSafeFury();
-        LoggerFactory.useSlf4jLogging(true);
     }
 
     @Override
