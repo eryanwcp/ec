@@ -132,9 +132,6 @@
         </profile>
         <profile>
             <id>docker</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <properties>
                 <project.packaging>jar</project.packaging>
                 <configSuffix>-docker</configSuffix>
