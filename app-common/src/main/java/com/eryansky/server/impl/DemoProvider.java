@@ -7,7 +7,7 @@ import com.eryansky.core.rpc.annotation.RPCProvider;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.service.UserService;
-import com.eryansky.server.DemoApi;
+import com.eryansky.server.DemoAPI;
 import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,7 +17,7 @@ import java.util.Map;
 
 @RPCProvider
 @Component
-public class DemoApiImpl implements DemoApi {
+public class DemoProvider implements DemoAPI {
 
     @Autowired
     private UserService userService;
