@@ -13,16 +13,20 @@ import java.io.IOException;
  */
 public class FurySerializer implements Serializer {
 
-    private final ThreadSafeFury fury;
+    private static ThreadSafeFury fury = null;
 
-    public FurySerializer(){
+    static {
         LoggerFactory.useSlf4jLogging(true);
-        this.fury = Fury.builder().withLanguage(Language.JAVA)
+        fury = Fury.builder().withLanguage(Language.JAVA)
                 // Allow to deserialize objects unknown types, more flexible
                 // but may be insecure if the classes contains malicious code.
                 .withRefTracking(true)
                 .requireClassRegistration(false)
                 .buildThreadSafeFury();
+    }
+
+    public FurySerializer(){
+
     }
 
     @Override
