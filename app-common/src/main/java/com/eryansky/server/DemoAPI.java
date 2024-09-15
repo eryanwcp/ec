@@ -5,16 +5,14 @@ import com.eryansky.client.common.rpc.RPCMethodConfig;
 import com.eryansky.client.common.rpc.RPCPermissions;
 import com.eryansky.common.model.R;
 import com.eryansky.common.orm.Page;
-import com.eryansky.core.security.annotation.RequiresPermissions;
 import com.eryansky.modules.sys.mapper.User;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.List;
 import java.util.Map;
 
 //@RPCExchange(name = "demo-service", serverUrl = "${ec.api.serverUrl:http://localhost:8080}",apiKey = "${ec.api.apiKey:}",encrypt = RPCExchange.ENCRYPT_AES)
 @RPCExchange(name = "demo-service", serverUrl = "${ec.api.serverUrl:http://localhost:8080/ec}",apiKey = "${ec.api.apiKey:}",encrypt = "${ec.api.encrypt:}")
-public interface DemoApi {
+public interface DemoAPI {
     String test1(String param1);
 
 
