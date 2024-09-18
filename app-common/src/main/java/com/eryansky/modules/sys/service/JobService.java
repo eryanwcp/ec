@@ -36,7 +36,7 @@ public class JobService extends BaseService {
             QuartzJob quartzJobAnnotation = AnnotationUtils.findAnnotation(clazz, QuartzJob.class);
             return quartzJobAnnotation;
         } catch (ClassNotFoundException e) {
-            logger.error(e.getMessage(), e);
+            logger.error(e.getMessage());
         }
         return null;
     }
