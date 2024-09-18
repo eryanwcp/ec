@@ -104,11 +104,13 @@
         <table id="contentTable" class="table table-striped table-bordered table-condensed">
             <thead>
             <tr>
+                <th>集群</th>
+                <th>执行实例</th>
+                <th>任务名</th>
                 <th>任务名</th>
                 <th>任务状态</th>
                 <%--<th>任务组名</th>
                 <th>所属类名</th>--%>
-                <th>执行实例</th>
                 <th>时间表达式</th>
                 <th>上一次执行时间</th>
                 <th>下一次执行时间</th>
@@ -118,11 +120,12 @@
             <tbody>
             {{#result}}
             <tr>
+                <td>{{instanceName}}</td>
+                <td>{{instanceId}}</td>
                 <td>{{jobName}}</td>
                 <td>{{triggerStateView}}</td>
                 <%--<td>{{jobGroup}}</td>
                 <td>{{jobClassName}}</td>--%>
-                <td>{{instanceName}}</td>
                 <td>{{cronExpression}}</td>
                 <td>{{prevFireTime}}</td>
                 <td>{{nextFireTime}}</td>
