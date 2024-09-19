@@ -32,7 +32,7 @@ import java.util.Map;
 @RequestMapping(value = "${adminPath}/sys/job")
 public class JobController extends SimpleController {
 	@Autowired
-	private JobService jobAndTriggerService;
+	private JobService jobService;
 
 	@Autowired
 	private Scheduler scheduler;
@@ -55,7 +55,7 @@ public class JobController extends SimpleController {
 			if(export){
 				page.setPageSize(Page.PAGESIZE_ALL);
 			}
-			page = jobAndTriggerService.findJobList(page,model.getJobName(),model.getTriggerState());
+			page = jobService.findJobList(page,model.getJobName(),model.getTriggerState());
 			if(export){
 				String title = "定时任务列表";
 				String[] hearders = new String[] {"任务名", "任务状态", "执行实例","时间表达式","上一次执行时间","下一次执行时间"};//表头数组
