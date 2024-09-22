@@ -53,7 +53,7 @@ public class SerializationUtils {
                 } else if("fury".equals(ser)){
                     g_serializer = Class.forName("com.eryansky.j2cache.util.FurySerializer").asSubclass(Serializer.class).getDeclaredConstructor().newInstance();
                 }else {
-                g_serializer = (Serializer) Class.forName(ser).getDeclaredConstructor().newInstance();
+                    g_serializer = (Serializer) Class.forName(ser).getDeclaredConstructor().newInstance();
                 }
             } catch (Exception e) {
                 throw new CacheException("Cannot initialize Serializer named [" + ser + ']', e);

@@ -36,7 +36,7 @@ public class J2Cache {
             config = J2CacheConfig.initFromConfig(CONFIG_FILE);
 			builder = J2CacheBuilder.init(config);
 		} catch (Exception e) {
-			logger.error("Failed to load J2Cache Config File : [{}]. " ,CONFIG_FILE);
+			logger.warn("Failed to load J2Cache Config File : [{}]. " ,CONFIG_FILE);
 		}
 	}
 
