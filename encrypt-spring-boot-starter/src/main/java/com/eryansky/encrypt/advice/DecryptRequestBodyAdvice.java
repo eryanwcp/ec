@@ -1,6 +1,5 @@
 package com.eryansky.encrypt.advice;
 
-import com.eryansky.common.orm.mybatis.sensitive.encrypt.AesSupport;
 import com.eryansky.common.utils.encode.Cryptos;
 import com.eryansky.common.utils.encode.RSAUtils;
 import com.eryansky.common.utils.encode.Sm4Utils;
@@ -8,6 +7,7 @@ import com.eryansky.common.utils.io.IoUtils;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.encrypt.anotation.DecryptRequestBody;
+import com.eryansky.encrypt.config.EncryptProvider;
 import com.eryansky.encrypt.enums.CipherMode;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -50,7 +50,7 @@ public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
         String requestEncrypt = Collections3.getFirst(headers.get(ENCRYPT));
         String requestEncryptKey = Collections3.getFirst(headers.get(ENCRYPT_KEY));
         if (StringUtils.isNotBlank(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey) ){
-            String key = RSAUtils.decryptBase64String(requestEncryptKey);
+            String key = RSAUtils.decryptBase64String(requestEncryptKey, EncryptProvider.privateKeyBase64());
             return new HttpInputMessage() {
                 @Override
                 public InputStream getBody() throws IOException {

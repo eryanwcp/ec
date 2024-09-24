@@ -7,8 +7,8 @@ import com.eryansky.common.utils.encode.Cryptos;
 import com.eryansky.common.utils.encode.RSAUtils;
 import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.utils.mapper.JsonMapper;
-import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.encrypt.anotation.EncryptResponseBody;
+import com.eryansky.encrypt.config.EncryptProvider;
 import com.eryansky.encrypt.enums.CipherMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,10 +46,12 @@ public class EncryptRResponseBodyAdvice implements ResponseBodyAdvice<R<Object>>
         String requestEncryptKey = Collections3.getFirst(headers.get(ENCRYPT_KEY));
         if (StringUtils.isNotBlank(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey) ){
             String data = JsonMapper.toJsonString(body.getData());
+            String key = null;
             if(CipherMode.SM4.name().equals(requestEncrypt)){
                 if(StringUtils.isNotBlank(data) && !StringUtils.equals(data,"null")){
                     try {
-                        body.setData(Sm4Utils.encrypt(RSAUtils.decryptHexString(requestEncryptKey),data));
+                        key = RSAUtils.decryptHexString(requestEncryptKey, EncryptProvider.privateKeyBase64());
+                        body.setData(Sm4Utils.encrypt(key,data));
                     } catch (Exception e) {
                         log.error(e.getMessage(),e);
                         throw new RuntimeException(e);
@@ -58,7 +60,8 @@ public class EncryptRResponseBodyAdvice implements ResponseBodyAdvice<R<Object>>
             }else if(CipherMode.AES.name().equals(requestEncrypt)){
                 if(StringUtils.isNotBlank(data) && !StringUtils.equals(data,"null")){
                     try {
-                        body.setData(Cryptos.aesECBEncryptBase64String(data, RSAUtils.decryptBase64String(requestEncryptKey)));
+                        key = RSAUtils.decryptBase64String(requestEncryptKey, EncryptProvider.privateKeyBase64());
+                        body.setData(Cryptos.aesECBEncryptBase64String(data, key));
                     } catch (Exception e) {
                         log.error(e.getMessage(),e);
                         throw new RuntimeException(e);

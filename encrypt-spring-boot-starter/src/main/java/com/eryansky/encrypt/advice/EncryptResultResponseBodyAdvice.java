@@ -8,6 +8,7 @@ import com.eryansky.common.utils.encode.RSAUtils;
 import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.encrypt.anotation.EncryptResponseBody;
+import com.eryansky.encrypt.config.EncryptProvider;
 import com.eryansky.encrypt.enums.CipherMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +48,7 @@ public class EncryptResultResponseBodyAdvice implements ResponseBodyAdvice<Resul
             String data = JsonMapper.toJsonString(body.getData());
             String obj = JsonMapper.toJsonString(body.getObj());
             if(CipherMode.SM4.name().equals(requestEncrypt)){
-                key = RSAUtils.decryptHexString(requestEncryptKey);
+                key = RSAUtils.decryptHexString(requestEncryptKey, EncryptProvider.privateKeyBase64());
                 if(StringUtils.isNotBlank(data) && !StringUtils.equals(data,"null")){
                     try {
                         body.setData(Sm4Utils.encrypt(key,data));
@@ -65,7 +66,7 @@ public class EncryptResultResponseBodyAdvice implements ResponseBodyAdvice<Resul
                     }
                 }
             }else if(CipherMode.AES.name().equals(requestEncrypt)){
-                key = RSAUtils.decryptBase64String(requestEncryptKey);
+                key = RSAUtils.decryptBase64String(requestEncryptKey, EncryptProvider.privateKeyBase64());
                 if(StringUtils.isNotBlank(data) && !StringUtils.equals(data,"null")){
                     try {
                         body.setData(Cryptos.aesECBEncryptBase64String(data,key));
