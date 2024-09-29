@@ -3,7 +3,7 @@ package com.eryansky;
 import com.eryansky.common.orm.Page;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.modules.sys.mapper.User;
-import com.eryansky.server.DemoApi;
+import com.eryansky.server.DemoAPI;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,7 @@ import java.util.*;
 public class ApiTests {
 
     @Autowired
-    private DemoApi demoApi;
+    private DemoAPI demoApi;
     @Test
     public void contextLoads() {
 

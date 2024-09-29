@@ -24,7 +24,7 @@ public class JobService extends BaseService {
         page.setResult(dao.findJobList(parameter));
         page.getResult().forEach(v->{
             QuartzJob quartzJob = getAnnotationByTriggerName(v.getTriggerName());
-            v.setInstanceName(null != quartzJob ? quartzJob.instanceId():null);
+            v.setInstanceId(null != quartzJob ? quartzJob.instanceId():null);
         });
         return page;
     }
@@ -36,7 +36,7 @@ public class JobService extends BaseService {
             QuartzJob quartzJobAnnotation = AnnotationUtils.findAnnotation(clazz, QuartzJob.class);
             return quartzJobAnnotation;
         } catch (ClassNotFoundException e) {
-            logger.error(e.getMessage(), e);
+            logger.error(e.getMessage());
         }
         return null;
     }

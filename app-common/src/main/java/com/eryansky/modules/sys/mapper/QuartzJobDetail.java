@@ -16,12 +16,16 @@ public class QuartzJobDetail extends BaseEntity<QuartzJobDetail> {
 	private String jobClassName;
 	private String triggerName;
 	private String triggerGroup;
+
 	private String instanceName;
+	private String instanceId;
+
 	private String cronExpression;
 	private String timeZoneId;
 	private Date nextFireTime;
 	private Date prevFireTime;
 	private String triggerState;
+
 
 	public String getJobName() {
 		return jobName;
@@ -61,6 +65,14 @@ public class QuartzJobDetail extends BaseEntity<QuartzJobDetail> {
 
 	public void setTriggerGroup(String triggerGroup) {
 		this.triggerGroup = triggerGroup;
+	}
+
+	public String getInstanceId() {
+		return instanceId;
+	}
+
+	public void setInstanceId(String instanceId) {
+		this.instanceId = instanceId;
 	}
 
 	public String getInstanceName() {

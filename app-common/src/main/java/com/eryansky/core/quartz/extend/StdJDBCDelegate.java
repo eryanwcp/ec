@@ -35,7 +35,7 @@ public class StdJDBCDelegate extends org.quartz.impl.jdbcjobstore.StdJDBCDelegat
     public List<TriggerKey> selectTriggerToAcquire(Connection conn, long noLaterThan, long noEarlierThan, int maxCount)
             throws SQLException {
         List<TriggerKey> triggerKeys = super.selectTriggerToAcquire(conn, noLaterThan, noEarlierThan, maxCount);
-        if (!StdSchedulerFactory.DEFAULT_INSTANCE_ID.equals(instanceId) && null != triggerKeys && triggerKeys.size() > 0) {
+        if (!StdSchedulerFactory.DEFAULT_INSTANCE_ID.equals(instanceId) && null != triggerKeys && !triggerKeys.isEmpty()) {
             return triggerKeys.stream().filter(k -> {
                 Class clazz = null;
                 try {
@@ -46,7 +46,7 @@ public class StdJDBCDelegate extends org.quartz.impl.jdbcjobstore.StdJDBCDelegat
                         return false;
                     }
                 } catch (ClassNotFoundException e) {
-                    logger.error(e.getMessage()+","+k.getName(), e);
+                    logger.error(e.getMessage()+","+k.getName());
                 }
                 return true;
 
