@@ -65,7 +65,7 @@ public class PaginationInterceptor extends BaseInterceptor {
                 }
 
                 //得到总记录数
-                page.setTotalCount(SQLHelper.getCount(originalSql, null, mappedStatement, parameterObject, boundSql, log));
+                page.autoTotalCount(SQLHelper.getCount(originalSql, null, mappedStatement, parameterObject, boundSql, log));
 
                 Dialect dialect = DIALECT;
                 //数据库类型

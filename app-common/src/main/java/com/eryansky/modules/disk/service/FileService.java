@@ -114,7 +114,7 @@ public class FileService extends CrudService<FileDao, File> {
                 patameter.put("fileSize", maxSize);
             }
         }
-        return page.setResult(dao.findAdvenceQueryList(patameter));
+        return page.autoResult(dao.findAdvenceQueryList(patameter));
     }
 
 

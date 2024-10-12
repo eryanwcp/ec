@@ -34,7 +34,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -157,7 +156,7 @@ public class NoticeService extends CrudService<NoticeDao, Notice> {
         Map<String, String> sqlMap = Maps.newHashMap();
         sqlMap.put("dsf", super.dataScopeFilter(SecurityUtils.getCurrentUser(), "o", "u"));
         parameter.put("sqlMap", sqlMap);
-        page.setResult(dao.findQueryList(parameter));
+        page.autoResult(dao.findQueryList(parameter));
 
         return page;
 

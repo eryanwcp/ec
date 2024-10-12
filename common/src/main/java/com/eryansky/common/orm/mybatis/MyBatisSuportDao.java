@@ -127,7 +127,7 @@ public class MyBatisSuportDao extends SqlSessionDaoSupport {
 
 		List<T> list = findList(key, params);
 		if (!list.isEmpty() && list.size() > 0) {
-			page.setTotalCount(list.size());
+			page.autoTotalCount(list.size());
 		}
 
 		page.setTotalPage(Page.countTotalPage(page.getPageSize(),
@@ -135,7 +135,7 @@ public class MyBatisSuportDao extends SqlSessionDaoSupport {
 
 		List<T> result = getSqlSession().selectList(key, params,
 				new RowBounds(offset, page.getPageSize()));
-		page.setResult(result);
+		page.autoResult(result);
 
 		return page;
 	}

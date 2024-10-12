@@ -8,7 +8,6 @@ package com.eryansky.core.orm.mybatis.service;
 import com.eryansky.common.orm.Page;
 import com.eryansky.common.orm.persistence.CrudDao;
 import com.eryansky.common.utils.collections.Collections3;
-import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.core.orm.mybatis.entity.BaseEntity;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
 import com.google.common.collect.Lists;
@@ -17,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Service基类
@@ -68,7 +66,7 @@ public abstract class CrudService<D extends CrudDao<T>, T extends BaseEntity<T>>
 	 */
 	public Page<T> findPage(Page<T> page, T entity) {
 		entity.setEntityPage(page);
-		page.setResult(dao.findList(entity));
+		page.autoResult(dao.findList(entity));
 		return page;
 	}
 

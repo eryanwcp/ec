@@ -16,7 +16,6 @@ import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.encode.Encrypt;
 import com.eryansky.common.utils.encode.Encryption;
-import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
 import com.eryansky.core.security.SecurityType;
 import com.eryansky.modules.sys._enum.SexType;
@@ -619,7 +618,7 @@ public class UserService extends CrudService<UserDao, User> {
         parameter.put("parentOrganId", parentOrganId);
         parameter.put("userType", userType);
         parameter.put("query", query);
-        page.setResult(dao.findByPasswords(parameter));
+        page.autoResult(dao.findByPasswords(parameter));
         return page;
     }
 
@@ -753,7 +752,7 @@ public class UserService extends CrudService<UserDao, User> {
         parameter.put("organId", organId);
         parameter.put("query", query);
         parameter.put("userType", userType);
-        return page.setResult(dao.findQuery(parameter));
+        return page.autoResult(dao.findQuery(parameter));
     }
 
 
@@ -777,7 +776,7 @@ public class UserService extends CrudService<UserDao, User> {
         parameter.put("organId", organId);
         parameter.put("query", query);
         parameter.put("excludeUserIds", excludeUserIds);
-        return page.setResult(dao.findUsersByOrgan(parameter));
+        return page.autoResult(dao.findUsersByOrgan(parameter));
     }
 
 
@@ -1323,7 +1322,7 @@ public class UserService extends CrudService<UserDao, User> {
         parameter.put("roleId", roleId);
         parameter.put("parentOrganId", parentOrganId);
         parameter.put("query", query);
-        return page.setResult(dao.findUsersByRole(parameter));
+        return page.autoResult(dao.findUsersByRole(parameter));
     }
 
     /**
@@ -1366,7 +1365,7 @@ public class UserService extends CrudService<UserDao, User> {
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
         parameter.put("roleId", roleId);
-        return page.setResult(dao.findUsersByRoleId(parameter));
+        return page.autoResult(dao.findUsersByRoleId(parameter));
     }
 
     /**
@@ -1439,7 +1438,7 @@ public class UserService extends CrudService<UserDao, User> {
         parameter.put("postCode", postCode);
         parameter.put("parentOrganId", parentOrganId);
         parameter.put("query", query);
-        return page.setResult(dao.findUsersByPost(parameter));
+        return page.autoResult(dao.findUsersByPost(parameter));
     }
 
 
@@ -1629,7 +1628,7 @@ public class UserService extends CrudService<UserDao, User> {
         parameter.put("companyCode", companyCode);
         parameter.put("homeCompanyId", homeCompanyId);
         parameter.put("homeCompanyCode", homeCompanyCode);
-        return page.setResult(dao.findListByPostAndOrgan(parameter));
+        return page.autoResult(dao.findListByPostAndOrgan(parameter));
     }
 
 
@@ -2053,7 +2052,7 @@ public class UserService extends CrudService<UserDao, User> {
         parameter.put(BaseInterceptor.PAGE, page);
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put("resourceId", resourceId);
-        return page.setResult(dao.findUsersByResourceId(parameter));
+        return page.autoResult(dao.findUsersByResourceId(parameter));
     }
 
 

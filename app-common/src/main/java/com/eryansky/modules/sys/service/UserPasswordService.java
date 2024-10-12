@@ -12,11 +12,9 @@ import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
 import com.eryansky.modules.sys._enum.UserPasswordUpdateType;
 import com.eryansky.modules.sys.mapper.User;
-import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.modules.sys.vo.PasswordTip;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Lists;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.eryansky.modules.sys.mapper.UserPassword;
@@ -101,7 +99,7 @@ public class UserPasswordService extends CrudService<UserPasswordDao, UserPasswo
         parameter.put("types", types);
         parameter.put(BaseInterceptor.PAGE, page);
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
-        return page.setResult(dao.findByUserId(parameter)).getResult();
+        return page.autoResult(dao.findByUserId(parameter)).getResult();
     }
 
     /**

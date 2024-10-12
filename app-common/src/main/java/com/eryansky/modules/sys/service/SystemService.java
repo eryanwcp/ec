@@ -213,7 +213,7 @@ public class SystemService extends BaseService {
         if (null != params) {
             params.forEach(parameter::putIfAbsent);
         }
-        return page.setResult(systemDao.findTableDataByTableName(parameter));
+        return page.autoResult(systemDao.findTableDataByTableName(parameter));
     }
 
 }

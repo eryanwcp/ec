@@ -39,7 +39,7 @@ public class VersionLogService extends CrudService<VersionLogDao, VersionLog> {
         parameter.put(BaseInterceptor.PAGE, page);
         parameter.put(VersionLog.FIELD_STATUS, VersionLog.STATUS_NORMAL);
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
-        page.setResult(dao.findQueryList(parameter));
+        page.autoResult(dao.findQueryList(parameter));
         return page;
     }
 

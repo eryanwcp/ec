@@ -21,7 +21,7 @@ public class JobService extends BaseService {
         Parameter parameter = Parameter.newPageParameter(page, AppConstants.getJdbcType());
         parameter.put("jobName", jobName);
         parameter.put("jobState", jobState);
-        page.setResult(dao.findJobList(parameter));
+        page.autoResult(dao.findJobList(parameter));
         page.getResult().forEach(v->{
             QuartzJob quartzJob = getAnnotationByTriggerName(v.getTriggerName());
             v.setInstanceId(null != quartzJob ? quartzJob.instanceId():null);

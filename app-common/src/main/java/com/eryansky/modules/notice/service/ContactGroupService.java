@@ -112,7 +112,7 @@ public class ContactGroupService extends CrudService<ContactGroupDao, ContactGro
         parameter.put(BaseInterceptor.PAGE, page);
         parameter.put("contactGroupId",contactGroupId);
         parameter.put("query",query);
-        return page.setResult(dao.findContactGroupUsers(parameter));
+        return page.autoResult(dao.findContactGroupUsers(parameter));
     }
 
     public List<User> findContactGroupUsers(String contactGroupId, String query) {

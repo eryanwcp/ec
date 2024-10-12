@@ -18,7 +18,6 @@ import com.eryansky.core.orm.mybatis.entity.DataEntity;
 import com.eryansky.core.orm.mybatis.service.TreeService;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.modules.sys._enum.ResourceType;
-import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.AppUtils;
 import com.eryansky.utils.CacheConstants;
@@ -45,7 +44,7 @@ import java.util.*;
 public class ResourceService extends TreeService<ResourceDao, Resource> {
 
     public Page<Resource> findPage(Page<Resource> page, Resource entity) {
-        return page.setResult(dao.findList(entity));
+        return page.autoResult(dao.findList(entity));
     }
 
     /**

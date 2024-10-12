@@ -7,7 +7,6 @@ package com.eryansky.common.utils.io;
 
 import com.eryansky.common.exception.ServiceException;
 import com.eryansky.common.orm.Page;
-import com.eryansky.common.utils.DateUtils;
 import com.eryansky.common.utils.Identities;
 import com.eryansky.common.utils.StringUtils;
 import com.google.common.collect.Lists;
@@ -494,12 +493,12 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 				throw new RuntimeException(e);
 			}
 		};
-		page.setTotalCount(streamSupplier.get().count());
+		page.autoTotalCount(streamSupplier.get().count());
 		if(page.getPageSize() == Page.PAGESIZE_ALL){
-			return page.setResult(streamSupplier.get().collect(Collectors.toList()));
+			return page.autoResult(streamSupplier.get().collect(Collectors.toList()));
 		}
 		int beginIndex = (page.getPageNo() - 1) * page.getPageSize();
-		return  page.setResult(streamSupplier.get().skip(beginIndex)
+		return  page.autoResult(streamSupplier.get().skip(beginIndex)
 				.limit(page.getPageSize())
 				.collect(Collectors.toList()));
 	}

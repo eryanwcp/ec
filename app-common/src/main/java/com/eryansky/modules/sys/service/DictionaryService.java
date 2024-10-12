@@ -12,7 +12,6 @@ import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.core.orm.mybatis.service.CrudService;
 import com.eryansky.modules.sys.dao.DictionaryDao;
 import com.eryansky.modules.sys.mapper.Dictionary;
-import com.eryansky.modules.sys.mapper.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,7 +46,7 @@ public class DictionaryService extends CrudService<DictionaryDao, Dictionary> {
     @Override
     public Page<Dictionary> findPage(Page<Dictionary> page, Dictionary entity) {
         entity.setEntityPage(page);
-        page.setResult(dao.findList(entity));
+        page.autoResult(dao.findList(entity));
         return page;
     }
 

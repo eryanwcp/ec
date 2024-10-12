@@ -32,7 +32,7 @@ public class ConfigService extends CrudService<ConfigDao, Config> {
         parameter.put("query", query);
         parameter.put(BaseInterceptor.PAGE, page);
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
-        page.setResult(dao.findQueryList(parameter));
+        page.autoResult(dao.findQueryList(parameter));
         return page;
     }
 

@@ -12,7 +12,6 @@ import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
 import com.eryansky.modules.sys._enum.RoleType;
 import com.eryansky.modules.sys._enum.YesOrNo;
-import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.utils.CacheConstants;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -160,7 +159,7 @@ public class RoleService extends CrudService<RoleDao, Role> {
         parameter.put(BaseInterceptor.PAGE, page);
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put("resourceId", resourceId);
-        return page.setResult(dao.findRolesByResourceId(parameter));
+        return page.autoResult(dao.findRolesByResourceId(parameter));
     }
 
 

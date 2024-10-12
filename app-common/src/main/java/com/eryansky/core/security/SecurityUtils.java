@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import java.lang.annotation.Annotation;
+
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.net.InetAddress;
@@ -981,11 +981,11 @@ public class SecurityUtils {
         if (null != companyId) {
             list = list.parallelStream().filter(v -> companyId.equals(v.getLoginCompanyId()) || companyId.equals(v.getLoginHomeCompanyId())).collect(Collectors.toList());
         }
-        page.setTotalCount(list.size());
+        page.autoTotalCount(list.size());
         if (Page.PAGESIZE_ALL == page.getPageSize()) {
-            return page.setResult(list);
+            return page.autoResult(list);
         }
-        return page.setResult(AppUtils.getPagedList(list, page.getPageNo(), page.getPageSize()));
+        return page.autoResult(AppUtils.getPagedList(list, page.getPageNo(), page.getPageSize()));
     }
 
     /**

@@ -37,13 +37,13 @@ public class LogService extends CrudService<LogDao, Log> {
     @Override
     public Page<Log> findPage(Page<Log> page, Log entity) {
         entity.setEntityPage(page);
-        page.setResult(dao.findList(entity));
+        page.autoResult(dao.findList(entity));
         return page;
     }
 
     public Page<Log> findQueryPage(Page<Log> page, Log entity) {
         Parameter parameter = Parameter.newPageParameter(page, AppConstants.getJdbcType());
-        page.setResult(dao.findQueryList(parameter));
+        page.autoResult(dao.findQueryList(parameter));
         return page;
     }
 
@@ -87,7 +87,7 @@ public class LogService extends CrudService<LogDao, Log> {
             sqlMap.put("dsf", dataScopeFilter(SecurityUtils.getCurrentUser(), "o", "u"));
         }
         parameter.put("sqlMap", sqlMap);
-        page.setResult(dao.findQueryList(parameter));
+        page.autoResult(dao.findQueryList(parameter));
         return page;
     }
 
@@ -263,7 +263,7 @@ public class LogService extends CrudService<LogDao, Log> {
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
         parameter.put(Log.FIELD_STATUS, Log.STATUS_NORMAL);
         List<Map<String, Object>> mapList = dao.getLoginStatistics(parameter);
-        pg.setResult(mapList);
+        pg.autoResult(mapList);
         return pg;
     }
 
@@ -288,7 +288,7 @@ public class LogService extends CrudService<LogDao, Log> {
         parameter.put(BaseInterceptor.PAGE, pg);
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
         List<Map<String, Object>> mapList = dao.getModuleStatistics(parameter);
-        pg.setResult(mapList);
+        pg.autoResult(mapList);
         return pg;
     }
 

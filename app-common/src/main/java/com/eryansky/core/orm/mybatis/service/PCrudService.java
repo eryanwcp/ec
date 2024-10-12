@@ -68,7 +68,7 @@ public abstract class PCrudService<D extends PCrudDao<T,PK>, T extends PBaseEnti
 	 */
 	public Page<T> findPage(Page<T> page, T entity) {
 		entity.setEntityPage(page);
-		page.setResult(dao.findList(entity));
+		page.autoResult(dao.findList(entity));
 		return page;
 	}
 
