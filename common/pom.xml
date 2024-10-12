@@ -85,11 +85,6 @@
             <version>${org.mapstruct.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct-processor</artifactId>
-            <version>${org.mapstruct.version}</version>
-        </dependency>
-        <dependency>
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
             <version>${commons-net.version}</version>
