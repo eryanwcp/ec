@@ -139,6 +139,9 @@ public class SysLogAspect {
     public void doAfterReturning(Object ret) {
         //得到当前线程的log对象
         Log log = sysLogThreadLocal.get();
+        if(null == log){
+            return;
+        }
         long end = System.currentTimeMillis();
         long opTime = end - log.getStartTime();
         log.setActionTime(String.valueOf(opTime));
@@ -158,6 +161,9 @@ public class SysLogAspect {
     @AfterThrowing(pointcut = "sysLogAspect()", throwing = "e")
     public void doAfterThrowable(Throwable e) {
         Log log = sysLogThreadLocal.get();
+        if(null == log){
+            return;
+        }
         long end = System.currentTimeMillis();
         long opTime = end - log.getStartTime();
         log.setActionTime(String.valueOf(opTime));
