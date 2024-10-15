@@ -199,7 +199,7 @@ public class MvcConfigurer implements WebMvcConfigurer {
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
         converter.setObjectMapper(objectMapper);
         RestTemplate restTemplate = builder.setConnectTimeout(Duration.ofSeconds(10))
-                .setReadTimeout(Duration.ofMinutes(30)).build();
+                .setReadTimeout(Duration.ofMinutes(15)).build();
         restTemplate.getMessageConverters().add(converter);
         return restTemplate;
     }
