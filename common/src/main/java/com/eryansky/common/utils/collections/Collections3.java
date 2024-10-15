@@ -160,6 +160,46 @@ public class Collections3 {
 			}
 		return null;
 	}
+
+
+	/**
+	 * 查找并删除元素
+	 * @param collection
+	 * @param test
+	 * @param <T>
+	 * @return
+	 */
+	public static <T> List<T> findAndRemove(Iterable<? extends T> collection, Predicate<? super T> test) {
+		T value = null;
+		// Create collection using Predicate
+		List<T> rc = new ArrayList<>();
+		for (Iterator<? extends T> it = collection.iterator(); it.hasNext();)
+			if (test.test(value = it.next())) {
+				it.remove();
+				rc.add(value);
+			}
+		return rc;
+	}
+
+	/**
+	 * 查找并删除元素
+	 * @param collection
+	 * @param test
+	 * @param <T>
+	 * @return
+	 */
+	public synchronized  static <T> List<T> findAndRemoveWithSynchronized (Iterable<? extends T> collection, Predicate<? super T> test) {
+		T value = null;
+		// Create collection using Predicate
+		List<T> rc = new ArrayList<>();
+		for (Iterator<? extends T> it = collection.iterator(); it.hasNext();)
+			if (test.test(value = it.next())) {
+				it.remove();
+				rc.add(value);
+			}
+		return rc;
+	}
+
 	/**
 	 * 获取Collection的最后一个元素 ，如果collection为空返回null.
 	 */
