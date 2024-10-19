@@ -20,11 +20,11 @@
         <bsh.version>2.0b6</bsh.version>
 
         <sitemesh.version>3.2.1</sitemesh.version>
-        <commons-csv.version>1.11.0</commons-csv.version>
+        <commons-csv.version>1.12.0</commons-csv.version>
         <commons-cli.version>1.9.0</commons-cli.version>
-        <commons-compress.version>1.26.2</commons-compress.version>
+        <commons-compress.version>1.27.1</commons-compress.version>
         <jwt.version>4.4.0</jwt.version>
-        <guava.version>33.3.0-jre</guava.version>
+        <guava.version>33.3.1-jre</guava.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
