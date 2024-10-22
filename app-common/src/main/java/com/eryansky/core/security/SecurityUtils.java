@@ -543,7 +543,7 @@ public class SecurityUtils {
         SessionInfo sessionInfo = userToSessionInfo(user);
         sessionInfo.setIp(IpUtils.getIpAddr0(request));
         sessionInfo.addAttribute("clientIPs",IpUtils.getIpAddr(request));
-        sessionInfo.R(UserAgentUtils.getHTTPUserAgent(request));
+        sessionInfo.setUserAgent(UserAgentUtils.getHTTPUserAgent(request));
 
         sessionInfo.setBrowserType(UserAgentUtils.getBrowser(request).getName());
         String longitude_s = WebUtils.getParameter(request, "longitude");
