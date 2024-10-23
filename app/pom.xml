@@ -139,12 +139,9 @@
         </profile>
         <profile>
             <id>docker</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <properties>
                 <project.packaging>jar</project.packaging>
-                <configSuffix>-docker</configSuffix>
+                <configSuffix></configSuffix>
                 <profileActive>docker</profileActive>
             </properties>
             <dependencies>
@@ -414,7 +411,7 @@
                     <container>
                         <mainClass>com.eryansky.Application</mainClass>
                         <jvmFlags>
-                            <jvmFlag>-Dspring.profiles.active=${profileActive}</jvmFlag>
+                            <jvmFlag>-Dspring.profiles.active=${profileActive}${configSuffix}</jvmFlag>
                             <jvmFlag>-Xms1g</jvmFlag>
                             <jvmFlag>-Xmx2g</jvmFlag>
                             <jvmFlag>-Djava.awt.headless=true</jvmFlag>

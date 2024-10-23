@@ -787,12 +787,6 @@ public abstract class CacheChannel implements Closeable , AutoCloseable {
 	 * <p>方法如下：</p>
 	 * <code>
 	 *     CacheChannel channel = J2Cache.getChannel();
-	 *     RedisClient client = ((RedisCacheProvider)channel.getL2Provider()).getRedisClient();
-	 *     try {
-	 *     	   client.get().xxxxx(...);
-	 *     } finally {
-	 *         client.release();
-	 *     }
 	 * </code>
 	 * @return 返回二级缓存的 CacheProvider 实例
 	 */
