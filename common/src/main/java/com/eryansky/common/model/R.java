@@ -15,7 +15,7 @@ public class R<T> implements Serializable {
 
     public static final int NO_PERMISSION = 403;
 
-    private String msg = "success";
+    private String msg = "操作成功！";
 
     private int code = SUCCESS;
 
@@ -77,5 +77,10 @@ public class R<T> implements Serializable {
         }
         return r;
     }
+
+    public boolean isSuccess() {
+        return SUCCESS == code;
+    }
+
 
 }
