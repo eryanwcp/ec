@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 
 /**
- * 数字格式化 保留2为小数
+ * 数字格式化 保留0位小数
  */
 public class BigDecimal0Serializer extends JsonSerializer<BigDecimal> {
 

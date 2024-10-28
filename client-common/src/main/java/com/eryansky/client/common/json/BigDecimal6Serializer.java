@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 
 /**
- * 数字格式化 保留6为小数
+ * 数字格式化 保留6位小数
  */
 public class BigDecimal6Serializer extends JsonSerializer<BigDecimal> {
 
