@@ -17,8 +17,8 @@
         <java.version>17</java.version>
         <commons-codec.version>1.17.1</commons-codec.version>
 
-        <ec-common.version>4.3.20241025.02</ec-common.version>
-        <ec-client-common.version>4.3.20241025.02</ec-client-common.version>
+        <ec-common.version>4.3.20241025.03</ec-common.version>
+        <ec-client-common.version>4.3.20241025.03</ec-client-common.version>
     </properties>
 
     <dependencies>

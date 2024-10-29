@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.eryansky</groupId>
         <artifactId>ec-parent</artifactId>
-        <version>4.3.20241025.02</version>
+        <version>4.3.20241025.03</version>
     </parent>
     <artifactId>ec-app-common</artifactId>
     <version>${ec-app-common.version}</version>
@@ -112,6 +112,11 @@
         <dependency>
             <groupId>fr.opensagres.xdocreport</groupId>
             <artifactId>fr.opensagres.poi.xwpf.converter.xhtml</artifactId>
+            <version>${xwpf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.opensagres.xdocreport</groupId>
+            <artifactId>fr.opensagres.poi.xwpf.converter.pdf</artifactId>
             <version>${xwpf.version}</version>
         </dependency>
         <dependency>
