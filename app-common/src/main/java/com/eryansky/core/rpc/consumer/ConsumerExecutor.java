@@ -68,7 +68,7 @@ public class ConsumerExecutor {
             responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, responseType);
         }
         if(!HttpStatus.OK.equals(responseEntity.getStatusCode())){
-            log.error("{}",JsonMapper.toJsonString(responseEntity.getBody()));
+            log.error("RPC请求异常：{} {} {}",url,responseEntity.getStatusCode(),JsonMapper.toJsonString(responseEntity.getBody()));
         }
         return (T) responseEntity.getBody();
     }
