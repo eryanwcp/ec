@@ -17,6 +17,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
@@ -36,7 +37,9 @@ public class ConsumerExecutor {
         String requestEncrypt = headers.get(RPCUtils.HEADER_ENCRYPT);
         String requestEncryptKey = headers.get(RPCUtils.HEADER_ENCRYPT_KEY);
         if (StringUtils.isNotBlank(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey) ){
-            responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, String.class);
+//            responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, String.class);//多一层引号““””
+            responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
+//            responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Serializable.class);
             String data = (String) responseEntity.getBody();
             JavaType javaType = jsonMapper.getTypeFactory().constructType(responseType.getType());
             if(CipherMode.SM4.name().equals(requestEncrypt)){
