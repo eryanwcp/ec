@@ -13,6 +13,8 @@ import java.security.SecureRandom;
 import java.security.Security;
 import java.util.Arrays;
 
+import static java.util.Objects.isNull;
+
 /**
  * Sm4 国密算法
  * 支持 ECB和CBC两种模式
@@ -20,9 +22,7 @@ import java.util.Arrays;
  */
 public final class Sm4Utils {
  
-    static {
-        Security.addProvider(new BouncyCastleProvider());
-    }
+
  
     private static final String ENCODING = "UTF-8";
     public static final String ALGORITHM_NAME = "SM4";
@@ -37,6 +37,14 @@ public final class Sm4Utils {
 
     // 128-32位16进制；256-64位16进制
     public static final int DEFAULT_KEY_SIZE = 128;
+
+    private static final BouncyCastleProvider PROVIDER = new BouncyCastleProvider();
+
+    static {
+        if (isNull(Security.getProvider(BouncyCastleProvider.PROVIDER_NAME))) {
+            Security.addProvider(PROVIDER);
+        }
+    }
 
     /**
      * 自动生成密钥
