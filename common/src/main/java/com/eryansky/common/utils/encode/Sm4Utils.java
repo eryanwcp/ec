@@ -310,23 +310,11 @@ public final class Sm4Utils {
 
     public static void main(String[] args) {
         try {
-            String paramStr = "data";
-            System.out.println("==========加密前源数据==========");
-            // 生成32位16进制密钥
-            String key = Sm4Utils.generateHexKeyString();
-            System.out.println("==========生成key==========");
+            String paramStr = "11a87789527470081563a709175ec839ce0bc6060bad733dbe03b10e7eed86b88f5b1588b20b10c1b48266dd9b10a5eb4c6048313640d0bab690d874a8db3047635def28cab94510e086872786c5ee053413cad58c2bdf69babc50e20a63bf90280b313eadff245ed017c79a8cef325b91168ecb5e075384a351c1f5bcd55c40e93f96b7fbde58ff063f927048655f315256e6e6e4390a629c848ae7d4503d10a4fcdd0f96d9a4cd32ddd67ee4d5fd2f42e7d4ea835a4abce7d6288938e23077b70407dc8f9529652e482636347296cb92d4182d91044430b7486df0dc46d7bcc6b61bfc561d072c2b47f1045263a0bcc057c7847f5c19924c7c03c2e938666a218345f6f0944306a5aab1eb04d85f7b459d8382fc0eecebca82186ed6e6d3f37d78858f552921456e2dc78c1a5a5bf5292580c049716f8fdb363d595afb50d833319de2319a7004bb16cee9172d8daa2552bfa3c7b0b87df326897372820488951b3dc77dd2aad085e48c23ec95fbb2c708b9d9cf61817adaea87c7f0d45756d3ddda66e5390c9ca2a7144cf021c9eec46e964e99235d6512fbebd303fb72f79b55f1a49fee1a7253fbf5b03e391ed453ce25d5088dc1d12a50b9df836dd95a8c16ead62d385b71396419500b6c225a1f52dbfa2e3b7eb4e79f488b044315de42f2d169d4047fba4e3bbd2ceb52ad63bc40022b329b83224a1dbd6b4c1b60dc85da675d06a151f8dff6edd74a83afaa19392a7d89c1f1a456229747b8efe82c9b9dcb3bc11eaa31950cf26a77f8f4abe85277883de78c706bd8fdda7c66f6b7901c5c031fc2f6d04e601e5684a13979d2f6978eecf3188359b0ff54864e24f09a3975d5cc46bf8d414adbefd95b9016a9376ff4fab09e7847239621fc0bd6f0023d2bc7369fd7af11925a605929a1769ceacec8a1b576f5e2fb4fd13e9af2f82ea49f35e90f66dc5d32c8ba4e594334955c44a7b6f5f38a1bdbe10f1c787f932c89f7010d0bc222c1b3b64dcb51f0fcc94c617c0e4d5d7fa306bc545e032c5b5dd18a84606452cdcf5d3c795dd3755bb5f62c012f0b52d40eda2dc21b15120e8762d26a8e030a24fe0afc4798e23b6112bb4b0a0f5f696ced552c0be50ef928baa0782e50381bf5b9f18a78d47936160a2dbf0b090905c62487815a60f787a3d2e0188587f77e0a4370767019e50d693b0cca9c874f974233ee9b7f024953adec70c2cd9063047e3dd588ae4c9be2ac5684fbd81cace503baf5ae65a7f2de88ece9429dbc91cd4ef4564c73073dbcf44fc733c7c7c0c8f88e6d1e0eeffe2c65e238d4c917deb9a16ba0b9d59b324e6e0083351b464ac16e74d26e54ff13e8f545b0a41bfb963f53ca91ca662a4140141237c34cbf16b1478934da678e27b849010b7301220eefa688135b162cd2529646e8a78118fe7ec90232c954a23b33a6c64c1d087137eabf06b41948460271e981cd1b5ec33cb5815029a7767cb19e5d49f8d0f7ac994feb5e96efc0d1979ab18c50589f4694532d011f75097bff17ab2cbb41efec31639237043e8fe6a6ed054e378c217c42902e146da972245a0a01acc5d0ec061364f086477333fc2743ec6e3c2d885ff4807e47b75874bd8676da79124280a7d6876bd9fd47f7e4d1ce3bcdbbdc8c93412e1b0b13d06cabc43e653fb3626ae717ec1124d725485d006bc0d51e152717e8235dc60f496352f1bd28426ec213b413df446f72563af572dfc5d80111fc31b68bae36920be14ab888f5ebfdde256245a05df32566a1092c51c40d3218b8ddb4f91898774a1fe53d1181";
+            String eKey = "66c11520443b21735753f4ba122d946b23fccbae74dd871a0d5908546e80f209ad662a65a6147ac36ab924bef776e52aadd1bee2005bb7d436b2e15d5db7c9d7";
+            String key = RSAUtils.decryptHexString(eKey);
             System.out.println(key);
-            String cipher = Sm4Utils.encryptEcb(key, paramStr);
-            System.out.println("==========加密串==========");
-            System.out.println(cipher);
-            String encrypt = encrypt(key, paramStr);
-            System.out.println(encrypt);
-            System.out.println("==========是否为同一数据==========");
-            System.out.println(Sm4Utils.verifyEcb(key, cipher, paramStr));
-            paramStr = Sm4Utils.decryptEcb(key, cipher);
-            System.out.println("==========解密后数据==========");
-            System.out.println(paramStr);
-            System.out.println(decrypt(key,encrypt));
+            System.out.println(decrypt(key,paramStr));
         } catch (Exception e) {
             e.printStackTrace();
         }
