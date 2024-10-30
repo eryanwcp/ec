@@ -7,13 +7,13 @@
     <parent>
 		<groupId>com.eryansky</groupId>
 		<artifactId>ec-parent</artifactId>
-		<version>4.2.20240831.03</version>
+		<version>4.3.20241025.04</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>ec-ureport2</artifactId>
     <packaging>pom</packaging>
-	<version>4.2.20240831.03</version>
+	<version>4.3.20241025.04</version>
     <name>ec-ureport2</name>
 	<properties>
 		<ec-ureport2.version>2.7.1</ec-ureport2.version>

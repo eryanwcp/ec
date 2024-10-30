@@ -1,7 +1,7 @@
 package com.eryansky.common.utils.encode;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.pqc.legacy.math.linearalgebra.ByteUtils;
+import org.bouncycastle.util.encoders.Hex;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -55,7 +55,7 @@ public final class Sm4Utils {
      * @throws Exception
      */
     public static String generateHexKeyString() throws Exception {
-        return ByteUtils.toHexString(generateKey());
+        return Hex.toHexString(generateKey());
     }
 
     /**
@@ -99,15 +99,14 @@ public final class Sm4Utils {
      */
     public static String encryptEcb(String hexKey, String paramStr) {
         try {
-            String cipherText = "";
             // 16进制字符串-->byte[]
-            byte[] keyData = ByteUtils.fromHexString(hexKey);
+            byte[] keyData = Hex.decode(hexKey);
             // String-->byte[]
             byte[] srcData = paramStr.getBytes(ENCODING);
             // 加密后的数组
             byte[] cipherArray = encryptEcbPadding(keyData, srcData);
             // byte[]-->hexString
-            cipherText = ByteUtils.toHexString(cipherArray);
+            String cipherText = Hex.toHexString(cipherArray);
             return cipherText;
         } catch (Exception e) {
             return paramStr;
@@ -141,9 +140,9 @@ public final class Sm4Utils {
         // 用于接收解密后的字符串
         String decryptStr = "";
         // hexString-->byte[]
-        byte[] keyData = ByteUtils.fromHexString(hexKey);
+        byte[] keyData = Hex.decode(hexKey);
         // hexString-->byte[]
-        byte[] cipherData = ByteUtils.fromHexString(cipherText);
+        byte[] cipherData = Hex.decode(cipherText);
         // 解密
         byte[] srcData = new byte[0];
         try {
@@ -184,9 +183,9 @@ public final class Sm4Utils {
         // 用于接收校验结果
         boolean flag = false;
         // hexString-->byte[]
-        byte[] keyData = ByteUtils.fromHexString(hexKey);
+        byte[] keyData = Hex.decode(hexKey);
         // 将16进制字符串转换成数组
-        byte[] cipherData = ByteUtils.fromHexString(cipherText);
+        byte[] cipherData = Hex.decode(cipherText);
         // 解密
         byte[] decryptData = decryptEcbPadding(keyData, cipherData);
         // 将原字符串转换成byte[]
@@ -209,14 +208,14 @@ public final class Sm4Utils {
     public static String encrypt(String hexKey, String paramStr) throws Exception {
         String result = "";
         // 16进制字符串-->byte[]
-        byte[] keyData = ByteUtils.fromHexString(hexKey);
+        byte[] keyData = Hex.decode(hexKey);
         // String-->byte[]
         byte[] srcData = paramStr.getBytes(ENCODING);
         // 加密后的数组
         byte[] cipherArray = encryptCbcPadding(keyData, srcData);
 
         // byte[]-->hexString
-        result = ByteUtils.toHexString(cipherArray);
+        result = Hex.toHexString(cipherArray);
         return result;
     }
 
@@ -276,9 +275,9 @@ public final class Sm4Utils {
         // 用于接收解密后的字符串
         String result = "";
         // hexString-->byte[]
-        byte[] keyData = ByteUtils.fromHexString(hexKey);
+        byte[] keyData = Hex.decode(hexKey);
         // hexString-->byte[]
-        byte[] resultData = ByteUtils.fromHexString(text);
+        byte[] resultData = Hex.decode(text);
         // 解密
         byte[] srcData = decryptCbcPadding(keyData, resultData);
         // byte[]-->String
@@ -303,9 +302,8 @@ public final class Sm4Utils {
 
     public static void main(String[] args) {
         try {
-            String paramStr = "Hello, world";
+            String paramStr = "data";
             System.out.println("==========加密前源数据==========");
-            System.out.println(paramStr);
             // 生成32位16进制密钥
             String key = Sm4Utils.generateHexKeyString();
             System.out.println("==========生成key==========");
