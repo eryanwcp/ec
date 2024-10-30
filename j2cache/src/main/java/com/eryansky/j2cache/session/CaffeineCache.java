@@ -39,8 +39,9 @@ public class CaffeineCache {
                 .expireAfterAccess(expire, TimeUnit.SECONDS)
                 .removalListener((k,v, cause) -> {
                     //程序删除的缓存不做通知处理，因为上层已经做了处理
-                    if(cause != RemovalCause.EXPLICIT && cause != RemovalCause.REPLACED)
-                        listener.notifyElementExpired((String)k);
+                    if (!RemovalCause.EXPLICIT.equals(cause) && !RemovalCause.REPLACED.equals(cause)) {
+                        listener.notifyElementExpired((String) k);
+                    }
                 })
                 .build();
 
