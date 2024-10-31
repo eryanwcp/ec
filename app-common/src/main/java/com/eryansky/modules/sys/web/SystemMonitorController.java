@@ -23,7 +23,6 @@ import com.eryansky.common.web.filter.XsslHttpServletRequestWrapper;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.aop.annotation.Logging;
-import com.eryansky.core.security.ApplicationSessionContext;
 import com.eryansky.core.security.annotation.RequiresPermissions;
 import com.eryansky.j2cache.CacheChannel;
 import com.eryansky.j2cache.util.SerializationUtils;
@@ -195,9 +194,7 @@ public class SystemMonitorController extends SimpleController {
             Collection<String> regions = CacheUtils.regionNames();
             logger.warn("regionNames:{}", JsonMapper.toJsonString(regions));
             for (String _cacheName : regions) {
-                if (!ApplicationSessionContext.CACHE_SESSION.equals(_cacheName)) {//黑名单
-                    CacheUtils.clearCache(_cacheName);
-                }
+                CacheUtils.clearCache(_cacheName);
             }
             //更新客户端缓存时间戳
             AppConstants.SYS_INIT_TIME = System.currentTimeMillis();

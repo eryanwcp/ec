@@ -17,6 +17,7 @@ package com.eryansky.j2cache.session;
 
 import com.eryansky.j2cache.lettuce.LettuceByteCodec;
 import com.eryansky.j2cache.util.IpUtils;
+import com.eryansky.j2cache.util.SerializationUtils;
 import io.lettuce.core.AbstractRedisClient;
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.RedisClient;
@@ -35,7 +36,6 @@ import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.Closeable;
@@ -331,7 +331,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             put(SessionObject.KEY_SERVICE_HOST, IpUtils.getActivityLocalIp().getBytes());
             session.getAttributes().entrySet().forEach((e)-> {
                 try {
-                    put(e.getKey(), Serializer.write(e.getValue()));
+                    put(e.getKey(), SerializationUtils.serialize(e.getValue()));
                 } catch (RuntimeException | IOException excp) {
                     if(!discardNonSerializable)
                         throw ((excp instanceof RuntimeException)?(RuntimeException)excp : new RuntimeException(excp));
@@ -364,7 +364,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             cache1.put(session.getId(), session);
             if(this.cache2 != null){
                 try {
-                    cache2.setBytes(session.getId(), key, Serializer.write(session.get(key)));
+                    cache2.setBytes(session.getId(), key, SerializationUtils.serialize(session.get(key)));
                 } catch (RuntimeException | IOException e) {
                     if(!this.discardNonSerializable)
                         throw ((e instanceof RuntimeException)?(RuntimeException)e : new RuntimeException(e));
@@ -405,6 +405,19 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
                 this.publish(new Command(Command.OPT_DELETE_SESSION, session_id, null));
             }
         }
+    }
+
+    /**
+     * 获取所有keys
+     * @return
+     */
+    public Collection<String> keys()  {
+        Set<String> keys = new HashSet<>();
+        keys.addAll(cache1.keys());
+        if(null != cache2){
+            keys.addAll(cache2.keys());
+        }
+        return keys;
     }
 
 }

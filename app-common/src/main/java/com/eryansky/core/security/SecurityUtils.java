@@ -1123,7 +1123,7 @@ public class SecurityUtils {
      * @return
      */
     public static Collection<String> findExtendSessionIdKeys() {
-        return Static.applicationSessionContext.findSessionExtendKes();
+        return Static.applicationSessionContext.findSessionExtendKeys();
     }
 
 
@@ -1163,7 +1163,7 @@ public class SecurityUtils {
      * @param sessionInfo
      */
     public static void syncExtendSession(SessionInfo sessionInfo) {
-        Collection<String> sessionInfoIds = Static.applicationSessionContext.findSessionExtendKes();
+        Collection<String> sessionInfoIds = Static.applicationSessionContext.findSessionExtendKeys();
         sessionInfoIds.parallelStream().filter(v -> sessionInfo.getId().equals(getExtendSessionId(v))).forEach(v -> addExtendSession(v, sessionInfo.getId()));
     }
 
@@ -1173,7 +1173,7 @@ public class SecurityUtils {
      * @param sessionInfoId
      */
     public static void removeExtendSession(String sessionInfoId) {
-        Collection<String> sessionIds = Static.applicationSessionContext.findSessionExtendKes();
+        Collection<String> sessionIds = Static.applicationSessionContext.findSessionExtendKeys();
         sessionIds.parallelStream().filter(v -> sessionInfoId.equals(getExtendSessionId(v))).forEach(v -> Static.applicationSessionContext.removeExtendSession(v));
     }
 
