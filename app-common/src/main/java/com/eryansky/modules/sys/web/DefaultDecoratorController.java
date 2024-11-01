@@ -25,25 +25,24 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping(value = "/decorators")
 public class DefaultDecoratorController extends SimpleController {
 
-    @GetMapping(value = {"default"})
+    @RequestMapping(value = {"default"},method = {RequestMethod.GET,RequestMethod.POST})
     public ModelAndView _default(HttpServletRequest request) {
         ModelAndView modelAndView = new ModelAndView("modules/sys/layouts/default");
         return modelAndView;
     }
 
-    @GetMapping(value = {"default_sys"})
+    @RequestMapping(value = {"default_sys"},method = {RequestMethod.GET,RequestMethod.POST})
     public ModelAndView default_sys(HttpServletRequest request) {
         ModelAndView modelAndView = new ModelAndView("modules/sys/layouts/default");
         return modelAndView;
     }
 
-    @GetMapping(value = {"default_full"})
+    @RequestMapping(value = {"default_full"},method = {RequestMethod.GET,RequestMethod.POST})
     public ModelAndView default_full(HttpServletRequest request) {
         ModelAndView modelAndView = new ModelAndView("modules/sys/layouts/default_full");
         return modelAndView;
     }
-
-    @GetMapping(value = {"default_mobile"})
+    @RequestMapping(value = {"default_mobile"},method = {RequestMethod.GET,RequestMethod.POST})
     public ModelAndView default_mobile(HttpServletRequest request) {
         ModelAndView modelAndView = new ModelAndView("modules/sys/layouts/default_mobile");
         return modelAndView;
