@@ -40,7 +40,6 @@ import org.springframework.util.StringUtils;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -62,6 +61,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
     private String pubsub_channel;
     private GenericObjectPool<StatefulConnection<String, byte[]>> pool;
     private StatefulRedisPubSubConnection<String, String> pubsub_subscriber;
+    private StatefulRedisPubSubConnection<String, String> pubConnection;
     private static final LettuceByteCodec codec = new LettuceByteCodec();
 
     private final boolean discardNonSerializable;
@@ -182,14 +182,16 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         this.cache2 = new LettuceCache(clusterName, redisClient,pool,scanCount);
         logger.info("J2Cache Session L2 CacheProvider {}.",this.cache2.getClass().getName());
 
-        this.publish(Command.join());
-
-
         this.pubsub_subscriber = this.pubsub();
         this.pubsub_subscriber.addListener(this);
         RedisPubSubAsyncCommands<String, String> async = this.pubsub_subscriber.async();
         async.subscribe(this.pubsub_channel);
-        logger.info("Connected to redis channel:{}, time {}ms.", this.pubsub_channel, System.currentTimeMillis()-ct);
+        logger.info("Connected to redis session channel:{}, time {}ms.", this.pubsub_channel, System.currentTimeMillis()-ct);
+
+        this.pubConnection = this.pubsub();
+        this.publish(Command.join());
+        logger.info("Connected to redis session channel:{}, time {}ms.", this.pubsub_channel, System.currentTimeMillis()-ct);
+
     }
 
     /**
@@ -213,10 +215,8 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             return;
         }
 
-        try (StatefulRedisPubSubConnection<String, String> connection = this.pubsub()){
-            RedisPubSubCommands<String, String> sync = connection.sync();
-            sync.publish(this.pubsub_channel, cmd.toString());
-        }
+        RedisPubSubCommands<String, String> sync = pubConnection.sync();
+        sync.publish(this.pubsub_channel, cmd.toString());
 
     }
 
@@ -270,6 +270,9 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             this.unsubscribed(this.pubsub_channel, 1);
         } finally {
             this.cache1.close();
+            if(null != this.pubConnection){
+                this.pubConnection.close();
+            }
             if(null != this.pubsub_subscriber){
                 this.pubsub_subscriber.close();
             }
