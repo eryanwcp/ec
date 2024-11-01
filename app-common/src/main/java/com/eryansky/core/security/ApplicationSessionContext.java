@@ -79,7 +79,7 @@ public class ApplicationSessionContext {
 	}
 
 	public List<SessionInfo> findSessionInfoData(Collection<String> keys) {
-		return keys.parallelStream().map(key -> {
+		return keys.stream().map(key -> {
 			SessionObject sessionObject = cacheFacade.getSession(key);
 			return null != sessionObject ? (SessionInfo) sessionObject.get(SessionObject.KEY_SESSION_DATA) : null;
 		}).filter(Objects::nonNull).collect(Collectors.toList());
@@ -87,7 +87,7 @@ public class ApplicationSessionContext {
 
 	public Collection<String> findSessionInfoKeys() {
 		Collection<String> keys = cacheFacade.keys();
-		return keys.parallelStream().filter(key -> {
+		return keys.stream().filter(key -> {
 			SessionObject sessionObject = cacheFacade.getSession(key);
 			return  null != sessionObject && null != sessionObject.get(SessionObject.KEY_SESSION_DATA);
 		}).collect(Collectors.toList());

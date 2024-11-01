@@ -61,7 +61,8 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
     private String pubsub_channel;
     private GenericObjectPool<StatefulConnection<String, byte[]>> pool;
     private StatefulRedisPubSubConnection<String, String> pubsub_subscriber;
-    private RedisPubSubCommands<String, String> pubSubCommands;
+//    private RedisPubSubCommands<String, String> pubSubCommands;
+    private StatefulRedisPubSubConnection<String, String> pubConnection;
     private static final LettuceByteCodec codec = new LettuceByteCodec();
 
     private final boolean discardNonSerializable;
@@ -188,7 +189,8 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         async.subscribe(this.pubsub_channel);
         logger.info("Connected to redis session channel:{}, time {}ms.", this.pubsub_channel, System.currentTimeMillis()-ct);
 
-        pubSubCommands = this.pubsub_subscriber.sync();
+//        pubSubCommands = this.pubsub_subscriber.sync();
+        this.pubConnection = this.pubsub();
         this.publish(Command.join());
     }
 
@@ -216,7 +218,9 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
 //            RedisPubSubCommands<String, String> sync = connection.sync();
 //            sync.publish(this.pubsub_channel, cmd.toString());
 //        }
-        pubSubCommands.publish(this.pubsub_channel, cmd.toString());
+//        pubSubCommands.publish(this.pubsub_channel, cmd.toString());
+        RedisPubSubCommands<String, String> sync = pubConnection.sync();
+        sync.publish(this.pubsub_channel, cmd.toString());
 
     }
 
@@ -270,6 +274,9 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             this.unsubscribed(this.pubsub_channel, 1);
         } finally {
             this.cache1.close();
+            if(null != this.pubConnection){
+                this.pubConnection.close();
+            }
             if(null != this.pubsub_subscriber){
                 this.pubsub_subscriber.close();
             }
