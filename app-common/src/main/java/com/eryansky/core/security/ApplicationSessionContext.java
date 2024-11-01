@@ -74,7 +74,8 @@ public class ApplicationSessionContext {
 	}
 
 	public List<SessionInfo> findSessionInfoData() {
-		Collection<String> keys = findSessionInfoKeys();
+//		Collection<String> keys = findSessionInfoKeys();
+		Collection<String> keys = cacheFacade.keys();
 		return findSessionInfoData(keys);
 	}
 
