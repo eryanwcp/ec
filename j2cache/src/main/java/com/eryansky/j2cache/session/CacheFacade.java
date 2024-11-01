@@ -190,8 +190,6 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
 
         this.pubConnection = this.pubsub();
         this.publish(Command.join());
-        logger.info("Connected to redis session channel:{}, time {}ms.", this.pubsub_channel, System.currentTimeMillis()-ct);
-
     }
 
     /**
