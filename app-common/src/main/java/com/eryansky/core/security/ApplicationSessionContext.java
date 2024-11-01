@@ -79,12 +79,18 @@ public class ApplicationSessionContext {
 	}
 
 	public List<SessionInfo> findSessionInfoData(Collection<String> keys) {
-		return keys.parallelStream().map(key->(SessionInfo)cacheFacade.getSession(key).get(SessionObject.KEY_SESSION_DATA)).filter(Objects::nonNull).collect(Collectors.toList());
+		return keys.parallelStream().map(key -> {
+			SessionObject sessionObject = cacheFacade.getSession(key);
+			return null != sessionObject ? (SessionInfo) sessionObject.get(SessionObject.KEY_SESSION_DATA) : null;
+		}).filter(Objects::nonNull).collect(Collectors.toList());
 	}
 
 	public Collection<String> findSessionInfoKeys() {
 		Collection<String> keys = cacheFacade.keys();
-		return keys.parallelStream().filter(key->null != cacheFacade.getSession(key).get(SessionObject.KEY_SESSION_DATA)).collect(Collectors.toList());
+		return keys.parallelStream().filter(key -> {
+			SessionObject sessionObject = cacheFacade.getSession(key);
+			return  null != sessionObject && null != sessionObject.get(SessionObject.KEY_SESSION_DATA);
+		}).collect(Collectors.toList());
 	}
 
 	public int findSessionInfoKeySize() {
@@ -133,7 +139,10 @@ public class ApplicationSessionContext {
 	 */
 	public Collection<String> findSessionExtendKeys() {
 		Collection<String> keys = cacheFacade.keys();
-		return keys.stream().filter(key->null != cacheFacade.getSession(key).get(SessionObject.KEY_SESSION_EXTEND)).map(key->(String)cacheFacade.getSession(key).get(SessionObject.KEY_SESSION_DATA)).collect(Collectors.toList());
+		return keys.stream().filter(key->{
+			SessionObject sessionObject = cacheFacade.getSession(key);
+			return  null != sessionObject && null != sessionObject.get(SessionObject.KEY_SESSION_EXTEND);
+		}).collect(Collectors.toList());
 	}
 
 
