@@ -419,8 +419,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
      * @return
      */
     public Collection<String> keys()  {
-        Set<String> keys = new HashSet<>();
-        keys.addAll(cache1.keys());
+        Set<String> keys = new HashSet<>(cache1.keys());
         if(null != cache2){
             keys.addAll(cache2.keys());
         }

@@ -20,6 +20,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 
 import java.util.Collection;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -74,5 +75,9 @@ public class CaffeineCache {
 
     public Collection<String> keys() {
         return cache.asMap().keySet();
+    }
+
+    public ConcurrentMap<String,Object> map() {
+        return cache.asMap();
     }
 }
