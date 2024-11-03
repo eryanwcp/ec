@@ -173,7 +173,7 @@ public class LettuceCache {
     public Collection<String> keys() {
         try(StatefulConnection<String, byte[]> connection = connect()) {
             RedisKeyCommands<String, byte[]> cmd = (RedisKeyCommands)sync(connection);
-            return cmd.keys(namespace+":*").parallelStream().map(v->getKeyName(v)).collect(Collectors.toList());
+            return cmd.keys(namespace+":*").stream().map(this::getKeyName).collect(Collectors.toList());
         }
 
     }
