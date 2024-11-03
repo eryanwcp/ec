@@ -558,7 +558,7 @@ public class SecurityUtils {
         sessionInfo.setDeviceCode(deviceCode_s);
         sessionInfo.setDeviceType(StringUtils.isNotBlank(platform_s) ? platform_s:UserAgentUtils.getDeviceType(request).toString());
         setOrRefreshSessionInfoToken(sessionInfo,user.getPassword());
-        sessionInfo.setId(session.getId());
+        sessionInfo.setId(SecurityUtils.getNoSuffixSessionId(session));
 //        sessionInfo.addIfNotExistLoginName(sessionInfo.getLoginName());
         //可选账号
 //        List<User> users = UserUtils.findByCode(sessionInfo.getCode());
@@ -770,7 +770,7 @@ public class SecurityUtils {
             if (null == session) {
                 return null;
             }
-            sessionInfo = getSessionInfo(session.getId());
+            sessionInfo = getSessionInfo(getFixedSessionId(getNoSuffixSessionId(session)));
             if (null == sessionInfo && StringUtils.isNotBlank(token)) {
                 sessionInfo = getSessionInfoByTokenOrRefreshToken(StringUtils.replaceOnce(token, "Bearer ", ""));
             }
@@ -799,7 +799,7 @@ public class SecurityUtils {
             if (null == session) {
                 return null;
             }
-            sessionInfo = getSessionInfo(session.getId());
+            sessionInfo = getSessionInfo(getFixedSessionId(getNoSuffixSessionId(session)));
             if (sessionInfo == null) {
                 String token = request.getHeader("Authorization");
                 if (StringUtils.isNotBlank(token)) {
@@ -926,11 +926,12 @@ public class SecurityUtils {
             Static.userService.logout(_sessionInfo.getUserId(), securityType);
         }
         Static.applicationSessionContext.removeSession(sessionId);
+        removeExtendSession(sessionId);
         if (null != invalidate && invalidate) {
             try {
 
                 HttpSession httpSession = SpringMVCHolder.getSession();
-                if (httpSession != null && httpSession.getId().equals(sessionId)) {
+                if (httpSession != null && SecurityUtils.getNoSuffixSessionId(httpSession).equals(sessionId)) {
                     httpSession.invalidate();
                 }
             } catch (Exception e) {
@@ -1089,6 +1090,14 @@ public class SecurityUtils {
         return sessionInfo != null && sessionInfo.isMobileLogin();
     }
 
+    /**
+     * 去除jvmRoute后缀
+     * @param session
+     * @return
+     */
+    public static String getNoSuffixSessionId(HttpSession session) {
+        return null == session ? null : StringUtils.substringBefore(session.getId(), ".");
+    }
 
     /**
      * 获取Host列表（服务器有登录后才能获取相关服务器信息）
@@ -1097,8 +1106,77 @@ public class SecurityUtils {
      */
     public static Collection<String> findServerHosts() {
         List<SessionInfo> list = findSessionInfoList();
-        return list.parallelStream().map(SessionInfo::getHost).filter(Objects::nonNull).collect(Collectors.toSet());
+        return list.stream().map(SessionInfo::getHost).filter(Objects::nonNull).collect(Collectors.toSet());
     }
+
+    /**
+     * APP与Webview session同步兼容 添加关联已有sessionId
+     * @param sessionId
+     * @return
+     */
+    public static void addExtendSession(String sessionId,String sessionInfoId) {
+       Static.applicationSessionContext.addExtendSession(sessionId,sessionInfoId);
+    }
+
+    /**
+     * APP与Webview session cache keys
+     * @return
+     */
+    public static Collection<String> findExtendSessionIdKeys() {
+        return Static.applicationSessionContext.findSessionExtendKeys();
+    }
+
+
+    /**
+     * APP与Webview session cache data
+     * @return
+     */
+    public static List<Map<String, String>> findExtendSessionIds() {
+        return Lists.newArrayList(findExtendSessionIdKeys()).parallelStream().map(v -> {
+            Map<String, String> data = Maps.newHashMap();
+            data.put(v, getExtendSessionId(v));
+            return data;
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * APP与Webview session同步兼容 查找关联已有sessionId
+     * @param sessionId
+     * @return
+     */
+    public static String getExtendSessionId(String sessionId) {
+        return Static.applicationSessionContext.getExtendSession(sessionId);
+    }
+
+    /**
+     * APP与Webview session同步兼容
+     * @param sessionId
+     * @return
+     */
+    public static String getFixedSessionId(String sessionId) {
+        String sessionInfoId = getExtendSessionId(sessionId);
+        return null != sessionInfoId ? sessionInfoId:sessionId;
+    }
+
+    /**
+     * APP与Webview 同步刷新关联信息
+     * @param sessionInfo
+     */
+    public static void syncExtendSession(SessionInfo sessionInfo) {
+        Collection<String> sessionInfoIds = Static.applicationSessionContext.findSessionExtendKeys();
+        sessionInfoIds.stream().filter(v -> sessionInfo.getId().equals(getExtendSessionId(v))).forEach(v -> addExtendSession(v, sessionInfo.getId()));
+    }
+
+
+    /**
+     * APP与Webview 同步删除关联信息
+     * @param sessionInfoId
+     */
+    public static void removeExtendSession(String sessionInfoId) {
+        Collection<String> sessionIds = Static.applicationSessionContext.findSessionExtendKeys();
+        sessionIds.stream().filter(v -> sessionInfoId.equals(getExtendSessionId(v))).forEach(v -> Static.applicationSessionContext.removeExtendSession(v));
+    }
+
 
     public static final String LOCK_URL_LIMIT_REGION = "lock_url_limit";
 

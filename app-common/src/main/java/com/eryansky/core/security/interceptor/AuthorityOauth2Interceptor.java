@@ -104,6 +104,7 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
                 }
                 if (verify) {
                     if(null != sessionInfo){
+                        SecurityUtils.addExtendSession(request.getSession().getId(),sessionInfo.getId());
                         logger.debug("自动跳过登录：{},{},{},{},{}", loginName, IpUtils.getIpAddr0(request), requestUrl,request.getSession().getId(),sessionInfo.getId());
                     }else{
                         SecurityUtils.putUserToSession(request,user);
