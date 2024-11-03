@@ -83,14 +83,6 @@ public class LettuceCache {
         return session_id;
     }
 
-    private String getKeyName(String sessionKey) {
-        if (namespace != null && !namespace.isEmpty()){
-            return sessionKey.substring(this.namespace.length()+1);
-        }
-        return sessionKey;
-    }
-
-
     public byte[] getBytes(String session_id, String key) {
         try(StatefulConnection<String, byte[]> connection = connect()) {
             RedisHashCommands<String, byte[]> cmd = (RedisHashCommands)sync(connection);
@@ -170,7 +162,7 @@ public class LettuceCache {
     public Collection<String> keys() {
         try(StatefulConnection<String, byte[]> connection = connect()) {
             RedisKeyCommands<String, byte[]> cmd = (RedisKeyCommands)sync(connection);
-            return cmd.keys(namespace+":*").parallelStream().map(this::getKeyName).collect(Collectors.toList());
+            return cmd.keys(namespace+":*").stream().map(k->k.substring(this.namespace.length()+1)).collect(Collectors.toSet());
         }
 
     }
