@@ -85,7 +85,7 @@ public class LettuceCache {
 
     private String getKeyName(String sessionKey) {
         if (namespace != null && !namespace.isEmpty()){
-            return sessionKey.replace(namespace + ":" ,"");
+            return sessionKey.substring(this.namespace.length()+1);
         }
         return sessionKey;
     }
