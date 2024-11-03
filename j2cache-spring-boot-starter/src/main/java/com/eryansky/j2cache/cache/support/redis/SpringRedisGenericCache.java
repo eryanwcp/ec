@@ -57,7 +57,7 @@ public class SpringRedisGenericCache implements Level2Cache {
 
 	@Override
 	public boolean exists(String key) {
-		return 	redisTemplate.execute((RedisCallback<Boolean>) redis -> redis.exists(_key(key)));
+		return Boolean.TRUE.equals(redisTemplate.execute((RedisCallback<Boolean>) redis -> redis.exists(_key(key))));
 	}
 
 	@Override
@@ -82,7 +82,7 @@ public class SpringRedisGenericCache implements Level2Cache {
 	@Override
 	public List<byte[]> getBytes(Collection<String> keys) {
 		return redisTemplate.execute((RedisCallback<List<byte[]>>) redis -> {
-			byte[][] bytes = keys.stream().map(k -> _key(k)).toArray(byte[][]::new);
+			byte[][] bytes = keys.stream().map(this::_key).toArray(byte[][]::new);
 			return redis.mGet(bytes);
 		});
 	}
