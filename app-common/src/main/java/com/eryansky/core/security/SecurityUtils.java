@@ -998,6 +998,14 @@ public class SecurityUtils {
     }
 
     /**
+     * Session size
+     * @return
+     */
+    public static int getSessionSize() {
+        return Static.applicationSessionContext.findSessionKeySize();
+    }
+
+    /**
      * Session keys
      * @return
      */

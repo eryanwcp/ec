@@ -98,6 +98,11 @@ public class ApplicationSessionContext {
 		return findSessionInfoKeys().size();
 	}
 
+	public int findSessionKeySize() {
+		Collection<String> keys = cacheFacade.keys();
+		return keys.size();
+	}
+
 
 	/**
 	 * APP与Webview session同步兼容 添加关联已有sessionId

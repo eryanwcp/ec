@@ -29,7 +29,13 @@ public class Server
 {
     
     private static final int OSHI_WAIT_SECOND = 1000;
-    
+
+    /**
+     * sessionSize
+     */
+    private int sessionSize = -1;
+
+
     /**
      * CPU相关信息
      */
@@ -58,6 +64,14 @@ public class Server
      * 系统参数
      */
     private Properties sysProperties =  System.getProperties();
+
+    public int getSessionSize() {
+        return sessionSize;
+    }
+
+    public void setSessionSize(int sessionSize) {
+        this.sessionSize = sessionSize;
+    }
 
     public CpuEntity getCpu()
     {

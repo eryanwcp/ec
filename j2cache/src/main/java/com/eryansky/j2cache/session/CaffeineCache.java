@@ -18,6 +18,8 @@ package com.eryansky.j2cache.session;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalCause;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.concurrent.ConcurrentMap;
@@ -30,6 +32,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class CaffeineCache {
 
+    private static final Logger logger = LoggerFactory.getLogger(CaffeineCache.class);
+
     private final Cache<String, Object> cache;
     private final int size ;
     private final int expire ;
@@ -40,8 +44,12 @@ public class CaffeineCache {
                 .expireAfterAccess(expire, TimeUnit.SECONDS)
                 .removalListener((k,v, cause) -> {
                     //程序删除的缓存不做通知处理，因为上层已经做了处理
-                    if (!RemovalCause.EXPLICIT.equals(cause) && !RemovalCause.REPLACED.equals(cause)) {
-                        listener.notifyElementExpired((String) k);
+                    if (!RemovalCause.EXPLICIT.equals(cause) && !RemovalCause.REPLACED.equals(cause) && RemovalCause.SIZE.equals(cause)) {
+                        try {
+                            listener.notifyElementExpired((String) k);
+                        } catch (Exception e) {
+                            logger.error(cause+","+e.getMessage(),e);
+                        }
                     }
                 })
                 .build();

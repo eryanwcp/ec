@@ -23,6 +23,7 @@ import com.eryansky.common.web.filter.XsslHttpServletRequestWrapper;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.aop.annotation.Logging;
+import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.annotation.RequiresPermissions;
 import com.eryansky.j2cache.CacheChannel;
 import com.eryansky.j2cache.util.SerializationUtils;
@@ -77,6 +78,7 @@ public class SystemMonitorController extends SimpleController {
             Server server = new Server();
             try {
                 server.copyTo();
+                server.setSessionSize(SecurityUtils.getSessionSize());
                 return renderString(response, Result.successResult().setData(server));
             } catch (Exception e) {
                 logger.error(e.getMessage(),e);
