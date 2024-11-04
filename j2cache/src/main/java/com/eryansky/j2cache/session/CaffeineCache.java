@@ -48,7 +48,8 @@ public class CaffeineCache {
                         try {
                             listener.notifyElementExpired((String) k);
                         } catch (Exception e) {
-                            logger.error(cause+","+e.getMessage(),e);
+                            logger.error("{}:{} {}",k,v, cause);
+                            logger.error(e.getMessage(),e);
                         }
                     }
                 })
