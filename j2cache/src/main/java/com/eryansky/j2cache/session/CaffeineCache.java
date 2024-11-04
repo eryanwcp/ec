@@ -15,6 +15,7 @@
  */
 package com.eryansky.j2cache.session;
 
+import com.eryansky.j2cache.util.SerializationUtils;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalCause;
@@ -44,11 +45,11 @@ public class CaffeineCache {
                 .expireAfterAccess(expire, TimeUnit.SECONDS)
                 .removalListener((k,v, cause) -> {
                     //程序删除的缓存不做通知处理，因为上层已经做了处理
-                    if (!RemovalCause.EXPLICIT.equals(cause) && !RemovalCause.REPLACED.equals(cause) && RemovalCause.SIZE.equals(cause)) {
+                    if (!RemovalCause.EXPLICIT.equals(cause) && !RemovalCause.REPLACED.equals(cause) && !RemovalCause.SIZE.equals(cause)) {
                         try {
                             listener.notifyElementExpired((String) k);
                         } catch (Exception e) {
-                            logger.error("{}:{} {}",k,v, cause);
+                            logger.error("{}:{} {}",k, v, cause);
                             logger.error(e.getMessage(),e);
                         }
                     }
