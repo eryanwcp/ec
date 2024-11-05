@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.eryansky</groupId>
         <artifactId>ec-ureport2</artifactId>
-        <version>4.3.20241025.05</version>
+        <version>4.2.20241031.02</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
