@@ -72,6 +72,8 @@ public class HttpCompoents {
      * 连接超时时间 可以配到配置文件 （单位毫秒）
      */
     private static final int MAX_TIME_OUT = 30*1000;
+
+    private static final int MAX_SOCKET_TIMEOUT = 10*60*1000;
     /**
      * 设置整个连接池最大连接数
      */
@@ -212,7 +214,7 @@ public class HttpCompoents {
 
         requestConfig = RequestConfig.custom()
                 .setCookieSpec("easy")
-                .setSocketTimeout(MAX_TIME_OUT)
+                .setSocketTimeout(MAX_SOCKET_TIMEOUT)
                 .setConnectTimeout(MAX_TIME_OUT)
                 .setConnectionRequestTimeout(MAX_TIME_OUT)
                 .setRedirectsEnabled(true).build();
