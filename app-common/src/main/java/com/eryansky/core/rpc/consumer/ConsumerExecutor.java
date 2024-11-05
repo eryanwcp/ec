@@ -1,52 +1,49 @@
 package com.eryansky.core.rpc.consumer;
 
 import com.eryansky.common.utils.StringUtils;
-import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.encode.Cryptos;
 import com.eryansky.common.utils.encode.RSAUtils;
 import com.eryansky.common.utils.encode.Sm4Utils;
+import com.eryansky.common.utils.http.HttpCompoents;
+import com.eryansky.common.utils.http.HttpPoolCompoents;
 import com.eryansky.common.utils.mapper.JsonMapper;
-import com.eryansky.core.rpc.config.RestTemplateHolder;
 import com.eryansky.core.rpc.utils.RPCUtils;
 import com.eryansky.encrypt.enums.CipherMode;
 import com.fasterxml.jackson.databind.JavaType;
-import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
-import org.springframework.web.client.RestTemplate;
 
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+
+import static com.fasterxml.jackson.core.JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION;
 
 public class ConsumerExecutor {
 
     private static final Logger log = LoggerFactory.getLogger(ConsumerExecutor.class);
-    private static final JsonMapper jsonMapper = JsonMapper.getInstance();
+    private static final JsonMapper jsonMapper = JsonMapper.getInstance().enable(INCLUDE_SOURCE_IN_LOCATION);
+    private static final HttpPoolCompoents httpCompoents = HttpPoolCompoents.getInstance();
 
     public static <T> T  execute(String url, Map<String,String> headers, Object[] params, ParameterizedTypeReference responseType) throws Exception {
         // 获取RestTemplate对象
-        RestTemplate restTemplate = RestTemplateHolder.restTemplate();
         // 构建请求体
-        HttpEntity<?> httpEntity = createHttpEntity(params,headers);
-        // 进行远程rpc请求
-        ResponseEntity responseEntity = null;
+        String httpEntity = createHttpBody(params,headers);
         // 返回接口 数据解密
         String requestEncrypt = headers.get(RPCUtils.HEADER_ENCRYPT);
         String requestEncryptKey = headers.get(RPCUtils.HEADER_ENCRYPT_KEY);
+        String data = httpCompoents.post(url,httpEntity,headers,StandardCharsets.UTF_8.name());
+        if(StringUtils.isBlank(data)){
+            return null;
+        }
+        String rData = data;
+        JavaType javaType = jsonMapper.getTypeFactory().constructType(responseType.getType());
         if (StringUtils.isNotBlank(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey) ){
-//            responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, String.class);//多一层引号““””
-            responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
-//            responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Serializable.class);
-            String data = (String) responseEntity.getBody();
-            JavaType javaType = jsonMapper.getTypeFactory().constructType(responseType.getType());
             if(CipherMode.SM4.name().equals(requestEncrypt)){
                 if(StringUtils.isNotBlank(data) && !StringUtils.equals(data,"null")){
                     try {
                         String key = RSAUtils.decryptHexString(requestEncryptKey);
-                        return jsonMapper.toJavaObject(Sm4Utils.decrypt(key,data),javaType);
+                        rData = Sm4Utils.decrypt(key,StringUtils.startsWith(data,"\"") ? data.substring(1,data.length()-1):data);
                     } catch (Exception e) {
                         log.error(e.getMessage(),e);
                         throw new RuntimeException(e);
@@ -56,7 +53,7 @@ public class ConsumerExecutor {
                 if(StringUtils.isNotBlank(data) && !StringUtils.equals(data,"null")){
                     try {
                         String key = RSAUtils.decryptBase64String(requestEncryptKey);
-                        return jsonMapper.toJavaObject(Cryptos.aesECBDecryptBase64String(data,key),javaType);
+                        rData = Cryptos.aesECBDecryptBase64String(data,key);
                     } catch (Exception e) {
                         log.error(e.getMessage(),e);
                         throw new RuntimeException(e);
@@ -64,13 +61,11 @@ public class ConsumerExecutor {
                 }
 
             }
-        }else{
-            responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, responseType);
         }
-        if(!HttpStatus.OK.equals(responseEntity.getStatusCode())){
-            log.error("RPC请求异常：{} {} {}",url,responseEntity.getStatusCode(),JsonMapper.toJsonString(responseEntity.getBody()));
+        if(StringUtils.isBlank(rData)){
+            return null;
         }
-        return (T) responseEntity.getBody();
+        return jsonMapper.toJavaObject(rData,javaType);
     }
 
     /**
@@ -79,13 +74,7 @@ public class ConsumerExecutor {
      * @param params
      * @return
      */
-    private static HttpEntity<?> createHttpEntity(Object[] params, Map<String,String> headers) throws Exception {
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        if(null != headers){
-            headers.forEach(httpHeaders::add);
-        }
-
+    private static String createHttpBody(Object[] params, Map<String,String> headers) throws Exception {
         if (params != null && params.length != 0) {
             StringBuilder builder = new StringBuilder();
             builder.append("[");
@@ -112,11 +101,11 @@ public class ConsumerExecutor {
                     data = Cryptos.aesECBEncryptBase64String(builder.toString(),key);
                 }
                 headers.put(RPCUtils.HEADER_ENCRYPT_KEY, encryptKey);
-                httpHeaders.put(RPCUtils.HEADER_ENCRYPT_KEY, Lists.newArrayList(encryptKey));
             }
-            return new HttpEntity<>(data.getBytes(StandardCharsets.UTF_8), httpHeaders);
+            return data;
         } else {
-            return new HttpEntity<>(httpHeaders);
+            return StringUtils.EMPTY;
         }
     }
+
 }
