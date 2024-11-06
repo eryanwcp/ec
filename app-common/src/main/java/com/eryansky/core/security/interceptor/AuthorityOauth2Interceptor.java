@@ -46,10 +46,22 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        String authorization = request.getParameter(AuthorityInterceptor.ATTR_AUTHORIZATION);
+        if (StringUtils.isBlank(authorization)) {
+            authorization = request.getHeader("Authorization");
+        }
+        String token = StringUtils.replaceOnce(authorization, "Bearer ", "");
+
+
         //已登录用户
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         if (null != sessionInfo && request.getSession().getId().equals(sessionInfo.getId()) && null != UserType.getByValue(sessionInfo.getUserType())) {
-            return true;
+            if(StringUtils.isBlank(token) || StringUtils.equals(token,sessionInfo.getToken()) || StringUtils.equals(token,sessionInfo.getRefreshToken())){
+                return true;
+            }else{
+                //兼容Token变化了 防止缓存
+                sessionInfo = null;
+            }
         }
 
         //注解处理 满足设置不拦截
@@ -69,14 +81,11 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
                 return true;
             }
             //自动登录
-            String authorization = request.getParameter(AuthorityInterceptor.ATTR_AUTHORIZATION);
-            if (StringUtils.isBlank(authorization)) {
-                authorization = request.getHeader("Authorization");
-            }
+
             if (StringUtils.isNotBlank(authorization)) {
                 String requestUrl = request.getRequestURI();
                 boolean verify = false;
-                String token = StringUtils.replaceOnce(authorization, "Bearer ", "");
+
                 //判断是否已经登录过
                 if(null == sessionInfo){
                     sessionInfo = SecurityUtils.getSessionInfoByTokenOrRefreshToken(token);
