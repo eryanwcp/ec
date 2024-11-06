@@ -13,6 +13,21 @@ import com.eryansky.modules.disk.extend.IFileManager;
 import com.eryansky.utils.AppConstants;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.collect.Lists;
+import org.apache.hc.client5.http.cookie.*;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.cookie.RFC6265CookieSpecFactory;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.psl.PublicSuffixMatcher;
+import org.apache.hc.client5.http.psl.PublicSuffixMatcherLoader;
+import org.apache.hc.client5.http.ssl.*;
+import org.apache.hc.core5.http.config.Lookup;
+import org.apache.hc.core5.http.config.Registry;
+import org.apache.hc.core5.http.config.RegistryBuilder;
+import org.apache.hc.core5.reactor.ssl.SSLBufferMode;
+import org.apache.hc.core5.ssl.SSLContexts;
+import org.apache.hc.core5.ssl.TrustStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -22,6 +37,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.Ordered;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -30,8 +46,13 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
+import javax.net.ssl.SSLContext;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.*;
+import java.util.function.Supplier;
 
 import static com.fasterxml.jackson.core.JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION;
 
@@ -198,11 +219,47 @@ public class MvcConfigurer implements WebMvcConfigurer {
         // 创建一个 MappingJackson2HttpMessageConverter 实例，并使用自定义的 ObjectMapper
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
         converter.setObjectMapper(objectMapper);
-        RestTemplate restTemplate = builder.setConnectTimeout(Duration.ofSeconds(10))
-                .setReadTimeout(Duration.ofMinutes(15)).build();
+
+        RestTemplate restTemplate = builder.requestFactory(this::getRequestFactory).setConnectTimeout(Duration.ofSeconds(10)).build();
         restTemplate.getMessageConverters().add(converter);
         return restTemplate;
     }
+
+    //配置SSL, 使用RestTemplate访问https
+    public HttpComponentsClientHttpRequestFactory getRequestFactory(){
+        try {
+            TrustStrategy trustStrategy = (x509Certificates, s) -> true;
+            SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null,trustStrategy).build();
+            TlsSocketStrategy tlsSocketStrategy = new DefaultClientTlsStrategy(
+                    sslContext,
+                    HttpsSupport.getSystemProtocols(),
+                    HttpsSupport.getSystemCipherSuits(),
+                    SSLBufferMode.STATIC,
+                    HostnameVerificationPolicy.BOTH,
+                    HttpsSupport.getDefaultHostnameVerifier());
+            PublicSuffixMatcher publicSuffixMatcher = PublicSuffixMatcherLoader.getDefault();
+            final RFC6265CookieSpecFactory cookieSpecFactory = new RFC6265CookieSpecFactory(publicSuffixMatcher);
+            final Lookup<CookieSpecFactory> cookieSpecRegistry = RegistryBuilder.<CookieSpecFactory>create()
+                    .register(StandardCookieSpec.RELAXED, cookieSpecFactory)
+                    .register(StandardCookieSpec.STRICT, cookieSpecFactory)
+                    .build();
+
+
+            CloseableHttpClient httpClient = HttpClients.custom()
+//                    .disableCookieManagement()
+//                    .setDefaultCookieSpecRegistry(cookieSpecRegistry)
+                    .setConnectionManager(PoolingHttpClientConnectionManagerBuilder
+                    .create().setTlsSocketStrategy(tlsSocketStrategy).build()).build();
+            HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
+            requestFactory.setHttpClient(httpClient);
+            requestFactory.setConnectionRequestTimeout(5000);
+            requestFactory.setConnectTimeout(10000);
+            return requestFactory;
+        } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
 
 }
