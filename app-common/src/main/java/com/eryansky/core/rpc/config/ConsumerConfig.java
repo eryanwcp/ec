@@ -15,10 +15,10 @@ public class ConsumerConfig {
 //        //需要设置serverUrl
 //        return new ConsumerScanAndFillListener();
 //    }
-//    @Bean
-//    public RestTemplateHolder restTemplateHolder() {
-//        return new RestTemplateHolder();
-//    }
+    @Bean
+    public RestTemplateHolder restTemplateHolder() {
+        return new RestTemplateHolder();
+    }
 
 
     @Scope(value = "prototype")
