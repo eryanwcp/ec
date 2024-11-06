@@ -9,6 +9,7 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
+import com.eryansky.core.security.SecurityType;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
 import com.eryansky.core.security.annotation.PrepareOauth2;
@@ -60,6 +61,7 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
                 return true;
             }else{
                 //兼容Token变化了 防止缓存
+                SecurityUtils.removeSessionInfoFromSession(sessionInfo.getId(), SecurityType.offline);
                 sessionInfo = null;
             }
         }
