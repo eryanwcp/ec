@@ -61,7 +61,6 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
                 return true;
             }else{
                 //兼容Token变化了 防止缓存
-                SecurityUtils.removeSessionInfoFromSession(sessionInfo.getId(), SecurityType.offline);
                 sessionInfo = null;
             }
         }
