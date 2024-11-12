@@ -108,7 +108,7 @@ public class NoticeReceiveInfoService extends CrudService<NoticeReceiveInfoDao, 
         entity.setEntityPage(page);
         parameter.put(BaseInterceptor.PAGE, page);
         parameter.put("dbName", entity.getDbName());
-        page.setResult(dao.findQueryList(parameter));
+        page.autoResult(dao.findQueryList(parameter));
 
         return page;
     }
@@ -121,7 +121,7 @@ public class NoticeReceiveInfoService extends CrudService<NoticeReceiveInfoDao, 
         notice.setBizMode(NoticeMode.Effective.getValue());
         noticeReceiveInfo.setNotice(notice);
         noticeReceiveInfo.setEntityPage(page);
-        page.setResult(dao.findUserUnreadNotices(noticeReceiveInfo));
+        page.autoResult(dao.findUserUnreadNotices(noticeReceiveInfo));
         return page;
     }
 
@@ -192,7 +192,7 @@ public class NoticeReceiveInfoService extends CrudService<NoticeReceiveInfoDao, 
         parameter.put("noticeId", noticeId);
         parameter.put(BaseInterceptor.PAGE, page);
         List<NoticeReceiveInfo> list = dao.findQueryList(parameter);
-        page.setResult(list);
+        page.autoResult(list);
         return page;
     }
 

@@ -68,7 +68,7 @@ public abstract class CrudService<D extends CrudDao<T>, T extends BaseEntity<T>>
 	 */
 	public Page<T> findPage(Page<T> page, T entity) {
 		entity.setEntityPage(page);
-		page.setResult(dao.findList(entity));
+		page.autoResult(dao.findList(entity));
 		return page;
 	}
 

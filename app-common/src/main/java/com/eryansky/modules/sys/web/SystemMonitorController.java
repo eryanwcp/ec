@@ -110,8 +110,8 @@ public class SystemMonitorController extends SimpleController {
                 map.put("keys", CacheUtils.keySize(r.getName()));
                 dataList.add(map);
             }
-            page.setTotalCount(regions.size());
-            page.setResult(dataList);
+            page.autoTotalCount(regions.size());
+            page.autoResult(dataList);
             return renderString(response, page);
         }
         uiModel.addAttribute("page", page);
@@ -130,7 +130,7 @@ public class SystemMonitorController extends SimpleController {
         Page<Map<String, Object>> page = new Page<>(request, response);
         if (WebUtils.isAjaxRequest(request)) {
             Collection<String> keys = CacheUtils.keys(region);
-            page.setTotalCount(keys.size());
+            page.autoTotalCount(keys.size());
             List<String> pKeys = AppUtils.getPagedList(Collections3.union(keys, Collections.emptyList()), page.getPageNo(), page.getPageSize());
             List<Map<String, Object>> dataList = Lists.newArrayList();
             CacheChannel cacheChannel = CacheUtils.getCacheChannel();
@@ -142,7 +142,7 @@ public class SystemMonitorController extends SimpleController {
                 map.put("ttl2", cacheChannel.ttl(region, key, 2));
                 dataList.add(map);
             });
-            page.setResult(dataList);
+            page.autoResult(dataList);
             return renderString(response, page);
         }
         uiModel.addAttribute("region", region);
@@ -244,8 +244,8 @@ public class SystemMonitorController extends SimpleController {
                 map.put("keys", CacheUtils.getCacheChannel().queueList(r.getName()).size());
                 dataList.add(map);
             }
-            page.setTotalCount(regions.size());
-            page.setResult(dataList);
+            page.autoTotalCount(regions.size());
+            page.autoResult(dataList);
             return renderString(response, page);
         }
         uiModel.addAttribute("page", page);
@@ -345,7 +345,7 @@ public class SystemMonitorController extends SimpleController {
                     }
                     return line;
                 }).collect(Collectors.toList());
-                page.setResult(resultLogs);
+                page.autoResult(resultLogs);
                 return renderString(response, Result.successResult().setData(page).setObj(PrettyMemoryUtils.prettyByteSize(file.length())));
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);

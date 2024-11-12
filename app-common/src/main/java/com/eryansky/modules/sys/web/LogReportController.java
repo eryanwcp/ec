@@ -128,8 +128,8 @@ public class LogReportController extends SimpleController {
                 page.setPageSize(Page.PAGESIZE_ALL);
             }
             List<Map<String, Object>> list = logService.findDayLoginStatistics(_startTime, endTime);
-            page.setResult(list);
-            page.setTotalCount(list.size());
+            page.autoResult(list);
+            page.autoTotalCount(list.size());
             if (export) {
                 String title = "每日登陆次数分析";
                 String[] hearders = new String[]{"日期", "访问量",};//表头数组

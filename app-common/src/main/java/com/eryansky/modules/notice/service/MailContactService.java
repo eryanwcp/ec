@@ -32,7 +32,7 @@ public class MailContactService extends CrudService<MailContactDao, MailContact>
         parameter.put(BaseInterceptor.PAGE, page);
         parameter.put("contactGroupId",contactGroupId);
         parameter.put("query",query);
-        return page.setResult(dao.findByContactGroupId(parameter));
+        return page.autoResult(dao.findByContactGroupId(parameter));
     }
 
     public MailContact checkExist(String contactGroupId, String email) {

@@ -494,12 +494,12 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 				throw new RuntimeException(e);
 			}
 		};
-		page.setTotalCount(streamSupplier.get().count());
+		page.autoTotalCount(streamSupplier.get().count());
 		if(page.getPageSize() == Page.PAGESIZE_ALL){
-			return page.setResult(streamSupplier.get().collect(Collectors.toList()));
+			return page.autoResult(streamSupplier.get().collect(Collectors.toList()));
 		}
 		int beginIndex = (page.getPageNo() - 1) * page.getPageSize();
-		return  page.setResult(streamSupplier.get().skip(beginIndex)
+		return  page.autoResult(streamSupplier.get().skip(beginIndex)
 				.limit(page.getPageSize())
 				.collect(Collectors.toList()));
 	}

@@ -65,7 +65,7 @@ public class MessageService extends CrudService<MessageDao, Message> {
         if (null != params) {
             params.forEach(parameter::putIfAbsent);
         }
-        page.setResult(dao.findQueryList(parameter));
+        page.autoResult(dao.findQueryList(parameter));
         return page;
     }
 
@@ -98,7 +98,7 @@ public class MessageService extends CrudService<MessageDao, Message> {
         if (null != params) {
             params.forEach(parameter::putIfAbsent);
         }
-        page.setResult(dao.findQueryList(parameter));
+        page.autoResult(dao.findQueryList(parameter));
         return page;
     }
 

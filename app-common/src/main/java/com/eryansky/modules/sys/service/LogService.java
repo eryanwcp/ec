@@ -37,13 +37,13 @@ public class LogService extends CrudService<LogDao, Log> {
     @Override
     public Page<Log> findPage(Page<Log> page, Log entity) {
         entity.setEntityPage(page);
-        page.setResult(dao.findList(entity));
+        page.autoResult(dao.findList(entity));
         return page;
     }
 
     public Page<Log> findQueryPage(Page<Log> page, Log entity) {
         Parameter parameter = Parameter.newPageParameter(page, AppConstants.getJdbcType());
-        page.setResult(dao.findQueryList(parameter));
+        page.autoResult(dao.findQueryList(parameter));
         return page;
     }
 
@@ -87,7 +87,7 @@ public class LogService extends CrudService<LogDao, Log> {
             sqlMap.put("dsf", dataScopeFilter(SecurityUtils.getCurrentUser(), "o", "u"));
         }
         parameter.put("sqlMap", sqlMap);
-        page.setResult(dao.findQueryList(parameter));
+        page.autoResult(dao.findQueryList(parameter));
         return page;
     }
 

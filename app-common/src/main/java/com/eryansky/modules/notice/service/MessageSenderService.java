@@ -54,7 +54,7 @@ public class MessageSenderService extends CrudService<MessageSenderDao, MessageS
     @Override
     public Page<MessageSender> findPage(Page<MessageSender> page, MessageSender entity) {
         entity.setEntityPage(page);
-        page.setResult(dao.findList(entity));
+        page.autoResult(dao.findList(entity));
         return page;
     }
 }

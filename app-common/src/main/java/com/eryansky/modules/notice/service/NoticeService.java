@@ -157,7 +157,7 @@ public class NoticeService extends CrudService<NoticeDao, Notice> {
         Map<String, String> sqlMap = Maps.newHashMap();
         sqlMap.put("dsf", super.dataScopeFilter(SecurityUtils.getCurrentUser(), "o", "u"));
         parameter.put("sqlMap", sqlMap);
-        page.setResult(dao.findQueryList(parameter));
+        page.autoResult(dao.findQueryList(parameter));
 
         return page;
 

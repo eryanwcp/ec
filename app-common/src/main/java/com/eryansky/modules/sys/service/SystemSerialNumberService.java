@@ -43,7 +43,7 @@ public class SystemSerialNumberService extends CrudService<SystemSerialNumberDao
     @Override
     public Page<SystemSerialNumber> findPage(Page<SystemSerialNumber> page, SystemSerialNumber entity) {
         entity.setEntityPage(page);
-        page.setResult(dao.findList(entity));
+        page.autoResult(dao.findList(entity));
         return page;
     }
 

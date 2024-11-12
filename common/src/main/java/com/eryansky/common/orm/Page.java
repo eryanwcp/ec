@@ -105,10 +105,10 @@ public class Page<T> implements Serializable{
 	 * @param list 本页数据对象列表
 	 */
 	public Page(int pageNo, int pageSize, long count, List<T> list) {
-		this.setTotalCount(count);
+		this.autoTotalCount(count);
 		this.setPageNo(pageNo);
 		this.pageSize = pageSize;
-		this.setResult(list,false);
+		this.autoResult(list,false);
 	}
 
 	/**
@@ -400,16 +400,21 @@ public class Page<T> implements Serializable{
 		return result;
 	}
 
+	public Page<T> setResult(final List<T> result) {
+		this.result = result;
+		return this;
+	}
+
 	/**
 	 * 设置页内的记录列表.
 	 */
-	public Page<T> setResult(final List<T> result) {
-		return setResult(result,true);
+	public Page<T> autoResult(final List<T> result) {
+		return autoResult(result,true);
 	}
 	/**
 	 * 设置页内的记录列表.
 	 */
-	public Page<T> setResult(final List<T> result,boolean flag) {
+	public Page<T> autoResult(final List<T> result, boolean flag) {
 		this.result = result;
 		if(flag){
 			initialize();
@@ -429,6 +434,14 @@ public class Page<T> implements Serializable{
 	 * 设置总记录数.
 	 */
 	public Page<T> setTotalCount(final long totalCount) {
+		this.totalCount = totalCount;
+		return this;
+	}
+
+	/**
+	 * 设置总记录数.
+	 */
+	public Page<T> autoTotalCount(final long totalCount) {
 		this.totalCount = totalCount;
 		if (pageSize >= totalCount){
 			pageNo = 1;

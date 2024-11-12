@@ -101,7 +101,7 @@ public class UserPasswordService extends CrudService<UserPasswordDao, UserPasswo
         parameter.put("types", types);
         parameter.put(BaseInterceptor.PAGE, page);
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
-        return page.setResult(dao.findByUserId(parameter)).getResult();
+        return page.autoResult(dao.findByUserId(parameter)).getResult();
     }
 
     /**

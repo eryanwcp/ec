@@ -47,7 +47,7 @@ public class MessageReceiveService extends CrudService<MessageReceiveDao, Messag
     @Override
     public Page<MessageReceive> findPage(Page<MessageReceive> page, MessageReceive entity) {
         entity.setEntityPage(page);
-        page.setResult(dao.findList(entity));
+        page.autoResult(dao.findList(entity));
         return page;
     }
 
@@ -88,7 +88,7 @@ public class MessageReceiveService extends CrudService<MessageReceiveDao, Messag
         if (null != params) {
             params.forEach(parameter::putIfAbsent);
         }
-        page.setResult(dao.findUserList(parameter));
+        page.autoResult(dao.findUserList(parameter));
         return page;
     }
 
@@ -298,7 +298,7 @@ public class MessageReceiveService extends CrudService<MessageReceiveDao, Messag
         parameter.put("isSend", isSend);
         parameter.put(BaseInterceptor.PAGE, page);
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
-        return page.setResult(dao.findByMessageId(parameter));
+        return page.autoResult(dao.findByMessageId(parameter));
     }
 
 
@@ -361,7 +361,7 @@ public class MessageReceiveService extends CrudService<MessageReceiveDao, Messag
         parameter.put("messageId", messageId);
         parameter.put("isRead", isRead);
         parameter.put("isSend", isSend);
-        return page.setResult(dao.findBySenderUserId(parameter));
+        return page.autoResult(dao.findBySenderUserId(parameter));
     }
 
 }

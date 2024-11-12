@@ -47,7 +47,7 @@ public class DictionaryService extends CrudService<DictionaryDao, Dictionary> {
     @Override
     public Page<Dictionary> findPage(Page<Dictionary> page, Dictionary entity) {
         entity.setEntityPage(page);
-        page.setResult(dao.findList(entity));
+        page.autoResult(dao.findList(entity));
         return page;
     }
 

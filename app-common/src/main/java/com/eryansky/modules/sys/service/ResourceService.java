@@ -45,7 +45,7 @@ import java.util.*;
 public class ResourceService extends TreeService<ResourceDao, Resource> {
 
     public Page<Resource> findPage(Page<Resource> page, Resource entity) {
-        return page.setResult(dao.findList(entity));
+        return page.autoResult(dao.findList(entity));
     }
 
     /**

@@ -160,7 +160,7 @@ public class RoleService extends CrudService<RoleDao, Role> {
         parameter.put(BaseInterceptor.PAGE, page);
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put("resourceId", resourceId);
-        return page.setResult(dao.findRolesByResourceId(parameter));
+        return page.autoResult(dao.findRolesByResourceId(parameter));
     }
 
 

@@ -83,8 +83,8 @@ public class PaginationMapperMethod {
         } else {
             throw new BindingException("Invalid bound statement (not found rowBounds or pagination in paramenters)");
         }
-        page.setTotalCount(executeForCount(param));
-        page.setResult(executeForList(param, rowBounds));
+        page.autoTotalCount(executeForCount(param));
+        page.autoResult(executeForList(param, rowBounds));
         return page;
     }
 
