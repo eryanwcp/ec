@@ -236,7 +236,11 @@
 			${item.columnName}
 		</foreach>
 		FROM
-		<if test="tableSchema != null and tableSchema != ''">CONCAT( #{tableSchema}, '.')</if>${tableName}
+		<choose>
+			<when test="tableSchema != null and tableSchema != ''">${tableSchema}.${tableName}</when>
+			<otherwise>${tableName}</otherwise>
+		</choose>
+
 	</select>
 
 </mapper>
