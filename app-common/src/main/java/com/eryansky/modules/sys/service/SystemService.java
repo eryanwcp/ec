@@ -180,8 +180,20 @@ public class SystemService extends BaseService {
      * @return
      */
     public List<TableDTO> findTableList(String query){
+        return findTableList(null,query);
+    }
+
+
+    /**
+     * 查询表清单（安全级别较高慎用）
+     * @param tableSchema 库
+     * @param query
+     * @return
+     */
+    public List<TableDTO> findTableList(String tableSchema,String query){
         Parameter parameter = Parameter.newParameter();
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
+        parameter.put("tableSchema", tableSchema);
         parameter.put("query", query);
         return systemDao.findTableList(parameter);
     }
@@ -192,7 +204,18 @@ public class SystemService extends BaseService {
      * @return
      */
     public List<TableColumnDTO> findTableColumnByTableName(String tableName){
+        return findTableColumnByTableName(null,tableName);
+    }
+
+    /**
+     * 根据表名查询字段清单（安全级别较高慎用）
+     * @param tableSchema 库
+     * @param tableName 表名称
+     * @return
+     */
+    public List<TableColumnDTO> findTableColumnByTableName(String tableSchema,String tableName){
         Parameter parameter = Parameter.newParameter();
+        parameter.put("tableSchema", tableSchema);
         parameter.put("tableName", tableName);
         return systemDao.findTableColumnByTableName(parameter);
     }
@@ -204,11 +227,24 @@ public class SystemService extends BaseService {
      * @param params 自定义参数
      * @return
      */
-    public Page<Map<String,Object>> findTableDataByTableName(Page<Map<String,Object>> page, String tableName,Map<String,String> params){
+    public Page<Map<String,Object>> findTableDataByTableName(Page<Map<String,Object>> page,String tableName,Map<String,String> params){
+        return findTableDataByTableName(page,null,tableName,params);
+    }
+
+    /**
+     * 根据表名查询数据 （安全级别较高慎用）
+     * @param page
+     * @param tableSchema 库
+     * @param tableName 表名称
+     * @param params 自定义参数
+     * @return
+     */
+    public Page<Map<String,Object>> findTableDataByTableName(Page<Map<String,Object>> page,String tableSchema, String tableName,Map<String,String> params){
         Parameter parameter = Parameter.newParameter();
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
         parameter.put(BaseInterceptor.PAGE, page);
-        parameter.put("list", findTableColumnByTableName(tableName));
+        parameter.put("list", findTableColumnByTableName(tableSchema,tableName));
+        parameter.put("tableSchema", tableSchema);
         parameter.put("tableName", tableName);
         if (null != params) {
             params.forEach(parameter::putIfAbsent);

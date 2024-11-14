@@ -191,7 +191,11 @@
 		table_comment AS "tableComment"
 		FROM information_schema.tables
 		<where>
-			table_schema = (SELECT database())
+			table_schema =
+			<choose>
+				<when test="tableSchema != null and tableSchema != ''">#{tableSchema}</when>
+				<otherwise>(SELECT database())</otherwise>
+			</choose>
 			<if test="query != null and query != ''">
 				AND table_name LIKE
 				<choose>
@@ -215,7 +219,11 @@
 		column_key AS "columnKey"
 		FROM information_schema.columns
 		<where>
-			table_schema = (SELECT database())
+			table_schema =
+			<choose>
+				<when test="tableSchema != null and tableSchema != ''">#{tableSchema}</when>
+				<otherwise>(SELECT database())</otherwise>
+			</choose>
 			AND table_name = #{tableName}
 		</where>
 		ORDER BY ordinal_position ASC
@@ -227,7 +235,8 @@
 		<foreach collection="list" item="item" separator=",">
 			${item.columnName}
 		</foreach>
-		FROM ${tableName}
+		FROM
+		<if test="tableSchema != null and tableSchema != ''">CONCAT( #{tableSchema}, '.')</if>${tableName}
 	</select>
 
 </mapper>
