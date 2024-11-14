@@ -229,7 +229,7 @@ public class SystemService extends BaseService {
      * @return
      */
     public TablePageDTO findTableDataByTableName(Page<Map<String,Object>> page,String tableName,Map<String,String> params){
-        return findTableDataByTableName(page,null,tableName,params);
+        return findTableDataByTableName(page,null,tableName,null,params);
     }
 
     /**
@@ -240,7 +240,7 @@ public class SystemService extends BaseService {
      * @param params 自定义参数
      * @return
      */
-    public TablePageDTO findTableDataByTableName(Page<Map<String,Object>> page,String tableSchema, String tableName,Map<String,String> params){
+    public TablePageDTO findTableDataByTableName(Page<Map<String,Object>> page,String tableSchema, String tableName,String sql,Map<String,String> params){
         Parameter parameter = Parameter.newParameter();
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
         parameter.put(BaseInterceptor.PAGE, page);
@@ -248,6 +248,7 @@ public class SystemService extends BaseService {
         parameter.put("list", columns);
         parameter.put("tableSchema", tableSchema);
         parameter.put("tableName", tableName);
+        parameter.put("sql", sql);
         if (null != params) {
             params.forEach(parameter::putIfAbsent);
         }

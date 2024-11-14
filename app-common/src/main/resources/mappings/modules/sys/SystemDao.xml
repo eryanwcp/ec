@@ -240,7 +240,9 @@
 			<when test="tableSchema != null and tableSchema != ''">${tableSchema}.${tableName}</when>
 			<otherwise>${tableName}</otherwise>
 		</choose>
-
+		<if test="sql != null and sql != ''">
+			${sql}
+		</if>
 	</select>
 
 </mapper>
