@@ -230,7 +230,7 @@
 	</select>
 
 
-	<select id="findTableDataByTableName" resultType="java.util.Map">
+	<select id="findTableDataByTableName" resultType="java.util.LinkedHashMap">
 		SELECT
 		<foreach collection="list" item="item" separator=",">
 			${item.columnName}
