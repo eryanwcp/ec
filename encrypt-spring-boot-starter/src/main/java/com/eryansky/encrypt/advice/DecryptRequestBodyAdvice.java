@@ -1,6 +1,7 @@
 package com.eryansky.encrypt.advice;
 
 import com.eryansky.common.utils.encode.Cryptos;
+import com.eryansky.common.utils.encode.EncodeUtils;
 import com.eryansky.common.utils.encode.RSAUtils;
 import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.utils.io.IoUtils;
@@ -60,6 +61,8 @@ public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
                             return IOUtils.toInputStream(Sm4Utils.decrypt(key, content), StandardCharsets.UTF_8);
                         }else if(CipherMode.AES.name().equals(requestEncrypt)){
                             return IOUtils.toInputStream(Cryptos.aesECBDecryptBase64String(content,key), StandardCharsets.UTF_8);
+                        }else if(CipherMode.BASE64.name().equals(requestEncrypt)){
+                            return IOUtils.toInputStream(new String(EncodeUtils.base64Decode(content)), StandardCharsets.UTF_8);
                         }
                         return IOUtils.toInputStream(content, StandardCharsets.UTF_8);
                     } catch (Exception e) {

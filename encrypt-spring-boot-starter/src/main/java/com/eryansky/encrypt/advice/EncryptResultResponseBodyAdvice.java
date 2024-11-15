@@ -4,6 +4,7 @@ import com.eryansky.common.model.Result;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.encode.Cryptos;
+import com.eryansky.common.utils.encode.EncodeUtils;
 import com.eryansky.common.utils.encode.RSAUtils;
 import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.utils.mapper.JsonMapper;
@@ -19,6 +20,8 @@ import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * 默认加密策略 返回值为Result
@@ -78,6 +81,23 @@ public class EncryptResultResponseBodyAdvice implements ResponseBodyAdvice<Resul
                 if(StringUtils.isNotBlank(obj) && !StringUtils.equals(obj,"null")){
                     try {
                         body.setObj(Cryptos.aesECBEncryptBase64String(data,key));
+                    } catch (Exception e) {
+                        log.error(e.getMessage(),e);
+                        throw new RuntimeException(e);
+                    }
+                }
+            }else if(CipherMode.BASE64.name().equals(requestEncrypt)){
+                if(StringUtils.isNotBlank(data) && !StringUtils.equals(data,"null")){
+                    try {
+                        body.setData(EncodeUtils.base64Encode(data.getBytes(StandardCharsets.UTF_8)));
+                    } catch (Exception e) {
+                        log.error(e.getMessage(),e);
+                        throw new RuntimeException(e);
+                    }
+                }
+                if(StringUtils.isNotBlank(obj) && !StringUtils.equals(obj,"null")){
+                    try {
+                        body.setObj(EncodeUtils.base64Encode(data.getBytes(StandardCharsets.UTF_8)));
                     } catch (Exception e) {
                         log.error(e.getMessage(),e);
                         throw new RuntimeException(e);
