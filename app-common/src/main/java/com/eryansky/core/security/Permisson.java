@@ -26,6 +26,9 @@ public class Permisson implements Serializable {
      */
     private String markUrl;
 
+    public Permisson() {
+    }
+
     public Permisson(String id, String code, String markUrl) {
         this.id = id;
         this.code = code;

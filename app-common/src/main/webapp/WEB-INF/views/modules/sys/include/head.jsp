@@ -9,6 +9,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 <meta name="renderer" content="webkit">
+<script type="text/javascript" charset="utf-8">
+    var ctx = "${ctx}";
+    var ctxAdmin = "${ctxAdmin}";
+    var ctxFront = "${ctxFront}";
+    var ctxMobile = "${ctxMobile}";
+    var ctxStatic = "${ctxStatic}";
+    var appURL = "${appURL}";
+</script>
 <script src="${ctxStatic}/js/jquery/jquery-1.12.4.min.js" type="text/javascript"></script>
 <script src="${ctxStatic}/js/jquery/jquery-migrate-1.4.1.min.js" type="text/javascript"></script>
 <script src="${ctxStatic}/js/jquery/jquery-extend.min.js" type="text/javascript"></script>
@@ -34,10 +42,7 @@
 <script src="${ctxStatic}/js/bootstrap/dropdown/bootstrap-hover-dropdown.js" type="text/javascript"></script>
 <!--[if lt IE 7 ]> <script src="${ctxStatic}/js/dd_belatedpng.js"></script> <script> DD_belatedPNG.fix('img, .png_bg'); //fix any <img> or .png_bg background-images </script> <![endif]-->
 <script type="text/javascript">
-    var ctx = "${ctx}";
-    var ctxAdmin = "${ctxAdmin}";
-    var ctxFront = "${ctxFront}";
-    var ctxMobile = "${ctxMobile}";
-    var ctxStatic = "${ctxStatic}";
-    var appURL = "${appURL}";
+    try {
+        $.ajaxSetup({headers:{'Authorization':'Bearer ${sessionInfo.token}'}});
+    } catch (e) {console.log(e);}
 </script>

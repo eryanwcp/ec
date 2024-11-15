@@ -45,6 +45,7 @@
 			<tr><td>IP地址</td><td>{{sys.computerIp}}</td></tr>
 			<tr><td>操作系统</td><td>{{sys.osName}} {{sys.osArch}}</td></tr>
 			<tr><td>服务器时间</td><td>{{sys.serverTime}}</td></tr>
+			<tr><td>在线会话数</td><td>{{sessionSize}}</td></tr>
 			<tr><td>CPU型号</td><td>{{cpu.cpuModel}}</td></tr>
 			<tr><td>CPU核心数</td><td>{{cpu.cpuNum}}</td></tr>
 			<tr><td>CPU用户使用率</td><td>{{cpu.used}} %</td></tr>

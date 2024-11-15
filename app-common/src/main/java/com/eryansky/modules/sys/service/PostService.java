@@ -71,7 +71,7 @@ public class PostService extends CrudService<PostDao, Post> {
         parameter.put(BaseInterceptor.PAGE, p);
         parameter.put("organId", entity.getOrganId());
         parameter.put("query", entity.getQuery());
-        return p.setResult(dao.findQuery(parameter));
+        return p.autoResult(dao.findQuery(parameter));
     }
 
 

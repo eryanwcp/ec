@@ -476,6 +476,27 @@ public class WebUtils extends org.springframework.web.util.WebUtils {
      */
     public static String getAppURL(HttpServletRequest request,boolean adaptiveScheme) {
         StringBuffer url = new StringBuffer();
+        url.append(getROOTAppURL(request,adaptiveScheme))
+                .append(request.getContextPath());
+        return url.toString();
+    }
+
+    /**
+     * 自动获取应用URL地址
+     * @param request
+     * @return
+     */
+    public static String getROOTAppURL(HttpServletRequest request) {
+        return getROOTAppURL(request,false);
+    }
+    /**
+     * 自动获取应用URL地址
+     * @param request
+     * @param adaptiveScheme 兼容http、http请求头
+     * @return
+     */
+    public static String getROOTAppURL(HttpServletRequest request,boolean adaptiveScheme) {
+        StringBuffer url = new StringBuffer();
         int port = request.getServerPort();
         if (port < 0) {
             port = 80;
@@ -501,7 +522,6 @@ public class WebUtils extends org.springframework.web.util.WebUtils {
                 url.append(port);
             }
         }
-        url.append(request.getContextPath());
         return url.toString();
     }
 

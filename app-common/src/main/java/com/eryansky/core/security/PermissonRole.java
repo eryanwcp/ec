@@ -22,6 +22,8 @@ public class PermissonRole implements Serializable {
      */
     private String code;
 
+    public PermissonRole() {
+    }
 
     public PermissonRole(String code) {
         this.code = code;

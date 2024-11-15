@@ -1,5 +1,5 @@
-import JSEncrypt from 'jsencrypt'
-import {b64tohex, hex2b64} from "jsencrypt/lib/lib/jsbn/base64";
+import JSEncrypt from 'jsencrypt.min.js'
+import {b64tohex, hex2b64} from "base64.min.js";
 
 //以下代码测试过 结合后端 实现加解密 没什么问题 引入外部三个包
 //安装gm-crypt 出现问题的时候 如果是webpack xxx 控制台执行下面这行
@@ -12,7 +12,7 @@ import {b64tohex, hex2b64} from "jsencrypt/lib/lib/jsbn/base64";
 //引入 crypto-js 该包 解决aes加解密
 //npm install crypto-js
 //https://github.com/brix/crypto-js
-import CryptoJS from "crypto-js";
+import CryptoJS from "crypto-js.min.js";
 //npm install jsencrypt
 //https://github.com/travist/jsencrypt
 const jsEncrypt = new JSEncrypt()

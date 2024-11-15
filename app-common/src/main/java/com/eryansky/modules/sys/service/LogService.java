@@ -263,7 +263,7 @@ public class LogService extends CrudService<LogDao, Log> {
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
         parameter.put(Log.FIELD_STATUS, Log.STATUS_NORMAL);
         List<Map<String, Object>> mapList = dao.getLoginStatistics(parameter);
-        pg.setResult(mapList);
+        pg.autoResult(mapList);
         return pg;
     }
 
@@ -288,7 +288,7 @@ public class LogService extends CrudService<LogDao, Log> {
         parameter.put(BaseInterceptor.PAGE, pg);
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
         List<Map<String, Object>> mapList = dao.getModuleStatistics(parameter);
-        pg.setResult(mapList);
+        pg.autoResult(mapList);
         return pg;
     }
 

@@ -17,6 +17,7 @@ import com.eryansky.modules.sys.utils.AreaUtils;
 import com.eryansky.modules.sys.utils.OrganUtils;
 import com.eryansky.modules.sys.vo.TableColumnDTO;
 import com.eryansky.modules.sys.vo.TableDTO;
+import com.eryansky.modules.sys.vo.TablePageDTO;
 import com.eryansky.utils.AppConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -180,8 +181,20 @@ public class SystemService extends BaseService {
      * @return
      */
     public List<TableDTO> findTableList(String query){
+        return findTableList(null,query);
+    }
+
+
+    /**
+     * 查询表清单（安全级别较高慎用）
+     * @param tableSchema 库
+     * @param query
+     * @return
+     */
+    public List<TableDTO> findTableList(String tableSchema,String query){
         Parameter parameter = Parameter.newParameter();
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
+        parameter.put("tableSchema", tableSchema);
         parameter.put("query", query);
         return systemDao.findTableList(parameter);
     }
@@ -192,7 +205,18 @@ public class SystemService extends BaseService {
      * @return
      */
     public List<TableColumnDTO> findTableColumnByTableName(String tableName){
+        return findTableColumnByTableName(null,tableName);
+    }
+
+    /**
+     * 根据表名查询字段清单（安全级别较高慎用）
+     * @param tableSchema 库
+     * @param tableName 表名称
+     * @return
+     */
+    public List<TableColumnDTO> findTableColumnByTableName(String tableSchema,String tableName){
         Parameter parameter = Parameter.newParameter();
+        parameter.put("tableSchema", tableSchema);
         parameter.put("tableName", tableName);
         return systemDao.findTableColumnByTableName(parameter);
     }
@@ -204,16 +228,35 @@ public class SystemService extends BaseService {
      * @param params 自定义参数
      * @return
      */
-    public Page<Map<String,Object>> findTableDataByTableName(Page<Map<String,Object>> page, String tableName,Map<String,String> params){
+    public TablePageDTO findTableDataByTableName(Page<Map<String,Object>> page,String tableName,Map<String,String> params){
+        return findTableDataByTableName(page,null,tableName,null,params);
+    }
+
+    /**
+     * 根据表名查询数据 （安全级别较高慎用）
+     * @param page
+     * @param tableSchema 库
+     * @param tableName 表名称
+     * @param params 自定义参数
+     * @return
+     */
+    public TablePageDTO findTableDataByTableName(Page<Map<String,Object>> page,String tableSchema, String tableName,String sql,Map<String,String> params){
         Parameter parameter = Parameter.newParameter();
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
         parameter.put(BaseInterceptor.PAGE, page);
-        parameter.put("list", findTableColumnByTableName(tableName));
+        List<TableColumnDTO> columns = findTableColumnByTableName(tableSchema,tableName);
+        parameter.put("list", columns);
+        parameter.put("tableSchema", tableSchema);
         parameter.put("tableName", tableName);
+        parameter.put("sql", sql);
         if (null != params) {
             params.forEach(parameter::putIfAbsent);
         }
-        return page.autoResult(systemDao.findTableDataByTableName(parameter));
+        page.autoResult(systemDao.findTableDataByTableName(parameter));
+        TablePageDTO tablePageDTO = new TablePageDTO();
+        tablePageDTO.setPage(page);
+        tablePageDTO.setColumns(columns);
+        return tablePageDTO;
     }
 
 }

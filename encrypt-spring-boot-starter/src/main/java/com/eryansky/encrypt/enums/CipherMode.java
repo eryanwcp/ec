@@ -20,6 +20,10 @@ public enum CipherMode {
      */
     SM4,
     /**
+     * BASE64
+     */
+    BASE64,
+    /**
      * 混合加密 AES_RSA
      */
     AES_RSA,
