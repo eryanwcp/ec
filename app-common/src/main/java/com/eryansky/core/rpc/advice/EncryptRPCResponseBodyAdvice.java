@@ -8,6 +8,7 @@ import com.eryansky.common.utils.encode.RSAUtils;
 import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.encrypt.anotation.EncryptResponseBody;
+import com.eryansky.encrypt.config.EncryptProvider;
 import com.eryansky.encrypt.enums.CipherMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,20 +48,20 @@ public class EncryptRPCResponseBodyAdvice implements ResponseBodyAdvice<Object> 
         String requestEncryptKey = Collections3.getFirst(headers.get(ENCRYPT_KEY));
         if (StringUtils.isNotBlank(requestEncrypt)) {
             String data = JsonMapper.toJsonString(body);
-            if (CipherMode.SM4.name().equals(requestEncrypt)) {
+            if (CipherMode.SM4.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)) {
                 if (StringUtils.isNotBlank(data) && !StringUtils.equals(data, "null")) {
                     try {
-                        String key = RSAUtils.decryptHexString(requestEncryptKey);
+                        String key = RSAUtils.decryptHexString(requestEncryptKey, EncryptProvider.privateKeyBase64());
                         return Sm4Utils.encrypt(key, data);
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
                         throw new RuntimeException(e);
                     }
                 }
-            } else if (CipherMode.AES.name().equals(requestEncrypt)) {
+            } else if (CipherMode.AES.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)) {
                 if (StringUtils.isNotBlank(data) && !StringUtils.equals(data, "null")) {
                     try {
-                        String key = RSAUtils.decryptBase64String(requestEncryptKey);
+                        String key = RSAUtils.decryptBase64String(requestEncryptKey, EncryptProvider.privateKeyBase64());
                         return Cryptos.aesECBEncryptBase64String(data, key);
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
