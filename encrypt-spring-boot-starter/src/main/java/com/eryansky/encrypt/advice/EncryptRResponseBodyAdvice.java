@@ -47,13 +47,12 @@ public class EncryptRResponseBodyAdvice implements ResponseBodyAdvice<R<Object>>
         HttpHeaders headers = request.getHeaders();
         String requestEncrypt = Collections3.getFirst(headers.get(ENCRYPT));
         String requestEncryptKey = Collections3.getFirst(headers.get(ENCRYPT_KEY));
-        if (StringUtils.isNotBlank(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey) ){
+        if (StringUtils.isNotBlank(requestEncrypt)){
             String data = JsonMapper.toJsonString(body.getData());
-            String key = null;
             if(CipherMode.SM4.name().equals(requestEncrypt)){
                 if(StringUtils.isNotBlank(data) && !StringUtils.equals(data,"null")){
                     try {
-                        key = RSAUtils.decryptHexString(requestEncryptKey, EncryptProvider.privateKeyBase64());
+                        String key = RSAUtils.decryptHexString(requestEncryptKey, EncryptProvider.privateKeyBase64());
                         body.setData(Sm4Utils.encrypt(key,data));
                     } catch (Exception e) {
                         log.error(e.getMessage(),e);
@@ -63,7 +62,7 @@ public class EncryptRResponseBodyAdvice implements ResponseBodyAdvice<R<Object>>
             }else if(CipherMode.AES.name().equals(requestEncrypt)){
                 if(StringUtils.isNotBlank(data) && !StringUtils.equals(data,"null")){
                     try {
-                        key = RSAUtils.decryptBase64String(requestEncryptKey, EncryptProvider.privateKeyBase64());
+                        String key = RSAUtils.decryptBase64String(requestEncryptKey, EncryptProvider.privateKeyBase64());
                         body.setData(Cryptos.aesECBEncryptBase64String(data, key));
                     } catch (Exception e) {
                         log.error(e.getMessage(),e);

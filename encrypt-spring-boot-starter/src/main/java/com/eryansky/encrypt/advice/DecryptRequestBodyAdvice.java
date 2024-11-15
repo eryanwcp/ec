@@ -50,16 +50,17 @@ public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
         HttpHeaders headers = httpInputMessage.getHeaders();
         String requestEncrypt = Collections3.getFirst(headers.get(ENCRYPT));
         String requestEncryptKey = Collections3.getFirst(headers.get(ENCRYPT_KEY));
-        if (StringUtils.isNotBlank(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey) ){
-            String key = RSAUtils.decryptBase64String(requestEncryptKey, EncryptProvider.privateKeyBase64());
+        if (StringUtils.isNotBlank(requestEncrypt)){
             return new HttpInputMessage() {
                 @Override
                 public InputStream getBody() throws IOException {
                     String content = IoUtils.toString(httpInputMessage.getBody(), StandardCharsets.UTF_8);
                     try {
                         if(CipherMode.SM4.name().equals(requestEncrypt)){
+                            String key = RSAUtils.decryptBase64String(requestEncryptKey, EncryptProvider.privateKeyBase64());
                             return IOUtils.toInputStream(Sm4Utils.decrypt(key, content), StandardCharsets.UTF_8);
                         }else if(CipherMode.AES.name().equals(requestEncrypt)){
+                            String key = RSAUtils.decryptBase64String(requestEncryptKey, EncryptProvider.privateKeyBase64());
                             return IOUtils.toInputStream(Cryptos.aesECBDecryptBase64String(content,key), StandardCharsets.UTF_8);
                         }else if(CipherMode.BASE64.name().equals(requestEncrypt)){
                             return IOUtils.toInputStream(new String(EncodeUtils.base64Decode(content)), StandardCharsets.UTF_8);
