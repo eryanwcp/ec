@@ -11,6 +11,7 @@
     var ctxAdmin = "${ctxAdmin}";
     var ctxFront = "${ctxFront}";
     var ctxStatic = "${ctxStatic}";
+    var appURL = "${appURL}";
 </script>
 <link rel="stylesheet" type="text/css" href="${ctxStatic}/css/default${yuicompressor}.css?_=${sysInitTime}" />
 <%-- 引入jQuery --%>
@@ -38,3 +39,8 @@
 <script type="text/javascript" src="${ctxStatic}/js/easyui/extend/js/easyui-extend${yuicompressor}.js?_=${sysInitTime}" charset="utf-8"></script>
 <%-- easyui自定义表单校验扩展 --%>
 <script type="text/javascript" src="${ctxStatic}/js/easyui/extend/js/validatebox-extend${yuicompressor}.js?_=${sysInitTime}" charset="utf-8"></script>
+<script type="text/javascript">
+    try {
+        $.ajaxSetup({headers:{'Authorization':'Bearer ${sessionInfo.token}'}});
+    } catch (e) {console.log(e);}
+</script>

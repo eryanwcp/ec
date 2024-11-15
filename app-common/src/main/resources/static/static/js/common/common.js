@@ -321,3 +321,41 @@ function unEscape(htmlStr) {
 	htmlStr = htmlStr.replace(/&amp;/g , "&");
 	return htmlStr;
 }
+
+function getKey(n){
+	var chars = ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+	if(n==null){
+		n = 8;
+	}
+	var res = "";
+	for(var i = 0; i < n ; i ++) {
+		var id = Math.ceil(Math.random()*35);
+		res += chars[id];
+	}
+	return res;
+}
+const encryptKey = getKey(16);
+/* 加密方法 */
+function AesEncrypt(word) {
+	const key = CryptoJS.enc.Utf8.parse(encryptKey); // 十六位十六进制数作为密钥
+	const srcs = CryptoJS.enc.Utf8.parse(word);
+	const encrypted = CryptoJS.AES.encrypt(srcs, key, {
+		iv: [],
+		mode: CryptoJS.mode.ECB,
+		padding: CryptoJS.pad.Pkcs7
+	});
+	return CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
+}
+/* 解密方法 */
+function AesDecrypt(word) {
+	const key = CryptoJS.enc.Utf8.parse(encryptKey); // 十六位十六进制数作为密钥
+	const encryptedHexStr = CryptoJS.enc.Base64.parse(word);
+	const srcs = CryptoJS.enc.Base64.stringify(encryptedHexStr);
+	const decrypt = CryptoJS.AES.decrypt(srcs, key, {
+		iv: [],
+		mode: CryptoJS.mode.ECB,
+		padding: CryptoJS.pad.Pkcs7
+	});
+	const decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
+	return decryptedStr.toString();
+}

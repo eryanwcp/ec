@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
@@ -56,6 +57,7 @@ public class JsonMapper  extends ObjectMapper{
         }
         // 允许单引号、允许不带引号的字段名称
         this.enableSimple();
+        this.enableJavaTime();
         //解决hibernate延时加载设置
 //        this.registerHibernate4Module();
         // 设置默认日期格式
@@ -169,6 +171,11 @@ public class JsonMapper  extends ObjectMapper{
         return this;
     }
 
+    public JsonMapper enableJavaTime() {
+        JavaTimeModule module = new JavaTimeModule();
+        this.registerModule(module);
+        return this;
+    }
 	/**
 	 * Object可以是POJO，也可以是Collection或数组。
 	 * 如果对象为Null, 返回"null".

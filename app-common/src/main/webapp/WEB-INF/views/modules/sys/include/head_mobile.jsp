@@ -9,6 +9,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 <meta name="renderer" content="webkit">
+<script type="text/javascript" charset="utf-8">
+    var ctx = "${ctx}";
+    var ctxAdmin = "${ctxAdmin}";
+    var ctxFront = "${ctxFront}";
+    var ctxMobile = "${ctxMobile}";
+    var ctxStatic = "${ctxStatic}";
+    var appURL = "${appURL}";
+</script>
 <script src="${ctxStatic}/js/jquery/jquery-1.12.4.min.js" type="text/javascript"></script>
 <script src="${ctxStatic}/js/jquery/jquery-migrate-1.4.1.min.js" type="text/javascript"></script>
 <script src="${ctxStatic}/js/jquery/jquery-extend.min.js" type="text/javascript"></script>
@@ -35,12 +43,6 @@
 <link href="${ctxStatic}/js/toastr/toastr.min.css" type="text/css" rel="stylesheet" />
 <script src="${ctxStatic}/js/toastr/toastr.min.js" type="text/javascript"></script>
 <script type="text/javascript">
-    var ctx = "${ctx}";
-    var ctxAdmin = "${ctxAdmin}";
-    var ctxFront = "${ctxFront}";
-    var ctxMobile = "${ctxMobile}";
-    var ctxStatic = "${ctxStatic}";
-    var appURL = "${appURL}";
     try {
         toastr.options = {"closeButton":true,"positionClass": "toast-top-center"};
         $.ajaxSetup({headers:{'Authorization':'Bearer ${sessionInfo.token}'}});
