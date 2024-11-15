@@ -49,7 +49,7 @@ public class EncryptRResponseBodyAdvice implements ResponseBodyAdvice<R<Object>>
         String requestEncryptKey = Collections3.getFirst(headers.get(ENCRYPT_KEY));
         if (StringUtils.isNotBlank(requestEncrypt)){
             String data = JsonMapper.toJsonString(body.getData());
-            if(CipherMode.SM4.name().equals(requestEncrypt)){
+            if(CipherMode.SM4.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)){
                 if(StringUtils.isNotBlank(data) && !StringUtils.equals(data,"null")){
                     try {
                         String key = RSAUtils.decryptHexString(requestEncryptKey, EncryptProvider.privateKeyBase64());
@@ -59,7 +59,7 @@ public class EncryptRResponseBodyAdvice implements ResponseBodyAdvice<R<Object>>
                         throw new RuntimeException(e);
                     }
                 }
-            }else if(CipherMode.AES.name().equals(requestEncrypt)){
+            }else if(CipherMode.AES.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)){
                 if(StringUtils.isNotBlank(data) && !StringUtils.equals(data,"null")){
                     try {
                         String key = RSAUtils.decryptBase64String(requestEncryptKey, EncryptProvider.privateKeyBase64());
