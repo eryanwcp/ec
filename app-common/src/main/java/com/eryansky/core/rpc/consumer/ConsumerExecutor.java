@@ -2,6 +2,7 @@ package com.eryansky.core.rpc.consumer;
 
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.encode.Cryptos;
+import com.eryansky.common.utils.encode.EncodeUtils;
 import com.eryansky.common.utils.encode.RSAUtils;
 import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.utils.mapper.JsonMapper;
@@ -36,7 +37,7 @@ public class ConsumerExecutor {
         String requestEncrypt = headers.get(RPCUtils.HEADER_ENCRYPT);
         String requestEncryptKey = headers.get(RPCUtils.HEADER_ENCRYPT_KEY);
 
-        if (StringUtils.isNotBlank(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey) ){
+        if (StringUtils.isNotBlank(requestEncrypt)){
 //            responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, String.class);//多一层引号““””
 //            responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Serializable.class);
             responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
@@ -46,20 +47,46 @@ public class ConsumerExecutor {
             }
             String data = (String) responseEntity.getBody();
             JavaType javaType = jsonMapper.getTypeFactory().constructType(responseType.getType());
-            if(CipherMode.SM4.name().equals(requestEncrypt)){
+            if(CipherMode.SM4.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)){
                 if(StringUtils.isNotBlank(data) && !StringUtils.equals(data,"null")){
                     try {
-                        String key = RSAUtils.decryptHexString(requestEncryptKey);
+                        String key = null;
+                        try {
+                            key = RSAUtils.decryptHexString(requestEncryptKey);
+                        } catch (Exception e) {
+                            key = requestEncryptKey;
+                        }
                         return jsonMapper.toJavaObject(Sm4Utils.decrypt(key,data),javaType);
                     } catch (Exception e) {
                         log.error(e.getMessage(),e);
                         throw new RuntimeException(e);
                     }
                 }
-            }else if(CipherMode.AES.name().equals(requestEncrypt)){
+            }else if(CipherMode.AES.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)){
                 if(StringUtils.isNotBlank(data) && !StringUtils.equals(data,"null")){
                     try {
-                        String key = RSAUtils.decryptBase64String(requestEncryptKey);
+                        String key = null;
+                        try {
+                            key = RSAUtils.decryptBase64String(requestEncryptKey);
+                        } catch (Exception e) {
+                            key = requestEncryptKey;
+                        }
+                        return jsonMapper.toJavaObject(Cryptos.aesECBDecryptBase64String(data,key),javaType);
+                    } catch (Exception e) {
+                        log.error(e.getMessage(),e);
+                        throw new RuntimeException(e);
+                    }
+                }
+
+            }else if(CipherMode.BASE64.name().equals(requestEncrypt)){
+                if(StringUtils.isNotBlank(data) && !StringUtils.equals(data,"null")){
+                    try {
+                        String key = null;
+                        try {
+                            key = RSAUtils.decryptBase64String(requestEncryptKey);
+                        } catch (Exception e) {
+                            key = requestEncryptKey;
+                        }
                         return jsonMapper.toJavaObject(Cryptos.aesECBDecryptBase64String(data,key),javaType);
                     } catch (Exception e) {
                         log.error(e.getMessage(),e);
@@ -118,6 +145,8 @@ public class ConsumerExecutor {
                     String key = Cryptos.getBase64EncodeKey();
                     encryptKey = RSAUtils.encryptBase64String(key);
                     data = Cryptos.aesECBEncryptBase64String(builder.toString(),key);
+                }else if(CipherMode.BASE64.name().equals(encrypt)){
+                    data = EncodeUtils.base64Encode(builder.toString().getBytes(StandardCharsets.UTF_8));
                 }
                 headers.put(RPCUtils.HEADER_ENCRYPT_KEY, encryptKey);
                 httpHeaders.put(RPCUtils.HEADER_ENCRYPT_KEY, Lists.newArrayList(encryptKey));

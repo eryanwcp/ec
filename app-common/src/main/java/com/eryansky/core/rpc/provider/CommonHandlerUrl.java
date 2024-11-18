@@ -60,13 +60,28 @@ public class CommonHandlerUrl {
         // 获取请求体
         String requestBodyJsonString = StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8);
         //请求体解密
-        if (StringUtils.isNotBlank(encrypt) && StringUtils.isNotBlank(encryptKey) ){
+        if (StringUtils.isNotBlank(encrypt)){
             String key = null;
-            if(CipherMode.SM4.name().equals(encrypt)){
-                key = RSAUtils.decryptHexString(encryptKey);
+            if(CipherMode.SM4.name().equals(encrypt) && StringUtils.isNotBlank(encryptKey) ){
+                try {
+                    key = RSAUtils.decryptHexString(encryptKey);
+                } catch (Exception e) {
+                    key = encryptKey;
+                }
                 requestBodyJsonString = Sm4Utils.decrypt(key, requestBodyJsonString);
-            }else if(CipherMode.AES.name().equals(encrypt)){
-                key = RSAUtils.decryptBase64String(encryptKey);
+            }else if(CipherMode.AES.name().equals(encrypt) && StringUtils.isNotBlank(encryptKey) ){
+                try {
+                    key = RSAUtils.decryptBase64String(encryptKey);
+                } catch (Exception e) {
+                    key = encryptKey;
+                }
+                requestBodyJsonString = Cryptos.aesECBDecryptBase64String(requestBodyJsonString,key);
+            }else if(CipherMode.BASE64.name().equals(encrypt)){
+                try {
+                    key = RSAUtils.decryptBase64String(encryptKey);
+                } catch (Exception e) {
+                    key = encryptKey;
+                }
                 requestBodyJsonString = Cryptos.aesECBDecryptBase64String(requestBodyJsonString,key);
             }
         }

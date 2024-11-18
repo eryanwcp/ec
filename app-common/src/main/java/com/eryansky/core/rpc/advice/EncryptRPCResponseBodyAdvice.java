@@ -51,7 +51,12 @@ public class EncryptRPCResponseBodyAdvice implements ResponseBodyAdvice<Object> 
             if (CipherMode.SM4.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)) {
                 if (StringUtils.isNotBlank(data) && !StringUtils.equals(data, "null")) {
                     try {
-                        String key = RSAUtils.decryptHexString(requestEncryptKey, EncryptProvider.privateKeyBase64());
+                        String key = null;
+                        try {
+                            key = RSAUtils.decryptHexString(requestEncryptKey, EncryptProvider.privateKeyBase64());
+                        } catch (Exception e) {
+                            key = requestEncryptKey;
+                        }
                         return Sm4Utils.encrypt(key, data);
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
@@ -61,7 +66,12 @@ public class EncryptRPCResponseBodyAdvice implements ResponseBodyAdvice<Object> 
             } else if (CipherMode.AES.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)) {
                 if (StringUtils.isNotBlank(data) && !StringUtils.equals(data, "null")) {
                     try {
-                        String key = RSAUtils.decryptBase64String(requestEncryptKey, EncryptProvider.privateKeyBase64());
+                        String key = null;
+                        try {
+                            key = RSAUtils.decryptBase64String(requestEncryptKey, EncryptProvider.privateKeyBase64());
+                        } catch (Exception e) {
+                            key = requestEncryptKey;
+                        }
                         return Cryptos.aesECBEncryptBase64String(data, key);
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
