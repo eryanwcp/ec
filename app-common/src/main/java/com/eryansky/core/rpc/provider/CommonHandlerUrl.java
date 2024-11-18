@@ -5,6 +5,7 @@ import com.eryansky.common.utils.encode.Cryptos;
 import com.eryansky.common.utils.encode.RSAUtils;
 import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.utils.mapper.JsonMapper;
+import com.eryansky.core.rpc.advice.EncryptRPCResponseBodyAdvice;
 import com.eryansky.core.rpc.utils.RPCUtils;
 import com.eryansky.core.security.annotation.RestApi;
 import com.eryansky.encrypt.anotation.EncryptResponseBody;
@@ -47,7 +48,7 @@ public class CommonHandlerUrl {
     }
 
     @RestApi
-    @EncryptResponseBody(defaultHandle = false,handle = "RPC")
+    @EncryptResponseBody(defaultHandle = false,handle = EncryptRPCResponseBodyAdvice.HANDLE)
     @ResponseBody
     /**
      *  拦截自定义请求的url，可以做成统一的处理器
