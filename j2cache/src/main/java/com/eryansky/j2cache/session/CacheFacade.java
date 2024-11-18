@@ -15,6 +15,7 @@
  */
 package com.eryansky.j2cache.session;
 
+import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.j2cache.lettuce.LettuceByteCodec;
 import com.eryansky.j2cache.util.IpUtils;
 import com.eryansky.j2cache.util.SerializationUtils;
@@ -332,16 +333,17 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             return;
         }
         //write to redis
-        cache2.setBytes(session.getId(), new HashMap<String, byte[]>() {{
+        cache2.setBytes(session.getId(), new HashMap<>() {{
             put(SessionObject.KEY_CREATE_AT, String.valueOf(session.getCreated_at()).getBytes());
             put(SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
             put(SessionObject.KEY_SERVICE_HOST, IpUtils.getActivityLocalIp().getBytes());
-            session.getAttributes().entrySet().forEach((e)-> {
+            put(SessionObject.KEY_CLIENT_IP, SpringMVCHolder.getIp().getBytes());
+            session.getAttributes().forEach((key, value) -> {
                 try {
-                    put(e.getKey(), SerializationUtils.serialize(e.getValue()));
+                    put(key, SerializationUtils.serialize(value));
                 } catch (RuntimeException | IOException excp) {
-                    if(!discardNonSerializable)
-                        throw ((excp instanceof RuntimeException)?(RuntimeException)excp : new RuntimeException(excp));
+                    if (!discardNonSerializable)
+                        throw ((excp instanceof RuntimeException) ? (RuntimeException) excp : new RuntimeException(excp));
                 }
             });
         }}, cache1.getExpire());
