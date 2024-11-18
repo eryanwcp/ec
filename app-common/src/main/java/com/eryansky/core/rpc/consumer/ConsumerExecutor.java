@@ -138,31 +138,29 @@ public class ConsumerExecutor {
             headers.put(RPCUtils.HEADER_ENCRYPT_KEY, encryptKey);
             httpHeaders.put(RPCUtils.HEADER_ENCRYPT_KEY, Lists.newArrayList(encryptKey));
         }
-
+        StringBuilder builder = new StringBuilder();
+        builder.append("[");
         if (params != null && params.length != 0) {
-            StringBuilder builder = new StringBuilder();
-            builder.append("[");
             for (int i = 0; i < params.length; i++) {
                 builder.append(jsonMapper.toJson(params[i]));
                 if (i != params.length - 1) {
                     builder.append(",");
                 }
             }
-            builder.append("]");
 
-            String data = builder.toString();
-            if (StringUtils.isNotBlank(encrypt)){
-                if(CipherMode.SM4.name().equals(encrypt)){
-                    data = Sm4Utils.encrypt(key, builder.toString());
-                }else if(CipherMode.AES.name().equals(encrypt)){
-                    data = Cryptos.aesECBEncryptBase64String(builder.toString(),key);
-                }else if(CipherMode.BASE64.name().equals(encrypt)){
-                    data = EncodeUtils.base64Encode(builder.toString().getBytes(StandardCharsets.UTF_8));
-                }
-            }
-            return new HttpEntity<>(data.getBytes(StandardCharsets.UTF_8), httpHeaders);
-        } else {
-            return new HttpEntity<>(httpHeaders);
         }
+        builder.append("]");
+
+        String data = builder.toString();
+        if (StringUtils.isNotBlank(encrypt)){
+            if(CipherMode.SM4.name().equals(encrypt)){
+                data = Sm4Utils.encrypt(key, builder.toString());
+            }else if(CipherMode.AES.name().equals(encrypt)){
+                data = Cryptos.aesECBEncryptBase64String(builder.toString(),key);
+            }else if(CipherMode.BASE64.name().equals(encrypt)){
+                data = EncodeUtils.base64Encode(builder.toString().getBytes(StandardCharsets.UTF_8));
+            }
+        }
+        return new HttpEntity<>(data.getBytes(StandardCharsets.UTF_8), httpHeaders);
     }
 }
