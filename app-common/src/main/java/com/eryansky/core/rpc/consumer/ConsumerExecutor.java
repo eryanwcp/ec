@@ -41,10 +41,6 @@ public class ConsumerExecutor {
 //            responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, String.class);//多一层引号““””
 //            responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Serializable.class);
             responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
-            if(log.isDebugEnabled()){
-                log.debug(JsonMapper.toJsonString(headers));
-                log.debug(JsonMapper.toJsonString(responseEntity.getHeaders()));
-            }
             String data = (String) responseEntity.getBody();
             JavaType javaType = jsonMapper.getTypeFactory().constructType(responseType.getType());
             if(CipherMode.SM4.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)){
@@ -94,13 +90,15 @@ public class ConsumerExecutor {
                     }
                 }
 
+            }else{
+                responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, responseType);
             }
         }else{
             responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, responseType);
-            if(log.isDebugEnabled()){
-                log.debug(JsonMapper.toJsonString(headers));
-                log.debug(JsonMapper.toJsonString(responseEntity.getHeaders()));
-            }
+        }
+        if(log.isDebugEnabled()){
+            log.debug(JsonMapper.toJsonString(headers));
+            log.debug(JsonMapper.toJsonString(responseEntity.getHeaders()));
         }
         if(!HttpStatus.OK.equals(responseEntity.getStatusCode())){
             log.error("RPC请求异常：{} {} {}",url,responseEntity.getStatusCode(),JsonMapper.toJsonString(responseEntity.getBody()));
@@ -120,6 +118,21 @@ public class ConsumerExecutor {
         if(null != headers){
             headers.forEach(httpHeaders::add);
         }
+        //加密处理
+        String encrypt = headers.get(RPCUtils.HEADER_ENCRYPT);
+        String encryptKey =  null;
+        String key = null;
+        if (StringUtils.isNotBlank(encrypt)){
+            if(CipherMode.SM4.name().equals(encrypt)){
+                key = Sm4Utils.generateHexKeyString();
+                encryptKey = RSAUtils.encryptHexString(key);
+            }else if(CipherMode.AES.name().equals(encrypt)){
+                key = Cryptos.getBase64EncodeKey();
+                encryptKey = RSAUtils.encryptBase64String(key);
+            }
+            headers.put(RPCUtils.HEADER_ENCRYPT_KEY, encryptKey);
+            httpHeaders.put(RPCUtils.HEADER_ENCRYPT_KEY, Lists.newArrayList(encryptKey));
+        }
 
         if (params != null && params.length != 0) {
             StringBuilder builder = new StringBuilder();
@@ -132,24 +145,15 @@ public class ConsumerExecutor {
             }
             builder.append("]");
 
-            //加密处理
-            String encrypt = headers.get(RPCUtils.HEADER_ENCRYPT);
-            String encryptKey =  null;
             String data = builder.toString();
             if (StringUtils.isNotBlank(encrypt)){
                 if(CipherMode.SM4.name().equals(encrypt)){
-                    String key = Sm4Utils.generateHexKeyString();
-                    encryptKey = RSAUtils.encryptHexString(key);
                     data = Sm4Utils.encrypt(key, builder.toString());
                 }else if(CipherMode.AES.name().equals(encrypt)){
-                    String key = Cryptos.getBase64EncodeKey();
-                    encryptKey = RSAUtils.encryptBase64String(key);
                     data = Cryptos.aesECBEncryptBase64String(builder.toString(),key);
                 }else if(CipherMode.BASE64.name().equals(encrypt)){
                     data = EncodeUtils.base64Encode(builder.toString().getBytes(StandardCharsets.UTF_8));
                 }
-                headers.put(RPCUtils.HEADER_ENCRYPT_KEY, encryptKey);
-                httpHeaders.put(RPCUtils.HEADER_ENCRYPT_KEY, Lists.newArrayList(encryptKey));
             }
             return new HttpEntity<>(data.getBytes(StandardCharsets.UTF_8), httpHeaders);
         } else {
