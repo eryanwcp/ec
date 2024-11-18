@@ -191,7 +191,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         logger.info("Connected to redis session channel:{}, time {}ms.", this.pubsub_channel, System.currentTimeMillis()-ct);
 
 //        pubSubCommands = this.pubsub_subscriber.sync();
-        this.pubConnection = this.pubsub();
+//        this.pubConnection = this.pubsub();
         this.publish(Command.join());
     }
 
@@ -215,13 +215,15 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         if(this.cache2 == null){
             return;
         }
-//        try (StatefulRedisPubSubConnection<String, String> connection = this.pubsub()){
-//            RedisPubSubCommands<String, String> sync = connection.sync();
-//            sync.publish(this.pubsub_channel, cmd.toString());
-//        }
-//        pubSubCommands.publish(this.pubsub_channel, cmd.toString());
-        RedisPubSubCommands<String, String> sync = pubConnection.sync();
-        sync.publish(this.pubsub_channel, cmd.toString());
+        synchronized (CacheFacade.class){
+            try (StatefulRedisPubSubConnection<String, String> connection = this.pubsub()){
+                RedisPubSubCommands<String, String> sync = connection.sync();
+                sync.publish(this.pubsub_channel, cmd.toString());
+            }
+        }
+
+//        RedisPubSubCommands<String, String> sync = pubConnection.sync();
+//        sync.publish(this.pubsub_channel, cmd.toString());
 
     }
 
