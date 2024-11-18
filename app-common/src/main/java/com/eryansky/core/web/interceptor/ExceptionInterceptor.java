@@ -13,12 +13,24 @@ import com.eryansky.common.utils.Exceptions;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.SysConstants;
 import com.eryansky.common.utils.SysUtils;
+import com.eryansky.common.utils.collections.Collections3;
+import com.eryansky.common.utils.encode.Cryptos;
+import com.eryansky.common.utils.encode.EncodeUtils;
+import com.eryansky.common.utils.encode.RSAUtils;
+import com.eryansky.common.utils.encode.Sm4Utils;
+import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.utils.WebUtils;
+import com.eryansky.core.rpc.utils.RPCUtils;
 import com.eryansky.core.security.SecurityUtils;
+import com.eryansky.encrypt.advice.EncryptResultResponseBodyAdvice;
+import com.eryansky.encrypt.config.EncryptProvider;
+import com.eryansky.encrypt.enums.CipherMode;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
@@ -27,9 +39,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
+import static com.eryansky.common.web.utils.WebUtils.JSON_TYPE;
 
 /**
  * @author Eryan
@@ -117,7 +133,57 @@ public class ExceptionInterceptor implements HandlerExceptionResolver {
         //异步方式返回异常信息
         if(StringUtils.startsWith(requestUrl, request.getContextPath()+"/rest") || WebUtils.isAjaxRequest(request)){
             result.setCode(Result.ERROR_API);
-            WebUtils.renderJson(response, result);
+
+            //数据加密
+            String requestEncrypt = request.getHeader(EncryptResultResponseBodyAdvice.ENCRYPT);
+            String requestEncryptKey = request.getHeader(EncryptResultResponseBodyAdvice.ENCRYPT_KEY);
+            String data = JsonMapper.toJsonString(result);
+            if (StringUtils.isNotBlank(requestEncrypt)) {
+                if (CipherMode.SM4.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)) {
+                    if (StringUtils.isNotBlank(data) && !StringUtils.equals(data, "null")) {
+                        try {
+                            String key = null;
+                            try {
+                                key = RSAUtils.decryptHexString(requestEncryptKey, EncryptProvider.privateKeyBase64());
+                            } catch (Exception e) {
+                                key = requestEncryptKey;
+                            }
+                            data = Sm4Utils.encrypt(key, data);
+                        } catch (Exception e) {
+                            logger.error(e.getMessage(), e);
+                            throw new RuntimeException(e);
+                        }
+                    }
+                } else if (CipherMode.AES.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)) {
+                    if (StringUtils.isNotBlank(data) && !StringUtils.equals(data, "null")) {
+                        try {
+                            String key = null;
+                            try {
+                                key = RSAUtils.decryptBase64String(requestEncryptKey, EncryptProvider.privateKeyBase64());
+                            } catch (Exception e) {
+                                key = requestEncryptKey;
+                            }
+                            data = Cryptos.aesECBEncryptBase64String(data, key);
+                        } catch (Exception e) {
+                            logger.error(e.getMessage(), e);
+                            throw new RuntimeException(e);
+                        }
+                    }
+
+                } else if (CipherMode.BASE64.name().equals(requestEncrypt)) {
+                    if (StringUtils.isNotBlank(data) && !StringUtils.equals(data, "null")) {
+                        try {
+                            data = EncodeUtils.base64Encode(data.getBytes(StandardCharsets.UTF_8));
+                        } catch (Exception e) {
+                            logger.error(e.getMessage(), e);
+                            throw new RuntimeException(e);
+                        }
+                    }
+
+                }
+            }
+
+            WebUtils.renderJson(response, JSON_TYPE,data);
         }
 //        WebUtils.renderText(response, result);
 
