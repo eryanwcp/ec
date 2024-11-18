@@ -41,7 +41,12 @@ public class ConsumerExecutor {
 //            responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, String.class);//多一层引号““””
 //            responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Serializable.class);
             responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
-            String data = (String) responseEntity.getBody();
+            String data = null;
+            try {
+                data = (String) responseEntity.getBody();
+            } catch (Exception e) {
+                log.error(e.getMessage(),e);
+            }
             JavaType javaType = jsonMapper.getTypeFactory().constructType(responseType.getType());
             if(CipherMode.SM4.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)){
                 if(StringUtils.isNotBlank(data) && !StringUtils.equals(data,"null")){
