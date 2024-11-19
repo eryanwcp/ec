@@ -75,10 +75,11 @@ public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
                         }else if(CipherMode.BASE64.name().equals(requestEncrypt)){
                             return IOUtils.toInputStream(new String(EncodeUtils.base64Decode(content)), StandardCharsets.UTF_8);
                         }
-                        return IOUtils.toInputStream(content, StandardCharsets.UTF_8);
+                        return httpInputMessage.getBody();
                     } catch (Exception e) {
                         log.error(e.getMessage(),e);
-                        throw new RuntimeException(e);
+//                        throw new RuntimeException(e);
+                        return httpInputMessage.getBody();
                     }
                 }
 
