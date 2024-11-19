@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -46,6 +47,13 @@ public class JsonMapper  extends ObjectMapper{
 
 	private static final Logger logger = LoggerFactory.getLogger(JsonMapper.class);
 
+    /**
+     * 最大字符长度
+     */
+    private static final int MAX_STRING_LEN = 100_000_000;
+
+    public static final int DEFAULT_MAX_DEPTH = 2000;
+
     public JsonMapper() {
         this(null);
     }
@@ -74,6 +82,9 @@ public class JsonMapper  extends ObjectMapper{
 //                jgen.writeString("");
 //            }
 //        });
+
+        this.getFactory().setStreamReadConstraints(StreamReadConstraints.builder()
+                .maxStringLength(MAX_STRING_LEN).maxNestingDepth(DEFAULT_MAX_DEPTH).build());
 	}
 
     private static class JsonMapperHolder {
