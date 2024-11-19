@@ -45,6 +45,12 @@ import java.util.function.Supplier;
 public class JsonMapper  extends ObjectMapper{
 
 	private static final Logger logger = LoggerFactory.getLogger(JsonMapper.class);
+    /**
+     * 最大字符长度
+     */
+    private static final int MAX_STRING_LEN = 200_000_000;
+
+    public static final int DEFAULT_MAX_DEPTH = 2000;
 
     public JsonMapper() {
         this(null);
@@ -74,6 +80,8 @@ public class JsonMapper  extends ObjectMapper{
 //                jgen.writeString("");
 //            }
 //        });
+        this.getFactory().setStreamReadConstraints(StreamReadConstraints.builder()
+                .maxStringLength(MAX_STRING_LEN).maxNestingDepth(DEFAULT_MAX_DEPTH).build());
 	}
 
     private static class JsonMapperHolder {
