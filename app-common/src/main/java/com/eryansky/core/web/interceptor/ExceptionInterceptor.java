@@ -181,7 +181,7 @@ public class ExceptionInterceptor implements HandlerExceptionResolver {
                 }
             }
 
-            WebUtils.renderJson(response, JSON_TYPE,data);
+            WebUtils.render(response, JSON_TYPE,data);
         }
 //        WebUtils.renderText(response, result);
 
