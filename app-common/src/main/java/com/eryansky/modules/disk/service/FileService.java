@@ -10,6 +10,7 @@ import com.eryansky.common.orm.Page;
 import com.eryansky.common.orm.model.Parameter;
 import com.eryansky.common.orm.mybatis.interceptor.BaseInterceptor;
 import com.eryansky.common.utils.DateUtils;
+import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.io.FileUtils;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
@@ -148,7 +149,8 @@ public class FileService extends CrudService<FileDao, File> {
          */
         java.io.File tempFile = null;
         String fullName = DiskUtils.getMultipartOriginalFilename(uploadFile);
-        String code = FileUploadUtils.encodingFilename(fullName);
+        fullName = StringUtils.right(StringUtils.replace(fullName,"-",""),36);
+        String code = FileUploadUtils.encodingFilenamePrefix(fullName);
         String storePath = iFileManager.getStorePath(folder, sessionInfo.getUserId(), fullName);
 
         String fileTemp = AppConstants.getDiskTempDir() + java.io.File.separator + code;

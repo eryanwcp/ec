@@ -5,6 +5,7 @@
  */
 package com.eryansky.modules.disk.extend;
 
+import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.io.FileUtils;
 import com.eryansky.core.web.upload.FileUploadUtils;
 import com.eryansky.modules.disk.mapper.Folder;
@@ -63,8 +64,9 @@ public class DISKManager implements IFileManager {
     @Override
     public String getStorePath(Folder folder, String userId, String fileName) {
         String path = DiskUtils.getDISKStoreDir(folder, userId);
-        String code = FileUploadUtils.encodingFilename(fileName);
-        path += java.io.File.separator + code;
+        fileName = StringUtils.right(StringUtils.replace(fileName,"-",""),36);
+        String code = FileUploadUtils.encodingFilenamePrefix(fileName);
+        path += java.io.File.separator + code + "_" + fileName;
         return path;
     }
 }

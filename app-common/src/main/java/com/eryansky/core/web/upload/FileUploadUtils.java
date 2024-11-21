@@ -340,10 +340,22 @@ public class FileUploadUtils {
      */
     public static final String encodingFilename(String filename) {
         filename = StringUtils.right(StringUtils.replace(filename,"-",""),36);
-        filename = MD5Util.hash(filename + System.nanoTime() + counter++)+ "_" + filename ;
+        filename = encodingFilenamePrefix(filename) + "_" + filename;
         return filename;
     }
 
+    /**
+     * 生成文件名前缀
+     * 1、'_'替换为 ''
+     * 2、hex(md5(filename + now nano time + counter++))
+     * 3、[2]_
+     * @param filename 原始文件名
+     * @return
+     */
+    public static final String encodingFilenamePrefix(String filename) {
+        filename = MD5Util.hash(filename + System.nanoTime() + counter++) ;
+        return filename;
+    }
 
     /**
      * 日期路径 即年/月/日  如2013/01/03
