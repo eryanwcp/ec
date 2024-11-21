@@ -243,6 +243,7 @@ public class DiskUtils {
                                       InputStream inputStream, String fileName) throws InvalidExtensionException,
             FileUploadSizeException,
             FileNameLengthLimitExceededException, IOException {
+        fileName = StringUtils.right(StringUtils.replace(fileName,"-",""),36);
         String _userId = StringUtils.isBlank(userId) ? User.SUPERUSER_ID : userId;
         String code = FileUploadUtils.encodingFilename(fileName);
         Folder folder = checkAndSaveSystemFolderByCode(folderCode, _userId, folderType);
