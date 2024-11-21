@@ -148,12 +148,12 @@ public class FileService extends CrudService<FileDao, File> {
         /*		Exception exception = null;
          */
         java.io.File tempFile = null;
-        String fullName = DiskUtils.getMultipartOriginalFilename(uploadFile);
-        fullName = StringUtils.right(StringUtils.replace(fullName,"-",""),36);
-        String code = FileUploadUtils.encodingFilenamePrefix(fullName);
-        String storePath = iFileManager.getStorePath(folder, sessionInfo.getUserId(), fullName);
+        String fileName = DiskUtils.getMultipartOriginalFilename(uploadFile);
+        fileName = StringUtils.right(StringUtils.replace(fileName,"-",""),36);
+        String code = FileUploadUtils.encodingFilenamePrefix(fileName);
+        String storePath = iFileManager.getStorePath(folder, sessionInfo.getUserId(), fileName);
 
-        String fileTemp = AppConstants.getDiskTempDir() + java.io.File.separator + code;
+        String fileTemp = AppConstants.getDiskTempDir() + java.io.File.separator + code+ "_" + fileName;;
         tempFile = new java.io.File(fileTemp);
         try (FileOutputStream fos = FileUtils.openOutputStream(tempFile)){
             IOUtils.copy(uploadFile.getInputStream(), fos);
@@ -162,10 +162,10 @@ public class FileService extends CrudService<FileDao, File> {
             file.setFolderId(folder.getId());
             file.setCode(code);
             file.setUserId(sessionInfo.getUserId());
-            file.setName(fullName);
+            file.setName(fileName);
             file.setFilePath(storePath);
             file.setFileSize(uploadFile.getSize());
-            file.setFileSuffix(FilenameUtils.getExtension(fullName));
+            file.setFileSuffix(FilenameUtils.getExtension(fileName));
             save(file);
         } catch (Exception e) {
             // exception = e;
