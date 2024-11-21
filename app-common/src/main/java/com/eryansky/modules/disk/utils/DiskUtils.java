@@ -244,7 +244,7 @@ public class DiskUtils {
             FileUploadSizeException,
             FileNameLengthLimitExceededException, IOException {
         String _userId = StringUtils.isBlank(userId) ? User.SUPERUSER_ID : userId;
-        String code = FileUploadUtils.encodingFilenamePrefix(_userId + "", fileName);
+        String code = FileUploadUtils.encodingFilename(fileName);
         Folder folder = checkAndSaveSystemFolderByCode(folderCode, _userId, folderType);
         String storeFilePath = Static.iFileManager.getStorePath(folder, _userId, fileName);
         File file = new File();

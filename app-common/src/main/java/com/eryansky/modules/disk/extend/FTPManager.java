@@ -568,8 +568,7 @@ public class FTPManager implements IFileManager {
     @Override
     public String getStorePath(Folder folder, String userId, String fileName) {
         String path = DiskUtils.getFTPStoreDir(folder, userId);
-        String code = FileUploadUtils.encodingFilenamePrefix(userId,
-                fileName);
+        String code = FileUploadUtils.encodingFilename(fileName);
         return path + "/" + code + "_" + fileName;
     }
 
