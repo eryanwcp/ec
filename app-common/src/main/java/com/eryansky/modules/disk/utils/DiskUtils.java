@@ -5,6 +5,7 @@
  */
 package com.eryansky.modules.disk.utils;
 
+import com.eryansky.common.exception.ServiceException;
 import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
@@ -254,7 +255,11 @@ public class DiskUtils {
         file.setFilePath(storeFilePath);
         file.setFileSize(Long.valueOf(inputStream.available()));
         file.setFileSuffix(FilenameUtils.getExtension(fileName));
-        Static.iFileManager.saveFile(file.getFilePath(), inputStream, true);
+        IFileManager.UploadStatus uploadStatus = Static.iFileManager.saveFile(file.getFilePath(), inputStream, true);
+        if(null == uploadStatus || IFileManager.UploadStatus.Upload_New_File_Failed.equals(uploadStatus)){
+            logger.error("文件上传失败:"+fileName);
+            throw new ServiceException("文件上传失败："+fileName);
+        }
         Static.fileService.save(file);
         return file;
     }
