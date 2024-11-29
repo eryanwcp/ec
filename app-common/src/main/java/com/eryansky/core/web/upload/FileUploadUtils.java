@@ -339,7 +339,6 @@ public class FileUploadUtils {
      * @return
      */
     public static final String encodingFilename(String filename) {
-        filename = StringUtils.right(StringUtils.replace(filename,"-",""),36);
         filename = encodingFilenamePrefix(filename) + "_" + filename;
         return filename;
     }
