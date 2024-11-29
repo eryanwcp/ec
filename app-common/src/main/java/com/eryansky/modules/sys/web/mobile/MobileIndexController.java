@@ -25,6 +25,7 @@ import com.eryansky.modules.disk.mapper.File;
 import com.eryansky.modules.disk.utils.DiskUtils;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys._enum.VersionLogType;
+import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.mapper.VersionLog;
 import com.eryansky.modules.sys.service.VersionLogService;
 import com.eryansky.modules.sys.utils.DownloadFileUtils;
@@ -351,14 +352,13 @@ public class MobileIndexController extends SimpleController {
             if(StringUtils.isNotBlank(folderCode)){
                 _folderName = FilenameUtils.getName(folderCode);
             }
-            file = DiskUtils.saveSystemFile(_folderName, sessionInfo.getUserId(), multipartFile);
-            DiskUtils.saveFile(file);
-            Map<String, Object> _data = Maps.newHashMap();
-            String data = "data:image/jpeg;base64," + EncodeUtils.base64Encode(FileCopyUtils.copyToByteArray(Files.newInputStream(file.getDiskFile().toPath())));
-            _data.put("file", file);
-            _data.put("data", data);
-            _data.put("url", AppConstants.getAdminPath() + "/disk/fileDownload/" + file.getId());
-            result = Result.successResult().setObj(_data).setMsg("文件上传成功！");
+            file = DiskUtils.saveSystemFile(_folderName, null == sessionInfo ? User.SUPERUSER_ID:sessionInfo.getUserId(), multipartFile);
+//            Map<String, Object> _data = Maps.newHashMap();
+//            String data = "data:image/jpeg;base64," + EncodeUtils.base64Encode(FileCopyUtils.copyToByteArray(Files.newInputStream(file.getDiskFile().toPath())));
+//            _data.put("file", file);
+//            _data.put("data", data);
+//            _data.put("url", AppConstants.getAdminPath() + "/disk/fileDownload/" + file.getId());
+            result = Result.successResult().setData(file).setMsg("文件上传成功！");
         } catch (InvalidExtensionException e) {
             exception = e;
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
