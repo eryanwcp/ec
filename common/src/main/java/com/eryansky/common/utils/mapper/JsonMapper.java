@@ -50,7 +50,7 @@ public class JsonMapper  extends ObjectMapper{
     /**
      * 最大字符长度
      */
-    private static final int MAX_STRING_LEN = 200_000_000;
+    private static final int MAX_STRING_LEN = 900_000_000;
 
     public static final int DEFAULT_MAX_DEPTH = 2000;
 
