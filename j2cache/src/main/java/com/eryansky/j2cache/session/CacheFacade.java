@@ -376,6 +376,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             if(this.cache2 != null){
                 try {
                     cache2.setBytes(session.getId(), key, SerializationUtils.serialize(session.get(key)));
+                    cache2.ttl(session.getId(), cache1.getExpire());
                 } catch (RuntimeException | IOException e) {
                     if(!this.discardNonSerializable)
                         throw ((e instanceof RuntimeException)?(RuntimeException)e : new RuntimeException(e));

@@ -127,8 +127,8 @@ public class LettuceCache {
         try(StatefulConnection<String, byte[]> connection = connect()) {
             RedisHashCommands<String, byte[]> cmd = (RedisHashCommands)sync(connection);
             cmd.hset(_key(session_id),bytes);
-            ttl(session_id,expireInSeconds);
         }
+        ttl(session_id,expireInSeconds);
     }
 
     public void evict(String session_id, String...keys) {
