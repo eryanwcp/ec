@@ -51,16 +51,29 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
         if (StringUtils.isBlank(authorization)) {
             authorization = request.getHeader("Authorization");
         }
+        String requestUrl = request.getRequestURI();
         String token = StringUtils.replaceOnce(authorization, "Bearer ", "");
-
+        String loginName = null;
+        if(StringUtils.isNotBlank(token)){
+            try {
+                loginName = SecurityUtils.getLoginNameByToken(token);
+            } catch (Exception e) {
+                if(!(e instanceof TokenExpiredException)){
+                    logger.error("Token校验失败：{},{},{},{},{}",loginName, SpringMVCHolder.getIp(), requestUrl, token, e.getMessage());
+                }
+            }
+        }
 
         //已登录用户
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
-        if (null != sessionInfo && request.getSession().getId().equals(sessionInfo.getId()) && null != UserType.getByValue(sessionInfo.getUserType())) {
-            if(StringUtils.isBlank(token) || StringUtils.equals(token,sessionInfo.getToken()) || StringUtils.equals(token,sessionInfo.getRefreshToken())){
+        if (null != sessionInfo && null != UserType.getByValue(sessionInfo.getUserType())) {
+            if(StringUtils.isBlank(token) || StringUtils.equals(token,sessionInfo.getToken()) || StringUtils.equals(token,sessionInfo.getRefreshToken()) || StringUtils.equals(loginName,sessionInfo.getLoginName())){
                 return true;
-            }else{
-                //兼容Token变化了 防止缓存
+            }
+            //兼容Token变化了 防止缓存
+            if(StringUtils.isNotBlank(loginName) && !StringUtils.equals(loginName,sessionInfo.getLoginName())){
+//                SecurityUtils.removeSessionInfoFromSession(sessionInfo.getId(), SecurityType.offline);
+                logger.warn("会话更新：{} =》{}",sessionInfo.getLoginName(),loginName);
                 sessionInfo = null;
             }
         }
@@ -84,7 +97,7 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
             //自动登录
 
             if (StringUtils.isNotBlank(authorization)) {
-                String requestUrl = request.getRequestURI();
+
                 boolean verify = false;
 
                 //判断是否已经登录过
@@ -97,10 +110,8 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
                     return true;
                 }
                 
-                String loginName = null;
                 User user = null;
                 try {
-                    loginName = SecurityUtils.getLoginNameByToken(token);
                     user = UserUtils.getUserByLoginName(loginName);
                     if(null == user){
                         logger.warn("Token校验失败（用户不存在）：{},{},{}", loginName, requestUrl, token);
