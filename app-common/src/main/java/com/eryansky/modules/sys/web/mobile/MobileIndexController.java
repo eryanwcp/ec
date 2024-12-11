@@ -1,5 +1,10 @@
 package com.eryansky.modules.sys.web.mobile;
 
+import cn.hutool.core.img.ImgUtil;
+import com.drew.imaging.ImageMetadataReader;
+import com.drew.metadata.Directory;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.Tag;
 import com.eryansky.common.exception.ActionException;
 import com.eryansky.common.model.Result;
 import com.eryansky.common.orm._enum.StatusState;
@@ -44,6 +49,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.Map;
@@ -244,10 +252,17 @@ public class MobileIndexController extends SimpleController {
 
     /**
      * 图片文件上传
+     * @param base64Data
+     * @param folderCode 文件夹名称
+     * @param press 是否添加水印
+     * @param pressText 水印文字
      */
     @PostMapping(value = {"base64ImageUpLoad"})
     @ResponseBody
-    public Result base64ImageUpLoad(@RequestParam(value = "base64Data", required = false) String base64Data) {
+    public Result base64ImageUpLoad(@RequestParam(value = "base64Data", required = false) String base64Data,
+                                    String folderCode,
+                                    @RequestParam(value = "press",defaultValue = "true") Boolean press,
+                                    String pressText) {
         Result result = null;
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         if (null == sessionInfo) {
@@ -256,6 +271,10 @@ public class MobileIndexController extends SimpleController {
         Exception exception = null;
         File file = null;
         try {
+            String _folderName = "IMAGE";//默认文件夹
+            if(StringUtils.isNotBlank(folderCode)){
+                _folderName = FilenameUtils.getName(folderCode);
+            }
 
             String dataPrix = "";
             String data = "";
@@ -291,15 +310,12 @@ public class MobileIndexController extends SimpleController {
                 bs = EncodeUtils.base64Decode(data);
 //                bs = Base64Utils.decodeFromString(data);
             } catch (Exception e) {
-                logger.info("{},{}",new Object[]{sessionInfo.getLoginName(),base64Data});
+                logger.info("{},{}",sessionInfo.getLoginName(),base64Data);
                 logger.error("图片上传失败,"+e.getMessage(),e);
                 return Result.errorResult().setMsg("图片上传失败,解析异常！");
             }
-
-            file = DiskUtils.saveSystemFile("IMAGE", FolderType.NORMAL.getValue(), sessionInfo.getUserId(), new ByteArrayInputStream(bs), tempFileName);
-            file.setStatus(StatusState.LOCK.getValue());
-            DiskUtils.saveFile(file);
-            result = Result.successResult().setObj(file).setMsg("文件上传成功！");
+            file = DiskUtils.saveSystemFile(_folderName, FolderType.NORMAL.getValue(), sessionInfo.getUserId(), new ByteArrayInputStream(bs), tempFileName);
+            result = Result.successResult().setData(file).setMsg("文件上传成功！");
         } catch (InvalidExtensionException e) {
             exception = e;
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
@@ -331,14 +347,20 @@ public class MobileIndexController extends SimpleController {
      * 图片文件上传
      * @param multipartFile
      * @param folderCode 文件夹名称
+     * @param press 是否添加水印
+     * @param pressText 水印文字
      */
     @PostMapping(value = {"imageUpLoad"})
     @ResponseBody
-    public Result imageUpLoad(@RequestParam(value = "uploadFile", required = false) MultipartFile multipartFile,String folderCode) {
+    public Result imageUpLoad(@RequestParam(value = "uploadFile", required = false) MultipartFile multipartFile,
+                              String folderCode,
+                              @RequestParam(value = "press",defaultValue = "true") Boolean press,
+                              String pressText) {
         Result result = null;
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         Exception exception = null;
         File file = null;
+        java.io.File tempFile = null;
         try {
 //            FileUploadUtils.assertAllowed(multipartFile,FileUploadUtils.IMAGE_EXTENSION, FileUploadUtils.DEFAULT_MAX_SIZE);
             String _folderName = "IMAGE";//默认文件夹
@@ -352,12 +374,60 @@ public class MobileIndexController extends SimpleController {
             if(StringUtils.isNotBlank(folderCode)){
                 _folderName = FilenameUtils.getName(folderCode);
             }
-            file = DiskUtils.saveSystemFile(_folderName, null == sessionInfo ? User.SUPERUSER_ID:sessionInfo.getUserId(), multipartFile);
-//            Map<String, Object> _data = Maps.newHashMap();
-//            String data = "data:image/jpeg;base64," + EncodeUtils.base64Encode(FileCopyUtils.copyToByteArray(Files.newInputStream(file.getDiskFile().toPath())));
-//            _data.put("file", file);
-//            _data.put("data", data);
-//            _data.put("url", AppConstants.getAdminPath() + "/disk/fileDownload/" + file.getId());
+
+            InputStream inputStream = multipartFile.getInputStream();
+            String tempFileName = Identities.uuid() +"."+ extension;
+            if(press){
+                // 获取偏转角度
+                int angle = getAngle(multipartFile);
+                // 原始图片缓存
+                BufferedImage originalImage =  ImgUtil.read(multipartFile.getInputStream());
+
+                // 水印文字
+                String watermarkText = StringUtils.isNotBlank(pressText) ? pressText:sessionInfo.getLoginName();
+                BufferedImage watermarkImage = null;
+                if (angle != 90 && angle != 270) {
+                    // 不需要旋转，直接处理
+                    watermarkImage = new BufferedImage(
+                            originalImage.getWidth(),
+                            originalImage.getHeight(),
+                            BufferedImage.TYPE_INT_RGB
+                    );
+                    Graphics2D g2d = (Graphics2D) watermarkImage.getGraphics();
+                    g2d.setFont(new java.awt.Font("宋体", java.awt.Font.BOLD, 28)); // 设置水印字体
+                    g2d.drawImage(originalImage, 0, 0, null); // 绘制原始图片
+                    g2d.setColor(Color.red); // 设置水印颜色
+                    g2d.drawString(watermarkText, 20, 30); // 绘制水印文字
+                    g2d.dispose();
+                } else {
+                    // 宽高互换
+                    int imgWidth = originalImage.getHeight();
+                    int imgHeight = originalImage.getWidth();
+
+                    // 中心点位置
+                    double centerWidth = ((double) imgWidth) / 2;
+                    double centerHeight = ((double) imgHeight) / 2;
+
+                    // 图片缓存
+                    watermarkImage = new BufferedImage(imgWidth, imgHeight, BufferedImage.TYPE_INT_RGB);
+
+                    // 旋转对应角度
+                    Graphics2D g = watermarkImage.createGraphics();
+                    g.rotate(Math.toRadians(angle), centerWidth, centerHeight);
+                    g.drawImage(originalImage, (imgWidth - originalImage.getWidth()) / 2, (imgHeight - originalImage.getHeight()) / 2, null);
+                    g.rotate(Math.toRadians(-angle), centerWidth, centerHeight);
+                    g.setFont(new java.awt.Font("宋体", java.awt.Font.BOLD, 28)); // 设置水印字体
+                    g.setColor(Color.red); // 设置水印颜色
+                    g.drawString(watermarkText, 20, 30); // 绘制水印文字
+                    g.dispose();
+                }
+                tempFile = new java.io.File(tempFileName);
+                ImgUtil.write(watermarkImage, tempFile);
+                inputStream = new FileInputStream(tempFileName);
+            }
+
+
+            file = DiskUtils.saveSystemFile(_folderName, FolderType.NORMAL.getValue(), sessionInfo.getUserId(), inputStream, tempFileName);
             result = Result.successResult().setData(file).setMsg("文件上传成功！");
         } catch (InvalidExtensionException e) {
             exception = e;
@@ -378,11 +448,39 @@ public class MobileIndexController extends SimpleController {
             if (exception != null) {
                 logger.error(exception.getMessage(),exception);
                 if (file != null) {
-                    DiskUtils.deleteFile(file.getId());
+                    DiskUtils.deleteFile(file);
                 }
             }
+            if (tempFile != null) {
+                tempFile.delete();
+            }
+
         }
         return result;
 
+    }
+
+    private int getAngle(MultipartFile file) {
+        try {
+            Metadata metadata = ImageMetadataReader.readMetadata(file.getInputStream());
+            for (Directory directory : metadata.getDirectories()) {
+                for (Tag tag : directory.getTags()) {
+                    if ("Orientation".equals(tag.getTagName())) {
+                        String orientation = tag.getDescription();
+                        if (orientation.contains("90")) {
+                            return 90;
+                        } else if (orientation.contains("180")) {
+                            return 180;
+                        } else if (orientation.contains("270")) {
+                            return 270;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+            return 0;
+        }
+        return 0;
     }
 }
