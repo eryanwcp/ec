@@ -40,7 +40,7 @@
         <logstash-logback-encoder.version>8.0</logstash-logback-encoder.version>
         <logback-classic.version>1.5.12</logback-classic.version>
         <byte-buddy.version>1.14.18</byte-buddy.version>
-        <org.mapstruct.version>1.6.2</org.mapstruct.version>
+        <org.mapstruct.version>1.6.3</org.mapstruct.version>
 
         <tomcat.version>10.1.33</tomcat.version>
 
