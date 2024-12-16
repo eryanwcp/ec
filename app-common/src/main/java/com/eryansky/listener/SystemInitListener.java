@@ -93,7 +93,7 @@ public class SystemInitListener extends DefaultSystemInitListener{
 	}
 
 	private void clearTempDir(){
-		logger.info("清空本地缓存目录:{}", AppConstants.getDiskTempDir());
+		logger.info("清空本地缓存目录：{}", AppConstants.getDiskTempDir());
 		DiskUtils.clearTempDir();
 		logger.info("清空本地缓存目录结束。");
 	}
