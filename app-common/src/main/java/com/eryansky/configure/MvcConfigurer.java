@@ -225,6 +225,15 @@ public class MvcConfigurer implements WebMvcConfigurer {
         return restTemplate;
     }
 
+    /**
+     * 设置整个连接池最大连接数
+     */
+    private static final int POOL_MAX_CONN = 1024;
+    /**
+     * 设置单个路由默认连接数
+     */
+    private static final int POOL_MAX_PER_CONN = 256;
+
     //配置SSL, 使用RestTemplate访问https
     public HttpComponentsClientHttpRequestFactory getRequestFactory(){
         try {
@@ -237,19 +246,19 @@ public class MvcConfigurer implements WebMvcConfigurer {
                     SSLBufferMode.STATIC,
                     HostnameVerificationPolicy.BOTH,
                     HttpsSupport.getDefaultHostnameVerifier());
-            PublicSuffixMatcher publicSuffixMatcher = PublicSuffixMatcherLoader.getDefault();
-            final RFC6265CookieSpecFactory cookieSpecFactory = new RFC6265CookieSpecFactory(publicSuffixMatcher);
-            final Lookup<CookieSpecFactory> cookieSpecRegistry = RegistryBuilder.<CookieSpecFactory>create()
-                    .register(StandardCookieSpec.RELAXED, cookieSpecFactory)
-                    .register(StandardCookieSpec.STRICT, cookieSpecFactory)
-                    .build();
+//            PublicSuffixMatcher publicSuffixMatcher = PublicSuffixMatcherLoader.getDefault();
+//            final RFC6265CookieSpecFactory cookieSpecFactory = new RFC6265CookieSpecFactory(publicSuffixMatcher);
+//            final Lookup<CookieSpecFactory> cookieSpecRegistry = RegistryBuilder.<CookieSpecFactory>create()
+//                    .register(StandardCookieSpec.RELAXED, cookieSpecFactory)
+//                    .register(StandardCookieSpec.STRICT, cookieSpecFactory)
+//                    .build();
 
 
             CloseableHttpClient httpClient = HttpClients.custom()
 //                    .disableCookieManagement()
 //                    .setDefaultCookieSpecRegistry(cookieSpecRegistry)
                     .setConnectionManager(PoolingHttpClientConnectionManagerBuilder
-                    .create().setTlsSocketStrategy(tlsSocketStrategy).build()).build();
+                    .create().setTlsSocketStrategy(tlsSocketStrategy).setMaxConnTotal(POOL_MAX_CONN).setMaxConnPerRoute(POOL_MAX_PER_CONN).build()).build();
             HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
             requestFactory.setHttpClient(httpClient);
             requestFactory.setConnectionRequestTimeout(10*1000);
