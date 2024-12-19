@@ -51,7 +51,7 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
         if (StringUtils.isBlank(authorization)) {
             authorization = request.getHeader("Authorization");
         }
-        String token = StringUtils.replaceOnce(authorization, "Bearer ", "");
+        String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""),"Bearer","");
         if(StringUtils.isBlank(token)){
             return true;
         }
