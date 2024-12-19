@@ -154,7 +154,7 @@
 				 ar.code,
 				 ar.biz_code,
 				 a.remark,
-				 P.code,
+				 p.code,
 				 p.biz_code,
 				 getOrganCompanyId(a.id),
 				 getOrganCompanyCode(a.id),

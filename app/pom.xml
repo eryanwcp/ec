@@ -19,7 +19,7 @@
         <velocity.version>2.3</velocity.version>
         <ckfinder.version>2.3</ckfinder.version>
         <sitemesh.version>2.5.0</sitemesh.version>
-        <liquibase.version>4.29.2</liquibase.version>
+        <liquibase.version>4.30.0</liquibase.version>
         <commons-cli.version>1.9.0</commons-cli.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

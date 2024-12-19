@@ -71,10 +71,8 @@ public class R<T> implements Serializable {
 
     public static R<Boolean> rest(boolean result) {
         R<Boolean> r = new R<>();
-        if (!result) {
-            r.setCode(R.FAIL);
-            r.setData(false);
-        }
+        r.setData(result);
+        r.setCode(result ? SUCCESS:FAIL);
         return r;
     }
 
