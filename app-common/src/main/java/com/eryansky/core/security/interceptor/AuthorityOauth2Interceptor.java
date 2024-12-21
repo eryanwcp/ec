@@ -52,30 +52,27 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
             authorization = request.getHeader("Authorization");
         }
         String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""),"Bearer","");
-        if(StringUtils.isBlank(token)){
-            return true;
-        }
         String requestUrl = request.getRequestURI();
         String loginName = null;
-        try {
-            loginName = SecurityUtils.getLoginNameByToken(token);
-        } catch (Exception e) {
-            if(!(e instanceof TokenExpiredException)){
-                logger.error("Token校验失败：{},{},{},{},{}",loginName, SpringMVCHolder.getIp(), requestUrl, token, e.getMessage());
+        if(StringUtils.isNotBlank(token)){
+            try {
+                loginName = SecurityUtils.getLoginNameByToken(token);
+            } catch (Exception e) {
+                if(!(e instanceof TokenExpiredException)){
+                    logger.error("Token校验失败：{},{},{},{},{}",loginName, SpringMVCHolder.getIp(), requestUrl, token, e.getMessage());
+                }
             }
         }
-        if(StringUtils.isBlank(loginName)){
-            return true;
-        }
+
 
         //已登录用户
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         if (null != sessionInfo && null != UserType.getByValue(sessionInfo.getUserType())) {
-            if(StringUtils.equals(token,sessionInfo.getToken()) || StringUtils.equals(token,sessionInfo.getRefreshToken()) || StringUtils.equals(loginName,sessionInfo.getLoginName())){
+            if(StringUtils.isBlank(token) || StringUtils.equals(token,sessionInfo.getToken()) || StringUtils.equals(token,sessionInfo.getRefreshToken()) || StringUtils.equals(loginName,sessionInfo.getLoginName())){
                 return true;
             }
             //兼容Token变化了 防止缓存
-            if(!StringUtils.equals(loginName,sessionInfo.getLoginName())){
+            if(StringUtils.isNotBlank(loginName) && !StringUtils.equals(loginName,sessionInfo.getLoginName())){
 //                SecurityUtils.removeSessionInfoFromSession(sessionInfo.getId(), SecurityType.offline);
                 logger.warn("会话更新：{} =》{}",sessionInfo.getLoginName(),loginName);
                 sessionInfo = null;
@@ -98,11 +95,14 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
             if(null != authType && !PrepareOauth2.DEFAULT_AUTH_TYPE.equals(authType)){
                 return true;
             }
+//            if(StringUtils.isBlank(loginName)){
+//                return true;
+//            }
             //自动登录
             boolean verify = false;
 
             //判断是否已经登录过
-            if(null == sessionInfo){
+            if(null == sessionInfo && StringUtils.isNotBlank(token)){
                 sessionInfo = SecurityUtils.getSessionInfoByTokenOrRefreshToken(token);
             }
             //兼容非内置用户时，自动跳过拦截
@@ -113,7 +113,7 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
 
             User user = null;
             try {
-                user = UserUtils.getUserByLoginName(loginName);
+                user = null != loginName ? UserUtils.getUserByLoginName(loginName):null;
                 if(null == user){
                     logger.warn("Token校验失败（用户不存在）：{},{},{}", loginName, requestUrl, token);
                     return true;
