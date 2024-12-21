@@ -9,7 +9,6 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
-import com.eryansky.core.security.SecurityType;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
 import com.eryansky.core.security.annotation.PrepareOauth2;
@@ -47,39 +46,10 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String authorization = request.getParameter(AuthorityInterceptor.ATTR_AUTHORIZATION);
-        if (StringUtils.isBlank(authorization)) {
-            authorization = request.getHeader("Authorization");
-        }
-        String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""),"Bearer","");
-        String requestUrl = request.getRequestURI();
-        String loginName = null;
-        if(StringUtils.isNotBlank(token)){
-            try {
-                loginName = SecurityUtils.getLoginNameByToken(token);
-            } catch (Exception e) {
-                if(!(e instanceof TokenExpiredException)){
-                    logger.error("Token校验失败：{},{},{},{},{}",loginName, SpringMVCHolder.getIp(), requestUrl, token, e.getMessage());
-                }
-            }
-        }
-
-
         //已登录用户
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
-        if (null != sessionInfo && null != UserType.getByValue(sessionInfo.getUserType())) {
-            if(StringUtils.isNotBlank(token) && (StringUtils.equals(token,sessionInfo.getToken()) || StringUtils.equals(token,sessionInfo.getRefreshToken()) || StringUtils.equals(loginName,sessionInfo.getLoginName()))){
-                return true;
-            }
-
-            //兼容Token变化了 防止缓存
-            if(StringUtils.isNotBlank(loginName) && !StringUtils.equals(loginName,sessionInfo.getLoginName())){
-//                SecurityUtils.removeSessionInfoFromSession(sessionInfo.getId(), SecurityType.offline);
-                logger.warn("会话更新：{} =》{}",sessionInfo.getLoginName(),loginName);
-                sessionInfo = null;
-            }else if (request.getSession().getId().equals(sessionInfo.getId())) {
-                return true;
-            }
+        if (null != sessionInfo && request.getSession().getId().equals(sessionInfo.getId()) && null != UserType.getByValue(sessionInfo.getUserType())) {
+            return true;
         }
 
         //注解处理 满足设置不拦截
@@ -98,45 +68,53 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
             if(null != authType && !PrepareOauth2.DEFAULT_AUTH_TYPE.equals(authType)){
                 return true;
             }
-            if(StringUtils.isBlank(loginName)){
-                return true;
-            }
             //自动登录
-            boolean verify = false;
-
-            //判断是否已经登录过
-            if(null == sessionInfo){
-                sessionInfo = SecurityUtils.getSessionInfoByTokenOrRefreshToken(token);
+            String authorization = request.getParameter(AuthorityInterceptor.ATTR_AUTHORIZATION);
+            if (StringUtils.isBlank(authorization)) {
+                authorization = request.getHeader("Authorization");
             }
-            //兼容非内置用户时，自动跳过拦截
-            if(null != sessionInfo && null == UserType.getByValue(sessionInfo.getUserType())){
+            if (StringUtils.isNotBlank(authorization)) {
+                String requestUrl = request.getRequestURI();
+                boolean verify = false;
+                String token = StringUtils.replaceOnce(authorization, "Bearer ", "");
+                //判断是否已经登录过
+                if(null == sessionInfo){
+                    sessionInfo = SecurityUtils.getSessionInfoByTokenOrRefreshToken(token);
+                }
+                //兼容非内置用户时，自动跳过拦截
+                if(null != sessionInfo && null == UserType.getByValue(sessionInfo.getUserType())){
 //                    logger.warn("{},Token校验失败（用户不存在）,{},{}", sessionInfo.getLoginName(), requestUrl, token);
-                return true;
-            }
-
-            User user = null;
-            try {
-                user = UserUtils.getUserByLoginName(loginName);
-                if(null == user){
-                    logger.warn("Token校验失败（用户不存在）：{},{},{}", loginName, requestUrl, token);
                     return true;
                 }
-                verify = SecurityUtils.verifySessionInfoToken(token, loginName, user.getPassword());
-            } catch (Exception e) {
-                if(!(e instanceof TokenExpiredException)){
-                    logger.error("Token校验失败：{},{},{},{},{}",loginName, SpringMVCHolder.getIp(), requestUrl, token, e.getMessage());
-                }
-            }
-            if (verify) {
-                if(null != sessionInfo){
-                    SecurityUtils.addExtendSession(request.getSession().getId(),sessionInfo.getId());
-                    logger.debug("自动跳过登录：{},{},{},{},{}", loginName, IpUtils.getIpAddr0(request), requestUrl,request.getSession().getId(),sessionInfo.getId());
-                }else{
-                    SecurityUtils.putUserToSession(request,user);
-                    UserUtils.recordLogin(user.getId());
-                    logger.debug("自动登录成功：{},{},{}", loginName, IpUtils.getIpAddr0(request), requestUrl);
-                }
 
+                String loginName = null;
+                User user = null;
+                try {
+                    loginName = SecurityUtils.getLoginNameByToken(token);
+                    user = UserUtils.getUserByLoginName(loginName);
+                    if(null == user){
+                        logger.warn("Token校验失败（用户不存在）：{},{},{}", loginName, requestUrl, token);
+                        return true;
+                    }
+                    verify = SecurityUtils.verifySessionInfoToken(token, loginName, user.getPassword());
+                } catch (Exception e) {
+                    if(!(e instanceof TokenExpiredException)){
+                        logger.error("Token校验失败：{},{},{},{},{}",loginName, SpringMVCHolder.getIp(), requestUrl, token, e.getMessage());
+                    }
+                }
+                if (verify) {
+                    if(null != sessionInfo){
+                        SecurityUtils.addExtendSession(request.getSession().getId(),sessionInfo.getId());
+                        logger.debug("自动跳过登录：{},{},{},{},{}", loginName, IpUtils.getIpAddr0(request), requestUrl,request.getSession().getId(),sessionInfo.getId());
+                    }else{
+                        SecurityUtils.putUserToSession(request,user);
+                        UserUtils.recordLogin(user.getId());
+                        logger.debug("自动登录成功：{},{},{}", loginName, IpUtils.getIpAddr0(request), requestUrl);
+                    }
+
+                } else {
+//                logger.warn("自动登录失败,{}",authorization);
+                }
             }
         }
         return true;
