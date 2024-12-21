@@ -68,7 +68,7 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
         //已登录用户
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         if (null != sessionInfo && null != UserType.getByValue(sessionInfo.getUserType())) {
-            if(StringUtils.isBlank(token) || StringUtils.equals(token,sessionInfo.getToken()) || StringUtils.equals(token,sessionInfo.getRefreshToken()) || StringUtils.equals(loginName,sessionInfo.getLoginName())){
+            if(StringUtils.isNotBlank(token) && (StringUtils.equals(token,sessionInfo.getToken()) || StringUtils.equals(token,sessionInfo.getRefreshToken()) || StringUtils.equals(loginName,sessionInfo.getLoginName()))){
                 return true;
             }
             //兼容Token变化了 防止缓存
