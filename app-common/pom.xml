@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.eryansky</groupId>
         <artifactId>ec-parent</artifactId>
-        <version>4.2.20241112.11</version>
+        <version>4.2.20241221.01</version>
     </parent>
     <artifactId>ec-app-common</artifactId>
     <version>${ec-app-common.version}</version>
@@ -51,12 +51,6 @@
             <groupId>com.eryansky</groupId>
             <artifactId>ec-common</artifactId>
             <version>${ec-common.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.eryansky</groupId>
-            <artifactId>ec-ureport2-consol</artifactId>
-            <version>2.7.1</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.eryansky</groupId>

@@ -71,11 +71,14 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
             if(StringUtils.isNotBlank(token) && (StringUtils.equals(token,sessionInfo.getToken()) || StringUtils.equals(token,sessionInfo.getRefreshToken()) || StringUtils.equals(loginName,sessionInfo.getLoginName()))){
                 return true;
             }
+
             //兼容Token变化了 防止缓存
             if(StringUtils.isNotBlank(loginName) && !StringUtils.equals(loginName,sessionInfo.getLoginName())){
 //                SecurityUtils.removeSessionInfoFromSession(sessionInfo.getId(), SecurityType.offline);
                 logger.warn("会话更新：{} =》{}",sessionInfo.getLoginName(),loginName);
                 sessionInfo = null;
+            }else if (request.getSession().getId().equals(sessionInfo.getId())) {
+                return true;
             }
         }
 
