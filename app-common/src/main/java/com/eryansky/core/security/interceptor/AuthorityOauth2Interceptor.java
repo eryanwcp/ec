@@ -51,33 +51,16 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
         if (StringUtils.isBlank(authorization)) {
             authorization = request.getHeader("Authorization");
         }
-        String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""),"Bearer","");
-        if(StringUtils.isBlank(token)){
-            return true;
-        }
-        String requestUrl = request.getRequestURI();
-        String loginName = null;
-        try {
-            loginName = SecurityUtils.getLoginNameByToken(token);
-        } catch (Exception e) {
-            if(!(e instanceof TokenExpiredException)){
-                logger.error("Token校验失败：{},{},{},{},{}",loginName, SpringMVCHolder.getIp(), requestUrl, token, e.getMessage());
-            }
-        }
-        if(StringUtils.isBlank(loginName)){
-            return true;
-        }
+        String token = StringUtils.replaceOnce(authorization, "Bearer ", "");
+
 
         //已登录用户
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
-        if (null != sessionInfo && null != UserType.getByValue(sessionInfo.getUserType())) {
-            if(StringUtils.equals(token,sessionInfo.getToken()) || StringUtils.equals(token,sessionInfo.getRefreshToken()) || StringUtils.equals(loginName,sessionInfo.getLoginName())){
+        if (null != sessionInfo && request.getSession().getId().equals(sessionInfo.getId()) && null != UserType.getByValue(sessionInfo.getUserType())) {
+            if(StringUtils.isBlank(token) || StringUtils.equals(token,sessionInfo.getToken()) || StringUtils.equals(token,sessionInfo.getRefreshToken())){
                 return true;
-            }
-            //兼容Token变化了 防止缓存
-            if(!StringUtils.equals(loginName,sessionInfo.getLoginName())){
-//                SecurityUtils.removeSessionInfoFromSession(sessionInfo.getId(), SecurityType.offline);
-                logger.warn("会话更新：{} =》{}",sessionInfo.getLoginName(),loginName);
+            }else{
+                //兼容Token变化了 防止缓存
                 sessionInfo = null;
             }
         }
@@ -99,41 +82,49 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
                 return true;
             }
             //自动登录
-            boolean verify = false;
 
-            //判断是否已经登录过
-            if(null == sessionInfo){
-                sessionInfo = SecurityUtils.getSessionInfoByTokenOrRefreshToken(token);
-            }
-            //兼容非内置用户时，自动跳过拦截
-            if(null != sessionInfo && null == UserType.getByValue(sessionInfo.getUserType())){
+            if (StringUtils.isNotBlank(authorization)) {
+                String requestUrl = request.getRequestURI();
+                boolean verify = false;
+
+                //判断是否已经登录过
+                if(null == sessionInfo){
+                    sessionInfo = SecurityUtils.getSessionInfoByTokenOrRefreshToken(token);
+                }
+                //兼容非内置用户时，自动跳过拦截
+                if(null != sessionInfo && null == UserType.getByValue(sessionInfo.getUserType())){
 //                    logger.warn("{},Token校验失败（用户不存在）,{},{}", sessionInfo.getLoginName(), requestUrl, token);
-                return true;
-            }
-
-            User user = null;
-            try {
-                user = UserUtils.getUserByLoginName(loginName);
-                if(null == user){
-                    logger.warn("Token校验失败（用户不存在）：{},{},{}", loginName, requestUrl, token);
                     return true;
                 }
-                verify = SecurityUtils.verifySessionInfoToken(token, loginName, user.getPassword());
-            } catch (Exception e) {
-                if(!(e instanceof TokenExpiredException)){
-                    logger.error("Token校验失败：{},{},{},{},{}",loginName, SpringMVCHolder.getIp(), requestUrl, token, e.getMessage());
-                }
-            }
-            if (verify) {
-                if(null != sessionInfo){
-                    SecurityUtils.addExtendSession(request.getSession().getId(),sessionInfo.getId());
-                    logger.debug("自动跳过登录：{},{},{},{},{}", loginName, IpUtils.getIpAddr0(request), requestUrl,request.getSession().getId(),sessionInfo.getId());
-                }else{
-                    SecurityUtils.putUserToSession(request,user);
-                    UserUtils.recordLogin(user.getId());
-                    logger.debug("自动登录成功：{},{},{}", loginName, IpUtils.getIpAddr0(request), requestUrl);
-                }
 
+                String loginName = null;
+                User user = null;
+                try {
+                    loginName = SecurityUtils.getLoginNameByToken(token);
+                    user = UserUtils.getUserByLoginName(loginName);
+                    if(null == user){
+                        logger.warn("Token校验失败（用户不存在）：{},{},{}", loginName, requestUrl, token);
+                        return true;
+                    }
+                    verify = SecurityUtils.verifySessionInfoToken(token, loginName, user.getPassword());
+                } catch (Exception e) {
+                    if(!(e instanceof TokenExpiredException)){
+                        logger.error("Token校验失败：{},{},{},{},{}",loginName, SpringMVCHolder.getIp(), requestUrl, token, e.getMessage());
+                    }
+                }
+                if (verify) {
+                    if(null != sessionInfo){
+                        SecurityUtils.addExtendSession(request.getSession().getId(),sessionInfo.getId());
+                        logger.debug("自动跳过登录：{},{},{},{},{}", loginName, IpUtils.getIpAddr0(request), requestUrl,request.getSession().getId(),sessionInfo.getId());
+                    }else{
+                        SecurityUtils.putUserToSession(request,user);
+                        UserUtils.recordLogin(user.getId());
+                        logger.debug("自动登录成功：{},{},{}", loginName, IpUtils.getIpAddr0(request), requestUrl);
+                    }
+
+                } else {
+//                logger.warn("自动登录失败,{}",authorization);
+                }
             }
         }
         return true;
