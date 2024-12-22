@@ -5,6 +5,7 @@
  */
 package com.eryansky.core.security;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.eryansky.common.exception.SystemException;
 import com.eryansky.common.orm.Page;
 import com.eryansky.common.spring.SpringContextHolder;
@@ -542,6 +543,7 @@ public class SecurityUtils {
         }
         SessionInfo sessionInfo = userToSessionInfo(user);
         sessionInfo.setIp(IpUtils.getIpAddr0(request));
+        sessionInfo.addAttribute("clientIPs",IpUtils.getIpAddr(request));
         sessionInfo.setUserAgent(UserAgentUtils.getHTTPUserAgent(request));
 
         sessionInfo.setBrowserType(UserAgentUtils.getBrowser(request).getName());
