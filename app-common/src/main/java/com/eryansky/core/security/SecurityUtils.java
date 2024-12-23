@@ -5,6 +5,7 @@
  */
 package com.eryansky.core.security;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.eryansky.common.exception.SystemException;
 import com.eryansky.common.orm.Page;
 import com.eryansky.common.spring.SpringContextHolder;
@@ -542,6 +543,7 @@ public class SecurityUtils {
         }
         SessionInfo sessionInfo = userToSessionInfo(user);
         sessionInfo.setIp(IpUtils.getIpAddr0(request));
+        sessionInfo.addAttribute("clientIPs",IpUtils.getIpAddr(request));
         sessionInfo.setUserAgent(UserAgentUtils.getHTTPUserAgent(request));
 
         sessionInfo.setBrowserType(UserAgentUtils.getBrowser(request).getName());
@@ -746,43 +748,13 @@ public class SecurityUtils {
      * 获取当前用户session信息.
      */
     public static SessionInfo getCurrentSessionInfo() {
-        SessionInfo sessionInfo = null;
+        HttpServletRequest request = null;
         try {
-            HttpServletRequest request = null;
-            try {
-                request = SpringMVCHolder.getRequest();
-            } catch (Exception e) {
-//                logger.error(e.getMessage());
-            }
-            if (null == request) {
-                return null;
-            }
-
-            HttpSession session = null;
-            String token = null;
-            try {
-                session = request.getSession();
-                token = request.getHeader(AuthorityInterceptor.ATTR_AUTHORIZATION);
-            } catch (Exception e) {
-//                logger.error(e.getMessage());
-            }
-            if (null == session) {
-                return null;
-            }
-            sessionInfo = getSessionInfo(getFixedSessionId(getNoSuffixSessionId(session)));
-            if (null == sessionInfo && StringUtils.isNotBlank(token)) {
-                sessionInfo = getSessionInfoByTokenOrRefreshToken(StringUtils.replaceOnce(token, "Bearer ", ""));
-            }
+            request = SpringMVCHolder.getRequest();
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
-        } finally {
-            if (null != sessionInfo) {
-                refreshSessionInfo(sessionInfo);
-
-            }
+//                logger.error(e.getMessage());
         }
-
-        return sessionInfo;
+        return getCurrentSessionInfo(request);
     }
 
     /**
@@ -794,15 +766,32 @@ public class SecurityUtils {
             if (null == request) {
                 return null;
             }
-            HttpSession session = request.getSession();
+            HttpSession session = null;
+            try {
+                session = request.getSession();
+            } catch (Exception e) {
+//                logger.error(e.getMessage());
+            }
             if (null == session) {
                 return null;
             }
-            sessionInfo = getSessionInfo(getFixedSessionId(getNoSuffixSessionId(session)));
+            String sessionId = getNoSuffixSessionId(session);
+            sessionInfo = getSessionInfo(sessionId);
+
+            //关联sessionId
             if (sessionInfo == null) {
-                String token = request.getHeader("Authorization");
-                if (StringUtils.isNotBlank(token)) {
-                    sessionInfo = getSessionInfoByTokenOrRefreshToken(StringUtils.replaceOnce(token, "Bearer ", ""));
+                String fixedSessionId = getFixedSessionId(sessionId);
+                sessionInfo = getSessionInfo(fixedSessionId);
+            }
+            //Authorization 请求头或请求参数
+            if (sessionInfo == null) {
+                String authorization = request.getHeader(AuthorityInterceptor.ATTR_AUTHORIZATION);
+                if(StringUtils.isBlank(authorization)){
+                    authorization = request.getParameter(AuthorityInterceptor.ATTR_AUTHORIZATION);
+                }
+                if (StringUtils.isNotBlank(authorization)) {
+                    String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""),"Bearer","");
+                    sessionInfo = getSessionInfoByTokenOrRefreshToken(token);
                 }
             }
         } catch (Exception e) {
