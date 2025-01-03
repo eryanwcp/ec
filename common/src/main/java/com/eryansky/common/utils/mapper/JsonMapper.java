@@ -148,7 +148,7 @@ public class JsonMapper  extends ObjectMapper{
      * 开启 XSS 过滤器
      */
     public JsonMapper enabledXssFilter(){
-        this.registerModule(new SimpleModule().addDeserializer(String.class, new JsonDeserializer<String>() {
+        this.registerModule(new SimpleModule().addDeserializer(String.class, new JsonDeserializer<>() {
             @Override
             public String deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
                 String text = p.getText();

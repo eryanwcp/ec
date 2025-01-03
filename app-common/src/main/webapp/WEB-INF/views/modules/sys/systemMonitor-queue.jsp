@@ -72,6 +72,7 @@
 	<li><a href="${ctxAdmin}/sys/systemMonitor/cache">缓存管理</a></li>
 	<li class="active"><a href="${ctxAdmin}/sys/systemMonitor/queue">队列管理</a></li>
 	<li><a href="${ctxAdmin}/sys/systemMonitor/asyncTask">异步任务</a></li>
+	<li><a href="${ctxAdmin}/sys/job">调度任务</a></li>
 </ul>
 <form:form id="searchForm" method="post" class="breadcrumb form-search">
 	<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
