@@ -40,7 +40,7 @@
         function loadData() {
             var queryParam = $.serializeObject($("#searchForm"));
             $.ajax({
-                url: ctxAdmin + "/notice/messageReceive?_=" + new Date().getTime(),
+                url: appURL + "/a/notice/messageReceive?_=" + new Date().getTime(),
                 type: "post",
                 dataType: "json",
                 data: queryParam,
@@ -67,7 +67,7 @@
          */
         function setRead(id,messageId,linkUrl){
             $.ajax({
-                url: '${ctxAdmin}/notice/messageReceive/setRead?id='+id,
+                url: appURL + "/a/notice/messageReceive/setRead?id='+id,
                 type: 'post',
                 dataType: 'json',
                 success: function (data) {}
@@ -75,7 +75,7 @@
             if(linkUrl){
                 try {
                     $.ajax({
-                        url: '${ctx}/f/getMessageSSOUrl?messageId=' + messageId,
+                        url: appURL + "/f/getMessageSSOUrl?messageId=' + messageId,
                         type: 'post',
                         dataType: 'json',
                         success: function (data) {
@@ -100,7 +100,7 @@
     </script>
 </head>
 <body style="border: 0;padding: 0;">
-<form:form id="searchForm" modelAttribute="model" action="${ctxAdmin}/notice/messageReceive" method="post" class="breadcrumb form-search">
+<form:form id="searchForm" modelAttribute="model" action="${appURL}/a/notice/messageReceive" method="post" class="breadcrumb form-search">
     <input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
     <input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
     <form:radiobutton path="isRead" value="0" label="未阅" onclick="$('#pageNo').val(1);loadData();"/>

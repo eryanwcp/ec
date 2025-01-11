@@ -62,6 +62,13 @@
         <example>${fns:getAppURL(key)}</example>
     </function>
     <function>
+        <description>当前应用服务地址（包含应用上下文）</description>
+        <name>getAdaptiveClientAppURL</name>
+        <function-class>com.eryansky.utils.AppUtils</function-class>
+        <function-signature>java.lang.String getAdaptiveClientAppURL()</function-signature>
+        <example>${fns:getAdaptiveClientAppURL(key)}</example>
+    </function>
+    <function>
         <description>应用名称</description>
         <name>getAppName</name>
         <function-class>com.eryansky.utils.AppConstants</function-class>
