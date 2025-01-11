@@ -478,7 +478,7 @@ public class MobileIndexController extends SimpleController {
                 }
             }
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage());
             return 0;
         }
         return 0;

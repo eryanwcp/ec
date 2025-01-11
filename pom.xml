@@ -5,7 +5,7 @@
 
     <groupId>com.eryansky</groupId>
     <artifactId>ec-parent</artifactId>
-    <version>4.3.20241221.05</version>
+    <version>4.3.20241221.06</version>
     <modules>
         <module>common</module>
         <module>j2cache</module>
@@ -58,13 +58,13 @@
         <commons-codec.version>1.17.1</commons-codec.version>
 
 
-        <ec-common.version>4.3.20241221.05</ec-common.version>
-        <ec-app-common.version>4.3.20241221.05</ec-app-common.version>
-        <ec-client-common.version>4.3.20241221.05</ec-client-common.version>
-        <ec-j2cache.version>4.3.20241221.05</ec-j2cache.version>
-        <ec-j2cache-spring-boot-starter.version>4.3.20241221.05</ec-j2cache-spring-boot-starter.version>
-        <ec-fastweixin.version>4.3.20241221.05</ec-fastweixin.version>
-        <ec-encrypt-spring-boot-starter.version>4.3.20241221.05</ec-encrypt-spring-boot-starter.version>
+        <ec-common.version>4.3.20241221.06</ec-common.version>
+        <ec-app-common.version>4.3.20241221.06</ec-app-common.version>
+        <ec-client-common.version>4.3.20241221.06</ec-client-common.version>
+        <ec-j2cache.version>4.3.20241221.06</ec-j2cache.version>
+        <ec-j2cache-spring-boot-starter.version>4.3.20241221.06</ec-j2cache-spring-boot-starter.version>
+        <ec-fastweixin.version>4.3.20241221.06</ec-fastweixin.version>
+        <ec-encrypt-spring-boot-starter.version>4.3.20241221.06</ec-encrypt-spring-boot-starter.version>
 
         <jackson.version>2.18.2</jackson.version>
     </properties>
