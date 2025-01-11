@@ -14,7 +14,7 @@
     <packaging>jar</packaging>
     <properties>
         <caffeine.version>2.9.3</caffeine.version>
-        <lettuce.version>6.2.7.RELEASE</lettuce.version>
+        <lettuce.version>6.5.1.RELEASE</lettuce.version>
         <objenesis.version>3.3</objenesis.version>
         <fst.version>2.57</fst.version>
         <snappy.version>1.1.10.7</snappy.version>
