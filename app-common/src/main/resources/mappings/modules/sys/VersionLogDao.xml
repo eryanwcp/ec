@@ -126,7 +126,7 @@
 				ORDER BY ${entityPage.orderBy} ${entityPage.order}
 			</when>
 			<otherwise>
-				ORDER BY a.update_time DESC
+				ORDER BY a.pub_time DESC,a.update_time DESC
 			</otherwise>
 		</choose>
 	</select>
@@ -183,7 +183,7 @@
 				ORDER BY ${entityPage.orderBy} ${entityPage.order}
 			</when>
 			<otherwise>
-				ORDER BY a.update_time DESC
+				ORDER BY a.pub_time DESC,a.update_time DESC
 			</otherwise>
 		</choose>
 	</select>
@@ -201,7 +201,7 @@
 				ORDER BY ${entityPage.orderBy} ${entityPage.order}
 			</when>
 			<otherwise>
-				ORDER BY a.update_time DESC
+				ORDER BY a.pub_time DESC,a.update_time DESC
 			</otherwise>
 		</choose>
 	</select>
