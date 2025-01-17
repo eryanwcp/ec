@@ -375,14 +375,7 @@ public class MobileIndexController extends SimpleController {
 
             String filename = DiskUtils.getMultipartOriginalFilename(multipartFile);
             String extension = FilenameUtils.getExtension(filename);
-            //兼容处理 无后缀文件的处理
-            if(StringUtils.isNotBlank(extension)){
-                FileUploadUtils.assertAllowed(multipartFile,FileUploadUtils.IMAGE_EXTENSION, FileUploadUtils.DEFAULT_MAX_SIZE);
-            }
-            if(StringUtils.isNotBlank(folderCode)){
-                _folderName = FilenameUtils.getName(folderCode);
-            }
-
+            //文件解密处理
             byte[] data = null;
             if(CipherMode.SM4.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)){
                 String key = null;
@@ -401,13 +394,8 @@ public class MobileIndexController extends SimpleController {
                 String key = null;
                 try {
                     key = RSAUtils.decryptBase64String(requestEncryptKey, EncryptProvider.privateKeyBase64());
-                } catch (Exception e) {
-                    key = requestEncryptKey;
-                }
-                try {
                     data =  Cryptos.aesECBDecryptBytes(multipartFile.getBytes(),key.getBytes(StandardCharsets.UTF_8));
                 } catch (Exception e) {
-                    logger.error(e.getMessage(),e);
                     try {
                         data =  Cryptos.aesECBDecryptBytes(multipartFile.getBytes(),EncodeUtils.base64Decode(requestEncryptKey));
                     } catch (Exception e2) {
@@ -415,6 +403,7 @@ public class MobileIndexController extends SimpleController {
                     }
 
                 }
+
             }else if(CipherMode.BASE64.name().equals(requestEncrypt)){
                 try {
                     data =  EncodeUtils.base64Decode(multipartFile.getBytes());
@@ -426,6 +415,15 @@ public class MobileIndexController extends SimpleController {
             if(null != data){
                 multipartFile = new CustomMultipartFile(filename,data);
             }
+
+            //兼容处理 无后缀文件的处理
+            if(StringUtils.isNotBlank(extension)){
+                FileUploadUtils.assertAllowed(multipartFile,FileUploadUtils.IMAGE_EXTENSION, FileUploadUtils.DEFAULT_MAX_SIZE);
+            }
+            if(StringUtils.isNotBlank(folderCode)){
+                _folderName = FilenameUtils.getName(folderCode);
+            }
+
             InputStream inputStream = multipartFile.getInputStream();
             String tempFileName = Identities.uuid() +"."+ extension;
             if(press){
