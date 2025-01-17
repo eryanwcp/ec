@@ -81,6 +81,13 @@ public class EncodeUtils {
 	}
 
 	/**
+	 * Base64解码.
+	 */
+	public static byte[] base64Decode(byte[] input) {
+		return Base64.decodeBase64(input);
+	}
+
+	/**
 	 * Base62编码。
 	 */
 	public static String encodeBase62(byte[] input) {

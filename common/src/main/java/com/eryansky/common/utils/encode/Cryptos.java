@@ -215,6 +215,8 @@ public class Cryptos {
         return new String(decryptResult);
     }
 
+
+
     /**
      * 使用AES解密字符串, 返回原始字符串.
      *
@@ -225,6 +227,16 @@ public class Cryptos {
     public static String aesDecrypt(byte[] input, byte[] key, Byte[] iv) {
         byte[] decryptResult = aes(input, key, iv, Cipher.DECRYPT_MODE);
         return new String(decryptResult);
+    }
+
+    /**
+     * 使用AES解密字符串, 返回.
+     *
+     * @param input Hex编码的加密字符串
+     * @param key 符合AES要求的密钥
+     */
+    public static byte[] aesECBDecryptBytes(byte[] input, byte[] key) {
+        return aesECB(input, key, Cipher.DECRYPT_MODE);
     }
 
     /**

@@ -1,18 +1,21 @@
 package com.eryansky.modules.sys.web.mobile;
 
 import cn.hutool.core.img.ImgUtil;
+import cn.hutool.core.map.CaseInsensitiveMap;
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
 import com.eryansky.common.exception.ActionException;
 import com.eryansky.common.model.Result;
-import com.eryansky.common.orm._enum.StatusState;
 import com.eryansky.common.utils.Identities;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.UserAgentUtils;
+import com.eryansky.common.utils.collections.Collections3;
+import com.eryansky.common.utils.encode.Cryptos;
 import com.eryansky.common.utils.encode.EncodeUtils;
-import com.eryansky.common.utils.net.IpUtils;
+import com.eryansky.common.utils.encode.RSAUtils;
+import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.core.aop.annotation.Logging;
@@ -25,24 +28,25 @@ import com.eryansky.core.web.annotation.MobileValue;
 import com.eryansky.core.web.upload.FileUploadUtils;
 import com.eryansky.core.web.upload.exception.FileNameLengthLimitExceededException;
 import com.eryansky.core.web.upload.exception.InvalidExtensionException;
+import com.eryansky.encrypt.advice.DecryptRequestBodyAdvice;
+import com.eryansky.encrypt.config.EncryptProvider;
+import com.eryansky.encrypt.enums.CipherMode;
 import com.eryansky.modules.disk._enum.FolderType;
+import com.eryansky.modules.disk.extend.CustomMultipartFile;
 import com.eryansky.modules.disk.mapper.File;
 import com.eryansky.modules.disk.utils.DiskUtils;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys._enum.VersionLogType;
-import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.mapper.VersionLog;
 import com.eryansky.modules.sys.service.VersionLogService;
 import com.eryansky.modules.sys.utils.DownloadFileUtils;
 import com.eryansky.modules.sys.utils.VersionLogUtils;
-import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.AppUtils;
 import com.google.common.collect.Maps;
 import org.apache.commons.fileupload2.core.FileUploadSizeException;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
@@ -53,7 +57,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.nio.file.Files;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -352,10 +356,14 @@ public class MobileIndexController extends SimpleController {
      */
     @PostMapping(value = {"imageUpLoad"})
     @ResponseBody
-    public Result imageUpLoad(@RequestParam(value = "uploadFile", required = false) MultipartFile multipartFile,
+    public Result imageUpLoad(@RequestHeader Map<String, String> headers,
+                              @RequestParam(value = "uploadFile", required = false) MultipartFile multipartFile,
                               String folderCode,
                               @RequestParam(value = "press",defaultValue = "true") Boolean press,
                               String pressText) {
+        CaseInsensitiveMap<String,String> caseInsensitiveMap = new CaseInsensitiveMap<>(headers);
+        String requestEncrypt =  caseInsensitiveMap.get(DecryptRequestBodyAdvice.ENCRYPT);
+        String requestEncryptKey =  caseInsensitiveMap.get(DecryptRequestBodyAdvice.ENCRYPT_KEY);
         Result result = null;
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         Exception exception = null;
@@ -375,6 +383,49 @@ public class MobileIndexController extends SimpleController {
                 _folderName = FilenameUtils.getName(folderCode);
             }
 
+            byte[] data = null;
+            if(CipherMode.SM4.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)){
+                String key = null;
+                try {
+                    key = RSAUtils.decryptHexString(requestEncryptKey, EncryptProvider.privateKeyBase64());
+                } catch (Exception e) {
+                    key = requestEncryptKey;
+                }
+                try {
+                    data =  Sm4Utils.decryptCbcPadding(key.getBytes(StandardCharsets.UTF_8), multipartFile.getBytes());
+                } catch (Exception e) {
+                    logger.error(e.getMessage(),e);
+                }
+
+            }else if(CipherMode.AES.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)){
+                String key = null;
+                try {
+                    key = RSAUtils.decryptBase64String(requestEncryptKey, EncryptProvider.privateKeyBase64());
+                } catch (Exception e) {
+                    key = requestEncryptKey;
+                }
+                try {
+                    data =  Cryptos.aesECBDecryptBytes(multipartFile.getBytes(),key.getBytes(StandardCharsets.UTF_8));
+                } catch (Exception e) {
+                    logger.error(e.getMessage(),e);
+                    try {
+                        data =  Cryptos.aesECBDecryptBytes(multipartFile.getBytes(),EncodeUtils.base64Decode(requestEncryptKey));
+                    } catch (Exception e2) {
+                        logger.error(e2.getMessage(),e2);
+                    }
+
+                }
+            }else if(CipherMode.BASE64.name().equals(requestEncrypt)){
+                try {
+                    data =  EncodeUtils.base64Decode(multipartFile.getBytes());
+                } catch (Exception e) {
+                    logger.error(e.getMessage(),e);
+                }
+            }
+
+            if(null != data){
+                multipartFile = new CustomMultipartFile(filename,data);
+            }
             InputStream inputStream = multipartFile.getInputStream();
             String tempFileName = Identities.uuid() +"."+ extension;
             if(press){
@@ -442,6 +493,9 @@ public class MobileIndexController extends SimpleController {
             exception = e;
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
         } catch (IOException e) {
+            exception = e;
+            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
+        } catch (Exception e) {
             exception = e;
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
         } finally {
