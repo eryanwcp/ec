@@ -19,7 +19,7 @@
         <xwpf.version>2.1.0</xwpf.version>
         <bsh.version>2.0b6</bsh.version>
 
-        <sitemesh.version>3.2.1</sitemesh.version>
+        <sitemesh.version>3.2.2</sitemesh.version>
         <commons-csv.version>1.12.0</commons-csv.version>
         <commons-cli.version>1.9.0</commons-cli.version>
         <commons-compress.version>1.27.1</commons-compress.version>
