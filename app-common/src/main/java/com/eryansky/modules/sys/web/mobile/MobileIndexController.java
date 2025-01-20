@@ -358,8 +358,8 @@ public class MobileIndexController extends SimpleController {
     @ResponseBody
     public Result imageUpLoad(@RequestHeader Map<String, String> headers,
                               @RequestParam(value = "uploadFile", required = false) MultipartFile multipartFile,
-                              String folderCode,
-                              @RequestParam(value = "press",defaultValue = "true") Boolean press,
+                              @RequestParam(value = "folderCode", defaultValue = "IMAGE") String folderCode,
+                              @RequestParam(value = "press", defaultValue = "true") Boolean press,
                               String pressText) {
         CaseInsensitiveMap<String,String> caseInsensitiveMap = new CaseInsensitiveMap<>(headers);
         String requestEncrypt =  caseInsensitiveMap.get(DecryptRequestBodyAdvice.ENCRYPT);
