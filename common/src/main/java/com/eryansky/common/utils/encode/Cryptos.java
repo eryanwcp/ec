@@ -228,6 +228,16 @@ public class Cryptos {
     }
 
     /**
+     * 使用AES解密字符串, 返回.
+     *
+     * @param input Hex编码的加密字符串
+     * @param key 符合AES要求的密钥
+     */
+    public static byte[] aesECBDecryptBytes(byte[] input, byte[] key) {
+        return aesECB(input, key, Cipher.DECRYPT_MODE);
+    }
+
+    /**
      * 使用AES解密字符串, 返回原始字符串.
      *
      * @param base64Data Base64编码的加密字符串

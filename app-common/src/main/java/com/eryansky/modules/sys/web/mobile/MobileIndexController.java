@@ -1,6 +1,7 @@
 package com.eryansky.modules.sys.web.mobile;
 
 import cn.hutool.core.img.ImgUtil;
+import cn.hutool.core.map.CaseInsensitiveMap;
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
@@ -11,7 +12,10 @@ import com.eryansky.common.orm._enum.StatusState;
 import com.eryansky.common.utils.Identities;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.UserAgentUtils;
+import com.eryansky.common.utils.encode.Cryptos;
 import com.eryansky.common.utils.encode.EncodeUtils;
+import com.eryansky.common.utils.encode.RSAUtils;
+import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
@@ -25,7 +29,11 @@ import com.eryansky.core.web.annotation.MobileValue;
 import com.eryansky.core.web.upload.FileUploadUtils;
 import com.eryansky.core.web.upload.exception.FileNameLengthLimitExceededException;
 import com.eryansky.core.web.upload.exception.InvalidExtensionException;
+import com.eryansky.encrypt.advice.DecryptRequestBodyAdvice;
+import com.eryansky.encrypt.config.EncryptProvider;
+import com.eryansky.encrypt.enums.CipherMode;
 import com.eryansky.modules.disk._enum.FolderType;
+import com.eryansky.modules.disk.extend.CustomMultipartFile;
 import com.eryansky.modules.disk.mapper.File;
 import com.eryansky.modules.disk.utils.DiskUtils;
 import com.eryansky.modules.sys._enum.LogType;
@@ -54,6 +62,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Map;
 
@@ -353,10 +362,14 @@ public class MobileIndexController extends SimpleController {
      */
     @PostMapping(value = {"imageUpLoad"})
     @ResponseBody
-    public Result imageUpLoad(@RequestParam(value = "uploadFile", required = false) MultipartFile multipartFile,
+    public Result imageUpLoad(@RequestHeader Map<String, String> headers,
+                              @RequestParam(value = "uploadFile", required = false) MultipartFile multipartFile,
                               String folderCode,
                               @RequestParam(value = "press",defaultValue = "true") Boolean press,
                               String pressText) {
+        CaseInsensitiveMap<String,String> caseInsensitiveMap = new CaseInsensitiveMap<>(headers);
+        String requestEncrypt =  caseInsensitiveMap.get(DecryptRequestBodyAdvice.ENCRYPT);
+        String requestEncryptKey =  caseInsensitiveMap.get(DecryptRequestBodyAdvice.ENCRYPT_KEY);
         Result result = null;
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         Exception exception = null;
@@ -368,6 +381,47 @@ public class MobileIndexController extends SimpleController {
 
             String filename = DiskUtils.getMultipartOriginalFilename(multipartFile);
             String extension = FilenameUtils.getExtension(filename);
+            //文件解密处理
+            byte[] data = null;
+            if(CipherMode.SM4.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)){
+                String key = null;
+                try {
+                    key = RSAUtils.decryptHexString(requestEncryptKey, EncryptProvider.privateKeyBase64());
+                } catch (Exception e) {
+                    key = requestEncryptKey;
+                }
+                try {
+                    data =  Sm4Utils.decryptCbcPadding(key.getBytes(StandardCharsets.UTF_8), multipartFile.getBytes());
+                } catch (Exception e) {
+                    logger.error(e.getMessage(),e);
+                }
+
+            }else if(CipherMode.AES.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)){
+                String key = null;
+                try {
+                    key = RSAUtils.decryptBase64String(requestEncryptKey, EncryptProvider.privateKeyBase64());
+                    data =  Cryptos.aesECBDecryptBytes(multipartFile.getBytes(),key.getBytes(StandardCharsets.UTF_8));
+                } catch (Exception e) {
+                    try {
+                        data =  Cryptos.aesECBDecryptBytes(multipartFile.getBytes(),EncodeUtils.base64Decode(requestEncryptKey));
+                    } catch (Exception e2) {
+                        logger.error(e2.getMessage(),e2);
+                    }
+
+                }
+
+            }else if(CipherMode.BASE64.name().equals(requestEncrypt)){
+                try {
+                    data =  EncodeUtils.base64Decode(multipartFile.getBytes());
+                } catch (Exception e) {
+                    logger.error(e.getMessage(),e);
+                }
+            }
+
+            if(null != data){
+                multipartFile = new CustomMultipartFile(filename,data);
+            }
+
             //兼容处理 无后缀文件的处理
             if(StringUtils.isNotBlank(extension)){
                 FileUploadUtils.assertAllowed(multipartFile,FileUploadUtils.IMAGE_EXTENSION, FileUploadUtils.DEFAULT_MAX_SIZE);
@@ -430,9 +484,9 @@ public class MobileIndexController extends SimpleController {
 
             file = DiskUtils.saveSystemFile(_folderName, FolderType.NORMAL.getValue(), sessionInfo.getUserId(), inputStream, tempFileName);
             Map<String, Object> _data = Maps.newHashMap();
-            String data = "data:image/jpeg;base64," + Base64Utils.encodeToString(FileCopyUtils.copyToByteArray(Files.newInputStream(file.getDiskFile().toPath())));
+            String base64Data = "data:image/jpeg;base64," + Base64Utils.encodeToString(FileCopyUtils.copyToByteArray(Files.newInputStream(file.getDiskFile().toPath())));
             _data.put("file", file);
-            _data.put("data", data);
+            _data.put("data", base64Data);
             _data.put("url", AppConstants.getAdminPath() + "/disk/fileDownload/" + file.getId());
             result = Result.successResult().setObj(_data).setMsg("文件上传成功！");
         } catch (InvalidExtensionException e) {
@@ -448,6 +502,9 @@ public class MobileIndexController extends SimpleController {
             exception = e;
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
         } catch (IOException e) {
+            exception = e;
+            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
+        } catch (Exception e) {
             exception = e;
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
         } finally {
