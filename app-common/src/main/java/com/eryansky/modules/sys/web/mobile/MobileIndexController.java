@@ -64,6 +64,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 
 /**
@@ -478,7 +479,7 @@ public class MobileIndexController extends SimpleController {
                 }
                 tempFile = new java.io.File(tempFileName);
                 ImgUtil.write(watermarkImage, tempFile);
-                inputStream = new FileInputStream(tempFileName);
+                inputStream = Files.newInputStream(Paths.get(tempFileName));
             }
 
 
