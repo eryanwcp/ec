@@ -388,7 +388,7 @@ public class MobileIndexController extends SimpleController {
                 String key = null;
                 try {
                     key = RSAUtils.decryptHexString(requestEncryptKey, EncryptProvider.privateKeyBase64());
-                    data =  Sm4Utils.decryptCbcPadding(key.getBytes(StandardCharsets.UTF_8),multipartFile.getBytes());
+                    data =  Sm4Utils.decryptCbcPadding(EncodeUtils.hexDecode(key),multipartFile.getBytes());
                 } catch (Exception e) {
                     try {
                         data =  Sm4Utils.decryptCbcPadding(EncodeUtils.base64Decode(requestEncryptKey),multipartFile.getBytes());
@@ -401,7 +401,7 @@ public class MobileIndexController extends SimpleController {
                 String key = null;
                 try {
                     key = RSAUtils.decryptBase64String(requestEncryptKey, EncryptProvider.privateKeyBase64());
-                    data =  Cryptos.aesECBDecryptBytes(multipartFile.getBytes(),key.getBytes(StandardCharsets.UTF_8));
+                    data =  Cryptos.aesECBDecryptBytes(multipartFile.getBytes(),EncodeUtils.base64Decode(key));
                 } catch (Exception e) {
                     try {
                         data =  Cryptos.aesECBDecryptBytes(multipartFile.getBytes(),EncodeUtils.base64Decode(requestEncryptKey));
