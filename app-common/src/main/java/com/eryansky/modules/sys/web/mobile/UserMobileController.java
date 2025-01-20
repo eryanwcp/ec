@@ -365,20 +365,20 @@ public class UserMobileController extends SimpleController {
                 String key = null;
                 try {
                     key = RSAUtils.decryptHexString(requestEncryptKey, EncryptProvider.privateKeyBase64());
+                    data =  Sm4Utils.decryptCbcPadding(EncodeUtils.hexDecode(key),multipartFile.getBytes());
                 } catch (Exception e) {
-                    key = requestEncryptKey;
-                }
-                try {
-                    data =  Sm4Utils.decryptCbcPadding(key.getBytes(StandardCharsets.UTF_8), multipartFile.getBytes());
-                } catch (Exception e) {
-                    logger.error(e.getMessage(),e);
+                    try {
+                        data =  Sm4Utils.decryptCbcPadding(EncodeUtils.base64Decode(requestEncryptKey),multipartFile.getBytes());
+                    } catch (Exception e2) {
+                        logger.error(e2.getMessage(),e2);
+                    }
                 }
 
             }else if(CipherMode.AES.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)){
                 String key = null;
                 try {
                     key = RSAUtils.decryptBase64String(requestEncryptKey, EncryptProvider.privateKeyBase64());
-                    data =  Cryptos.aesECBDecryptBytes(multipartFile.getBytes(),key.getBytes(StandardCharsets.UTF_8));
+                    data =  Cryptos.aesECBDecryptBytes(multipartFile.getBytes(),EncodeUtils.base64Decode(key));
                 } catch (Exception e) {
                     try {
                         data =  Cryptos.aesECBDecryptBytes(multipartFile.getBytes(),EncodeUtils.base64Decode(requestEncryptKey));
