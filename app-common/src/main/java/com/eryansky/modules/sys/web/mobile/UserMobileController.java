@@ -1,13 +1,18 @@
 package com.eryansky.modules.sys.web.mobile;
 
+import cn.hutool.core.img.ImgUtil;
+import cn.hutool.core.map.CaseInsensitiveMap;
+import com.drew.imaging.ImageMetadataReader;
+import com.drew.metadata.Directory;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.Tag;
 import com.eryansky.common.exception.ActionException;
 import com.eryansky.common.model.Result;
 import com.eryansky.common.orm._enum.StatusState;
+import com.eryansky.common.utils.Identities;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
-import com.eryansky.common.utils.encode.EncodeUtils;
-import com.eryansky.common.utils.encode.Encrypt;
-import com.eryansky.common.utils.encode.Encryption;
+import com.eryansky.common.utils.encode.*;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.utils.WebUtils;
@@ -19,6 +24,11 @@ import com.eryansky.core.web.annotation.Mobile;
 import com.eryansky.core.web.upload.FileUploadUtils;
 import com.eryansky.core.web.upload.exception.FileNameLengthLimitExceededException;
 import com.eryansky.core.web.upload.exception.InvalidExtensionException;
+import com.eryansky.encrypt.advice.DecryptRequestBodyAdvice;
+import com.eryansky.encrypt.config.EncryptProvider;
+import com.eryansky.encrypt.enums.CipherMode;
+import com.eryansky.modules.disk._enum.FolderType;
+import com.eryansky.modules.disk.extend.CustomMultipartFile;
 import com.eryansky.modules.disk.mapper.File;
 import com.eryansky.modules.disk.utils.DiskUtils;
 import com.eryansky.modules.sys._enum.LogType;
@@ -31,6 +41,7 @@ import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.fileupload.FileUploadBase;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -41,9 +52,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.List;
 
 /**
  * 用户管理
@@ -322,19 +340,131 @@ public class UserMobileController extends SimpleController {
      */
     @PostMapping(value = {"imageUpLoad"})
     @ResponseBody
-    public Result imageUpLoad(@RequestParam(value = "uploadFile", required = false) MultipartFile multipartFile) {
+    public Result imageUpLoad(@RequestHeader Map<String, String> headers,
+                              @RequestParam(value = "uploadFile", required = false) MultipartFile multipartFile,
+                              @RequestParam (name = "folderCode",defaultValue = User.FOLDER_USER_PHOTO)String folderCode,
+                              @RequestParam(value = "press",defaultValue = "false") Boolean press,
+                              String pressText) {
+        CaseInsensitiveMap<String,String> caseInsensitiveMap = new CaseInsensitiveMap<>(headers);
+        String requestEncrypt =  caseInsensitiveMap.get(DecryptRequestBodyAdvice.ENCRYPT);
+        String requestEncryptKey =  caseInsensitiveMap.get(DecryptRequestBodyAdvice.ENCRYPT_KEY);
         Result result = null;
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         Exception exception = null;
         File file = null;
+        java.io.File tempFile = null;
         try {
-            FileUploadUtils.assertAllowed(multipartFile,FileUploadUtils.IMAGE_EXTENSION, FileUploadUtils.DEFAULT_MAX_SIZE);
-            file = DiskUtils.saveSystemFile(User.FOLDER_USER_PHOTO, sessionInfo.getUserId(), multipartFile);
-            DiskUtils.saveFile(file);
+//            FileUploadUtils.assertAllowed(multipartFile,FileUploadUtils.IMAGE_EXTENSION, FileUploadUtils.DEFAULT_MAX_SIZE);
+            String _folderName = "IMAGE";//默认文件夹
+
+            String filename = DiskUtils.getMultipartOriginalFilename(multipartFile);
+            String extension = FilenameUtils.getExtension(filename);
+            //文件解密处理
+            byte[] data = null;
+            if(CipherMode.SM4.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)){
+                String key = null;
+                try {
+                    key = RSAUtils.decryptHexString(requestEncryptKey, EncryptProvider.privateKeyBase64());
+                } catch (Exception e) {
+                    key = requestEncryptKey;
+                }
+                try {
+                    data =  Sm4Utils.decryptCbcPadding(key.getBytes(StandardCharsets.UTF_8), multipartFile.getBytes());
+                } catch (Exception e) {
+                    logger.error(e.getMessage(),e);
+                }
+
+            }else if(CipherMode.AES.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)){
+                String key = null;
+                try {
+                    key = RSAUtils.decryptBase64String(requestEncryptKey, EncryptProvider.privateKeyBase64());
+                    data =  Cryptos.aesECBDecryptBytes(multipartFile.getBytes(),key.getBytes(StandardCharsets.UTF_8));
+                } catch (Exception e) {
+                    try {
+                        data =  Cryptos.aesECBDecryptBytes(multipartFile.getBytes(),EncodeUtils.base64Decode(requestEncryptKey));
+                    } catch (Exception e2) {
+                        logger.error(e2.getMessage(),e2);
+                    }
+
+                }
+
+            }else if(CipherMode.BASE64.name().equals(requestEncrypt)){
+                try {
+                    data =  EncodeUtils.base64Decode(multipartFile.getBytes());
+                } catch (Exception e) {
+                    logger.error(e.getMessage(),e);
+                }
+            }
+
+            if(null != data){
+                multipartFile = new CustomMultipartFile(filename,data);
+            }
+
+            //兼容处理 无后缀文件的处理
+            if(StringUtils.isNotBlank(extension)){
+                FileUploadUtils.assertAllowed(multipartFile,FileUploadUtils.IMAGE_EXTENSION, FileUploadUtils.DEFAULT_MAX_SIZE);
+            }
+            if(StringUtils.isNotBlank(folderCode)){
+                _folderName = FilenameUtils.getName(folderCode);
+            }
+
+            InputStream inputStream = multipartFile.getInputStream();
+            String tempFileName = Identities.uuid() +"."+ extension;
+            if(press){
+                // 获取偏转角度
+                int angle = getAngle(multipartFile);
+                // 原始图片缓存
+                BufferedImage originalImage =  ImgUtil.read(multipartFile.getInputStream());
+
+                // 水印文字
+                String watermarkText = StringUtils.isNotBlank(pressText) ? pressText:sessionInfo.getLoginName();
+                BufferedImage watermarkImage = null;
+                if (angle != 90 && angle != 270) {
+                    // 不需要旋转，直接处理
+                    watermarkImage = new BufferedImage(
+                            originalImage.getWidth(),
+                            originalImage.getHeight(),
+                            BufferedImage.TYPE_INT_RGB
+                    );
+                    Graphics2D g2d = (Graphics2D) watermarkImage.getGraphics();
+                    g2d.setFont(new java.awt.Font("宋体", java.awt.Font.BOLD, 28)); // 设置水印字体
+                    g2d.drawImage(originalImage, 0, 0, null); // 绘制原始图片
+                    g2d.setColor(Color.red); // 设置水印颜色
+                    g2d.drawString(watermarkText, 20, 30); // 绘制水印文字
+                    g2d.dispose();
+                } else {
+                    // 宽高互换
+                    int imgWidth = originalImage.getHeight();
+                    int imgHeight = originalImage.getWidth();
+
+                    // 中心点位置
+                    double centerWidth = ((double) imgWidth) / 2;
+                    double centerHeight = ((double) imgHeight) / 2;
+
+                    // 图片缓存
+                    watermarkImage = new BufferedImage(imgWidth, imgHeight, BufferedImage.TYPE_INT_RGB);
+
+                    // 旋转对应角度
+                    Graphics2D g = watermarkImage.createGraphics();
+                    g.rotate(Math.toRadians(angle), centerWidth, centerHeight);
+                    g.drawImage(originalImage, (imgWidth - originalImage.getWidth()) / 2, (imgHeight - originalImage.getHeight()) / 2, null);
+                    g.rotate(Math.toRadians(-angle), centerWidth, centerHeight);
+                    g.setFont(new java.awt.Font("宋体", java.awt.Font.BOLD, 28)); // 设置水印字体
+                    g.setColor(Color.red); // 设置水印颜色
+                    g.drawString(watermarkText, 20, 30); // 绘制水印文字
+                    g.dispose();
+                }
+                tempFile = new java.io.File(tempFileName);
+                ImgUtil.write(watermarkImage, tempFile);
+                inputStream = Files.newInputStream(Paths.get(tempFileName));
+            }
+
+
+            file = DiskUtils.saveSystemFile(_folderName, FolderType.NORMAL.getValue(), sessionInfo.getUserId(), inputStream, tempFileName);
             Map<String, Object> _data = Maps.newHashMap();
-            String data = "data:image/jpeg;base64," + Base64Utils.encodeToString(FileCopyUtils.copyToByteArray(new FileInputStream(file.getDiskFile())));
+            String base64Data = "data:image/jpeg;base64," + Base64Utils.encodeToString(FileCopyUtils.copyToByteArray(Files.newInputStream(file.getDiskFile().toPath())));
             _data.put("file", file);
-            _data.put("data", data);
+            _data.put("data", base64Data);
             _data.put("url", AppConstants.getAdminPath() + "/disk/fileDownload/" + file.getId());
             result = Result.successResult().setObj(_data).setMsg("文件上传成功！");
         } catch (InvalidExtensionException e) {
@@ -352,16 +482,47 @@ public class UserMobileController extends SimpleController {
         } catch (IOException e) {
             exception = e;
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
+        } catch (Exception e) {
+            exception = e;
+            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
         } finally {
             if (exception != null) {
                 logger.error(exception.getMessage(),exception);
                 if (file != null) {
-                    DiskUtils.deleteFile(file.getId());
+                    DiskUtils.deleteFile(file);
                 }
             }
+            if (tempFile != null) {
+                tempFile.delete();
+            }
+
         }
         return result;
 
+    }
+
+    private int getAngle(MultipartFile file) {
+        try {
+            Metadata metadata = ImageMetadataReader.readMetadata(file.getInputStream());
+            for (Directory directory : metadata.getDirectories()) {
+                for (Tag tag : directory.getTags()) {
+                    if ("Orientation".equals(tag.getTagName())) {
+                        String orientation = tag.getDescription();
+                        if (orientation.contains("90")) {
+                            return 90;
+                        } else if (orientation.contains("180")) {
+                            return 180;
+                        } else if (orientation.contains("270")) {
+                            return 270;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return 0;
+        }
+        return 0;
     }
 
 }
