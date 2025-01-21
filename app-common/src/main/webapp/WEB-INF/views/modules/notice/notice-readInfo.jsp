@@ -19,7 +19,7 @@
                         {field:'id',title:'主键',hidden:true,sortable:true,align:'right',width:80},
                         {field : 'userName', title : '姓名', width : 80},
                         {field : 'organName',title : '部门',width : 260,sortable:true},
-                        {field : 'companyName',title : '单位',width : 260,sortable:true, hidden: true},
+                        {field : 'companyName',title : '单位',width : 260,sortable:true},
                         {field : 'isReadView',title : '是否阅读',width : 80,sortable:true},
                         {field : 'readTime',title : '阅读时间',width : 146,sortable:true},
                         {field : 'isReplyView',title : '是否回复',width : 80,sortable:true},
