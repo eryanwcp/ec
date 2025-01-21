@@ -593,7 +593,7 @@
                 </foreach>
             </if>
         </where>
-        ORDER BY o.code ASC,o.sort ASC,uo.code ASC,uo.sort ASC,a.sort ASC
+        ORDER BY a.sort ASC
     </select>
 
 

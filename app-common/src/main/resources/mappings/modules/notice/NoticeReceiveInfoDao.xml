@@ -69,6 +69,8 @@
 		<include refid="noticeReceiveInfoColumns"/>
 		FROM t_notice_receive_info a
 		<include refid="noticeJoins"/>
+		LEFT JOIN t_sys_user u ON u.id = a.user_id
+		LEFT JOIN t_sys_organ_extend o ON o.id = u.default_organ_id
 		<where>
 			n.status = #{status}
 			<if test="noticeId != null and noticeId != ''">
@@ -146,7 +148,7 @@
 				</when>
 			</choose>
 		</where>
-		ORDER BY n.is_top DESC ,n.publish_time DESC
+		ORDER BY n.is_top DESC,o.home_company_code ASC,o.company_code ASC,u.sort ASC,n.publish_time DESC
 	</select>
 
 	<select id="findAllList" resultType="NoticeReceiveInfo">
