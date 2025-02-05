@@ -52,7 +52,7 @@ public class CaffeineCache {
                             }
                         } catch (Exception e) {
                             logger.error("{}:{} {}",k, v, cause);
-                            logger.error(e.getMessage(),e);
+                            logger.error(e.getMessage());
                         }
                     }
                 })
