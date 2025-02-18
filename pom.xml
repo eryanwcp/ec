@@ -55,7 +55,7 @@
 
         <httpcomponents.version>4.5.14</httpcomponents.version>
         <httpclient5.version>5.4.1</httpclient5.version>
-        <commons-codec.version>1.17.1</commons-codec.version>
+        <commons-codec.version>1.18.0</commons-codec.version>
 
 
         <ec-common.version>4.3.20250205.02</ec-common.version>
