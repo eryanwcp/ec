@@ -15,10 +15,10 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <java.version>1.8</java.version>
-        <commons-codec.version>1.17.1</commons-codec.version>
+        <commons-codec.version>1.18.0</commons-codec.version>
 
-        <ec-common.version>4.2.20241221.10</ec-common.version>
-        <ec-client-common.version>4.2.20241221.10</ec-client-common.version>
+        <ec-common.version>4.2.20241221.11</ec-common.version>
+        <ec-client-common.version>4.2.20241221.11</ec-client-common.version>
     </properties>
 
     <dependencies>

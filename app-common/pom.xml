@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.eryansky</groupId>
         <artifactId>ec-parent</artifactId>
-        <version>4.2.20241221.10</version>
+        <version>4.2.20241221.11</version>
     </parent>
     <artifactId>ec-app-common</artifactId>
     <version>${ec-app-common.version}</version>
@@ -16,16 +16,16 @@
 
     <properties>
         <poi.version>5.3.0</poi.version>
-        <xwpf.version>2.0.6</xwpf.version>
+        <xwpf.version>2.1.0</xwpf.version>
         <bsh.version>2.0b6</bsh.version>
 
         <sitemesh.version>2.5.0</sitemesh.version>
-        <commons-csv.version>1.11.0</commons-csv.version>
-        <commons-dbutils.version>1.8.1</commons-dbutils.version>
+        <commons-csv.version>1.13.0</commons-csv.version>
+        <commons-dbutils.version>1.9.0</commons-dbutils.version>
         <commons-cli.version>1.9.0</commons-cli.version>
         <commons-compress.version>1.27.1</commons-compress.version>
         <ckfinder.version>2.3</ckfinder.version>
-        <jwt.version>4.4.0</jwt.version>
+        <jwt.version>4.5.0</jwt.version>
         <guava.version>33.4.0-jre</guava.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -71,7 +71,7 @@
         <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
-            <version>1.10.14</version>
+            <version>1.10.15</version>
         </dependency>
 
         <dependency>
@@ -124,6 +124,11 @@
         <dependency>
             <groupId>fr.opensagres.xdocreport</groupId>
             <artifactId>fr.opensagres.poi.xwpf.converter.xhtml</artifactId>
+            <version>${xwpf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.opensagres.xdocreport</groupId>
+            <artifactId>fr.opensagres.poi.xwpf.converter.pdf</artifactId>
             <version>${xwpf.version}</version>
         </dependency>
         <dependency>

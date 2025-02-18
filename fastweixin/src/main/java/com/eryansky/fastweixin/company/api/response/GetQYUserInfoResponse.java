@@ -24,7 +24,7 @@ public class GetQYUserInfoResponse extends BaseResponse {
      */
     private String name;
     /**
-     * 手机号码，代开发自建应用需要管理员授权才返回；第三方仅通讯录应用可获取；对于非第三方创建的成员，第三方通讯录应用也不可获取
+     * 手机号码，代开发自建应用需要管理员授权且成员oauth2授权获取；第三方仅通讯录应用可获取；对于非第三方创建的成员，第三方通讯录应用也不可获取；上游企业不可获取下游企业成员该字段
      */
     private String mobile;
     /**
@@ -45,19 +45,24 @@ public class GetQYUserInfoResponse extends BaseResponse {
      */
     private String position;
     /**
-     * 性别。0表示未定义，1表示男性，2表示女性
+     * 性别。0表示未定义，1表示男性，2表示女性。代开发自建应用需要管理员授权且成员oauth2授权获取；第三方仅通讯录应用可获取；对于非第三方创建的成员，第三方通讯录应用也不可获取；上游企业不可获取下游企业成员该字段。注：不可获取指返回值0
      */
     private String gender;
     /**
-     * 邮箱，代开发自建应用需要管理员授权才返回；第三方仅通讯录应用可获取；对于非第三方创建的成员，第三方通讯录应用也不可获取
+     * 邮箱，代开发自建应用需要管理员授权且成员oauth2授权获取；第三方仅通讯录应用可获取；对于非第三方创建的成员，第三方通讯录应用也不可获取；上游企业不可获取下游企业成员该字段
      */
     private String email;
     /**
-     * 头像url。 第三方仅通讯录应用可获取；对于非第三方创建的成员，第三方通讯录应用也不可获取
+     * 企业邮箱，代开发自建应用需要管理员授权且成员oauth2授权获取；第三方仅通讯录应用可获取；对于非第三方创建的成员，第三方通讯录应用也不可获取；上游企业不可获取下游企业成员该字段
+     */
+    @JSONField(name = "biz_mail")
+    private String bizMail;
+    /**
+     * 头像url。 代开发自建应用需要管理员授权且成员oauth2授权获取；第三方仅通讯录应用可获取；对于非第三方创建的成员，第三方通讯录应用也不可获取；上游企业不可获取下游企业成员该字段
      */
     private String avatar;
     /**
-     * 头像缩略图url。第三方仅通讯录应用可获取；对于非第三方创建的成员，第三方通讯录应用也不可获取
+     * 头像缩略图url。第三方仅通讯录应用可获取；对于非第三方创建的成员，第三方通讯录应用也不可获取；上游企业不可获取下游企业成员该字段
      */
     @JSONField(name = "thumb_avatar")
     private String thumbAvatar;
@@ -80,12 +85,12 @@ public class GetQYUserInfoResponse extends BaseResponse {
     @JSONField(name = "open_userid")
     private String openUserId;
     /**
-     * 员工个人二维码，扫描可添加为外部联系人(注意返回的是一个url，可在浏览器上打开该url以展示二维码)；第三方仅通讯录应用可获取；对于非第三方创建的成员，第三方通讯录应用也不可获取
+     * 员工个人二维码，扫描可添加为外部联系人(注意返回的是一个url，可在浏览器上打开该url以展示二维码)；代开发自建应用需要管理员授权且成员oauth2授权获取；第三方仅通讯录应用可获取；对于非第三方创建的成员，第三方通讯录应用也不可获取；上游企业不可获取下游企业成员该字段
      */
     @JSONField(name = "qr_code")
     private String qrCode;
     /**
-     * 地址。代开发自建应用需要管理员授权才返回；第三方仅通讯录应用可获取；对于非第三方创建的成员，第三方通讯录应用也不可获取
+     * 地址。代开发自建应用需要管理员授权且成员oauth2授权获取；第三方仅通讯录应用可获取；对于非第三方创建的成员，第三方通讯录应用也不可获取；上游企业不可获取下游企业成员该字段
      */
     private String address;
     /**
@@ -184,6 +189,14 @@ public class GetQYUserInfoResponse extends BaseResponse {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getBizMail() {
+        return bizMail;
+    }
+
+    public void setBizMail(String bizMail) {
+        this.bizMail = bizMail;
     }
 
     public String getAvatar() {
