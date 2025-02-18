@@ -430,11 +430,19 @@
             <if test="folderId != null and folderId !=''">
                 AND a.folder_id = #{folderId}
             </if>
-            <if test="days != null and days !=''">
-                and DATEDIFF(CURDATE(), a.CREATE_TIME) > #{days}
-            </if>
+            <choose>
+                <when test="startTime != null and endTime != null">
+                    AND a.update_time BETWEEN #{startTime} AND #{endTime}
+                </when>
+                <when test="startTime != null and endTime == null">
+                    AND a.update_time <![CDATA[>=]]> #{startTime}
+                </when>
+                <when test="startTime == null and endTime != null">
+                    AND a.update_time <![CDATA[<=]]> #{endTime}
+                </when>
+            </choose>
         </where>
-        ORDER BY a.CREATE_TIME DESC
+        ORDER BY a.update_time DESC
     </select>
 
 </mapper>

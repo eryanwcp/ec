@@ -373,11 +373,12 @@ public class FileService extends CrudService<FileDao, File> {
      * @param folderId
      * @return
      */
-    public List<File> findFilesByFolderId(String folderId,String days) {
+    public List<File> findFilesByFolderId(String folderId,Date startTime, Date endTime) {
         Parameter parameter = Parameter.newParameter();
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put("folderId", folderId);
-        parameter.put("days", days);
+        parameter.put("startTime", startTime == null ? null : DateUtils.formatDateTime(startTime));
+        parameter.put("endTime", endTime == null ? null : DateUtils.formatDateTime(endTime));
         return dao.findFilesByFolderId(parameter);
     }
 
