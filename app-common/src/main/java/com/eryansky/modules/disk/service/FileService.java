@@ -374,9 +374,6 @@ public class FileService extends CrudService<FileDao, File> {
      * @return
      */
     public List<File> findFilesByFolderId(String folderId,String days) {
-        if (StringUtils.isEmpty(folderId)) {
-            return Collections.emptyList();
-        }
         Parameter parameter = Parameter.newParameter();
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put("folderId", folderId);
