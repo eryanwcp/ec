@@ -751,4 +751,15 @@ public class DiskUtils {
         }
         return fileName;
     }
+
+    /**
+     * 查询文件夹下的文件
+     * @param folderId 文件夹ID
+     * @param startTime 文件创建 开始时间
+     * @param endTime 文件创建 结束时间
+     * @return
+     */
+    public static List<File> findFilesByFolderId(String folderId, Date startTime, Date endTime) {
+        return Static.fileService.findFilesByFolderId(folderId, startTime, endTime);
+    }
 }

@@ -369,4 +369,20 @@ public class FileService extends CrudService<FileDao, File> {
         return dao.countFileSize(parameter);
     }
 
+    /**
+     * 查询文件夹下的文件
+     * @param folderId 文件夹ID
+     * @param startTime 文件创建 开始时间
+     * @param endTime 文件创建 结束时间
+     * @return
+     */
+    public List<File> findFilesByFolderId(String folderId,Date startTime, Date endTime) {
+        Parameter parameter = Parameter.newParameter();
+        parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
+        parameter.put("folderId", folderId);
+        parameter.put("startTime", startTime == null ? null : DateUtils.formatDateTime(startTime));
+        parameter.put("endTime", endTime == null ? null : DateUtils.formatDateTime(endTime));
+        return dao.findFilesByFolderId(parameter);
+    }
+
 }

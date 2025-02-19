@@ -420,4 +420,28 @@
         </choose>
     </delete>
 
+    <select id="findFilesByFolderId" resultType="File">
+        SELECT
+        <include refid="fileColumns"/>
+        FROM t_disk_file a
+        <where>
+            a.status = #{status}
+            <if test="folderId != null and folderId !=''">
+                AND a.folder_id = #{folderId}
+            </if>
+            <choose>
+                <when test="startTime != null and endTime != null">
+                    AND a.update_time BETWEEN #{startTime} AND #{endTime}
+                </when>
+                <when test="startTime != null and endTime == null">
+                    AND a.update_time <![CDATA[>=]]> #{startTime}
+                </when>
+                <when test="startTime == null and endTime != null">
+                    AND a.update_time <![CDATA[<=]]> #{endTime}
+                </when>
+            </choose>
+        </where>
+        ORDER BY a.update_time DESC
+    </select>
+
 </mapper>
