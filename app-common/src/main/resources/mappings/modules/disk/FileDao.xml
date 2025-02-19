@@ -290,6 +290,7 @@
 		${selectStatement}
 	</select>
 
+
     <insert id="insert">
         INSERT INTO t_disk_file(
         id,
@@ -419,5 +420,22 @@
             <otherwise>'%,'+#{folderId}+',%'</otherwise>
         </choose>
     </delete>
+
+    <select id="findFilesByFolderId" resultType="File">
+        SELECT
+        <include refid="fileColumns"/>
+        FROM t_disk_file a
+        <include refid="fileJoins"/>
+        <where>
+            a.status = #{status}
+            <if test="folderId != null and folderId !=''">
+                AND  f.id =  #{folderId}
+            </if>
+            <if test="days != null and days !=''">
+                and DATEDIFF(CURDATE(), a.CREATE_TIME) > #{days}
+            </if>
+        </where>
+        ORDER BY a.CREATE_TIME DESC
+    </select>
 
 </mapper>
