@@ -748,10 +748,11 @@ public class DiskUtils {
 
     /**
      * 查询文件夹下存在时间大于days天的文件
+     *
      * @param folderId
      * @return
      */
-    public static List<File> findFilesByFolderId(String folderId,String days) {
-        return Static.fileService.findFilesByFolderId(folderId, days);
+    public static List<File> findFilesByFolderId(String folderId, Date startTime, Date endTime) {
+        return Static.fileService.findFilesByFolderId(folderId, startTime, endTime);
     }
 }
