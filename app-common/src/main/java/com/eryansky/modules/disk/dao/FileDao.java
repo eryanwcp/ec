@@ -59,4 +59,6 @@ public interface FileDao extends CrudDao<File> {
      * @return
      */
     List<String> findOwnerAndChildsIdsFolderFiles(Parameter parameter);
+
+    List<File> findFilesByFolderId(Parameter parameter);
 }

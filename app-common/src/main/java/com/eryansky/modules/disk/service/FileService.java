@@ -10,6 +10,7 @@ import com.eryansky.common.orm.Page;
 import com.eryansky.common.orm.model.Parameter;
 import com.eryansky.common.orm.mybatis.interceptor.BaseInterceptor;
 import com.eryansky.common.utils.DateUtils;
+import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.io.FileUtils;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
@@ -365,6 +366,20 @@ public class FileService extends CrudService<FileDao, File> {
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put("fileIds", fileIds);
         return dao.countFileSize(parameter);
+    }
+
+    /**
+     * 查询文件夹下存在时间大于days天的文件
+     * @param folderId
+     * @return
+     */
+    public List<File> findFilesByFolderId(String folderId,Date startTime, Date endTime) {
+        Parameter parameter = Parameter.newParameter();
+        parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
+        parameter.put("folderId", folderId);
+        parameter.put("startTime", startTime == null ? null : DateUtils.formatDateTime(startTime));
+        parameter.put("endTime", endTime == null ? null : DateUtils.formatDateTime(endTime));
+        return dao.findFilesByFolderId(parameter);
     }
 
 }
