@@ -377,7 +377,7 @@ public class FileService extends CrudService<FileDao, File> {
      */
     public List<File> findFilesByFolderId(String folderId,Date startTime, Date endTime) {
         Parameter parameter = Parameter.newParameter();
-        parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
+        parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_DELETE);
         parameter.put("folderId", folderId);
         parameter.put("startTime", startTime == null ? null : DateUtils.formatDateTime(startTime));
         parameter.put("endTime", endTime == null ? null : DateUtils.formatDateTime(endTime));
