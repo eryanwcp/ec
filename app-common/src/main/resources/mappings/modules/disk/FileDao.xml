@@ -425,7 +425,7 @@
         <include refid="fileColumns"/>
         FROM t_disk_file a
         <where>
-            a.status = #{status}
+            a.status != #{status}
             <if test="folderId != null and folderId !=''">
                 AND a.folder_id = #{folderId}
             </if>
