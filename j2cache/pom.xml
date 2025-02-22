@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.eryansky</groupId>
         <artifactId>ec-parent</artifactId>
-        <version>4.3.20250205.04</version>
+        <version>4.3.20250205.05</version>
     </parent>
 
     <artifactId>ec-j2cache</artifactId>
@@ -18,7 +18,7 @@
         <objenesis.version>3.3</objenesis.version>
         <fst.version>3.0.4-jdk17</fst.version>
         <snappy.version>1.1.10.7</snappy.version>
-        <fury-core.version>0.9.0</fury-core.version>
+        <fury-core.version>0.10.0</fury-core.version>
         <guava.version>33.4.0-jre</guava.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
