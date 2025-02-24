@@ -10,6 +10,7 @@ import com.eryansky.common.orm.model.Parameter;
 import com.eryansky.common.orm.mybatis.interceptor.BaseInterceptor;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
+import com.eryansky.modules.sys.mapper.Role;
 import com.eryansky.utils.AppConstants;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
@@ -58,6 +59,26 @@ public class PostService extends CrudService<PostDao, Post> {
     public void savePost(Post entity) {
         super.save(entity);
         savePostOrgans(entity.getId(), entity.getOrganIds());
+    }
+
+    /**
+     * 查找所有
+     *
+     * @return
+     */
+    public List<Post> findAll() {
+        List<Post> list = dao.findList(new Post());
+        return list;
+    }
+
+    /**
+     * 查找所有(包含已删除)
+     *
+     * @return
+     */
+    public List<Post> findAllWithDelete() {
+        List<Post> list = dao.findAllList();
+        return list;
     }
 
     public Page<Post> findPage(Page<Post> p, Post entity) {

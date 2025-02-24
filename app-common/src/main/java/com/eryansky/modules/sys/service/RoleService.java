@@ -122,6 +122,18 @@ public class RoleService extends CrudService<RoleDao, Role> {
         return list;
     }
 
+
+    /**
+     * 查找所有(包含已删除)
+     *
+     * @return
+     */
+    public List<Role> findAllWithDelete() {
+        List<Role> list = dao.findAllList();
+        return list;
+    }
+
+
     /**
      * 查找机构角色
      *
