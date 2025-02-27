@@ -435,4 +435,16 @@ public class User extends DataEntity<User> implements IUser {
     public String getMobileSensitive() {
         return SensitiveUtils.getSensitive(mobile,SensitiveType.MOBILE_PHONE);
     }
+
+
+    public String getAttr(String key) {
+        return null != this.extendAttr ? (String) this.extendAttr.get(key):null;
+    }
+
+    public User setAttr(String key,Object value) {
+        if(null != extendAttr){
+            this.extendAttr.put(key,value);
+        }
+        return this;
+    }
 }

@@ -290,4 +290,15 @@ public class Organ extends TreeEntity<Organ> {
         }
         return typeView;
     }
+
+    public String getAttr(String key) {
+        return null != this.extendAttr ? (String) this.extendAttr.get(key):null;
+    }
+
+    public Organ setAttr(String key,Object value) {
+        if(null != extendAttr){
+            this.extendAttr.put(key,value);
+        }
+        return this;
+    }
 }

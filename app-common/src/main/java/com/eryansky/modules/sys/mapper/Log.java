@@ -341,4 +341,16 @@ public class Log extends DataEntity<Log> {
     public void setExtendAttr(ExtendAttr extendAttr) {
         this.extendAttr = extendAttr;
     }
+
+
+    public String getAttr(String key) {
+        return null != this.extendAttr ? (String) this.extendAttr.get(key):null;
+    }
+
+    public Log setAttr(String key,Object value) {
+        if(null != extendAttr){
+            this.extendAttr.put(key,value);
+        }
+        return this;
+    }
 }
