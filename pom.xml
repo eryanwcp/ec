@@ -44,7 +44,7 @@
 
         <tomcat.version>10.1.36</tomcat.version>
 
-        <mybatis-spring-boot.version>3.0.4</mybatis-spring-boot.version>
+        <mybatis-spring-boot.version>3.0.3</mybatis-spring-boot.version>
         <commons-pool2.version>2.12.1</commons-pool2.version>
         <druid-version>1.2.24</druid-version>
         <mariadb.driver.version>3.4.1</mariadb.driver.version>
