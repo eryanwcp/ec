@@ -5,7 +5,7 @@
 
     <groupId>com.eryansky</groupId>
     <artifactId>ec-parent</artifactId>
-    <version>4.3.20250205.08</version>
+    <version>4.3.20250226.01</version>
     <modules>
         <module>common</module>
         <module>j2cache</module>
@@ -35,17 +35,17 @@
         <java.version>17</java.version>
         <tomcat-plugin.version>2.2</tomcat-plugin.version>
 
-        <spring-boot.version>3.3.8</spring-boot.version>
-        <spring-integration-redis.version>6.3.7</spring-integration-redis.version>
+        <spring-boot.version>3.3.9</spring-boot.version>
+        <spring-integration-redis.version>6.3.8</spring-integration-redis.version>
         <logstash-logback-encoder.version>8.0</logstash-logback-encoder.version>
         <logback-classic.version>1.5.16</logback-classic.version>
         <byte-buddy.version>1.15.11</byte-buddy.version>
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
 
-        <tomcat.version>10.1.34</tomcat.version>
+        <tomcat.version>10.1.36</tomcat.version>
 
-        <mybatis-spring-boot.version>3.0.3</mybatis-spring-boot.version>
-        <commons-pool2.version>2.12.0</commons-pool2.version>
+        <mybatis-spring-boot.version>3.0.4</mybatis-spring-boot.version>
+        <commons-pool2.version>2.12.1</commons-pool2.version>
         <druid-version>1.2.24</druid-version>
         <mariadb.driver.version>3.4.1</mariadb.driver.version>
         <mysql.driver.version>8.4.0</mysql.driver.version>
@@ -54,17 +54,17 @@
         <oscar.driver.version>4.0.2</oscar.driver.version>
 
         <httpcomponents.version>4.5.14</httpcomponents.version>
-        <httpclient5.version>5.4.1</httpclient5.version>
+        <httpclient5.version>5.4.2</httpclient5.version>
         <commons-codec.version>1.18.0</commons-codec.version>
 
 
-        <ec-common.version>4.3.20250205.08</ec-common.version>
-        <ec-app-common.version>4.3.20250205.08</ec-app-common.version>
-        <ec-client-common.version>4.3.20250205.08</ec-client-common.version>
-        <ec-j2cache.version>4.3.20250205.08</ec-j2cache.version>
-        <ec-j2cache-spring-boot-starter.version>4.3.20250205.08</ec-j2cache-spring-boot-starter.version>
-        <ec-fastweixin.version>4.3.20250205.08</ec-fastweixin.version>
-        <ec-encrypt-spring-boot-starter.version>4.3.20250205.08</ec-encrypt-spring-boot-starter.version>
+        <ec-common.version>4.3.20250226.01</ec-common.version>
+        <ec-app-common.version>4.3.20250226.01</ec-app-common.version>
+        <ec-client-common.version>4.3.20250226.01</ec-client-common.version>
+        <ec-j2cache.version>4.3.20250226.01</ec-j2cache.version>
+        <ec-j2cache-spring-boot-starter.version>4.3.20250226.01</ec-j2cache-spring-boot-starter.version>
+        <ec-fastweixin.version>4.3.20250226.01</ec-fastweixin.version>
+        <ec-encrypt-spring-boot-starter.version>4.3.20250226.01</ec-encrypt-spring-boot-starter.version>
 
         <jackson.version>2.18.2</jackson.version>
     </properties>
