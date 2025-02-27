@@ -122,4 +122,16 @@ public class Area extends TreeEntity<Area> {
     public void setRemark(String remark) {
         this.remark = remark;
     }
+
+
+    public String getAttr(String key) {
+        return null != this.extendAttr ? (String) this.extendAttr.get(key):null;
+    }
+
+    public Area setAttr(String key,Object value) {
+        if(null != extendAttr){
+            this.extendAttr.put(key,value);
+        }
+        return this;
+    }
 }
