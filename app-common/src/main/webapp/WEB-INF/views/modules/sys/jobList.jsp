@@ -129,10 +129,11 @@
                 <td>{{prevFireTime}}</td>
                 <td>{{nextFireTime}}</td>
                 <td>
-                    <a id="{{jobName}}" style="cursor:pointer;" onclick="executeJob('{{jobName}}','{{jobGroup}}');">立即执行</a>
-                    <a id="{{jobName}}_1" style="cursor:pointer;" onclick="pauseJob('{{jobName}}','{{jobGroup}}');">暂停任务</a>
-                    <a id="{{jobName}}_2" style="cursor:pointer;" onclick="resumeJob('{{jobName}}','{{jobGroup}}');">继续任务</a>
-
+                    <e:hasPermission name="sys:job:edit">
+                        <a id="{{jobName}}" style="cursor:pointer;" onclick="executeJob('{{jobName}}','{{jobGroup}}');">立即执行</a>
+                        <a id="{{jobName}}_1" style="cursor:pointer;" onclick="pauseJob('{{jobName}}','{{jobGroup}}');">暂停任务</a>
+                        <a id="{{jobName}}_2" style="cursor:pointer;" onclick="resumeJob('{{jobName}}','{{jobGroup}}');">继续任务</a>
+                    </e:hasPermission>
                 </td>
             </tr>
             {{/result}}

@@ -1,12 +1,19 @@
+<%@ page import="com.eryansky.core.security.SecurityUtils" %>
 <%@ page language="java" pageEncoding="UTF-8" contentType="text/html; charset=UTF-8" %>
 <%@ include file="/common/taglibs.jsp" %>
 <%@ include file="/common/meta.jsp" %>
-<script type="text/javascript" src="${ctxStatic}/app/modules/sys/dictionary${yuicompressor}.js?_=${sysInitTime}"
-        charset="utf-8"></script>
+<script type="text/javascript">
+    var sessionInfoUserId = "${sessionInfo.userId}";//当前的登录用户id
+    var hasPermissionDictionaryEdit = <%= SecurityUtils.isPermitted("sys:dictionary:edit")%>;
+    var toolbar = [];
+</script>
+<script type="text/javascript" src="${ctxStatic}/app/modules/sys/dictionary${yuicompressor}.js?_=${sysInitTime}" charset="utf-8"></script>
 <%-- 数据字典右键操作 --%>
 <div id="treeMenu" class="easyui-menu" style="width:120px;">
-    <div name="edit" data-options="iconCls:'easyui-icon-edit'">编辑</div>
-    <div name="delete" data-options="iconCls:'easyui-icon-remove'">删除</div>
+    <e:hasPermission name="sys:dictionary:edit">
+        <div name="edit" data-options="iconCls:'easyui-icon-edit'">编辑</div>
+        <div name="delete" data-options="iconCls:'easyui-icon-remove'">删除</div>
+    </e:hasPermission>
 </div>
 <div class="easyui-layout" fit="true" style="margin: 0;border: 0;overflow: hidden;width:100%;height:100%;">
 

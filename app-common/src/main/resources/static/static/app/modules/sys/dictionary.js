@@ -7,6 +7,9 @@ var editRow = undefined;
 var editRowData = undefined;
 var $dictionaryItem_search_form;
 var currentDictionaryId = undefined;
+
+var hasPermissionDictionaryEdit = hasPermissionDictionaryEdit;
+var toolbar = toolbar;
 $(function () {
     $dictionaryItem_search_form = $('#dictionaryItem_search_form').form();
     loadDictionaryTree();
@@ -59,6 +62,21 @@ function loadDictionaryTree() {
  */
 
 function dictionaryItemDatagrid() {
+    if(hasPermissionDictionaryEdit){
+        toolbar = toolbar.concat([ {
+            text: '新增',
+            iconCls: 'easyui-icon-add',
+            handler: function () {
+                addDictionaryItem()
+            }
+        }, '-', {
+            text: '删除',
+            iconCls: 'easyui-icon-remove',
+            handler: function () {
+                delDictionaryItem()
+            }
+        }]);
+    }
     //数据列表
     $dictionaryItem_datagrid = $('#dictionaryItem_datagrid').datagrid({
         url: ctxAdmin + '/sys/dictionaryItem/datagrid',
@@ -213,25 +231,15 @@ function dictionaryItemDatagrid() {
                         operateHtml = "<a class='easyui-linkbutton' data-options='iconCls:\"easyui-icon-save\"' onclick='saveDictionaryItem(this," + rowIndex + ",\"" + rowData.id + "\")' >保存 </a>"
                             + "&nbsp;<a class='easyui-linkbutton' data-options='iconCls:\"easyui-icon-cancel\"' onclick='rejectChanges(" + rowIndex + ");' >取消  </a>";
                     } else {
-                        operateHtml = "<a class='easyui-linkbutton' data-options='iconCls:\"easyui-icon-edit\"' onclick='beginEdit(" + rowIndex + ")'>编辑</a>"
-                            + "&nbsp;<a class='easyui-linkbutton' data-options='iconCls:\"easyui-icon-remove\"' onclick='delDictionaryItem(\"" + rowData.id + "\",\"" + rowData.name + "\")'>删除</a>";
+                        if(hasPermissionDictionaryEdit){
+                            operateHtml = "<a class='easyui-linkbutton' data-options='iconCls:\"easyui-icon-edit\"' onclick='beginEdit(" + rowIndex + ")'>编辑</a>"
+                                + "&nbsp;<a class='easyui-linkbutton' data-options='iconCls:\"easyui-icon-remove\"' onclick='delDictionaryItem(\"" + rowData.id + "\",\"" + rowData.name + "\")'>删除</a>";
+                        }
                     }
                     return operateHtml;
                 }
             }]],
-        toolbar: [{
-            text: '新增',
-            iconCls: 'easyui-icon-add',
-            handler: function () {
-                addDictionaryItem()
-            }
-        }, '-', {
-            text: '删除',
-            iconCls: 'easyui-icon-remove',
-            handler: function () {
-                delDictionaryItem()
-            }
-        }],
+        toolbar: toolbar,
         onBeforeEdit: function (index, row) {
             editRow = index;
             editRowData = row;
