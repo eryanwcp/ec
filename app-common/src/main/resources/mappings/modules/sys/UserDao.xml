@@ -216,7 +216,7 @@
                     AND a.code = #{code}
                 </when>
                 <otherwise>
-                    <![CDATA[ 1 <> 1 ]]>
+                   AND <![CDATA[ 1 <> 1 ]]>
                 </otherwise>
             </choose>
         </where>
@@ -241,7 +241,7 @@
                     AND a.mobile = #{mobile}
                 </when>
                 <otherwise>
-                    <![CDATA[ 1 <> 1 ]]>
+                    AND <![CDATA[ 1 <> 1 ]]>
                 </otherwise>
             </choose>
         </where>
@@ -278,7 +278,7 @@
                     AND a.code = #{code}
                 </when>
                 <otherwise>
-                    <![CDATA[ 1 <> 1 ]]>
+                   AND <![CDATA[ 1 <> 1 ]]>
                 </otherwise>
             </choose>
         </where>
