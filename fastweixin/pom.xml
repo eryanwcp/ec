@@ -6,14 +6,14 @@
     <parent>
         <groupId>com.eryansky</groupId>
         <artifactId>ec-parent</artifactId>
-        <version>4.3.20250226.03</version>
+        <version>4.3.20250325.01</version>
     </parent>
 
     <artifactId>ec-fastweixin</artifactId>
     <version>${ec-fastweixin.version}</version>
     <packaging>jar</packaging>
     <properties>
-        <fastjson.version>2.0.55</fastjson.version>
+        <fastjson.version>2.0.56</fastjson.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
