@@ -376,9 +376,39 @@ public class ResourceService extends TreeService<ResourceDao, Resource> {
     public List<Resource> findAuthorityResourcesByUserId(String userId, Collection<String> resourceTypes) {
         Parameter parameter = new Parameter();
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
+        parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
         parameter.put("userId", userId);
         parameter.put("types", resourceTypes);
         return dao.findAuthorityResourcesByUserId(parameter);
+    }
+
+    /**
+     * 查找授权用户资源
+     *
+     * @param rootResourceId 根资源ID
+     * @param userId         用户ID
+     * @return
+     */
+    public List<Resource> findAuthorityResourcesByParentResourceIdAndUserId(String rootResourceId, String userId) {
+        return findAuthorityResourcesByParentResourceIdAndUserId(rootResourceId,userId,null);
+    }
+
+    /**
+     * 查找授权用户资源
+     *
+     * @param rootResourceId 根资源ID
+     * @param userId         用户ID
+     * @param resourceTypes  资源类型 为null,则查询所有 {@link ResourceType}
+     * @return
+     */
+    public List<Resource> findAuthorityResourcesByParentResourceIdAndUserId(String rootResourceId, String userId, Collection<String> resourceTypes) {
+        Parameter parameter = new Parameter();
+        parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
+        parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
+        parameter.put("rootResouceId", rootResourceId);
+        parameter.put("userId", userId);
+        parameter.put("types", resourceTypes);
+        return dao.findAuthorityResourcesByParentResourceIdAndUserId(parameter);
     }
 
     /**

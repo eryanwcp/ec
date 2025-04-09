@@ -139,7 +139,14 @@
         WHERE
         a.status = '0'
         <if test="id != null and id !=''">
-            AND (a.parent_id = #{id} )
+            AND (a.parent_id = #{id} OR a.parent_ids LIKE
+            <choose>
+                <when test="dbName == 'db2'">'%,'||#{id}||',%'</when>
+                <when test="dbName == 'mysql'">CONCAT('%,', #{id}, ',%')</when>
+                <when test="dbName == 'oracle'">'%,'||#{id}||',%'</when>
+                <otherwise>'%,'+#{id}+',%'</otherwise>
+            </choose>
+            )
         </if>
         <if test="types != null and types.size() !=0">
             AND a.type IN
@@ -330,6 +337,63 @@
                         </foreach>
                     </if>
                 </where>
+            )
+
+        </where>
+        ORDER BY a.sort ASC
+    </select>
+
+
+    <select id="findAuthorityResourcesByParentResourceIdAndUserId" resultType="Resource" useCache="false">
+        SELECT
+        DISTINCT
+        <include refid="resourceColumns"/>
+        FROM t_sys_resource a
+        LEFT JOIN t_sys_user_resource ur0 ON ur0.resource_id = a.id
+        LEFT JOIN t_sys_user u0 ON ur0.user_id = u0.id
+        <include refid="resourceJoins"/>
+        <where>
+            a.status = '0'
+            AND u0.id = #{userId}
+            AND (a.parent_id = #{rootResouceId} OR a.parent_ids LIKE
+            <choose>
+                <when test="dbName == 'db2'">'%,'||#{rootResouceId}||',%'</when>
+                <when test="dbName == 'mysql'">CONCAT('%,', #{rootResouceId}, ',%')</when>
+                <when test="dbName == 'oracle'">'%,'||#{rootResouceId}||',%'</when>
+                <otherwise>'%,'+#{rootResouceId}+',%'</otherwise>
+            </choose>
+            )
+            <if test="types != null and types.size() !=0">
+                AND a.type IN
+                <foreach collection="types" open="(" separator="," close=")" item="item">
+                    #{item}
+                </foreach>
+            </if>
+            OR a.id IN (
+            SELECT r.id
+            FROM t_sys_user u
+            LEFT JOIN t_sys_user_role ur ON ur.user_id = u.id
+            LEFT JOIN t_sys_role role ON  role.id = ur.role_id
+            LEFT JOIN t_sys_role_resource rr ON rr.role_id = role.id
+            LEFT JOIN t_sys_resource r ON r.id = rr.resource_id
+            <where>
+                r.status = '0' AND role.status = '0'
+                AND u.id = #{userId}
+                AND (r.parent_id = #{rootResouceId} OR r.parent_ids LIKE
+                <choose>
+                    <when test="dbName == 'db2'">'%,'||#{rootResouceId}||',%'</when>
+                    <when test="dbName == 'mysql'">CONCAT('%,', #{rootResouceId}, ',%')</when>
+                    <when test="dbName == 'oracle'">'%,'||#{rootResouceId}||',%'</when>
+                    <otherwise>'%,'+#{rootResouceId}+',%'</otherwise>
+                </choose>
+                )
+                <if test="types != null and types.size() !=0">
+                    AND r.type IN
+                    <foreach collection="types" open="(" separator="," close=")" item="item">
+                        #{item}
+                    </foreach>
+                </if>
+            </where>
             )
 
         </where>
