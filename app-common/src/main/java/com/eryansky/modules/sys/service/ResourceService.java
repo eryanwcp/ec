@@ -692,6 +692,7 @@ public class ResourceService extends TreeService<ResourceDao, Resource> {
         treeNode.addAttribute("markUrl", resource.getMarkUrl());
         treeNode.addAttribute("code", resource.getCode());
         treeNode.addAttribute("type", resource.getType());
+        treeNode.addAttribute("sort", resource.getSort());
         return treeNode;
     }
 
@@ -708,6 +709,7 @@ public class ResourceService extends TreeService<ResourceDao, Resource> {
         String url = resource.getUrl();
         menu.setHref(url);
         menu.addAttribute("type", resource.getType());
+        menu.addAttribute("sort", resource.getSort());
         return menu;
     }
 
