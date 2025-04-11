@@ -1036,6 +1036,17 @@ public class SecurityUtils {
 
     /**
      * 查看某个用户登录信息
+     * @param loginNameOrMobile 登录帐号或手机号
+     * @return
+     */
+    public static List<SessionInfo> findSessionInfoByLoginNameOrMobile(String loginNameOrMobile) {
+        List<SessionInfo> list = findSessionInfoListWithOrder();
+        return list.parallelStream().filter(sessionInfo -> loginNameOrMobile.equalsIgnoreCase(sessionInfo.getLoginName()) || loginNameOrMobile.equalsIgnoreCase(sessionInfo.getMobile())).collect(Collectors.toList());
+    }
+
+
+    /**
+     * 查看某个用户登录信息
      * @param userId 用户ID
      * @return
      */
