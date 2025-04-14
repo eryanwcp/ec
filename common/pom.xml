@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.eryansky</groupId>
         <artifactId>ec-parent</artifactId>
-        <version>4.3.20250325.03</version>
+        <version>4.3.20250325.04</version>
     </parent>
 
     <artifactId>ec-common</artifactId>
@@ -34,7 +34,7 @@
         <cglib-nodep.version>3.3.0</cglib-nodep.version>
         <slf4j.version>2.0.17</slf4j.version>
 
-        <guava.version>33.4.5-jre</guava.version>
+        <guava.version>33.4.7-jre</guava.version>
         <dozer.version>7.0.0</dozer.version>
         <freemarker.version>2.3.34</freemarker.version>
 
