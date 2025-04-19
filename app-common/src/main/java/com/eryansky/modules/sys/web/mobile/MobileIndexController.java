@@ -114,7 +114,7 @@ public class MobileIndexController extends SimpleController {
         VersionLog versionLog = null;
         String ua = UserAgentUtils.getHTTPUserAgent(SpringMVCHolder.getRequest());
         boolean likeIOS = AppUtils.likeIOS(ua);
-        boolean likeAndroid = AppUtils.likeAndroid(ua);
+        boolean likeAndroid = AppUtils.likeAndroidOrHarmonyOS(ua);
         if (versionLogType == null) {
             if (likeIOS) {
                 versionLogType = VersionLogType.iPhoneAPP.getValue();
