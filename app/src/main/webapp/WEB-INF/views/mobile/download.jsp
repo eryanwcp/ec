@@ -123,14 +123,14 @@
         <div class="panel active" id="loginpanel">
             <div class="title"><h2 style="color: #66d354;">${fns:getAppFullName()}APP下载</h2></div>
             <div id="qr" align="center" style="margin: 20px;"></div>
-            <div align="center">支持Android6.0+以及iOS12.0+</div>
+            <div align="center">支持Android10.0+以及iOS12.0+</div>
             <div align="center" style="color: red;">建议使用微信扫一扫
                 （<a href="#" data-ignore="true">用户手册</a>）
             </div>
 
-            <c:if test="${likeIOS == false}">
+<%--            <c:if test="${likeIOS == false}">--%>
                 <a href="${downloadUrl_Android}" class="button login download" data-ignore="true">Android版${not empty model.versionName ? '(V'.concat(model.versionName).concat(')'):''}下载</a>
-            </c:if>
+<%--            </c:if>--%>
             <c:if test="${likeIOS == true}">
                 <a href="${downloadUrl_iPhone}" class="button login download" data-ignore="true">iOS版${not empty model.versionName ? '(V'.concat(model.versionName).concat(')'):''}下载</a>
             </c:if>
