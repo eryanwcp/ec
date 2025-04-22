@@ -429,11 +429,36 @@ public class User extends DataEntity<User> implements IUser {
     }
 
     /**
+     * 办公电话脱敏
+     * @return
+     */
+    public String getTelSensitive() {
+        return SensitiveUtils.getSensitive(tel,SensitiveType.MOBILE_OR_FIXED_PHONE);
+    }
+
+    /**
      * 手机号脱敏
      * @return
      */
     public String getMobileSensitive() {
         return SensitiveUtils.getSensitive(mobile,SensitiveType.MOBILE_PHONE);
+    }
+
+
+    /**
+     * 邮箱地址脱敏
+     * @return
+     */
+    public String getEmailSensitive() {
+        return SensitiveUtils.getSensitive(email,SensitiveType.EMAIL);
+    }
+
+    /**
+     * 个人邮箱地址脱敏
+     * @return
+     */
+    public String getPersonEmailSensitive() {
+        return SensitiveUtils.getSensitive(personEmail,SensitiveType.EMAIL);
     }
 
 

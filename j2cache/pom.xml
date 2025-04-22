@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.eryansky</groupId>
         <artifactId>ec-parent</artifactId>
-        <version>4.3.20250325.05</version>
+        <version>4.3.20250325.06</version>
     </parent>
 
     <artifactId>ec-j2cache</artifactId>
