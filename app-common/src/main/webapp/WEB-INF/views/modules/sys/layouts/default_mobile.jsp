@@ -8,7 +8,7 @@
 <!--[if (gt IE 9)|!(IE)]><!--> <html class="no-js"> <!--<![endif]-->
 <html style="background-color: #e6e6e6;">
 <head>
-    <title><sitemesh:title default="${fns:getAppName()}"/></title>
+    <title><sitemesh:write property='title'/></title>
     <%@ include file="/WEB-INF/views/modules/sys/include/head_mobile.jsp" %>
     <%@ include file="/common/mobile-select-area.jsp" %>
     <%@ include file="/WEB-INF/views/include/dialog.jsp" %>
