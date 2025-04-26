@@ -235,7 +235,6 @@ public class DiskUtils {
      * @param fileName    文件名称
      * @return
      * @throws InvalidExtensionException
-     * @throws FileUploadBase.FileSizeLimitExceededException
      * @throws FileNameLengthLimitExceededException
      * @throws IOException
      */
