@@ -144,10 +144,10 @@ public class IndexController extends SimpleController {
      *
      * @return
      */
-    @Logging(value = "单点登录", logType = LogType.REST)
-    @GetMapping(value = {"sso/{url}"})
-    public String sso(HttpServletRequest request, @PathVariable String url) {
-        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
-        return "redirect:" + url + "?Authorization=" + (null != sessionInfo ? sessionInfo.getToken() : "");
-    }
+//    @Logging(value = "单点登录", logType = LogType.REST)
+//    @GetMapping(value = {"sso/{url}"})
+//    public String sso(HttpServletRequest request, @PathVariable String url) {
+//        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
+//        return "redirect:" + url + "?Authorization=" + (null != sessionInfo ? sessionInfo.getToken() : "");
+//    }
 }
