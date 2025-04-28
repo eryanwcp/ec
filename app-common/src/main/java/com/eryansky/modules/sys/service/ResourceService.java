@@ -148,6 +148,7 @@ public class ResourceService extends TreeService<ResourceDao, Resource> {
      */
     public Resource getByCode(String resourceCode) {
         Parameter parameter = new Parameter();
+        parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put("code", resourceCode);
         return dao.getByCode(parameter);
@@ -173,8 +174,8 @@ public class ResourceService extends TreeService<ResourceDao, Resource> {
      */
     public List<Resource> findOwnerAndChilds(String id, Collection<String> resourceTypes) {
         Parameter parameter = new Parameter();
-        parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
+        parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put("id", id);
         parameter.put("types", resourceTypes);
         return dao.findOwnAndChilds(parameter);
@@ -189,6 +190,7 @@ public class ResourceService extends TreeService<ResourceDao, Resource> {
      */
     public List<Resource> findChilds(String id, Collection<String> resourceTypes) {
         Parameter parameter = new Parameter();
+        parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put("id", id);
         parameter.put("types", resourceTypes);
@@ -214,6 +216,7 @@ public class ResourceService extends TreeService<ResourceDao, Resource> {
      */
     public List<Resource> findChild(String id, String status) {
         Parameter parameter = new Parameter();
+        parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
         parameter.put(DataEntity.FIELD_STATUS, StringUtils.isBlank(status) ? DataEntity.STATUS_NORMAL : status);
         parameter.put("parentId", id);
         return dao.findChild(parameter);
@@ -239,6 +242,7 @@ public class ResourceService extends TreeService<ResourceDao, Resource> {
      */
     public List<Resource> findResourcesByUserId(String userId, Collection<String> resourceTypes) {
         Parameter parameter = new Parameter();
+        parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put("userId", userId);
         parameter.put("types", resourceTypes);
@@ -264,6 +268,7 @@ public class ResourceService extends TreeService<ResourceDao, Resource> {
      */
     public List<String> findResourceIdsByUserId(String userId, Collection<String> resourceTypes) {
         Parameter parameter = new Parameter();
+        parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put("userId", userId);
         parameter.put("types", resourceTypes);
@@ -290,6 +295,7 @@ public class ResourceService extends TreeService<ResourceDao, Resource> {
      */
     public List<Resource> findResourcesByRoleId(String roleId, Collection<String> resourceTypes) {
         Parameter parameter = new Parameter();
+        parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put("roleId", roleId);
         parameter.put("types", resourceTypes);
@@ -316,6 +322,7 @@ public class ResourceService extends TreeService<ResourceDao, Resource> {
      */
     public List<String> findResourceIdsByRoleId(String roleId, Collection<String> resourceTypes) {
         Parameter parameter = new Parameter();
+        parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put("roleId", roleId);
         parameter.put("types", resourceTypes);
