@@ -86,8 +86,7 @@ $(function () {
         }, {
             title: '客户端版本',
             field: 'appVersion',
-            width: 120,
-            hidden: true
+            width: 120
         }, {
             title: '登录时间',
             field: 'loginTime',
