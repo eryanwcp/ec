@@ -820,6 +820,7 @@ public class SecurityUtils {
         return null == sessionInfo ? null : sessionInfo.getUserId();
     }
 
+
     /**
      * 获取当前登录用户账号信息.
      */
@@ -834,6 +835,22 @@ public class SecurityUtils {
     public static String getCurrentUserName() {
         SessionInfo sessionInfo = getCurrentSessionInfo();
         return null == sessionInfo ? null : sessionInfo.getName();
+    }
+
+    /**
+     * 获取当前登录用户信息.
+     */
+    public static String getCurrentUserToken() {
+        SessionInfo sessionInfo = getCurrentSessionInfo();
+        return null == sessionInfo ? null : sessionInfo.getToken();
+    }
+
+    /**
+     * 获取当前登录用户信息.
+     */
+    public static String getCurrentUserRefreshToken() {
+        SessionInfo sessionInfo = getCurrentSessionInfo();
+        return null == sessionInfo ? null : sessionInfo.getRefreshToken();
     }
 
     /**
