@@ -147,7 +147,7 @@
                         <a id="{{jobName}}" style="cursor:pointer;" onclick="executeJob('{{jobName}}','{{jobGroup}}');">立即执行</a>
                         <a id="{{jobName}}_1" style="cursor:pointer;" onclick="pauseJob('{{jobName}}','{{jobGroup}}');">暂停任务</a>
                         <a id="{{jobName}}_2" style="cursor:pointer;" onclick="resumeJob('{{jobName}}','{{jobGroup}}');">继续任务</a>
-                        <a id="{{jobName}}_3" style="cursor:pointer;" onclick="resumeJob('{{jobName}}','{{jobGroup}}');">继续任务</a>
+                        <a id="{{jobName}}_3" style="cursor:pointer;" onclick="removeJob('{{jobName}}','{{jobGroup}}');">删除</a>
                     </e:hasPermission>
                 </td>
             </tr>
