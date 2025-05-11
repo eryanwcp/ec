@@ -137,15 +137,5 @@ public class IndexController extends SimpleController {
         return modelAnView;
     }
 
-    /**
-     * 单点登录内部系统
-     *
-     * @return
-     */
-    @Logging(value = "单点登录", logType = LogType.REST)
-    @GetMapping(value = {"sso/{url}"})
-    public String sso(HttpServletRequest request, @PathVariable String url) {
-        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
-        return "redirect:" + url +(StringUtils.containsAny(url, "?") ? "&" : "?")+ "Authorization=" + (null != sessionInfo ? sessionInfo.getToken() : "");
-    }
+
 }
