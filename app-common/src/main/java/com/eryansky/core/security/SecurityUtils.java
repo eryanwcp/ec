@@ -743,6 +743,41 @@ public class SecurityUtils {
         return JWTUtils.getUsername(token);
     }
 
+    /**
+     * 根据Token获取用户信息
+     *
+     * @param token
+     * @return
+     */
+    public static User getUserByToken(String token) {
+        return getUserByToken(token, true);
+    }
+
+    /**
+     * 根据Token获取用户信息 校验
+     *
+     * @param token
+     * @param verify 是否校验有效性
+     * @return
+     */
+    public static User getUserByToken(String token, boolean verify) {
+        String loginName = null;
+        User user = null;
+        boolean flag = false;
+        try {
+            loginName = SecurityUtils.getLoginNameByToken(token);
+            user = UserUtils.getUserByLoginName(loginName);
+            if (verify && null != user) {
+                flag = SecurityUtils.verifySessionInfoToken(token, loginName, user.getPassword());
+            }
+        } catch (Exception e) {
+            if (!(e instanceof TokenExpiredException)) {
+                logger.error("Token校验失败：{},{},{},{}", loginName, SpringMVCHolder.getIp(), token, e.getMessage());
+            }
+        }
+        return flag ? user : null;
+    }
+
 
     /**
      * 获取当前用户session信息.

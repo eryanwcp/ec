@@ -55,7 +55,7 @@ public abstract class TreeService<D extends TreeDao<T>, T extends TreeEntity<T>>
 		// 更新子节点 parentIds
 		T o = null;
 		try {
-			o = entityClass.newInstance();
+			o = entityClass.getDeclaredConstructor().newInstance();
 		} catch (Exception e) {
 			throw new ServiceException(e);
 		}

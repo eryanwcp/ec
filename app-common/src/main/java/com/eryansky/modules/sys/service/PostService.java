@@ -64,6 +64,26 @@ public class PostService extends CrudService<PostDao, Post> {
         savePostOrgans(entity.getId(), entity.getOrganIds());
     }
 
+    /**
+     * 查找所有
+     *
+     * @return
+     */
+    public List<Post> findAll() {
+        List<Post> list = dao.findList(new Post());
+        return list;
+    }
+
+    /**
+     * 查找所有(包含已删除)
+     *
+     * @return
+     */
+    public List<Post> findAllWithDelete() {
+        List<Post> list = dao.findAllList();
+        return list;
+    }
+
     public Page<Post> findPage(Page<Post> p, Post entity) {
         Parameter parameter = new Parameter();
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
