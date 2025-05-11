@@ -93,6 +93,20 @@
             });
         }
 
+        function removeJob(jobClassName,jobGroupName) {
+            $("#"+jobClassName+"_3").attr("disabled",true).css({"pointer-events":"none","opacity":"0.4"});
+            $.ajax({
+                type : 'POST',
+                url :'${ctxAdmin}'+'/sys/job/removeJob',
+                data: {"jobClassName":jobClassName,"jobGroupName":jobGroupName},
+                dataType:"JSON",
+                success : function(data) {
+                    toastr.info(data.msg);
+                    setTimeout("location.reload()",3000);
+                }
+            });
+        }
+
         function page(n,s){
             $("#pageNo").val(n);
             $("#pageSize").val(s);
@@ -129,10 +143,12 @@
                 <td>{{prevFireTime}}</td>
                 <td>{{nextFireTime}}</td>
                 <td>
-                    <a id="{{jobName}}" style="cursor:pointer;" onclick="executeJob('{{jobName}}','{{jobGroup}}');">立即执行</a>
-                    <a id="{{jobName}}_1" style="cursor:pointer;" onclick="pauseJob('{{jobName}}','{{jobGroup}}');">暂停任务</a>
-                    <a id="{{jobName}}_2" style="cursor:pointer;" onclick="resumeJob('{{jobName}}','{{jobGroup}}');">继续任务</a>
-
+                    <e:hasPermission name="sys:job:edit">
+                        <a id="{{jobName}}" style="cursor:pointer;" onclick="executeJob('{{jobName}}','{{jobGroup}}');">立即执行</a>
+                        <a id="{{jobName}}_1" style="cursor:pointer;" onclick="pauseJob('{{jobName}}','{{jobGroup}}');">暂停任务</a>
+                        <a id="{{jobName}}_2" style="cursor:pointer;" onclick="resumeJob('{{jobName}}','{{jobGroup}}');">继续任务</a>
+                        <a id="{{jobName}}_3" style="cursor:pointer;" onclick="removeJob('{{jobName}}','{{jobGroup}}');">删除</a>
+                    </e:hasPermission>
                 </td>
             </tr>
             {{/result}}

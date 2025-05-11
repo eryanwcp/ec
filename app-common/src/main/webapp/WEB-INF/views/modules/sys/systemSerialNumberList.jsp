@@ -76,11 +76,13 @@
 				<td>{{preMaxNum}}</td>
 				<td>{{remark}}</td>
 				<td>
+				<e:hasPermission name="sys:systemSerialNumber:edit">
 					<a class="btn-link" href="${ctxAdmin}/sys/systemSerialNumber/form?id={{id}}">修改</a>&nbsp;
 					<a class="btn-link" onclick="return confirmx('要删除数据吗？', this.href)" href="${ctxAdmin}/sys/systemSerialNumber/delete?id={{id}}">删除</a>&nbsp;
 					{{#resetType}}
 					<a class="btn-link" target="_blank" href="${ctxAdmin}/sys/systemSerialNumber/resetSerialNumber?id={{id}}">重置</a>&nbsp;
 					{{/resetType}}
+				</e:hasPermission>
 				</td>
 			</tr>
 			{{/result}}

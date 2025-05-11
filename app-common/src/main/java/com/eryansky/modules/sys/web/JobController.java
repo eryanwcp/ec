@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.InvocationTargetException;
 import java.rmi.ServerException;
 import java.util.HashMap;
 import java.util.Map;
@@ -267,18 +268,16 @@ public class JobController extends SimpleController {
 			//加载参数指定的类
 			Class<?> classTmp = Class.forName(classname);
 			//实例化
-			baseJob = (Job) classTmp.newInstance();
+//			baseJob = (Job) classTmp.newInstance();
+			baseJob = (Job) classTmp.getDeclaredConstructor().newInstance();
 		} catch (ClassNotFoundException e) {
 			logger.error("找不到指定的类", e);
-			throw new ServerException("");
-		} catch (InstantiationException e) {
+			throw new ServerException(e.getMessage());
+		} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
 			logger.error("实例化类失败", e);
-			throw new ServerException("");
-		} catch (IllegalAccessException e) {
-			logger.error("实例化类失败", e);
-			throw new ServerException("");
+			throw new ServerException(e.getMessage());
 		}
-		return baseJob;
+        return baseJob;
 	}
 	
 	

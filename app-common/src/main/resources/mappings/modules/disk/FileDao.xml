@@ -290,7 +290,6 @@
 		${selectStatement}
 	</select>
 
-
     <insert id="insert">
         INSERT INTO t_disk_file(
         id,
