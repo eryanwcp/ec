@@ -43,7 +43,7 @@ public class FileUploadUtils {
     protected static final int DEFAULT_FILE_NAME_LENGTH = 200;
 
     public static final String[] IMAGE_EXTENSION = {
-            "bmp", "gif", "jpg", "jpeg", "png","heic"
+            "bmp", "gif", "jpg", "jpeg", "png","heic","webp","svg"
     };
 
     public static final String[] FLASH_EXTENSION = {
@@ -56,7 +56,7 @@ public class FileUploadUtils {
 
     public static final String[] DEFAULT_ALLOWED_EXTENSION = {
             //图片
-            "bmp", "gif", "jpg", "jpeg", "png","heic",
+            "bmp", "gif", "jpg", "jpeg", "png","heic","webp","svg",
             //word excel powerpoint
             "doc", "docx", "xls", "xlsx", "ppt", "pptx", "wps",
             "html", "htm", "txt",
