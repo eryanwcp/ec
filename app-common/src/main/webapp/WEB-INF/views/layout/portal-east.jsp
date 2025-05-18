@@ -20,11 +20,11 @@ $(function() {
         autoRowHeight:false,
 		idField : 'loginName',
 		columns : [ [ {
-			title : '姓名',
+			title : '名称',
 			field : 'name',
 			width : 60,
 			formatter : function(value, rowData, rowIndex) {
-				var title = $.formatString('登录名:{0},登录IP:{1},登录时间:{2}.', rowData.loginName, rowData.ip,rowData.loginTime);
+				var title = $.formatString('账号:{0},登录IP:{1},登录时间:{2}.', rowData.loginName, rowData.ip,rowData.loginTime);
 				return $.formatString('<span title="{0}" class="easyui-tooltip">{1}</span>', title, value);
 			}
 		},{
