@@ -109,6 +109,8 @@ public class VersionLogController extends SimpleController {
         parameter.put("versionName", model.getVersionName());
         parameter.put("remark", model.getRemark());
         parameter.put("versionLogType", model.getVersionLogType());
+        parameter.put("isPub", model.getIsPub());
+        parameter.put("isShelf", model.getIsShelf());
         parameter.put("query", model.getQuery());
 
         page = versionLogService.findPage(page, parameter);

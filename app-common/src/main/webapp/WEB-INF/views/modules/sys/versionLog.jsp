@@ -6,14 +6,24 @@
     <div data-options="region:'north',title:'过滤条件',collapsed:false,split:false,border:false"
          style="padding: 0px; height: 70px;width:100%; overflow-y: hidden;">
         <form id="versionLog_search_form" style="padding: 5px;">
-            类型：<select id="versionLogType" name="versionLogType" class="easyui-combobox" style="width: 160px;height:28px;" >
+            类型：<select id="versionLogType" name="versionLogType" class="easyui-combobox" style="width: 120px;height:28px;" >
                 <option value="">全部</option>
                 <c:forEach items="${versionLogTypes}" var="item">
                     <option value="${item.value}">${item.description}</option>
                 </c:forEach>
+            </select>&nbsp;
+            发布：<select id="isPub" name="isPub" class="easyui-combobox" style="width: 80px;height:28px;" >
+                    <option value="">全部</option>
+                    <option selected value="1">是</option>
+                    <option value="0">否</option>
+                </select>&nbsp;
+                下架：<select id="isShelf" name="isShelf" class="easyui-combobox" style="width: 80px;height:28px;" >
+                <option value="">全部</option>
+                <option value="1">是</option>
+                <option selected value="0">否</option>
             </select>
                 &nbsp;关键字：<input id="query" name="query" class="easyui--validatebox textbox eu-input"
-                                 maxlength="36 placeholder="关键字"/>
+                                 maxlength="36" placeholder="关键字" />
                 &nbsp;更新时间：<input type="text" name="startTime" class="easyui-my97" placeholder="更新时间"/>
                             ~ <input type="text" name="endTime" class="easyui-my97"  placeholder="更新时间"/>
             &nbsp;<a class="easyui-linkbutton" href="#" data-options="iconCls:'easyui-icon-search',width:100,height:28,onClick:search">查 询</a>
