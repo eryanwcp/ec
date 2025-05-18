@@ -120,6 +120,9 @@
 			<if test="app != null and app !=''">
 				AND a.app = #{app}
 			</if>
+			<if test="isShelf != null and isShelf !=''">
+				AND a.is_shelf = #{isShelf}
+			</if>
 		</where>
 		<choose>
 			<when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
@@ -140,6 +143,12 @@
 			a.status = #{status}
 			<if test="versionLogType != null and versionLogType != ''">
 				AND a.version_log_type = #{versionLogType}
+			</if>
+			<if test="isPub != null and isPub !=''">
+				AND a.is_pub = #{isPub}
+			</if>
+			<if test="isShelf != null and isShelf !=''">
+				AND a.is_shelf = #{isShelf}
 			</if>
 			<if test="query != null and query != ''">
 				AND (a.version_name LIKE
