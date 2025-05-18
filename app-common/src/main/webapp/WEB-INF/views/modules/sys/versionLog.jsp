@@ -11,13 +11,13 @@
                 <c:forEach items="${versionLogTypes}" var="item">
                     <option value="${item.value}">${item.description}</option>
                 </c:forEach>
-            </select>&nbsp;
-            发布：<select id="isPub" name="isPub" class="easyui-combobox" style="width: 80px;height:28px;" >
+            </select>
+            &nbsp;发布：<select id="isPub" name="isPub" class="easyui-combobox" style="width: 80px;height:28px;" >
                     <option value="">全部</option>
                     <option selected value="1">是</option>
                     <option value="0">否</option>
-                </select>&nbsp;
-                下架：<select id="isShelf" name="isShelf" class="easyui-combobox" style="width: 80px;height:28px;" >
+                </select>
+            &nbsp;下架：<select id="isShelf" name="isShelf" class="easyui-combobox" style="width: 80px;height:28px;" >
                 <option value="">全部</option>
                 <option value="1">是</option>
                 <option selected value="0">否</option>
