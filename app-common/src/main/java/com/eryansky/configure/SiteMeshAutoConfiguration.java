@@ -80,8 +80,8 @@ public class SiteMeshAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(name = "sitemesh3")
-    public FilterRegistrationBean<ConfigurableSiteMeshFilter> sitemesh3(ConfigurableSiteMeshFilter siteMeshFilter){
+    @ConditionalOnMissingBean(name = "sitemesh")
+    public FilterRegistrationBean<ConfigurableSiteMeshFilter> sitemesh(ConfigurableSiteMeshFilter siteMeshFilter){
         FilterRegistrationBean<ConfigurableSiteMeshFilter> registrationBean
                 = new FilterRegistrationBean<>();
         registrationBean.setFilter(siteMeshFilter);
