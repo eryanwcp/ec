@@ -34,7 +34,7 @@
         <cglib-nodep.version>3.3.0</cglib-nodep.version>
         <slf4j.version>2.0.17</slf4j.version>
 
-        <guava.version>33.4.7-jre</guava.version>
+        <guava.version>33.4.8-jre</guava.version>
         <dozer.version>7.0.0</dozer.version>
         <freemarker.version>2.3.34</freemarker.version>
 
