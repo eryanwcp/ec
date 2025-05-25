@@ -35,9 +35,9 @@
         <java.version>17</java.version>
         <tomcat-plugin.version>2.2</tomcat-plugin.version>
 
-        <spring-boot.version>3.3.12</spring-boot.version>
-        <spring-integration-redis.version>6.3.10</spring-integration-redis.version>
-        <logstash-logback-encoder.version>8.0</logstash-logback-encoder.version>
+        <spring-boot.version>3.5.0</spring-boot.version>
+        <spring-integration-redis.version>6.5.0</spring-integration-redis.version>
+        <logstash-logback-encoder.version>8.1</logstash-logback-encoder.version>
         <logback-classic.version>1.5.18</logback-classic.version>
         <byte-buddy.version>1.15.11</byte-buddy.version>
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
@@ -54,7 +54,7 @@
         <oscar.driver.version>4.0.2</oscar.driver.version>
 
         <httpcomponents.version>4.5.14</httpcomponents.version>
-        <httpclient5.version>5.4.2</httpclient5.version>
+        <httpclient5.version>5.5</httpclient5.version>
         <commons-codec.version>1.18.0</commons-codec.version>
 
 
@@ -66,7 +66,7 @@
         <ec-fastweixin.version>4.3.20250525.01</ec-fastweixin.version>
         <ec-encrypt-spring-boot-starter.version>4.3.20250525.01</ec-encrypt-spring-boot-starter.version>
 
-        <jackson.version>2.18.3</jackson.version>
+        <jackson.version>2.19.0</jackson.version>
     </properties>
 
 

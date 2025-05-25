@@ -15,7 +15,7 @@
     <description>web</description>
 
     <properties>
-        <poi.version>5.4.0</poi.version>
+        <poi.version>5.4.1</poi.version>
         <xwpf.version>2.1.0</xwpf.version>
         <bsh.version>2.0b6</bsh.version>
 
@@ -132,7 +132,7 @@
         <dependency>
             <groupId>org.javadelight</groupId>
             <artifactId>delight-rhino-sandbox</artifactId>
-            <version>0.0.17</version>
+            <version>0.0.18</version>
         </dependency>
 
         <dependency>
