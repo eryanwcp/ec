@@ -44,7 +44,7 @@ import java.util.Properties;
  * @author Eryan
  * @date 2019-01-23
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class DBConfigurer {
 
     private static final Logger logger = LoggerFactory.getLogger(DBConfigurer.class);
