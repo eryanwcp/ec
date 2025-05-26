@@ -3,14 +3,15 @@ var $versionLog_search_form;
 var $versionLog_dialog;
 var $versionLog_form;
 $(function () {
-    initDatagrid();
     $versionLog_search_form = $('#versionLog_search_form').form();
+    initDatagrid();
 });
 
 /**
  * 数据列表
  */
 function initDatagrid() {
+    var queryParams = $.serializeObject($versionLog_search_form);
     $versionLog_datagrid = $('#versionLog_datagrid').datagrid({
         url: ctxAdmin + '/sys/versionLog/datagrid',
         fit: true,
@@ -24,6 +25,7 @@ function initDatagrid() {
         nowrap: true,
         border: false,
         idField: 'id',
+        queryParams: queryParams,
         frozenColumns: [[
             {field: 'ck', checkbox: true, width: 60},
             {field: 'app', title: 'APP', width: 80},

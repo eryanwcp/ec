@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.eryansky</groupId>
         <artifactId>ec-parent</artifactId>
-        <version>4.2.20241221.29</version>
+        <version>4.2.20241221.30</version>
     </parent>
 
     <artifactId>ec-common</artifactId>
@@ -34,7 +34,7 @@
         <cglib-nodep.version>3.3.0</cglib-nodep.version>
         <slf4j.version>1.7.36</slf4j.version>
 
-        <guava.version>33.4.7-jre</guava.version>
+        <guava.version>33.4.8-jre</guava.version>
         <dozer.version>6.5.2</dozer.version>
         <freemarker.version>2.3.34</freemarker.version>
 
@@ -250,7 +250,7 @@
         <dependency>
             <groupId>com.github.oshi</groupId>
             <artifactId>oshi-core</artifactId>
-            <version>6.8.0</version>
+            <version>6.8.1</version>
         </dependency>
 
         <dependency>
