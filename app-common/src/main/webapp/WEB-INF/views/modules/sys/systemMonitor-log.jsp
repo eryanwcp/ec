@@ -55,6 +55,7 @@
 			{{&.}}</br>
 			{{/result}}
 		</div>
+		<input class="btn btn-primary" type="button" value="刷新" onclick="reLoad();"/>
 		<div class="page pagination"></div>
 	</script>
 </head>
