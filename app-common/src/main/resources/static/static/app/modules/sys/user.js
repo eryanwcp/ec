@@ -264,7 +264,7 @@ $(function () {
                 {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
                 {field: 'position', title: '职务', width: 120, sortable: true},
                 {field: 'code', title: '员工编号', width: 160, sortable: true, hidden: true},
-                {field: 'bizCode', title: '信息分类编码', width: 160,  sortable: true},
+                {field: 'bizCode', title: '信息分类编码', width: 200,  sortable: true},
                 {field: 'defaultOrganName', title: '部门', width: 160, sortable: true},
                 {field: 'companyName', title: '单位', width: 200, sortable: true, hidden: true},
                 {field: 'mobileSensitive', title: '手机号', width: 120},

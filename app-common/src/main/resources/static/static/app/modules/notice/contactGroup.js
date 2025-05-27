@@ -130,7 +130,7 @@ function listUser(contactGroupId){
             {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
             {field:'defaultOrganName',title:'部门',width:200},
             {field: 'code', title: '编码', width: 160, hidden: true, sortable: true},
-            {field: 'bizCode', title: '信息分类编码', width: 160, hidden: true, sortable: true},
+            {field: 'bizCode', title: '信息分类编码', width: 200, hidden: true, sortable: true},
             {field:'mobile',title:'手机号',width:120},
             {field:'tel',title:'办公电话',width:120},
             {field:'email',title:'企业邮箱',width:120},

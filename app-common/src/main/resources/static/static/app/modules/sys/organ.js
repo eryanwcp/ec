@@ -63,7 +63,7 @@ $(function () {
             {field: 'areaId', title: '区域ID', width: 260, hidden: true, sortable: true},
             {field: 'sysCode', title: '系统编码', width: 160, sortable: true, hidden: true},
             {field: 'code', title: '编码', width: 160, sortable: true},
-            {field: 'bizCode', title: '信息分类编码', width: 160, sortable: true},
+            {field: 'bizCode', title: '信息分类编码', width: 200, sortable: true},
             {field: 'managerUserName', title: '主管', width: 120, sortable: true},
             {field: 'superManagerUserName', title: '分管领导', width: 120, sortable: true},
             {field: 'address', title: '地址', width: 120, hidden: true},

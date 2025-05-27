@@ -27,7 +27,7 @@ $(function () {
                 {field: 'id', title: '主键', width: 260, sortable: true, hidden: true},
                 {field: 'sexView', title: '性别', width: 60, align: 'center', sortable: true},
                 {field: 'code', title: '员工编号', width: 160, sortable: true, hidden: true},
-                {field: 'bizCode', title: '信息分类编码', width: 160,sortable: true},
+                {field: 'bizCode', title: '信息分类编码', width: 200,sortable: true},
                 {field: 'mobile', title: '手机号', width: 100},
                 {field: 'tel', title: '办公电话', width: 100,hidden: true},
                 {field: 'qq', title: 'QQ', width: 100,hidden: true},
