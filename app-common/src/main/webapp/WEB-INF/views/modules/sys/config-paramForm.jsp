@@ -161,7 +161,7 @@
             <label class="control-label">最大登录用户数限制：</label>
             <div class="controls">
                 <input name="security.sessionUser.MaxSize" type="number" min="-1" max="999999" class="input-small"/>
-                <span class="help-inline">不允许登录：小于0 不限制；0 限制：具体数值</span>
+                <span class="help-inline">不允许登录：小于0 不限制：0 限制：具体数值</span>
             </div>
         </div>
 
