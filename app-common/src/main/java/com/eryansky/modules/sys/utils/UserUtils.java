@@ -660,12 +660,6 @@ public class UserUtils {
      * @param pagePassword 未加密的密码
      */
     public static void checkSecurity(String userId,String pagePassword){
-        if(User.SUPERUSER_ID.equals(userId)){
-            return;
-        }
-        if(!AppConstants.getIsSecurityOn()){
-            return;
-        }
         int max = AppConstants.getUserPasswordRepeatCount();
         if(max <=0){
             return;
