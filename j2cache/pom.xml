@@ -18,7 +18,7 @@
         <objenesis.version>3.3</objenesis.version>
         <fst.version>2.57</fst.version>
         <snappy.version>1.1.10.7</snappy.version>
-        <fury-core.version>0.10.3</fury-core.version>
+        <fury.version>0.10.3</fury.version>
         <guava.version>33.4.8-jre</guava.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -79,7 +79,13 @@
         <dependency>
             <groupId>org.apache.fury</groupId>
             <artifactId>fury-core</artifactId>
-            <version>${fury-core.version}</version>
+            <version>${fury.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.fury</groupId>
+            <artifactId>fury-extensions</artifactId>
+            <version>${fury.version}</version>
             <scope>provided</scope>
         </dependency>
 
