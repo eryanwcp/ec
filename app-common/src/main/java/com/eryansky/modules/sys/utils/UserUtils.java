@@ -113,6 +113,19 @@ public class UserUtils {
     }
 
     /**
+     * 根据信息分类编码查找用户
+     *
+     * @param bizCode 信息分离编码
+     * @return
+     */
+    public static User getUserByBizCode(String bizCode) {
+        if (StringUtils.isNotBlank(bizCode)) {
+            return Static.userService.getUserByBizCode(bizCode);
+        }
+        return null;
+    }
+
+    /**
      * 根据员工编号查找用户
      *
      * @param code 员工编号
