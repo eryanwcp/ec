@@ -87,7 +87,7 @@ public class SysLogAspect {
         // 执行方法所消耗的时间
         try {
             log.setType(logging.logType().getValue());
-            log.setUserId(null != sessionInfo ? sessionInfo.getUserId() : User.SUPERUSER_ID);
+
             log.setModule(className + "-" + methodName);
             log.setIp(null != request ? IpUtils.getIpAddr0(request) : (null != sessionInfo ? sessionInfo.getIp():StringUtils.EMPTY));
             log.setTitle(SpringUtils.parseSpel(logging.value(), method, args));
@@ -98,6 +98,7 @@ public class SysLogAspect {
                 log.setUserAgent(sessionInfo.getUserAgent());
                 log.setDeviceType(sessionInfo.getDeviceType());
                 log.setBrowserType(sessionInfo.getBrowserType());
+                log.setUserId(sessionInfo.getUserId());
                 extendAttr.put("userType",sessionInfo.getUserType());
                 extendAttr.put("userName",sessionInfo.getName());
                 extendAttr.put("userLoginName",sessionInfo.getLoginName());
@@ -116,6 +117,7 @@ public class SysLogAspect {
                     }
                 }
                 extendAttr.put("userType","S");//自定义 系统
+                log.setUserId(StringUtils.isNotBlank(userLoginName) ? userLoginName:User.SUPERUSER_ID);
                 extendAttr.put("userName",StringUtils.isNotBlank(userLoginName) ? userLoginName:"系统");
                 extendAttr.put("userLoginName", userLoginName);
                 log.setExtendAttr(extendAttr);
