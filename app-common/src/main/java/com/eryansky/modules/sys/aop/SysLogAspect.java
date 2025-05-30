@@ -111,9 +111,12 @@ public class SysLogAspect {
                     log.setBrowserType(UserAgentUtils.getBrowser(request).getName());
                     Map<String, List<String>> headers = WebUtils.getHeaders(request);
                     userLoginName = Collections3.getFirst(headers.get("appCode"));
+                    if(StringUtils.isBlank(userLoginName)){
+                        userLoginName = request.getParameter("appCode");
+                    }
                 }
                 extendAttr.put("userType","S");//自定义 系统
-                extendAttr.put("userName","系统");
+                extendAttr.put("userName",StringUtils.isNotBlank(userLoginName) ? userLoginName:"系统");
                 extendAttr.put("userLoginName", userLoginName);
                 log.setExtendAttr(extendAttr);
             }
