@@ -154,7 +154,10 @@ public class UserMobileController extends SimpleController {
             return Result.warnResult().setMsg("原始密码输入错误！");
         }
 
-        UserUtils.checkSecurity(model.getId(), _newPassword);
+        if(AppConstants.isCheckPasswordPolicy()){
+            UserUtils.checkSecurity(model.getId(), _newPassword);
+        }
+
         //修改本地密码
         if (UserPasswordUpdateType.UserInit.getValue().equals(type)) {
             UserUtils.updateUserPasswordFirst(model.getId(), _newPassword);
