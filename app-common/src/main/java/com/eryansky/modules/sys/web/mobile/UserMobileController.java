@@ -156,7 +156,10 @@ public class UserMobileController extends SimpleController {
             return Result.warnResult().setMsg("原始密码输入错误！");
         }
 
-        UserUtils.checkSecurity(model.getId(), _newPassword);
+        if(AppConstants.isCheckPasswordPolicy()){
+            UserUtils.checkSecurity(model.getId(), _newPassword);
+        }
+
         //修改本地密码
         if (UserPasswordUpdateType.UserInit.getValue().equals(type)) {
             UserUtils.updateUserPasswordFirst(model.getId(), _newPassword);
@@ -337,13 +340,16 @@ public class UserMobileController extends SimpleController {
     /**
      * 图片文件上传
      * @param multipartFile
+     * @param folderCode 文件夹名称
+     * @param press 是否添加水印
+     * @param pressText 水印文字
      */
     @PostMapping(value = {"imageUpLoad"})
     @ResponseBody
     public Result imageUpLoad(@RequestHeader Map<String, String> headers,
                               @RequestParam(value = "uploadFile", required = false) MultipartFile multipartFile,
-                              @RequestParam (name = "folderCode",defaultValue = User.FOLDER_USER_PHOTO)String folderCode,
-                              @RequestParam(value = "press",defaultValue = "false") Boolean press,
+                              @RequestParam(value = "folderCode", defaultValue = User.FOLDER_USER_PHOTO) String folderCode,
+                              @RequestParam(value = "press", defaultValue = "false") Boolean press,
                               String pressText) {
         CaseInsensitiveMap<String,String> caseInsensitiveMap = new CaseInsensitiveMap<>(headers);
         String requestEncrypt =  caseInsensitiveMap.get(DecryptRequestBodyAdvice.ENCRYPT);
