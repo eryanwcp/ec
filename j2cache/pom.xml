@@ -87,6 +87,12 @@
             <artifactId>fury-extensions</artifactId>
             <version>${fury.version}</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.fury</groupId>
+                    <artifactId>fury-test-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
