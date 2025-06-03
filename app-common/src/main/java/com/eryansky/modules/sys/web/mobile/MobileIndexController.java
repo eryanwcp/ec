@@ -57,6 +57,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
@@ -359,6 +360,8 @@ public class MobileIndexController extends SimpleController {
     public Result imageUpLoad(@RequestHeader Map<String, String> headers,
                               @RequestParam(value = "uploadFile", required = false) MultipartFile multipartFile,
                               @RequestParam(value = "folderCode", defaultValue = "IMAGE") String folderCode,
+                              @RequestParam(value = "longitude", required = false) Double longitude,
+                              @RequestParam(value = "latitude", required = false) Double latitude,
                               @RequestParam(value = "press", defaultValue = "true") Boolean press,
                               String pressText) {
         CaseInsensitiveMap<String,String> caseInsensitiveMap = new CaseInsensitiveMap<>(headers);
@@ -434,6 +437,10 @@ public class MobileIndexController extends SimpleController {
 
                 // 水印文字
                 String watermarkText = StringUtils.isNotBlank(pressText) ? pressText:sessionInfo.getLoginName();
+                String watermarkTextGPS = null;
+                if (null != longitude) {
+                    watermarkTextGPS = latitude + "," + longitude;
+                }
                 BufferedImage watermarkImage = null;
                 if (angle != 90 && angle != 270) {
                     // 不需要旋转，直接处理
@@ -442,11 +449,17 @@ public class MobileIndexController extends SimpleController {
                             originalImage.getHeight(),
                             BufferedImage.TYPE_INT_RGB
                     );
+
                     Graphics2D g2d = (Graphics2D) watermarkImage.getGraphics();
                     g2d.setFont(new java.awt.Font("宋体", java.awt.Font.BOLD, 28)); // 设置水印字体
                     g2d.drawImage(originalImage, 0, 0, null); // 绘制原始图片
-                    g2d.setColor(Color.red); // 设置水印颜色
+                    g2d.setColor(Color.WHITE); // 设置水印颜色
                     g2d.drawString(watermarkText, 20, 30); // 绘制水印文字
+                    if(null != watermarkTextGPS){
+                        FontMetrics metrics = g2d.getFontMetrics();
+                        int lineHeight = metrics.getHeight();
+                        g2d.drawString(watermarkText, 20, 30+(1*lineHeight)); // 绘制水印文字
+                    }
                     g2d.dispose();
                 } else {
                     // 宽高互换
@@ -466,8 +479,13 @@ public class MobileIndexController extends SimpleController {
                     g.drawImage(originalImage, (imgWidth - originalImage.getWidth()) / 2, (imgHeight - originalImage.getHeight()) / 2, null);
                     g.rotate(Math.toRadians(-angle), centerWidth, centerHeight);
                     g.setFont(new java.awt.Font("宋体", java.awt.Font.BOLD, 28)); // 设置水印字体
-                    g.setColor(Color.red); // 设置水印颜色
+                    g.setColor(Color.WHITE); // 设置水印颜色
                     g.drawString(watermarkText, 20, 30); // 绘制水印文字
+                    if(null != watermarkTextGPS){
+                        FontMetrics metrics = g.getFontMetrics();
+                        int lineHeight = metrics.getHeight();
+                        g.drawString(watermarkText, 20, 30+(1*lineHeight)); // 绘制水印文字
+                    }
                     g.dispose();
                 }
                 tempFile = new java.io.File(tempFileName);
