@@ -458,7 +458,7 @@ public class MobileIndexController extends SimpleController {
                     if (null != watermarkTextGPS) {
                         FontMetrics metrics = g2d.getFontMetrics();
                         int lineHeight = metrics.getHeight();
-                        g2d.drawString(watermarkText, 20, 30 + (1 * lineHeight)); // 绘制水印文字
+                        g2d.drawString(watermarkTextGPS, 20, 30 + (1 * lineHeight)); // 绘制水印文字
                     }
                     g2d.dispose();
                 } else {
@@ -484,7 +484,7 @@ public class MobileIndexController extends SimpleController {
                     if (null != watermarkTextGPS) {
                         FontMetrics metrics = g.getFontMetrics();
                         int lineHeight = metrics.getHeight();
-                        g.drawString(watermarkText, 20, 30 + (1 * lineHeight)); // 绘制水印文字
+                        g.drawString(watermarkTextGPS, 20, 30 + (1 * lineHeight)); // 绘制水印文字
                     }
                     g.dispose();
                 }
