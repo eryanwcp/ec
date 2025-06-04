@@ -8,6 +8,7 @@ import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
 import com.eryansky.common.exception.ActionException;
 import com.eryansky.common.model.Result;
+import com.eryansky.common.utils.Arith;
 import com.eryansky.common.utils.Identities;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.UserAgentUtils;
@@ -438,8 +439,8 @@ public class MobileIndexController extends SimpleController {
                 // 水印文字
                 String watermarkText = StringUtils.isNotBlank(pressText) ? pressText:sessionInfo.getLoginName();
                 String watermarkTextGPS = null;
-                if (null != longitude) {
-                    watermarkTextGPS = latitude + "," + longitude;
+                if (null != longitude && null != latitude) {
+                    watermarkTextGPS = Arith.round(latitude,6) + "," + Arith.round(longitude,6);
                 }
                 BufferedImage watermarkImage = null;
                 if (angle != 90 && angle != 270) {
