@@ -9,6 +9,7 @@ import com.drew.metadata.Tag;
 import com.eryansky.common.exception.ActionException;
 import com.eryansky.common.model.Result;
 import com.eryansky.common.orm._enum.StatusState;
+import com.eryansky.common.utils.Arith;
 import com.eryansky.common.utils.Identities;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.UserAgentUtils;
@@ -365,8 +366,10 @@ public class MobileIndexController extends SimpleController {
     @ResponseBody
     public Result imageUpLoad(@RequestHeader Map<String, String> headers,
                               @RequestParam(value = "uploadFile", required = false) MultipartFile multipartFile,
-                              String folderCode,
-                              @RequestParam(value = "press",defaultValue = "true") Boolean press,
+                              @RequestParam(value = "folderCode", defaultValue = "IMAGE") String folderCode,
+                              @RequestParam(value = "longitude", required = false) Double longitude,
+                              @RequestParam(value = "latitude", required = false) Double latitude,
+                              @RequestParam(value = "press", defaultValue = "true") Boolean press,
                               String pressText) {
         CaseInsensitiveMap<String,String> caseInsensitiveMap = new CaseInsensitiveMap<>(headers);
         String requestEncrypt =  caseInsensitiveMap.get(DecryptRequestBodyAdvice.ENCRYPT);
@@ -441,6 +444,10 @@ public class MobileIndexController extends SimpleController {
 
                 // 水印文字
                 String watermarkText = StringUtils.isNotBlank(pressText) ? pressText:sessionInfo.getLoginName();
+                String watermarkTextGPS = null;
+                if (null != longitude && null != latitude) {
+                    watermarkTextGPS = Arith.round(latitude,6) + "," + Arith.round(longitude,6);
+                }
                 BufferedImage watermarkImage = null;
                 if (angle != 90 && angle != 270) {
                     // 不需要旋转，直接处理
@@ -449,11 +456,17 @@ public class MobileIndexController extends SimpleController {
                             originalImage.getHeight(),
                             BufferedImage.TYPE_INT_RGB
                     );
+
                     Graphics2D g2d = (Graphics2D) watermarkImage.getGraphics();
                     g2d.setFont(new java.awt.Font("宋体", java.awt.Font.BOLD, 28)); // 设置水印字体
                     g2d.drawImage(originalImage, 0, 0, null); // 绘制原始图片
-                    g2d.setColor(Color.red); // 设置水印颜色
+                    g2d.setColor(Color.WHITE); // 设置水印颜色
                     g2d.drawString(watermarkText, 20, 30); // 绘制水印文字
+                    if (null != watermarkTextGPS) {
+                        FontMetrics metrics = g2d.getFontMetrics();
+                        int lineHeight = metrics.getHeight();
+                        g2d.drawString(watermarkTextGPS, 20, 30 + (1 * lineHeight)); // 绘制水印文字
+                    }
                     g2d.dispose();
                 } else {
                     // 宽高互换
@@ -473,8 +486,13 @@ public class MobileIndexController extends SimpleController {
                     g.drawImage(originalImage, (imgWidth - originalImage.getWidth()) / 2, (imgHeight - originalImage.getHeight()) / 2, null);
                     g.rotate(Math.toRadians(-angle), centerWidth, centerHeight);
                     g.setFont(new java.awt.Font("宋体", java.awt.Font.BOLD, 28)); // 设置水印字体
-                    g.setColor(Color.red); // 设置水印颜色
+                    g.setColor(Color.WHITE); // 设置水印颜色
                     g.drawString(watermarkText, 20, 30); // 绘制水印文字
+                    if (null != watermarkTextGPS) {
+                        FontMetrics metrics = g.getFontMetrics();
+                        int lineHeight = metrics.getHeight();
+                        g.drawString(watermarkTextGPS, 20, 30 + (1 * lineHeight)); // 绘制水印文字
+                    }
                     g.dispose();
                 }
                 tempFile = new java.io.File(tempFileName);
