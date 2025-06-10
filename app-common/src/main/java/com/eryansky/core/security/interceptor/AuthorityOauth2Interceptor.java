@@ -120,7 +120,7 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
                     logger.warn("Token校验失败（用户不存在）：{},{},{}", loginName, requestUrl, token);
                     return true;
                 }
-                verify = SecurityUtils.verifySessionInfoToken(token, loginName, user.getPassword());
+                verify = null != sessionInfo || SecurityUtils.verifySessionInfoToken(token, loginName, user.getPassword());
             } catch (Exception e) {
                 if(!(e instanceof TokenExpiredException)){
                     logger.error("Token校验失败：{},{},{},{},{}",loginName, SpringMVCHolder.getIp(), requestUrl, token, e.getMessage());
