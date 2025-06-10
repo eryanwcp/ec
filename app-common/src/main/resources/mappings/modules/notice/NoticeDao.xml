@@ -334,8 +334,8 @@
 
 	<insert id="insertNoticeFiles">
 		INSERT INTO t_notice_file(notice_id, file_id)
-		<foreach collection="ids" item="item" separator=" union all ">
-			SELECT #{id}, #{item} FROM dual
+		<foreach item="item" collection="ids" separator=",">
+			(#{id}, #{item})
 		</foreach>
 	</insert>
 	<!--通知附件-->

@@ -1374,8 +1374,8 @@
 
     <insert id="insertUserOrgans">
         INSERT INTO t_sys_user_organ(user_id, organ_id)
-        <foreach collection="ids" item="item" separator=" union all ">
-            SELECT #{id}, #{item} FROM dual
+        <foreach item="item" collection="ids" separator=",">
+            (#{id}, #{item})
         </foreach>
     </insert>
     <!--用户机构-->
@@ -1400,8 +1400,8 @@
 
     <insert id="insertUserPosts">
         INSERT INTO t_sys_user_post(user_id, post_id,organ_id)
-        <foreach collection="ids" item="item" separator=" union all ">
-            SELECT #{id}, #{item},#{organId} FROM dual
+        <foreach item="item" collection="ids" separator=",">
+            (#{id}, #{item},#{organId})
         </foreach>
     </insert>
     <!--用户岗位-->
@@ -1414,8 +1414,8 @@
 
     <insert id="insertUserRoles">
         INSERT INTO t_sys_user_role(user_id, role_id)
-        <foreach collection="ids" item="item" separator=" union all ">
-            SELECT #{id}, #{item} FROM dual
+        <foreach item="item" collection="ids" separator=",">
+            (#{id}, #{item})
         </foreach>
     </insert>
     <!--用户角色-->
@@ -1428,8 +1428,8 @@
 
     <insert id="insertUserResources">
         INSERT INTO t_sys_user_resource(user_id, resource_id)
-        <foreach collection="ids" item="item" separator=" union all ">
-            SELECT #{id}, #{item} FROM dual
+        <foreach item="item" collection="ids" separator=",">
+            (#{id}, #{item})
         </foreach>
     </insert>
 

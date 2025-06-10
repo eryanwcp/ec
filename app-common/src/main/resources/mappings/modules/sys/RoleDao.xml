@@ -282,8 +282,8 @@
 
     <insert id="insertRoleOrgans">
         INSERT INTO t_sys_role_organ(role_id, organ_id)
-        <foreach collection="ids" item="item" separator=" union all ">
-            SELECT #{id}, #{item} FROM dual
+        <foreach item="item" collection="ids" separator=",">
+            (#{id}, #{item})
         </foreach>
     </insert>
 
@@ -302,8 +302,8 @@
 
     <insert id="insertRoleDataOrgans">
         INSERT INTO t_sys_role_data_organ(role_id, organ_id)
-        <foreach collection="ids" item="item" separator=" union all ">
-            SELECT #{id}, #{item} FROM dual
+        <foreach item="item" collection="ids" separator=",">
+            (#{id}, #{item})
         </foreach>
     </insert>
 
@@ -329,8 +329,8 @@
 
     <insert id="insertRoleUsers">
         INSERT INTO t_sys_user_role(role_id, user_id)
-        <foreach collection="ids" item="item" separator=" union all ">
-            SELECT #{id}, #{item} FROM dual
+        <foreach item="item" collection="ids" separator=",">
+            (#{id}, #{item})
         </foreach>
     </insert>
     <!--角色用户-->
@@ -343,8 +343,8 @@
 
     <insert id="insertRoleResources">
         INSERT INTO t_sys_role_resource(role_id, resource_id)
-        <foreach collection="ids" item="item" separator=" union all ">
-            SELECT #{id}, #{item} FROM dual
+        <foreach item="item" collection="ids" separator=",">
+            (#{id}, #{item})
         </foreach>
     </insert>
 

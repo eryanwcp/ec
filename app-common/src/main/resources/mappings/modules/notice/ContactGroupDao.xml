@@ -310,8 +310,8 @@
 
     <insert id="insertContactGroupObjects">
         INSERT INTO t_notice_contact_group_object(contact_group_id, object_id)
-        <foreach collection="ids" item="item" separator=" union all ">
-            SELECT #{id}, #{item} FROM dual
+        <foreach item="item" collection="ids" separator=",">
+            (#{id}, #{item})
         </foreach>
     </insert>
     <!--分组对象-->

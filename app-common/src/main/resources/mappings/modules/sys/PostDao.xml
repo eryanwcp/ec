@@ -300,8 +300,8 @@
 
     <insert id="insertPostOrgans">
         INSERT INTO t_sys_post_organ(post_id, organ_id)
-        <foreach collection="ids" item="item" separator=" union all ">
-            SELECT #{id}, #{item} FROM dual
+        <foreach item="item" collection="ids" separator=",">
+            (#{id}, #{item})
         </foreach>
     </insert>
     <!--岗位机构-->
@@ -329,8 +329,8 @@
 
     <insert id="insertPostUsers">
         INSERT INTO t_sys_user_post(post_id, user_id,organ_id)
-        <foreach collection="ids" item="item" separator=" union all ">
-            SELECT #{id}, #{item},#{organId} FROM dual
+        <foreach item="item" collection="ids" separator=",">
+            (#{id}, #{item},#{organId})
         </foreach>
     </insert>
     <!--岗位用户-->
