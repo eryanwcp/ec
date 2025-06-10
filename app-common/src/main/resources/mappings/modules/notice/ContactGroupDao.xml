@@ -309,7 +309,7 @@
     </delete>
 
     <insert id="insertContactGroupObjects">
-        INSERT INTO t_notice_contact_group_object(contact_group_id, object_id)
+        INSERT INTO t_notice_contact_group_object(contact_group_id, object_id) VALUES
         <foreach item="item" collection="ids" separator=",">
             (#{id}, #{item})
         </foreach>

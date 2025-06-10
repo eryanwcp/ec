@@ -281,7 +281,7 @@
     </delete>
 
     <insert id="insertRoleOrgans">
-        INSERT INTO t_sys_role_organ(role_id, organ_id)
+        INSERT INTO t_sys_role_organ(role_id, organ_id) VALUES
         <foreach item="item" collection="ids" separator=",">
             (#{id}, #{item})
         </foreach>
@@ -301,7 +301,7 @@
     </delete>
 
     <insert id="insertRoleDataOrgans">
-        INSERT INTO t_sys_role_data_organ(role_id, organ_id)
+        INSERT INTO t_sys_role_data_organ(role_id, organ_id) VALUES
         <foreach item="item" collection="ids" separator=",">
             (#{id}, #{item})
         </foreach>
@@ -328,7 +328,7 @@
     </delete>
 
     <insert id="insertRoleUsers">
-        INSERT INTO t_sys_user_role(role_id, user_id)
+        INSERT INTO t_sys_user_role(role_id, user_id) VALUES
         <foreach item="item" collection="ids" separator=",">
             (#{id}, #{item})
         </foreach>
@@ -342,7 +342,7 @@
     </delete>
 
     <insert id="insertRoleResources">
-        INSERT INTO t_sys_role_resource(role_id, resource_id)
+        INSERT INTO t_sys_role_resource(role_id, resource_id) VALUES
         <foreach item="item" collection="ids" separator=",">
             (#{id}, #{item})
         </foreach>

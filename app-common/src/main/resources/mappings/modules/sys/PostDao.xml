@@ -299,7 +299,7 @@
     </delete>
 
     <insert id="insertPostOrgans">
-        INSERT INTO t_sys_post_organ(post_id, organ_id)
+        INSERT INTO t_sys_post_organ(post_id, organ_id) VALUES
         <foreach item="item" collection="ids" separator=",">
             (#{id}, #{item})
         </foreach>
@@ -328,7 +328,7 @@
     </delete>
 
     <insert id="insertPostUsers">
-        INSERT INTO t_sys_user_post(post_id, user_id,organ_id)
+        INSERT INTO t_sys_user_post(post_id, user_id,organ_id) VALUES
         <foreach item="item" collection="ids" separator=",">
             (#{id}, #{item},#{organId})
         </foreach>

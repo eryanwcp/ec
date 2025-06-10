@@ -333,7 +333,7 @@
 	</delete>
 
 	<insert id="insertNoticeFiles">
-		INSERT INTO t_notice_file(notice_id, file_id)
+		INSERT INTO t_notice_file(notice_id, file_id) VALUES
 		<foreach item="item" collection="ids" separator=",">
 			(#{id}, #{item})
 		</foreach>

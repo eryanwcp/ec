@@ -1373,7 +1373,7 @@
     </delete>
 
     <insert id="insertUserOrgans">
-        INSERT INTO t_sys_user_organ(user_id, organ_id)
+        INSERT INTO t_sys_user_organ(user_id, organ_id) VALUES
         <foreach item="item" collection="ids" separator=",">
             (#{id}, #{item})
         </foreach>
@@ -1399,7 +1399,7 @@
 
 
     <insert id="insertUserPosts">
-        INSERT INTO t_sys_user_post(user_id, post_id,organ_id)
+        INSERT INTO t_sys_user_post(user_id, post_id,organ_id) VALUES
         <foreach item="item" collection="ids" separator=",">
             (#{id}, #{item},#{organId})
         </foreach>
@@ -1413,7 +1413,7 @@
     </delete>
 
     <insert id="insertUserRoles">
-        INSERT INTO t_sys_user_role(user_id, role_id)
+        INSERT INTO t_sys_user_role(user_id, role_id) VALUES
         <foreach item="item" collection="ids" separator=",">
             (#{id}, #{item})
         </foreach>
@@ -1427,7 +1427,7 @@
     </delete>
 
     <insert id="insertUserResources">
-        INSERT INTO t_sys_user_resource(user_id, resource_id)
+        INSERT INTO t_sys_user_resource(user_id, resource_id) VALUES
         <foreach item="item" collection="ids" separator=",">
             (#{id}, #{item})
         </foreach>
