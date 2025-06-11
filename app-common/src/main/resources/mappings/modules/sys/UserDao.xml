@@ -135,7 +135,7 @@
         <include refid="userColumns"/>
         FROM t_sys_user a
         <where>
-            (a.id = #{idOrLoginName} OR a.login_name = #{idOrLoginName})
+            (a.id = #{id} OR a.login_name = #{loginName})
             <if test="status != null and status !=''">
                 AND a.status = #{status}
             </if>
