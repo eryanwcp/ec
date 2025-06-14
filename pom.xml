@@ -42,7 +42,7 @@
         <byte-buddy.version>1.15.11</byte-buddy.version>
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
 
-        <tomcat.version>10.1.41</tomcat.version>
+        <tomcat.version>10.1.42</tomcat.version>
 
         <mybatis-spring-boot.version>3.0.4</mybatis-spring-boot.version>
         <commons-pool2.version>2.12.1</commons-pool2.version>
