@@ -38,12 +38,15 @@ $(function () {
         state = 'p1';/*冒号代表列，逗号代表行*/
     }
     addPortalPanels(state);
-    $('#layout_portal_portal').portal('resize');
+    // $('#layout_portal_portal').portal('resize');
 
     initMedia();
 
     mymessages(false, true);
     window.setInterval('mymessages(true,true)', 5 * 60 * 1000);
+    window.setTimeout(function(){
+        $('#layout_portal_portal').portal('resize');
+    },1*1000);
 });
 
 function getPanelOptions(id) {
