@@ -166,10 +166,10 @@
             a.status = '0'
             <choose>
                 <when test="parentId != null and parentId !=''">
-                    AND a.parnet_id = #{parentId}
+                    AND a.parent_id = #{parentId}
                 </when>
                 <otherwise>
-                    AND (a.parnet_id IS NULL OR a.parnet_id = '' OR a.parent_id = '0')
+                    AND (a.parent_id IS NULL OR a.parent_id = '' OR a.parent_id = '0')
                 </otherwise>
             </choose>
         </where>
