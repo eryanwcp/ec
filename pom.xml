@@ -36,7 +36,7 @@
         <tomcat-plugin.version>2.2</tomcat-plugin.version>
 
         <spring-boot.version>3.4.7</spring-boot.version>
-        <spring-integration-redis.version>6.5.0</spring-integration-redis.version>
+        <spring-integration-redis.version>6.4.5</spring-integration-redis.version>
         <logstash-logback-encoder.version>8.1</logstash-logback-encoder.version>
         <logback-classic.version>1.5.18</logback-classic.version>
         <byte-buddy.version>1.15.11</byte-buddy.version>
