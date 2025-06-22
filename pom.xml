@@ -51,7 +51,6 @@
         <mysql.driver.version>8.4.0</mysql.driver.version>
         <oracle.driver.version>12.1.0.1-atlassian-hosted</oracle.driver.version>
         <db2.driver.version>10.1</db2.driver.version>
-        <oscar.driver.version>4.0.2</oscar.driver.version>
 
         <httpcomponents.version>4.5.14</httpcomponents.version>
         <httpclient5.version>5.5</httpclient5.version>
@@ -267,12 +266,6 @@
                     <artifactId>protobuf-java</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.oscar.jdbc</groupId>
-            <artifactId>oscar-java-client</artifactId>
-            <version>${oscar.driver.version}</version>
-            <scope>compile</scope>
         </dependency>
 
         <!-- JUnit test dependency -->
