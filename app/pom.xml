@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.eryansky</groupId>
         <artifactId>ec-parent</artifactId>
-        <version>4.3.20250621.01</version>
+        <version>4.3.20250621.02</version>
     </parent>
 
     <artifactId>ec-app</artifactId>
