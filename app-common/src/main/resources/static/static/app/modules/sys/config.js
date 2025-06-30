@@ -1,9 +1,53 @@
+var sessionInfoUserId = sessionInfoUserId;//参考父页面 role.jsp
+var hasPermissionConfigEdit = hasPermissionConfigEdit;
+
 var $config_datagrid;
 var $config_form;
 var $config_search_form;
 var $config_dialog;
+
 $(function () {
     $config_search_form = $('#config_search_form').form();
+    var toolbar = [];
+    if(hasPermissionConfigEdit){
+        toolbar = toolbar.concat([{
+            text: '新增',
+            iconCls: 'easyui-icon-add',
+            handler: function () {
+                showDialog();
+            }
+        },'-',{
+            text: '编辑',
+            iconCls: 'easyui-icon-edit',
+            handler: function () {
+                edit()
+            }
+        },'-',{
+            text: '删除',
+            iconCls: 'easyui-icon-remove',
+            handler: function () {
+                del()
+            }
+        },'-',{
+                text: '读取配置文件',
+                iconCls: 'easyui-icon-add',
+                handler: function () {
+                    syncFromProperties()
+                }
+        },'-', {
+            text: '快捷配置',
+            iconCls: 'easyui-icon-edit',
+            handler: function () {
+                var url = ctxAdmin + '/sys/config/paramForm';
+                try {
+                    parent.addTabs({id: 'notice', title: '参数配置', close: true, url: url, urlType: ''});
+                } catch (e) {
+                    eu.addTab(window.parent.layout_center_tabs, "参数配置", url, true, "");
+                }
+            }
+        }]);
+    }
+
     //数据列表
     $config_datagrid = $('#config_datagrid').datagrid({
         url: ctxAdmin + '/sys/config/datagrid',
@@ -27,52 +71,7 @@ $(function () {
                 {field: 'remark', title: '备注', width: 200}
             ]
         ],
-        toolbar: [
-            {
-                text: '新增',
-                iconCls: 'easyui-icon-add',
-                handler: function () {
-                    showDialog()
-                }
-            },
-            '-',
-            {
-                text: '编辑',
-                iconCls: 'easyui-icon-edit',
-                handler: function () {
-                    edit()
-                }
-            },
-            '-',
-            {
-                text: '删除',
-                iconCls: 'easyui-icon-remove',
-                handler: function () {
-                    del()
-                }
-            },
-            '-',
-            {
-                text: '读取配置文件',
-                iconCls: 'easyui-icon-add',
-                handler: function () {
-                    syncFromProperties()
-                }
-            },
-            '-',
-            {
-                text: '快捷配置',
-                iconCls: 'easyui-icon-edit',
-                handler: function () {
-                    var url = ctxAdmin + '/sys/config/paramForm';
-                    try {
-                        parent.addTabs({id: 'notice', title: '参数配置', close: true, url: url, urlType: ''});
-                    } catch (e) {
-                        eu.addTab(window.parent.layout_center_tabs, "参数配置", url, true, "");
-                    }
-                }
-            }
-        ],
+        toolbar: toolbar,
         onLoadSuccess: function () {
             $(this).datagrid('clearSelections');//取消所有的已选择项
             $(this).datagrid('unselectAll');//取消全选按钮为全选状态
