@@ -275,6 +275,7 @@ public class UserService extends CrudService<UserDao, User> {
      *
      * @param loginName 登录名
      * @param password  密码
+     * @param securityToken  安全码
      * @return
      */
     @SuppressWarnings("unchecked")
@@ -285,6 +286,31 @@ public class UserService extends CrudService<UserDao, User> {
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
         parameter.put("loginName", loginName);
+        parameter.put("password", password);
+        parameter.put("securityToken", securityToken);
+        List<User> list = dao.findLoginUser(parameter);
+        return list.isEmpty() ? null : list.get(0);
+    }
+
+    /**
+     * 根据登录名或手机号、密码查找用户.
+     * <br/>排除已删除的用户
+     *
+     * @param loginName 登录名
+     * @param mobile 手机号
+     * @param password  密码
+     * @param securityToken  安全码
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public User getUserByLMP(String loginName,String mobile, String password,String securityToken) {
+        Assert.notNull(loginName, "参数[loginName]为空!");
+        Assert.notNull(password, "参数[password]为空!");
+        Parameter parameter = new Parameter();
+        parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
+        parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
+        parameter.put("loginName", loginName);
+        parameter.put("mobile", mobile);
         parameter.put("password", password);
         parameter.put("securityToken", securityToken);
         List<User> list = dao.findLoginUser(parameter);
@@ -305,7 +331,7 @@ public class UserService extends CrudService<UserDao, User> {
         Parameter parameter = new Parameter();
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
-        parameter.put("loginName", mobile);
+        parameter.put("mobile", mobile);
         parameter.put("password", password);
         List<User> list = dao.findLoginUser(parameter);
         return list.isEmpty() ? null : list.get(0);

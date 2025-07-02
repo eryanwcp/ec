@@ -346,7 +346,21 @@
         SELECT
         <include refid="userColumns"/>
         FROM t_sys_user a
-        WHERE a.status = '0' AND (a.login_name = #{loginName} OR a.mobile = #{loginName})
+        WHERE a.status = '0'
+        <choose>
+            <when test="loginName != null and loginName != '' and mobile != null and mobile != ''">
+                AND (a.login_name = #{loginName} OR a.mobile = #{mobile})
+            </when>
+            <when test="loginName != null and loginName != ''">
+                AND a.login_name = #{loginName}
+            </when>
+            <when test="mobile != null and mobile != ''">
+                AND a.mobile = #{mobile}
+            </when>
+            <otherwise>
+                AND a.login_name = #{loginName}
+            </otherwise>
+        </choose>
         AND
           <choose>
               <when test="securityToken != null and securityToken != ''">
