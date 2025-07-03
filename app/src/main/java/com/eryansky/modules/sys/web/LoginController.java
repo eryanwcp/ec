@@ -228,7 +228,7 @@ public class LoginController extends SimpleController {
 
 
         // 获取用户信息
-        User user = userService.getUserByLP(loginName, _password,securityToken);
+        User user = userService.getUserByLMP(loginName,loginName, _password,securityToken);
         boolean flag = null != user;
         if(null  == user && AppConstants.isdevMode()){
             user = userService.getUserByLoginName(loginName);
