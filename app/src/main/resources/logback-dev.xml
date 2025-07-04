@@ -5,7 +5,7 @@
     <logger name="com.alibaba.druid" level="info"/>
     <logger name="com.eryansky" level="INFO"/>
     <logger name="com.eryansky.j2cache" level="INFO"/>
-    <logger name="org.apache.fury" level="WARN"/>
+    <logger name="org.apache.fory" level="WARN"/>
     <!--<logger name="com.eryansky.common.orm.mybatis" level="DEBUG"/>-->
 <!--    <logger name="com.eryansky.modules.sys.dao" level="debug"/>-->
     <contextName>ec</contextName>
