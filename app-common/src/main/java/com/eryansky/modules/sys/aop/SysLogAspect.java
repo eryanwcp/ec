@@ -11,6 +11,7 @@ import com.eryansky.common.utils.Exceptions;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.UserAgentUtils;
 import com.eryansky.common.utils.collections.Collections3;
+import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.common.web.utils.WebUtils;
@@ -87,10 +88,10 @@ public class SysLogAspect {
         // 执行方法所消耗的时间
         try {
             log.setType(logging.logType().getValue());
+
             log.setModule(className + "-" + methodName);
             log.setIp(null != request ? IpUtils.getIpAddr0(request) : (null != sessionInfo ? sessionInfo.getIp():StringUtils.EMPTY));
             log.setTitle(SpringUtils.parseSpel(logging.value(), method, args));
-            log.setParams(null != request ? request.getParameterMap(): null);
             log.setAction(null != request ? request.getMethod():StringUtils.EMPTY);
             ExtendAttr extendAttr = new ExtendAttr();
             if(null != sessionInfo){
@@ -122,9 +123,16 @@ public class SysLogAspect {
                 log.setExtendAttr(extendAttr);
             }
 
+            if(StringUtils.isNotBlank(logging.data())){
+                extendAttr.put("requestData",SpringUtils.parseSpel(logging.data(), method, args));
+            }else{
+                extendAttr.put("requestData", null != request ? JsonMapper.toJsonString(request.getParameterMap()):null);
+            }
 
             log.setExtendAttr(extendAttr);
-            log.setRemark(SpringUtils.parseSpel(logging.remark(), method, args));
+            if(StringUtils.isNotBlank(logging.remark())){
+                log.setRemark(SpringUtils.parseSpel(logging.remark(), method, args));
+            }
             log.setOperTime(Calendar.getInstance().getTime());
             //将当前实体保存到threadLocal
             sysLogThreadLocal.set(log);

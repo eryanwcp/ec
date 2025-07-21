@@ -112,7 +112,7 @@ public class PostController extends SimpleController {
     }
 
     @RequiresPermissions("sys:post:edit")
-    @Logging(value = "岗位管理-保存岗位", logType = LogType.access)
+    @Logging(value = "岗位管理-保存岗位",data = "#JsonMapper.toJson(#model)", logType = LogType.access)
     @PostMapping(value = {"save"}, produces = {MediaType.TEXT_HTML_VALUE})
     @ResponseBody
     public Result save(@ModelAttribute("model") Post model, String organId) {
@@ -141,7 +141,7 @@ public class PostController extends SimpleController {
      * @return
      */
     @RequiresPermissions("sys:post:edit")
-    @Logging(value = "岗位管理-删除岗位", logType = LogType.access)
+    @Logging(value = "岗位管理-删除岗位",data = "#JsonMapper.toJson(#ids)", logType = LogType.access)
     @PostMapping(value = {"remove"})
     @ResponseBody
     public Result remove(@RequestParam(value = "ids", required = false) List<String> ids) {
@@ -240,7 +240,7 @@ public class PostController extends SimpleController {
      * @return
      */
     @RequiresPermissions(logical = Logical.OR,value = {"sys:post:edit","sys:user:post:edit","sys:post:user:edit"})
-    @Logging(value = "岗位管理-添加关联用户", logType = LogType.access)
+    @Logging(value = "岗位管理-添加关联用户",remark = "#model.id",data = "#JsonMapper.toJson(#userIds)", logType = LogType.access)
     @PostMapping(value = {"addPostUser"})
     @ResponseBody
     public Result addPostUser(@ModelAttribute("model") Post model,
@@ -261,7 +261,7 @@ public class PostController extends SimpleController {
      * @return
      */
     @RequiresPermissions(logical = Logical.OR,value = {"sys:post:edit","sys:user:post:edit","sys:post:user:edit"})
-    @Logging(value = "岗位管理-移除关联用户", logType = LogType.access)
+    @Logging(value = "岗位管理-移除关联用户",remark = "#model.id",data = "#JsonMapper.toJson(#userIds)", logType = LogType.access)
     @PostMapping(value = {"removePostUser"})
     @ResponseBody
     public Result removePostUser(@ModelAttribute("model") Post model,

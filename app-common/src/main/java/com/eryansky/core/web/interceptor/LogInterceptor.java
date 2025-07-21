@@ -5,6 +5,7 @@
  */
 package com.eryansky.core.web.interceptor;
 
+import com.eryansky.client.common.vo.ExtendAttr;
 import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.common.utils.*;
 import com.eryansky.common.utils.collections.Collections3;
@@ -116,6 +117,7 @@ public class LogInterceptor implements HandlerInterceptor {
 		boolean flag = false;
 		Boolean _flag = null;
 		String remark = null;
+		String requestData = null;
 		if (ex != null) {
 			flag = true;
 			newLogValue = LogType.exception.getDescription();
@@ -154,6 +156,9 @@ public class LogInterceptor implements HandlerInterceptor {
 				}
 				if (StringUtils.isNotBlank(logging.remark())) {
 					remark = SpringUtils.parseSpel(logging.remark(), handlerMethod.getMethod(), parameterValues);
+				}
+				if (StringUtils.isNotBlank(logging.data())) {
+					requestData = SpringUtils.parseSpel(logging.data(), handlerMethod.getMethod(), parameterValues);
 				}
 			} else if (logging != null && !Boolean.parseBoolean(SpringUtils.parseSpel(logging.logging(), handlerMethod.getMethod(), parameterValues))) {
 				_flag = false;
@@ -196,7 +201,9 @@ public class LogInterceptor implements HandlerInterceptor {
 			log.setModule(requestUrl);
 			log.setAction(request.getMethod());
 			log.setRemark(remark);
-			log.setParams(request.getParameterMap());
+			ExtendAttr extendAttr = new ExtendAttr();
+			extendAttr.put("requestData",requestData);
+			log.setExtendAttr(extendAttr);
 			// 如果有异常，设置异常信息
 			log.setException(Exceptions.getStackTraceAsString(ex));
 			log.prePersist();

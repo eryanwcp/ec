@@ -185,7 +185,7 @@ public class SystemMonitorController extends SimpleController {
      * @param region 缓存名称
      * @return
      */
-    @Logging(value = "系统监控-清空缓存", logType = LogType.access)
+    @Logging(value = "系统监控-清空缓存",data = "#region", logType = LogType.access)
     @RequiresPermissions("sys:systemMonitor:edit")
     @GetMapping(value = "clearCache")
     public String clearCache(String region, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
@@ -212,7 +212,7 @@ public class SystemMonitorController extends SimpleController {
      * @param region 缓存名称
      * @return
      */
-    @Logging(value = "系统监控-清空缓存", logType = LogType.access)
+    @Logging(value = "系统监控-清空缓存",remark = "#region",data = "#key", logType = LogType.access)
     @RequiresPermissions("sys:systemMonitor:edit")
     @GetMapping(value = "clearCacheKey")
     public String clearCacheKey(String region, String key, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
@@ -262,7 +262,7 @@ public class SystemMonitorController extends SimpleController {
     }
 
     @RequiresPermissions("sys:systemMonitor:edit")
-    @Logging(value = "系统监控-队列管理:清空队列", logType = LogType.access, logging = "!#isAjax")
+    @Logging(value = "系统监控-队列管理:清空队列",data = "#region", logType = LogType.access, logging = "!#isAjax")
     @GetMapping(value = "queueClear")
     public String queueClear(HttpServletRequest request, RedirectAttributes redirectAttributes, String region, HttpServletResponse response) {
         CacheUtils.getCacheChannel().queueClear(region);

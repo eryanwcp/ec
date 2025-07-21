@@ -255,31 +255,6 @@ public class Log extends DataEntity<Log> {
         this.latitude = latitude;
     }
 
-
-    /**
-     * 设置请求参数
-     *
-     * @param paramMap
-     */
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public void setParams(Map paramMap) {
-        if (paramMap == null) {
-            return;
-        }
-        StringBuilder params = new StringBuilder();
-        for (Map.Entry<String, String[]> param : ((Map<String, String[]>) paramMap).entrySet()) {
-            params.append(("".equals(params.toString()) ? "" : "&") + param.getKey() + "=");
-            String paramValue = (param.getValue() != null && param.getValue().length > 0 ? param.getValue()[0] : "");
-            params.append(StringUtils.abbr(StringUtils.endsWithIgnoreCase(param.getKey(), "password") ? "" : paramValue, 100));
-        }
-        if (StringUtils.isNotBlank(this.remark)) {
-            this.remark = params.insert(0, this.remark).toString();
-        } else {
-            this.remark = params.toString();
-        }
-    }
-
-
     /**
      * 日志类类型 View
      */

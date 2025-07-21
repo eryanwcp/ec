@@ -129,7 +129,7 @@ public class RoleController extends SimpleController {
      * 保存.
      */
     @RequiresPermissions("sys:role:edit")
-    @Logging(value = "角色管理-保存角色", logType = LogType.access)
+    @Logging(value = "角色管理-保存角色",data = "#JsonMapper.toJson(#role)", logType = LogType.access)
     @PostMapping(value = {"save"}, produces = {MediaType.TEXT_HTML_VALUE})
     @ResponseBody()
     public Result save(@ModelAttribute("model") Role role, @RequestParam(value = "dataOrganIds", required = false) List<String> dataOrganIds) {
@@ -153,7 +153,7 @@ public class RoleController extends SimpleController {
      * 删除.
      */
     @RequiresPermissions("sys:role:edit")
-    @Logging(value = "角色管理-删除角色", logType = LogType.access)
+    @Logging(value = "角色管理-删除角色",data = "#JsonMapper.toJson(#ids)", logType = LogType.access)
     @PostMapping(value = {"remove"})
     @ResponseBody
     public Result remove(@RequestParam(value = "ids", required = false) List<String> ids) {
@@ -330,7 +330,7 @@ public class RoleController extends SimpleController {
      * @return
      */
     @RequiresPermissions(value = {"sys:role:edit","sys:role:user:edit","sys:user:role:edit"},logical = Logical.OR)
-    @Logging(value = "角色管理-添加关联用户", logType = LogType.access)
+    @Logging(value = "角色管理-添加关联用户",remark = "#model.id",data = "#JsonMapper.toJson(#userIds)", logType = LogType.access)
     @PostMapping(value = {"addRoleUser"})
     @ResponseBody
     public Result addRoleUser(@ModelAttribute("model") Role model,
@@ -349,7 +349,7 @@ public class RoleController extends SimpleController {
      * @return
      */
     @RequiresPermissions(value = {"sys:role:edit","sys:role:user:edit","sys:user:role:edit"},logical = Logical.OR)
-    @Logging(value = "角色管理-移除关联用户", logType = LogType.access)
+    @Logging(value = "角色管理-移除关联用户",remark = "#model.id",data = "#JsonMapper.toJson(#userIds)", logType = LogType.access)
     @PostMapping(value = {"removeRoleUser"})
     @ResponseBody
     public Result removeRoleUser(@ModelAttribute("model") Role model,
@@ -366,7 +366,7 @@ public class RoleController extends SimpleController {
      * @return
      */
     @RequiresPermissions(value = {"sys:role:edit","sys:role:user:edit","sys:user:role:edit"},logical = Logical.OR)
-    @Logging(value = "角色管理-保存角色用户", logType = LogType.access)
+    @Logging(value = "角色管理-保存角色用户",remark = "#model.id",data = "#JsonMapper.toJson(#userIds)", logType = LogType.access)
     @PostMapping(value = {"updateRoleUser"})
     @ResponseBody
     public Result updateRoleUser(@ModelAttribute("model") Role model,

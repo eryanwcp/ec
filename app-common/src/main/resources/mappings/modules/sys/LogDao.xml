@@ -26,9 +26,9 @@
 		a.longitude AS "longitude",
 		a.latitude AS "latitude",
 		a.extend_attr AS "extendAttr",
-		TRIM('"' FROM JSON_EXTRACT(extend_attr,'$.userName')) AS "userName",
-		TRIM('"' FROM JSON_EXTRACT(extend_attr,'$.userLoginName')) AS "userLoginName",
-		TRIM('"' FROM JSON_EXTRACT(extend_attr,'$.userMobie')) AS "userMobie"
+		TRIM('"' FROM JSON_EXTRACT(a.extend_attr,'$.userName')) AS "userName",
+		TRIM('"' FROM JSON_EXTRACT(a.extend_attr,'$.userLoginName')) AS "userLoginName",
+		TRIM('"' FROM JSON_EXTRACT(a.extend_attr,'$.userMobie')) AS "userMobie"
 	</sql>
 
     <sql id="sysLogJoins">
@@ -64,6 +64,13 @@
                     <otherwise>'%'+#{query}+'%'</otherwise>
                 </choose>
                 OR a.remark LIKE
+                <choose>
+                    <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+                    <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+                    <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+                    <otherwise>'%'+#{query}+'%'</otherwise>
+                </choose>
+                OR TRIM('"' FROM JSON_EXTRACT(a.extend_attr,'$.requestData')) LIKE
                 <choose>
                     <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
                     <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
@@ -118,6 +125,13 @@
                     <otherwise>'%'+#{query}+'%'</otherwise>
                 </choose>
                 OR a.remark LIKE
+                <choose>
+                    <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+                    <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+                    <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+                    <otherwise>'%'+#{query}+'%'</otherwise>
+                </choose>
+                OR TRIM('"' FROM JSON_EXTRACT(a.extend_attr,'$.requestData')) LIKE
                 <choose>
                     <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
                     <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
