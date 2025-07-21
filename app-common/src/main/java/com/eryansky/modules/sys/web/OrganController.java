@@ -179,7 +179,7 @@ public class OrganController extends SimpleController {
      * 保存.
      */
     @RequiresPermissions("sys:organ:edit")
-    @Logging(value = "机构管理-保存机构", logType = LogType.access)
+    @Logging(value = "机构管理-保存机构",data = "#JsonMapper.toJson(#organ)", logType = LogType.access)
     @PostMapping(value = {"save"}, produces = {MediaType.TEXT_HTML_VALUE})
     @ResponseBody
     public Result save(@ModelAttribute("model") Organ organ, String _parentId) {
@@ -210,7 +210,7 @@ public class OrganController extends SimpleController {
      * @return
      */
     @RequiresPermissions("sys:organ:edit")
-    @Logging(value = "机构管理-删除机构", logType = LogType.access)
+    @Logging(value = "机构管理-删除机构",data = "#id", logType = LogType.access)
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"delete/{id}"})
     @ResponseBody
     public Result delete(@PathVariable String id) {

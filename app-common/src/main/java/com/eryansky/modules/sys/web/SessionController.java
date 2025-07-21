@@ -75,6 +75,7 @@ public class SessionController extends SimpleController {
      * @param sessionIds sessionID集合
      * @return
      */
+    @Logging(value = "在线用户-强制用户下线",data = "#JsonMapper.toJson(#sessionIds)", logType = LogType.access)
     @RequiresPermissions("sys:session:edit")
     @PostMapping(value = {"offline"})
     @ResponseBody

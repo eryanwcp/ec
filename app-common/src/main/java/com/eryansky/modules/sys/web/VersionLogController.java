@@ -209,7 +209,7 @@ public class VersionLogController extends SimpleController {
      * @return
      */
     @RequiresPermissions("sys:versionLog:edit")
-    @Logging(value = "版本更新-保存版本", logType = LogType.access)
+    @Logging(value = "版本更新-保存版本",data = "#JsonMapper.toJson(#model)", logType = LogType.access)
     @PostMapping(value = {"save"}, produces = {MediaType.TEXT_HTML_VALUE})
     @ResponseBody
     public Result save(@ModelAttribute("model") VersionLog model) {
@@ -232,7 +232,7 @@ public class VersionLogController extends SimpleController {
      * @return
      */
     @RequiresPermissions("sys:versionLog:edit")
-    @Logging(value = "版本管理-删除版本", logType = LogType.access)
+    @Logging(value = "版本管理-删除版本",data = "#JsonMapper.toJson(#ids)", logType = LogType.access)
     @PostMapping(value = {"remove"})
     @ResponseBody
     public Result remove(@RequestParam(value = "ids", required = false) List<String> ids) {

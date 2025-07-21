@@ -178,7 +178,7 @@ public class UserController extends SimpleController {
      * 保存.
      */
     @RequiresPermissions("sys:user:edit")
-    @Logging(value = "用户管理-保存用户", logType = LogType.access)
+    @Logging(value = "用户管理-保存用户", data = "#JsonMapper.toJson(#user)",logType = LogType.access)
     @PostMapping(value = {"save"}, produces = {MediaType.TEXT_HTML_VALUE})
     @ResponseBody
     public Result save(@ModelAttribute("model") User user) {
@@ -221,7 +221,7 @@ public class UserController extends SimpleController {
 
 
     @RequiresPermissions("sys:user:edit")
-    @Logging(value = "用户管理-删除用户", logType = LogType.access)
+    @Logging(value = "用户管理-删除用户",data = "#JsonMapper.toJson(#ids)", logType = LogType.access)
     @PostMapping(value = {"remove"})
     @ResponseBody
     public Result remove(@RequestParam(value = "ids", required = false) List<String> ids) {
@@ -251,7 +251,7 @@ public class UserController extends SimpleController {
      * @return
      */
     @RequiresPermissions(logical = Logical.OR,value = {"sys:user:edit","sys:user:password:edit"})
-    @Logging(value = "用户管理-重置密码", logType = LogType.access)
+    @Logging(value = "用户管理-重置密码",data = "#JsonMapper.toJson(#userIds)", logType = LogType.access)
     @PostMapping(value = {"passwordReset"}, produces = {MediaType.TEXT_HTML_VALUE})
     @ResponseBody
     public Result passwordReset(@RequestParam(value = "userIds", required = true) List<String> userIds,
@@ -316,7 +316,7 @@ public class UserController extends SimpleController {
      * @return
      */
     @RequiresPermissions(logical = Logical.OR,value = {"sys:user:edit","sys:organ:user:edit","sys:user:organ:edit"})
-    @Logging(value = "用户管理-用户机构", logType = LogType.access)
+    @Logging(value = "用户管理-用户机构",remark = "#JsonMapper.toJson(#userIds)",data = "#JsonMapper.toJson(#organIds)", logType = LogType.access)
     @PostMapping(value = {"updateUserOrgan"}, produces = {MediaType.TEXT_HTML_VALUE})
     @ResponseBody
     public Result updateUserOrgan(@RequestParam(value = "userIds", required = false) Set<String> userIds,
@@ -346,7 +346,7 @@ public class UserController extends SimpleController {
      * @param postIds 岗位ID集合
      */
     @RequiresPermissions(logical = Logical.OR,value = {"sys:user:edit","sys:user:post:edit","sys:post:user:edit"})
-    @Logging(value = "用户管理-用户岗位", logType = LogType.access)
+    @Logging(value = "用户管理-用户岗位",remark = "#model.id",data = "#JsonMapper.toJson(#postIds)", logType = LogType.access)
     @PostMapping(value = {"updateUserPost"}, produces = {MediaType.TEXT_HTML_VALUE})
     @ResponseBody
     public Result updateUserPost(@ModelAttribute("model") User model,
@@ -403,7 +403,7 @@ public class UserController extends SimpleController {
      * @return
      */
     @RequiresPermissions(logical = Logical.OR,value = {"sys:user:edit","sys:resource:user:edit","sys:user:resource:edit"})
-    @Logging(value = "用户管理-用户资源", logType = LogType.access)
+    @Logging(value = "用户管理-用户资源",remark = "#JsonMapper.toJson(#userIds)",data = "#JsonMapper.toJson(#resourceIds)", logType = LogType.access)
     @PostMapping(value = {"updateUserResource"}, produces = {MediaType.TEXT_HTML_VALUE})
     @ResponseBody
     public Result updateUserResource(@RequestParam(value = "userIds", required = false) Set<String> userIds,
@@ -688,7 +688,7 @@ public class UserController extends SimpleController {
      * @return
      */
     @RequiresPermissions("sys:user:edit")
-    @Logging(value = "用户管理-排序调整", logType = LogType.access)
+    @Logging(value = "用户管理-排序调整",remark = "#upUserId", data = "#downUserId", logType = LogType.access)
     @PostMapping(value = {"changeOrderNo"})
     @ResponseBody
     public Result changeOrderNo(@RequestParam(required = true) String upUserId,
@@ -706,7 +706,7 @@ public class UserController extends SimpleController {
      * @return
      */
     @RequiresPermissions("sys:user:edit")
-    @Logging(value = "用户管理-锁定用户", logType = LogType.access)
+    @Logging(value = "用户管理-锁定用户",remark = "#status", data = "#JsonMapper.toJson(#userIds)", logType = LogType.access)
     @PostMapping(value = {"lock"})
     @ResponseBody
     public Result lock(@RequestParam(value = "userIds", required = false) List<String> userIds,
@@ -722,7 +722,7 @@ public class UserController extends SimpleController {
      * @return
      */
     @RequiresRoles(AppConstants.ROLE_SYSTEM_MANAGER)
-    @Logging(value = "用户管理-查看密码", logType = LogType.access)
+    @Logging(value = "用户管理-查看密码", data = "#JsonMapper.toJson(#loginName)", logType = LogType.access)
     @PostMapping(value = "viewUserPassword")
     @ResponseBody
     public Result viewUserPassword(String loginName) throws Exception {

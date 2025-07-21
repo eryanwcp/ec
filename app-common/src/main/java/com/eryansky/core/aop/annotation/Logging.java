@@ -48,5 +48,11 @@ public @interface Logging {
      * @return
      */
     String remark() default "";
+    /**
+     * 数据信息
+     * <br/>支持SpEL表达式
+     * @return
+     */
+    String data() default "";
 
 }

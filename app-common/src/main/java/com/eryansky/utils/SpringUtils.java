@@ -6,6 +6,7 @@
 package com.eryansky.utils;
 
 import cn.hutool.extra.spring.SpringUtil;
+import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.security.SecurityUtils;
@@ -24,6 +25,7 @@ import java.lang.reflect.Method;
 public class SpringUtils extends SpringUtil {
 
     public static final String PARAM_SESSION = "sessionInfo";
+    public static final String PARAM_JSON = "JsonMapper";
     public static final String PARAM_IS_AJAX = "isAjax";
     /**
      * 解析Spring SpEL表达式
@@ -49,6 +51,7 @@ public class SpringUtils extends SpringUtil {
 
             //系统注入数据
             try {
+                context.setVariable(PARAM_JSON, JsonMapper.getInstance());
                 //Session信息
                 context.setVariable(PARAM_SESSION, SecurityUtils.getCurrentSessionInfo());
                 //Ajax请求
