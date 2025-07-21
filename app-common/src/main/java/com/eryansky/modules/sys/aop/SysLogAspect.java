@@ -11,6 +11,7 @@ import com.eryansky.common.utils.Exceptions;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.UserAgentUtils;
 import com.eryansky.common.utils.collections.Collections3;
+import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.common.web.utils.WebUtils;
@@ -125,7 +126,7 @@ public class SysLogAspect {
             if(StringUtils.isNotBlank(logging.data())){
                 extendAttr.put("requestData",SpringUtils.parseSpel(logging.data(), method, args));
             }else{
-                extendAttr.put("requestData",null != request ? request.getParameterMap(): null);
+                extendAttr.put("requestData", null != request ? JsonMapper.toJsonString(request.getParameterMap()):null);
             }
 
             log.setExtendAttr(extendAttr);

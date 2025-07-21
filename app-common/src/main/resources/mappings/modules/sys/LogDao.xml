@@ -28,8 +28,7 @@
 		a.extend_attr AS "extendAttr",
 		TRIM('"' FROM JSON_EXTRACT(a.extend_attr,'$.userName')) AS "userName",
 		TRIM('"' FROM JSON_EXTRACT(a.extend_attr,'$.userLoginName')) AS "userLoginName",
-		TRIM('"' FROM JSON_EXTRACT(a.extend_attr,'$.userMobie')) AS "userMobie",
-		TRIM('"' FROM JSON_EXTRACT(a.extend_attr,'$.requestData')) AS "requestData"
+		TRIM('"' FROM JSON_EXTRACT(a.extend_attr,'$.userMobie')) AS "userMobie"
 	</sql>
 
     <sql id="sysLogJoins">

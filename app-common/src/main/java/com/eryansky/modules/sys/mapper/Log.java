@@ -121,10 +121,6 @@ public class Log extends DataEntity<Log> {
      * 自定义扩展数据
      */
     private ExtendAttr extendAttr;
-    /**
-     * 请求参数
-     */
-    private String requestData;
 
     public Log() {
         super();
@@ -331,13 +327,5 @@ public class Log extends DataEntity<Log> {
             this.extendAttr.put(key,value);
         }
         return this;
-    }
-
-    public String getRequestData() {
-        return requestData;
-    }
-
-    public void setRequestData(String requestData) {
-        this.requestData = requestData;
     }
 }
