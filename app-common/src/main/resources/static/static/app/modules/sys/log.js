@@ -49,8 +49,7 @@ $(function () {
                 }},
             {field: 'extendAttr', title: '自定义参数', width: 200,hidden: true,formatter: function (value, rowData, rowIndex) {
                     delete value['requestData'];
-                    var item = JSON.stringify(value);
-                    return item;
+                    return JSON.stringify(value);
             }},
             {field: 'actionTime', title: '操作耗时(ms)', width: 100,align: 'right'},
             {field: 'operTime', title: '操作时间', width: 136, sortable: true}
