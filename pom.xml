@@ -49,7 +49,6 @@
         <druid-version>1.2.24</druid-version>
         <mariadb.driver.version>3.1.4</mariadb.driver.version>
         <mysql.driver.version>8.4.0</mysql.driver.version>
-        <oracle.driver.version>12.1.0.1-atlassian-hosted</oracle.driver.version>
         <db2.driver.version>10.1</db2.driver.version>
         <oscar.driver.version>4.0.2</oscar.driver.version>
 
