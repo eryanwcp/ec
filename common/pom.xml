@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.eryansky</groupId>
         <artifactId>ec-parent</artifactId>
-        <version>4.2.20241221.41</version>
+        <version>4.2.20241221.42</version>
     </parent>
 
     <artifactId>ec-common</artifactId>
@@ -261,7 +261,7 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk18on</artifactId>
-            <version>1.80</version>
+            <version>1.81</version>
         </dependency>
         <dependency>
             <groupId>net.coobird</groupId>
