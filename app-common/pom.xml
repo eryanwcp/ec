@@ -20,10 +20,9 @@
         <bsh.version>2.0b6</bsh.version>
 
         <sitemesh.version>2.5.0</sitemesh.version>
-        <commons-csv.version>1.13.0</commons-csv.version>
-        <commons-dbutils.version>1.9.0</commons-dbutils.version>
+        <commons-csv.version>1.14.1</commons-csv.version>
         <commons-cli.version>1.9.0</commons-cli.version>
-        <commons-compress.version>1.27.1</commons-compress.version>
+        <commons-compress.version>1.28.0</commons-compress.version>
         <ckfinder.version>2.3</ckfinder.version>
         <jwt.version>4.5.0</jwt.version>
         <guava.version>33.4.8-jre</guava.version>

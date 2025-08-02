@@ -53,7 +53,7 @@
         <oscar.driver.version>4.0.2</oscar.driver.version>
 
         <httpcomponents.version>4.5.14</httpcomponents.version>
-        <commons-codec.version>1.18.0</commons-codec.version>
+        <commons-codec.version>1.19.0</commons-codec.version>
 
 
         <ec-common.version>4.2.20241221.43</ec-common.version>
