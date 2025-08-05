@@ -46,7 +46,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
         String sessionId = request.getSession().getId();
         String cacheKey = CACHE_REST_PREFIX + sessionId;
         Boolean handlerResult = CacheUtils.get(cacheKey);
-        if (null != handlerResult) {
+        if (null != handlerResult && handlerResult) {
             return handlerResult;
         }
         String requestUrl = request.getRequestURI().replaceAll("//", "/");
