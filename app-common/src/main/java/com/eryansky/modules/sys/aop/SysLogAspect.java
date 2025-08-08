@@ -18,6 +18,7 @@ import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
+import com.eryansky.core.security.jwt.JWTUtils;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys.event.SysLogEvent;
 import com.eryansky.modules.sys.mapper.Log;
@@ -103,7 +104,6 @@ public class SysLogAspect {
                 extendAttr.put("userName",sessionInfo.getName());
                 extendAttr.put("userLoginName",sessionInfo.getLoginName());
                 extendAttr.put("userMobile",sessionInfo.getMobile());
-                log.setExtendAttr(extendAttr);
             }else {
                 String userLoginName = null;
                 if(null != request){
@@ -115,12 +115,24 @@ public class SysLogAspect {
                     if(StringUtils.isBlank(userLoginName)){
                         userLoginName = request.getParameter("appCode");
                     }
+                    if(StringUtils.isBlank(userLoginName)){
+                        String access_token = Collections3.getFirst(headers.get("access_token"));;
+                        if(StringUtils.isNotBlank(access_token)){
+                            try {
+                                userLoginName = JWTUtils.getUsername(access_token);
+                            } catch (Exception e) {
+                                logger.error(e.getMessage());
+                            }
+                        }
+
+                    }
+
+
                 }
                 extendAttr.put("userType","S");//自定义 系统
                 log.setUserId(StringUtils.isNotBlank(userLoginName) ? userLoginName:User.SUPERUSER_ID);
                 extendAttr.put("userName",StringUtils.isNotBlank(userLoginName) ? userLoginName:"系统");
                 extendAttr.put("userLoginName", userLoginName);
-                log.setExtendAttr(extendAttr);
             }
 
             if(StringUtils.isNotBlank(logging.data())){

@@ -9,7 +9,10 @@ import com.eryansky.client.common.vo.ExtendAttr;
 import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.common.utils.*;
 import com.eryansky.common.utils.collections.Collections3;
+import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.utils.net.IpUtils;
+import com.eryansky.common.web.utils.WebUtils;
+import com.eryansky.core.security.jwt.JWTUtils;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.event.SysLogEvent;
 import com.google.common.collect.Lists;
@@ -202,6 +205,42 @@ public class LogInterceptor implements HandlerInterceptor {
 			log.setAction(request.getMethod());
 			log.setRemark(remark);
 			ExtendAttr extendAttr = new ExtendAttr();
+			if(null != sessionInfo){
+				log.setUserAgent(sessionInfo.getUserAgent());
+				log.setDeviceType(sessionInfo.getDeviceType());
+				log.setBrowserType(sessionInfo.getBrowserType());
+				log.setUserId(sessionInfo.getUserId());
+				extendAttr.put("userType",sessionInfo.getUserType());
+				extendAttr.put("userName",sessionInfo.getName());
+				extendAttr.put("userLoginName",sessionInfo.getLoginName());
+				extendAttr.put("userMobile",sessionInfo.getMobile());
+			}else {
+				String userLoginName = null;
+				log.setUserAgent(UserAgentUtils.getHTTPUserAgent(request));
+				log.setDeviceType(UserAgentUtils.getDeviceType(request).toString());
+				log.setBrowserType(UserAgentUtils.getBrowser(request).getName());
+				Map<String, List<String>> headers = WebUtils.getHeaders(request);
+				userLoginName = Collections3.getFirst(headers.get("appCode"));
+				if(StringUtils.isBlank(userLoginName)){
+					userLoginName = request.getParameter("appCode");
+				}
+				if(StringUtils.isBlank(userLoginName)){
+					String access_token = Collections3.getFirst(headers.get("access_token"));;
+					if(StringUtils.isNotBlank(access_token)){
+						try {
+							userLoginName = JWTUtils.getUsername(access_token);
+						} catch (Exception e) {
+							logger.error(e.getMessage());
+						}
+					}
+
+				}
+				extendAttr.put("userType","S");//自定义 系统
+				log.setUserId(StringUtils.isNotBlank(userLoginName) ? userLoginName:User.SUPERUSER_ID);
+				extendAttr.put("userName",StringUtils.isNotBlank(userLoginName) ? userLoginName:"系统");
+				extendAttr.put("userLoginName", userLoginName);
+			}
+
 			extendAttr.put("requestData",requestData);
 			log.setExtendAttr(extendAttr);
 			// 如果有异常，设置异常信息
