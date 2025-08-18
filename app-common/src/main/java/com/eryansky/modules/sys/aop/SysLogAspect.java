@@ -138,6 +138,10 @@ public class SysLogAspect {
                 extendAttr.put("requestData", null != request ? JsonMapper.toJsonString(request.getParameterMap()):null);
             }
 
+            if(logging.requestHeaders() && null != request){
+                extendAttr.put("requestHeaders",JsonMapper.toJsonString(WebUtils.getHeaders(request)));
+            }
+
             log.setExtendAttr(extendAttr);
             if(StringUtils.isNotBlank(logging.remark())){
                 log.setRemark(SpringUtils.parseSpel(logging.remark(), method, args));
