@@ -110,6 +110,9 @@ public class SysLogAspect {
                     Map<String, List<String>> headers = WebUtils.getHeaders(request);
                     userLoginName = Collections3.getFirst(headers.get("appCode"));
                     if(StringUtils.isBlank(userLoginName)){
+                        userLoginName = Collections3.getFirst(headers.get("appcode"));
+                    }
+                    if(StringUtils.isBlank(userLoginName)){
                         userLoginName = request.getParameter("appCode");
                     }
                     if(StringUtils.isBlank(userLoginName)){
