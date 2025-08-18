@@ -41,7 +41,7 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
+
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -121,6 +121,7 @@ public class LogInterceptor implements HandlerInterceptor {
 		Boolean _flag = null;
 		String remark = null;
 		String requestData = null;
+		String requestHeaders = null;
 		if (ex != null) {
 			flag = true;
 			newLogValue = LogType.exception.getDescription();
@@ -162,6 +163,10 @@ public class LogInterceptor implements HandlerInterceptor {
 				}
 				if (StringUtils.isNotBlank(logging.data())) {
 					requestData = SpringUtils.parseSpel(logging.data(), handlerMethod.getMethod(), parameterValues);
+				}
+
+				if (logging.requestHeaders()) {
+					requestHeaders= JsonMapper.toJsonString(WebUtils.getHeaders(request));
 				}
 			} else if (logging != null && !Boolean.parseBoolean(SpringUtils.parseSpel(logging.logging(), handlerMethod.getMethod(), parameterValues))) {
 				_flag = false;
@@ -242,6 +247,13 @@ public class LogInterceptor implements HandlerInterceptor {
 			}
 
 			extendAttr.put("requestData",requestData);
+
+
+
+			if(null != requestHeaders){
+				extendAttr.put("requestHeaders",requestHeaders);
+			}
+
 			log.setExtendAttr(extendAttr);
 			// 如果有异常，设置异常信息
 			log.setException(Exceptions.getStackTraceAsString(ex));

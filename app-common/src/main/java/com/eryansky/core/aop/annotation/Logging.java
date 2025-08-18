@@ -54,5 +54,10 @@ public @interface Logging {
      * @return
      */
     String data() default "";
+    /**
+     * 记录请求头 默认值：false
+     * @return
+     */
+    boolean requestHeaders() default false;
 
 }

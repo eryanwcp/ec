@@ -31,15 +31,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * 使用AspectJ实现登录登出日志AOP
@@ -139,6 +136,10 @@ public class SysLogAspect {
                 extendAttr.put("requestData",SpringUtils.parseSpel(logging.data(), method, args));
             }else{
                 extendAttr.put("requestData", null != request ? JsonMapper.toJsonString(request.getParameterMap()):null);
+            }
+
+            if(logging.requestHeaders() && null != request){
+                extendAttr.put("requestHeaders",JsonMapper.toJsonString(WebUtils.getHeaders(request)));
             }
 
             log.setExtendAttr(extendAttr);
