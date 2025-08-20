@@ -12,6 +12,7 @@ import com.eryansky.common.utils.UserAgentUtils;
 import com.eryansky.common.utils.encode.Encrypt;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
+import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
@@ -46,6 +47,12 @@ public class IndexController extends SimpleController {
     private UserService userService;
     @Autowired
     private UserPasswordService userPasswordService;
+
+    @GetMapping(value = {"headers"})
+    @ResponseBody
+    public Result headers(HttpServletRequest request) {
+        return Result.successResult().setData(WebUtils.getHeaders(request));
+    }
 
     @GetMapping(value = {""})
     public ModelAndView admin(HttpServletRequest request) {
