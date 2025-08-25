@@ -48,6 +48,7 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
 
     public static final String ATTR_SESSIONINFO = "sessionInfo";
     public static final String ATTR_AUTHORIZATION = "Authorization";
+    public static final String ATTR_TOKEN = "token";
 
 
     /**

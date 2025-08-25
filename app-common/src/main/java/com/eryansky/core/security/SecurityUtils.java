@@ -820,9 +820,12 @@ public class SecurityUtils {
             }
             //Authorization 请求头或请求参数
             if (sessionInfo == null) {
-                String authorization = request.getHeader(AuthorityInterceptor.ATTR_AUTHORIZATION);
-                if(StringUtils.isBlank(authorization)){
-                    authorization = request.getParameter(AuthorityInterceptor.ATTR_AUTHORIZATION);
+                String authorization = request.getParameter(AuthorityInterceptor.ATTR_AUTHORIZATION);
+                if (StringUtils.isBlank(authorization)) {
+                    authorization = request.getParameter(AuthorityInterceptor.ATTR_TOKEN);
+                }
+                if (StringUtils.isBlank(authorization)) {
+                    authorization = request.getHeader(AuthorityInterceptor.ATTR_AUTHORIZATION);
                 }
                 if (StringUtils.isNotBlank(authorization)) {
                     String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""),"Bearer","");
