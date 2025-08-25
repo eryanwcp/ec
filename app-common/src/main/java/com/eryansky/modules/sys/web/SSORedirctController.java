@@ -44,9 +44,12 @@ public class SSORedirctController extends SimpleController {
         if (StringUtils.isNotBlank(param)) {
             url += "?" + param;
         }
-        String authorization = request.getHeader(AuthorityInterceptor.ATTR_AUTHORIZATION);
-        if(StringUtils.isBlank(authorization)){
-            authorization = request.getParameter(AuthorityInterceptor.ATTR_AUTHORIZATION);
+        String authorization = request.getParameter(AuthorityInterceptor.ATTR_AUTHORIZATION);
+        if (StringUtils.isBlank(authorization)) {
+            authorization = request.getParameter(AuthorityInterceptor.ATTR_TOKEN);
+        }
+        if (StringUtils.isBlank(authorization)) {
+            authorization = request.getHeader(AuthorityInterceptor.ATTR_AUTHORIZATION);
         }
         String token = null;
         if (StringUtils.isNotBlank(authorization)) {
