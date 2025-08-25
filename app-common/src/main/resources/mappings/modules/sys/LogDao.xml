@@ -56,6 +56,13 @@
                     <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
                     <otherwise>'%'+#{query}+'%'</otherwise>
                 </choose>
+                OR a.remark LIKE
+                <choose>
+                    <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+                    <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+                    <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+                    <otherwise>'%'+#{query}+'%'</otherwise>
+                </choose>
                 OR a.ip LIKE
                 <choose>
                     <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
@@ -63,7 +70,7 @@
                     <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
                     <otherwise>'%'+#{query}+'%'</otherwise>
                 </choose>
-                OR a.remark LIKE
+                OR a.module LIKE
                 <choose>
                     <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
                     <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
@@ -125,6 +132,13 @@
                     <otherwise>'%'+#{query}+'%'</otherwise>
                 </choose>
                 OR a.remark LIKE
+                <choose>
+                    <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
+                    <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
+                    <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
+                    <otherwise>'%'+#{query}+'%'</otherwise>
+                </choose>
+                OR a.module LIKE
                 <choose>
                     <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
                     <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
