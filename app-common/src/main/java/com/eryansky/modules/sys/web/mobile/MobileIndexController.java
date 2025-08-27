@@ -8,10 +8,7 @@ import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
 import com.eryansky.common.exception.ActionException;
 import com.eryansky.common.model.Result;
-import com.eryansky.common.utils.Arith;
-import com.eryansky.common.utils.Identities;
-import com.eryansky.common.utils.StringUtils;
-import com.eryansky.common.utils.UserAgentUtils;
+import com.eryansky.common.utils.*;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.encode.Cryptos;
 import com.eryansky.common.utils.encode.EncodeUtils;
@@ -437,7 +434,7 @@ public class MobileIndexController extends SimpleController {
                 BufferedImage originalImage =  ImgUtil.read(multipartFile.getInputStream());
 
                 // 水印文字
-                String watermarkText = StringUtils.isNotBlank(pressText) ? pressText:sessionInfo.getLoginName();
+                String watermarkText = StringUtils.isNotBlank(pressText) ? pressText:sessionInfo.getLoginName()+" "+ DateUtils.getDateTime();
                 String watermarkTextGPS = null;
                 if (null != longitude && null != latitude) {
                     watermarkTextGPS = Arith.round(latitude,6) + "," + Arith.round(longitude,6);
