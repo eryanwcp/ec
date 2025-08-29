@@ -21,7 +21,7 @@
 
         <sitemesh.version>3.2.2</sitemesh.version>
         <commons-csv.version>1.14.1</commons-csv.version>
-        <commons-cli.version>1.9.0</commons-cli.version>
+        <commons-cli.version>1.10.0</commons-cli.version>
         <commons-compress.version>1.28.0</commons-compress.version>
         <jwt.version>4.5.0</jwt.version>
         <guava.version>33.4.8-jre</guava.version>
