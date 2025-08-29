@@ -16,8 +16,8 @@
     <description>web</description>
 
     <properties>
-        <velocity.version>2.3</velocity.version>
-        <liquibase.version>4.32.0</liquibase.version>
+        <velocity.version>2.4.1</velocity.version>
+        <liquibase.version>4.33.0</liquibase.version>
         <commons-cli.version>1.9.0</commons-cli.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
