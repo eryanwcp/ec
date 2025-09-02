@@ -5,7 +5,7 @@
 
     <groupId>com.eryansky</groupId>
     <artifactId>ec-parent</artifactId>
-    <version>4.2.20241221.46</version>
+    <version>4.2.20241221.47</version>
     <modules>
         <module>common</module>
         <module>j2cache</module>
@@ -56,13 +56,13 @@
         <commons-codec.version>1.19.0</commons-codec.version>
 
 
-        <ec-common.version>4.2.20241221.46</ec-common.version>
-        <ec-app-common.version>4.2.20241221.46</ec-app-common.version>
-        <ec-client-common.version>4.2.20241221.46</ec-client-common.version>
-        <ec-j2cache.version>4.2.20241221.46</ec-j2cache.version>
-        <ec-j2cache-spring-boot-starter.version>4.2.20241221.46</ec-j2cache-spring-boot-starter.version>
-        <ec-fastweixin.version>4.2.20241221.46</ec-fastweixin.version>
-        <ec-encrypt-spring-boot-starter.version>4.2.20241221.46</ec-encrypt-spring-boot-starter.version>
+        <ec-common.version>4.2.20241221.47</ec-common.version>
+        <ec-app-common.version>4.2.20241221.47</ec-app-common.version>
+        <ec-client-common.version>4.2.20241221.47</ec-client-common.version>
+        <ec-j2cache.version>4.2.20241221.47</ec-j2cache.version>
+        <ec-j2cache-spring-boot-starter.version>4.2.20241221.47</ec-j2cache-spring-boot-starter.version>
+        <ec-fastweixin.version>4.2.20241221.47</ec-fastweixin.version>
+        <ec-encrypt-spring-boot-starter.version>4.2.20241221.47</ec-encrypt-spring-boot-starter.version>
 
         <jackson.version>2.19.2</jackson.version>
     </properties>
@@ -370,55 +370,56 @@
         </dependency>
 
         <!--强制指定spring版本-->
+        <!--https://repository.cloudera.com/repository/libs-release-local/-->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
-            <version>5.3.39</version>
+            <version>5.3.39-cloudera-5.3.44</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>5.3.39</version>
+            <version>5.3.39-cloudera-5.3.44</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
-            <version>5.3.39</version>
+            <version>5.3.39-cloudera-5.3.44</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
-            <version>5.3.39</version>
+            <version>5.3.39-cloudera-5.3.44</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-aop</artifactId>
-            <version>5.3.39</version>
+            <version>5.3.39-cloudera-5.3.44</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-oxm</artifactId>
-            <version>5.3.39</version>
+            <version>5.3.39-cloudera-5.3.44</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-tx</artifactId>
-            <version>5.3.39</version>
+            <version>5.3.39-cloudera-5.3.44</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
-            <version>5.3.39</version>
+            <version>5.3.39-cloudera-5.3.44</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-messaging</artifactId>
-            <version>5.3.39</version>
+            <version>5.3.39-cloudera-5.3.44</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
-            <version>5.3.39</version>
+            <version>5.3.39-cloudera-5.3.44</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -503,4 +504,10 @@
             <url>http://www.eryansky.com/nexus/repository/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
+    <repositories>
+        <repository>
+            <id>cloudera</id>
+            <url>https://repository.cloudera.com/repository/libs-release-local/</url>
+        </repository>
+    </repositories>
 </project>
