@@ -2,7 +2,7 @@
 <%@ include file="/WEB-INF/views/include/taglib.jsp"%>
 <html>
 <head>
-	<title>会话缓存管理</title>
+	<title>会话监控</title>
 	<meta name="decorator" content="default_sys"/>
 	<script type="text/javascript">
 		$(function(){
