@@ -81,7 +81,7 @@ public class SystemMonitorController extends SimpleController {
             Server server = new Server();
             try {
                 server.copyTo();
-                server.setSessionSize(SecurityUtils.getSessionInfoSize());
+                server.setSessionSize(SecurityUtils.getSessionSize());
                 return renderString(response, Result.successResult().setData(server));
             } catch (Exception e) {
                 logger.error(e.getMessage(),e);
