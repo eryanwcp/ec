@@ -440,7 +440,9 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
      * @return
      */
     public Long ttl1(String key)  {
-        return cache1.ttl(key);
+//        return cache1.ttl(key);
+        SessionObject sessionObject = getSession(key);
+        return cache1.getExpire() - Duration.ofMillis(Calendar.getInstance().getTimeInMillis() - sessionObject.getLastAccess_at()).getSeconds();
     }
 
     /**
