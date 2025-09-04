@@ -237,7 +237,7 @@ public class SystemMonitorController extends SimpleController {
         Page<Map<String, Object>> page = new Page<>(request, response);
         String region = AppConstants.getConfigValue("j2cache.session.redis.cluster_name","j2cache-session");
         if (WebUtils.isAjaxRequest(request)) {
-            Collection<String> keys = SecurityUtils.findSessionInfoKeys();
+            Collection<String> keys = SecurityUtils.findSessionKeys();
             page.autoTotalCount(keys.size());
             List<String> pKeys = AppUtils.getPagedList(Collections3.union(keys, Collections.emptyList()), page.getPageNo(), page.getPageSize());
             List<Map<String, Object>> dataList = Lists.newArrayList();
