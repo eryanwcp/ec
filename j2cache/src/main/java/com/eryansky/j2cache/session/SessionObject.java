@@ -15,6 +15,8 @@
  */
 package com.eryansky.j2cache.session;
 
+import com.eryansky.j2cache.util.SerializationUtils;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -30,6 +32,9 @@ public class SessionObject implements Serializable {
     public static final String KEY_CREATE_AT = "CREATED_AT";
     public static final String KEY_ACCESS_AT = "ACCESS_AT" ;
     public static final String KEY_SERVICE_HOST = "SERVICE_HOST" ;
+    public static final String KEY_CLIENT_IP = "CLIENT_IP" ;
+    public static final String KEY_SESSION_DATA = "SESSION_DATA" ;
+    public static final String KEY_SESSION_EXTEND = "SESSION_EXTEND" ;
 
     private String id;
     private long created_at;
@@ -38,6 +43,7 @@ public class SessionObject implements Serializable {
      * 服务器地址 集群环境下区分session所在位置
      */
     private String host;
+    private String clientIP;
     private int maxInactiveInterval;
     private final ConcurrentHashMap<String, Object> attributes = new ConcurrentHashMap<>();
 
@@ -53,8 +59,10 @@ public class SessionObject implements Serializable {
                 this.access_at = Long.parseLong(new String(datas.get(i)));
             else if(KEY_SERVICE_HOST.equals(key))
                 this.host = new String(datas.get(i));
+            else if(KEY_CLIENT_IP.equals(key))
+                this.clientIP = new String(datas.get(i));
             else {
-                attributes.put(key, Serializer.read(datas.get(i)));
+                attributes.put(key, SerializationUtils.deserialize(datas.get(i)));
             }
         }
     }
@@ -115,6 +123,14 @@ public class SessionObject implements Serializable {
 
     public void setHost(String host) {
         this.host = host;
+    }
+
+    public String getClientIP() {
+        return clientIP;
+    }
+
+    public void setClientIP(String clientIP) {
+        this.clientIP = clientIP;
     }
 
     public int getMaxInactiveInterval() {

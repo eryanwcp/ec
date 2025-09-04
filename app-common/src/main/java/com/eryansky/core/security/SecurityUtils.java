@@ -23,6 +23,7 @@ import com.eryansky.core.security.annotation.RequiresUser;
 import com.eryansky.core.security.annotation.RestApi;
 import com.eryansky.core.security.interceptor.AuthorityInterceptor;
 import com.eryansky.core.security.jwt.JWTUtils;
+import com.eryansky.j2cache.session.SessionObject;
 import com.eryansky.modules.sys._enum.DataScope;
 import com.eryansky.modules.sys.mapper.*;
 import com.eryansky.modules.sys.service.*;
@@ -1040,6 +1041,14 @@ public class SecurityUtils {
     }
 
     /**
+     * Session size
+     * @return
+     */
+    public static int getSessionSize() {
+        return Static.applicationSessionContext.findSessionKeySize();
+    }
+
+    /**
      * Session keys
      * @return
      */
@@ -1047,6 +1056,23 @@ public class SecurityUtils {
         return Static.applicationSessionContext.findSessionInfoKeys();
     }
 
+    /**
+     * @param sessionId
+     * @return
+     */
+    public static SessionObject getSessionObjectBySessionId(String sessionId) {
+        return Static.applicationSessionContext.getSessionObjectBySessionId(sessionId);
+    }
+    public static void removeSession(String sessionId) {
+        Static.applicationSessionContext.removeSession(sessionId);
+    }
+
+    public static Long sessionTTL1(String sessionId) {
+        return Static.applicationSessionContext.sessionTTL1(sessionId);
+    }
+    public static Long sessionTTL2(String sessionId) {
+        return Static.applicationSessionContext.sessionTTL2(sessionId);
+    }
 
     /**
      * 查看某个用户登录信息
@@ -1163,7 +1189,7 @@ public class SecurityUtils {
      */
     public static Collection<String> findServerHosts() {
         List<SessionInfo> list = findSessionInfoList();
-        return list.parallelStream().map(SessionInfo::getHost).filter(Objects::nonNull).collect(Collectors.toSet());
+        return list.stream().map(SessionInfo::getHost).filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
     /**
@@ -1180,7 +1206,7 @@ public class SecurityUtils {
      * @return
      */
     public static Collection<String> findExtendSessionIdKeys() {
-        return Static.applicationSessionContext.findSessionExtendKes();
+        return Static.applicationSessionContext.findSessionExtendKeys();
     }
 
 
@@ -1220,8 +1246,8 @@ public class SecurityUtils {
      * @param sessionInfo
      */
     public static void syncExtendSession(SessionInfo sessionInfo) {
-        Collection<String> sessionInfoIds = Static.applicationSessionContext.findSessionExtendKes();
-        sessionInfoIds.parallelStream().filter(v -> sessionInfo.getId().equals(getExtendSessionId(v))).forEach(v -> addExtendSession(v, sessionInfo.getId()));
+        Collection<String> sessionInfoIds = Static.applicationSessionContext.findSessionExtendKeys();
+        sessionInfoIds.stream().filter(v -> sessionInfo.getId().equals(getExtendSessionId(v))).forEach(v -> addExtendSession(v, sessionInfo.getId()));
     }
 
 
@@ -1230,8 +1256,8 @@ public class SecurityUtils {
      * @param sessionInfoId
      */
     public static void removeExtendSession(String sessionInfoId) {
-        Collection<String> sessionIds = Static.applicationSessionContext.findSessionExtendKes();
-        sessionIds.parallelStream().filter(v -> sessionInfoId.equals(getExtendSessionId(v))).forEach(v -> Static.applicationSessionContext.removeExtendSession(v));
+        Collection<String> sessionIds = Static.applicationSessionContext.findSessionExtendKeys();
+        sessionIds.stream().filter(v -> sessionInfoId.equals(getExtendSessionId(v))).forEach(v -> Static.applicationSessionContext.removeExtendSession(v));
     }
 
 

@@ -244,4 +244,7 @@ public class J2CacheSessionFilter implements Filter {
 
     }
 
+    public CacheFacade getCache() {
+        return g_cache;
+    }
 }

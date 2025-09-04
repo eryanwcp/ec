@@ -15,15 +15,19 @@
  */
 package com.eryansky.j2cache.session;
 
+import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.j2cache.lettuce.LettuceByteCodec;
 import com.eryansky.j2cache.util.IpUtils;
+import com.eryansky.j2cache.util.SerializationUtils;
 import io.lettuce.core.AbstractRedisClient;
+import io.lettuce.core.ClientOptions;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
 import io.lettuce.core.api.StatefulConnection;
 import io.lettuce.core.cluster.ClusterClientOptions;
 import io.lettuce.core.cluster.ClusterTopologyRefreshOptions;
 import io.lettuce.core.cluster.RedisClusterClient;
+import io.lettuce.core.protocol.ProtocolVersion;
 import io.lettuce.core.pubsub.RedisPubSubAdapter;
 import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 import io.lettuce.core.pubsub.api.async.RedisPubSubAsyncCommands;
@@ -33,11 +37,10 @@ import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -59,6 +62,8 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
     private String pubsub_channel;
     private GenericObjectPool<StatefulConnection<String, byte[]>> pool;
     private StatefulRedisPubSubConnection<String, String> pubsub_subscriber;
+//    private RedisPubSubCommands<String, String> pubSubCommands;
+    private StatefulRedisPubSubConnection<String, String> pubConnection;
     private static final LettuceByteCodec codec = new LettuceByteCodec();
 
     private final boolean discardNonSerializable;
@@ -91,6 +96,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         String sentinelMasterId = redisConf.getProperty("sentinelMasterId");
         String sentinelPassword = redisConf.getProperty("sentinelPassword");
         long clusterTopologyRefreshMs = Long.valueOf(redisConf.getProperty("clusterTopologyRefresh", "3000"));
+        String protocolVersion = redisConf.getProperty("protocolVersion");
 
         if("redis-cluster".equalsIgnoreCase(scheme)) {
             scheme = "redis";
@@ -113,7 +119,11 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
                     //开启定时刷新,时间间隔根据实际情况修改
                     .enablePeriodicRefresh(Duration.ofMillis(clusterTopologyRefreshMs))
                     .build();
-            ((RedisClusterClient)redisClient).setOptions(ClusterClientOptions.builder().topologyRefreshOptions(topologyRefreshOptions).build());
+            ClusterClientOptions.Builder builder = ClusterClientOptions.builder().topologyRefreshOptions(topologyRefreshOptions);
+            if(StringUtils.hasText(protocolVersion)){
+                builder.protocolVersion(ProtocolVersion.valueOf(protocolVersion));
+            }
+            ((RedisClusterClient)redisClient).setOptions(builder.build());
         } else if("redis-sentinel".equalsIgnoreCase(scheme)) {
             scheme = "redis";
             String[] hostArray = hosts.split(",");
@@ -145,6 +155,11 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             uri.setPassword(password);
             redisClient = io.lettuce.core.RedisClient.create(uri);
         }
+
+        if(StringUtils.hasText(protocolVersion) && redisClient instanceof RedisClient){
+            ((RedisClient)redisClient).setOptions(ClientOptions.builder().protocolVersion(ProtocolVersion.valueOf(protocolVersion)).build());
+        }
+
         try {
             int timeout = Integer.parseInt(redisConf.getProperty("timeout", "10000"));
             redisClient.setDefaultTimeout(Duration.ofMillis(timeout));
@@ -169,14 +184,15 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         this.cache2 = new LettuceCache(clusterName, redisClient,pool,scanCount);
         logger.info("J2Cache Session L2 CacheProvider {}.",this.cache2.getClass().getName());
 
-        this.publish(Command.join());
-
-
         this.pubsub_subscriber = this.pubsub();
         this.pubsub_subscriber.addListener(this);
         RedisPubSubAsyncCommands<String, String> async = this.pubsub_subscriber.async();
         async.subscribe(this.pubsub_channel);
-        logger.info("Connected to redis channel:{}, time {}ms.", this.pubsub_channel, System.currentTimeMillis()-ct);
+        logger.info("Connected to redis session channel:{}, time {}ms.", this.pubsub_channel, System.currentTimeMillis()-ct);
+
+//        pubSubCommands = this.pubsub_subscriber.sync();
+//        this.pubConnection = this.pubsub();
+        this.publish(Command.join());
     }
 
     /**
@@ -199,11 +215,15 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         if(this.cache2 == null){
             return;
         }
-
-        try (StatefulRedisPubSubConnection<String, String> connection = this.pubsub()){
-            RedisPubSubCommands<String, String> sync = connection.sync();
-            sync.publish(this.pubsub_channel, cmd.toString());
+        synchronized (CacheFacade.class){
+            try (StatefulRedisPubSubConnection<String, String> connection = this.pubsub()){
+                RedisPubSubCommands<String, String> sync = connection.sync();
+                sync.publish(this.pubsub_channel, cmd.toString());
+            }
         }
+
+//        RedisPubSubCommands<String, String> sync = pubConnection.sync();
+//        sync.publish(this.pubsub_channel, cmd.toString());
 
     }
 
@@ -253,12 +273,18 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
     @Override
     public void close() {
         try {
-            cache1.close();
             this.publish(Command.quit());
             this.unsubscribed(this.pubsub_channel, 1);
         } finally {
+            this.cache1.close();
+            if(null != this.pubConnection){
+                this.pubConnection.close();
+            }
             if(null != this.pubsub_subscriber){
                 this.pubsub_subscriber.close();
+            }
+            if(null != this.redisClient){
+                this.redisClient.close();
             }
 
         }
@@ -303,22 +329,25 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
      * @param session 会话对象
      */
     public void saveSession(SessionObject session) {
+        session.setHost(IpUtils.getActivityLocalIp());
+        session.setClientIP(SpringMVCHolder.getIp());
         //write to caffeine
         cache1.put(session.getId(), session);
         if(this.cache2 == null){
             return;
         }
         //write to redis
-        cache2.setBytes(session.getId(), new HashMap<String, byte[]>() {{
+        cache2.setBytes(session.getId(), new HashMap<String,byte[]>() {{
             put(SessionObject.KEY_CREATE_AT, String.valueOf(session.getCreated_at()).getBytes());
             put(SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
-            put(SessionObject.KEY_SERVICE_HOST, IpUtils.getActivityLocalIp().getBytes());
-            session.getAttributes().entrySet().forEach((e)-> {
+            put(SessionObject.KEY_SERVICE_HOST, session.getHost().getBytes());
+            put(SessionObject.KEY_CLIENT_IP, session.getClientIP().getBytes());
+            session.getAttributes().forEach((key, value) -> {
                 try {
-                    put(e.getKey(), Serializer.write(e.getValue()));
+                    put(key, SerializationUtils.serialize(value));
                 } catch (RuntimeException | IOException excp) {
-                    if(!discardNonSerializable)
-                        throw ((excp instanceof RuntimeException)?(RuntimeException)excp : new RuntimeException(excp));
+                    if (!discardNonSerializable)
+                        throw ((excp instanceof RuntimeException) ? (RuntimeException) excp : new RuntimeException(excp));
                 }
             });
         }}, cache1.getExpire());
@@ -348,7 +377,8 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             cache1.put(session.getId(), session);
             if(this.cache2 != null){
                 try {
-                    cache2.setBytes(session.getId(), key, Serializer.write(session.get(key)));
+                    cache2.setBytes(session.getId(), key, SerializationUtils.serialize(session.get(key)));
+                    cache2.ttl(session.getId(), cache1.getExpire());
                 } catch (RuntimeException | IOException e) {
                     if(!this.discardNonSerializable)
                         throw ((e instanceof RuntimeException)?(RuntimeException)e : new RuntimeException(e));
@@ -360,6 +390,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             }
         }
     }
+
 
     public void removeSessionAttribute(SessionObject session, String key) {
         try {
@@ -391,4 +422,36 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         }
     }
 
+    /**
+     * 获取所有keys
+     * @return
+     */
+    public Collection<String> keys()  {
+        Set<String> keys = new HashSet<>(cache1.keys());
+        if(null != cache2){
+            keys.addAll(cache2.keys());
+        }
+        return keys;
+    }
+
+    /**
+     * 获取key的ttl时间
+     * @param key
+     * @return
+     */
+    public Long ttl1(String key)  {
+        return cache1.ttl(key);
+    }
+
+    /**
+     * 获取key的ttl时间
+     * @param key
+     * @return
+     */
+    public Long ttl2(String key)  {
+        if(null != cache2){
+            return cache2.ttl(key);
+        }
+        return null;
+    }
 }

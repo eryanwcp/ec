@@ -6,7 +6,7 @@
     <div data-options="region:'north',title:'过滤条件',collapsed:false,split:false,border:false"
          style="padding: 0px; height: 70px;width:100%; overflow-y: hidden;">
         <form id="versionLog_search_form" style="padding: 5px;">
-            类型：<select id="versionLogType" name="versionLogType" class="easyui-combobox" style="width: 160px;height:28px;" >
+            类型：<select id="versionLogType" name="versionLogType" class="easyui-combobox" style="width: 120px;height:28px;" >
                 <option value="">全部</option>
                 <c:forEach items="${versionLogTypes}" var="item">
                     <option value="${item.value}">${item.description}</option>

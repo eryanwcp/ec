@@ -18,15 +18,11 @@ package com.eryansky.j2cache.session;
 import com.eryansky.j2cache.CacheException;
 import com.google.common.collect.Maps;
 import io.lettuce.core.AbstractRedisClient;
-import io.lettuce.core.KeyScanCursor;
-import io.lettuce.core.ScanArgs;
-import io.lettuce.core.ScanCursor;
 import io.lettuce.core.api.StatefulConnection;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.sync.BaseRedisCommands;
 import io.lettuce.core.api.sync.RedisHashCommands;
 import io.lettuce.core.api.sync.RedisKeyCommands;
-import io.lettuce.core.api.sync.RedisStringCommands;
 import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import java.util.*;
@@ -81,7 +77,7 @@ public class LettuceCache {
      * @param session_id
      * @return
      */
-    private String getRegionName(String session_id) {
+    private String _key(String session_id) {
         if (namespace != null && !namespace.isEmpty())
             session_id = namespace + ":" + session_id;
         return session_id;
@@ -90,14 +86,14 @@ public class LettuceCache {
     public byte[] getBytes(String session_id, String key) {
         try(StatefulConnection<String, byte[]> connection = connect()) {
             RedisHashCommands<String, byte[]> cmd = (RedisHashCommands)sync(connection);
-            return cmd.hget(getRegionName(session_id), key);
+            return cmd.hget(_key(session_id), key);
         }
     }
 
     public List<byte[]> getBytes(String session_id, Collection<String> keys) {
         try(StatefulConnection<String, byte[]> connection = connect()) {
             RedisHashCommands<String, byte[]> cmd = (RedisHashCommands)sync(connection);
-            return cmd.hmget(getRegionName(session_id), keys.stream().toArray(String[]::new)).stream().map(kv -> kv.hasValue()?kv.getValue():null).collect(Collectors.toList());
+            return cmd.hmget(_key(session_id), keys.stream().toArray(String[]::new)).stream().map(kv -> kv.hasValue()?kv.getValue():null).collect(Collectors.toList());
         }
     }
 
@@ -110,19 +106,19 @@ public class LettuceCache {
     public void updateKeyBytes(String session_id, String key, byte[] bytes) {
         try(StatefulConnection<String, byte[]> connection = connect()) {
             RedisHashCommands<String, byte[]> cmd = (RedisHashCommands)sync(connection);
-            Map<String, byte[]> data = cmd.hgetall(getRegionName(session_id));
+            Map<String, byte[]> data = cmd.hgetall(_key(session_id));
             if(null == data){
                 data = Maps.newHashMap();
             }
             data.put(key,bytes);
-            cmd.hmset(getRegionName(session_id),data);
+            cmd.hmset(_key(session_id),data);
         }
     }
 
     public void setBytes(String session_id, String key, byte[] bytes) {
         try(StatefulConnection<String, byte[]> connection = connect()) {
             RedisHashCommands<String, byte[]> cmd = (RedisHashCommands)sync(connection);
-            cmd.hset(getRegionName(session_id),key,bytes);
+            cmd.hset(_key(session_id),key,bytes);
         }
     }
 
@@ -130,45 +126,52 @@ public class LettuceCache {
     public void setBytes(String session_id, Map<String,byte[]> bytes, int expireInSeconds) {
         try(StatefulConnection<String, byte[]> connection = connect()) {
             RedisHashCommands<String, byte[]> cmd = (RedisHashCommands)sync(connection);
-            cmd.hset(getRegionName(session_id),bytes);
-            ttl(session_id,expireInSeconds);
+            cmd.hset(_key(session_id),bytes);
         }
+        ttl(session_id,expireInSeconds);
     }
 
     public void evict(String session_id, String...keys) {
         try(StatefulConnection<String, byte[]> connection = connect()) {
             RedisHashCommands<String, byte[]> cmd = (RedisHashCommands)sync(connection);
-            cmd.hdel(getRegionName(session_id), keys);
+            cmd.hdel(_key(session_id), keys);
         }
     }
 
     public boolean ttl(String session_id, int ttl) {
         try(StatefulConnection<String, byte[]> connection = connect()) {
             RedisKeyCommands<String, byte[]> cmd = (RedisKeyCommands)sync(connection);
-            return cmd.expire(getRegionName(session_id),ttl);
+            return cmd.expire(_key(session_id),ttl);
         }
     }
 
     public List<String> keys(String session_id) {
         try(StatefulConnection<String, byte[]> connection = connect()) {
             RedisHashCommands<String, byte[]> cmd = (RedisHashCommands)sync(connection);
-            return cmd.hkeys(getRegionName(session_id));
+            return cmd.hkeys(_key(session_id));
         }
     }
 
     public void clear(String session_id) {
         try(StatefulConnection<String, byte[]> connection = connect()) {
             RedisKeyCommands<String, byte[]> cmd = (RedisKeyCommands)sync(connection);
-            cmd.del(getRegionName(session_id));
+            cmd.del(_key(session_id));
         }
     }
 
     public Collection<String> keys() {
         try(StatefulConnection<String, byte[]> connection = connect()) {
-            RedisHashCommands<String, byte[]> cmd = (RedisHashCommands)sync(connection);
-            return cmd.hkeys(namespace);
+            RedisKeyCommands<String, byte[]> cmd = (RedisKeyCommands)sync(connection);
+            return cmd.keys(namespace+":*").parallelStream().map(k->k.substring(this.namespace.length()+1)).collect(Collectors.toSet());
         }
 
+    }
+
+    public Long ttl(String key) {
+        try(StatefulConnection<String, byte[]> connection = connect()) {
+            RedisKeyCommands<String, byte[]> cmd = (RedisKeyCommands)sync(connection);
+            return cmd.ttl(key);
+        }
     }
 
 }

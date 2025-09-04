@@ -15,11 +15,17 @@
  */
 package com.eryansky.j2cache.session;
 
+import com.eryansky.j2cache.util.SerializationUtils;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Policy;
 import com.github.benmanes.caffeine.cache.RemovalCause;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.Collection;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -28,6 +34,8 @@ import java.util.concurrent.TimeUnit;
  * @author Winter Lau(javayou@gmail.com)
  */
 public class CaffeineCache {
+
+    private static final Logger logger = LoggerFactory.getLogger(CaffeineCache.class);
 
     private final Cache<String, Object> cache;
     private final int size ;
@@ -39,8 +47,16 @@ public class CaffeineCache {
                 .expireAfterAccess(expire, TimeUnit.SECONDS)
                 .removalListener((k,v, cause) -> {
                     //程序删除的缓存不做通知处理，因为上层已经做了处理
-                    if(cause != RemovalCause.EXPLICIT && cause != RemovalCause.REPLACED)
-                        listener.notifyElementExpired((String)k);
+                    if (!RemovalCause.EXPLICIT.equals(cause) && !RemovalCause.REPLACED.equals(cause) && !RemovalCause.SIZE.equals(cause)) {
+                        try {
+                            synchronized (CaffeineCache.class){
+                                listener.notifyElementExpired((String) k);
+                            }
+                        } catch (Exception e) {
+                            logger.error("{}:{} {}",k, v, cause);
+                            logger.error(e.getMessage());
+                        }
+                    }
                 })
                 .build();
 
@@ -73,5 +89,16 @@ public class CaffeineCache {
 
     public Collection<String> keys() {
         return cache.asMap().keySet();
+    }
+
+    public ConcurrentMap<String,Object> map() {
+        return cache.asMap();
+    }
+
+    public Long ttl(String key) {
+        Policy.Expiration<String,Object> p = cache.policy().expireAfterAccess().orElse(null);
+        long  total = null == p ? 0:p.getExpiresAfter(TimeUnit.SECONDS);
+        Duration d = null == p ? null:p.ageOf(key).orElse(null);
+        return null == d ? null:total - d.getSeconds();
     }
 }

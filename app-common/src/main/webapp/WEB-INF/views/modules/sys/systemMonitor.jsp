@@ -45,7 +45,7 @@
 			<tr><td>IP地址</td><td>{{sys.computerIp}}</td></tr>
 			<tr><td>操作系统</td><td>{{sys.osName}} {{sys.osArch}}</td></tr>
 			<tr><td>服务器时间</td><td>{{sys.serverTime}}</td></tr>
-			<tr><td>在线会话数</td><td>{{sessionSize}}</td></tr>
+			<tr><td>在线会话数</td><td><a href="${ctxAdmin}/sys/systemMonitor/sessionCache">{{sessionSize}}</a></td></tr>
 			<tr><td>CPU型号</td><td>{{cpu.cpuModel}}</td></tr>
 			<tr><td>CPU核心数</td><td>{{cpu.cpuNum}}</td></tr>
 			<tr><td>CPU用户使用率</td><td>{{cpu.used}} %</td></tr>
@@ -82,6 +82,7 @@
 <ul class="nav nav-tabs">
 	<li class="active"><a href="${ctxAdmin}/sys/systemMonitor">系统监控</a></li>
 	<li><a href="${ctxAdmin}/sys/systemMonitor/log">系统日志</a></li>
+	<li><a href="${ctxAdmin}/sys/systemMonitor/sessionCache">会话监控</a></li>
 	<li><a href="${ctxAdmin}/sys/systemMonitor/cache">缓存管理</a></li>
 	<li><a href="${ctxAdmin}/sys/systemMonitor/queue">队列管理</a></li>
 	<li><a href="${ctxAdmin}/sys/systemMonitor/asyncTask">异步任务</a></li>
