@@ -167,10 +167,10 @@ public class LettuceCache {
 
     }
 
-    public Long ttl(String key) {
+    public Long ttl(String session_id) {
         try(StatefulConnection<String, byte[]> connection = connect()) {
             RedisKeyCommands<String, byte[]> cmd = (RedisKeyCommands)sync(connection);
-            return cmd.ttl(key);
+            return cmd.ttl(_key(session_id));
         }
     }
 
