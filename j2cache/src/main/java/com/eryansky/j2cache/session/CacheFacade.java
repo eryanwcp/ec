@@ -435,24 +435,24 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
     }
 
     /**
-     * 获取key的ttl时间
-     * @param key
+     * 获取session_id的ttl时间
+     * @param session_id
      * @return
      */
-    public Long ttl1(String key) {
-//        return cache1.ttl(key);
-        SessionObject sessionObject = getSession(key);
+    public Long ttl1(String session_id) {
+//        return cache1.ttl(session_id);
+        SessionObject sessionObject = (SessionObject)cache1.get(session_id);
         return null != sessionObject ? cache1.getExpire() - Duration.ofMillis(Calendar.getInstance().getTimeInMillis() - sessionObject.getLastAccess_at()).getSeconds() : null;
     }
 
     /**
-     * 获取key的ttl时间
-     * @param key
+     * 获取session_id的ttl时间
+     * @param session_id
      * @return
      */
-    public Long ttl2(String key)  {
+    public Long ttl2(String session_id)  {
         if(null != cache2){
-            return cache2.ttl(key);
+            return cache2.ttl(session_id);
         }
         return null;
     }
