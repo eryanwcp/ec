@@ -329,6 +329,8 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
      * @param session 会话对象
      */
     public void saveSession(SessionObject session) {
+        session.setHost(IpUtils.getActivityLocalIp());
+        session.setClientIP(SpringMVCHolder.getIp());
         //write to caffeine
         cache1.put(session.getId(), session);
         if(this.cache2 == null){
@@ -338,8 +340,8 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         cache2.setBytes(session.getId(), new HashMap<>() {{
             put(SessionObject.KEY_CREATE_AT, String.valueOf(session.getCreated_at()).getBytes());
             put(SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
-            put(SessionObject.KEY_SERVICE_HOST, IpUtils.getActivityLocalIp().getBytes());
-            put(SessionObject.KEY_CLIENT_IP, SpringMVCHolder.getIp().getBytes());
+            put(SessionObject.KEY_SERVICE_HOST, session.getHost().getBytes());
+            put(SessionObject.KEY_CLIENT_IP, session.getClientIP().getBytes());
             session.getAttributes().forEach((key, value) -> {
                 try {
                     put(key, SerializationUtils.serialize(value));

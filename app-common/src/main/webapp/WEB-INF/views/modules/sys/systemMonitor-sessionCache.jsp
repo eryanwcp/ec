@@ -23,6 +23,7 @@
                 success: function (data) {
                     if (data['totalCount'] > 0) {
 						$.each(data['result'],function (i,r){
+							delete r['data']['loginUser'];
 							r['dataList'] = Object.entries(r['data']).map(([key, value]) => ({
 								key,
 								value: typeof value === 'object' ? JSON.stringify(value) : value,
@@ -49,19 +50,25 @@
 		<table id="contentTable" class="table table-striped table-bordered table-condensed">
 			<thead>
 			<tr>
+				<th>主机</th>
 				<th>会话ID</th>
+				<th>客户标识</th>
+				<th>IP地址</th>
 				<th>数据</th>
-				<th>创建时间</th>
-				<th>更新时间</th>
 				<th>一级TTL</th>
 				<th>二级TTL</th>
+				<th>创建时间</th>
+				<th>更新时间</th>
 				<th>操作</th>
 			</tr>
 			</thead>
 			<tbody>
 			{{#result}}
 			<tr>
+				<td>{{host}}</td>
 				<td>{{key}}</td>
+				<td>{{loginUser}}</td>
+				<td>{{clientIP}}</td>
 				<td>
 					<table class="table table-striped table-bordered table-condensed">
 						<tbody>
@@ -74,10 +81,10 @@
 						</tbody>
 					</table>
 				</td>
-				<td>{{created_at}}</td>
-				<td>{{lastAccess_at}}</td>
 				<td>{{ttl1}}</td>
 				<td>{{ttl2}}</td>
+				<td>{{created_at}}</td>
+				<td>{{lastAccess_at}}</td>
 				<td>
 					<e:hasPermission name="sys:systemMonitor:edit">
 						<a href="${ctxAdmin}/sys/systemMonitor/clearSessionCacheKey?key={{keyEncodeUrl}}"  onclick="return confirmx('确认要清除缓存KEY吗？', this.href)">删除</a>
@@ -94,7 +101,7 @@
 <ul class="nav nav-tabs">
 	<li><a href="${ctxAdmin}/sys/systemMonitor">系统监控</a></li>
 	<li><a href="${ctxAdmin}/sys/systemMonitor/log">系统日志</a></li>
-	<li class="active"><a href="${ctxAdmin}/sys/systemMonitor/sessionCache">会话缓存管理</a></li>
+	<li class="active"><a href="${ctxAdmin}/sys/systemMonitor/sessionCache">会话监控</a></li>
 	<li><a href="${ctxAdmin}/sys/systemMonitor/cache">缓存管理</a></li>
 	<li><a href="${ctxAdmin}/sys/systemMonitor/queue">队列管理</a></li>
 	<li><a href="${ctxAdmin}/sys/systemMonitor/asyncTask">异步任务</a></li>

@@ -226,12 +226,12 @@ public class SystemMonitorController extends SimpleController {
 
 
     /**
-     * 系统监控-缓存管理
+     * 系统监控-会话监控
      *
      * @return
      */
     @RequiresPermissions("sys:systemMonitor:view")
-    @Logging(value = "系统监控-会话缓存管理", logType = LogType.access, logging = "!#isAjax")
+    @Logging(value = "系统监控-会话监控", logType = LogType.access, logging = "!#isAjax")
     @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST}, value = "sessionCache")
     public String sessionCache(Model uiModel, HttpServletRequest request, HttpServletResponse response) {
         Page<Map<String, Object>> page = new Page<>(request, response);
@@ -241,7 +241,6 @@ public class SystemMonitorController extends SimpleController {
             page.autoTotalCount(keys.size());
             List<String> pKeys = AppUtils.getPagedList(Collections3.union(keys, Collections.emptyList()), page.getPageNo(), page.getPageSize());
             List<Map<String, Object>> dataList = Lists.newArrayList();
-            CacheChannel cacheChannel = CacheUtils.getCacheChannel();
             pKeys.forEach(key -> {
                 SessionObject sessionObject = SecurityUtils.getSessionObjectBySessionId(key);
                 Map<String, Object> map = Maps.newHashMap();
@@ -249,9 +248,12 @@ public class SystemMonitorController extends SimpleController {
                 map.put("keyEncodeUrl", EncodeUtils.urlEncode(key));
                 map.put("ttl1", SecurityUtils.sessionTTL1(key));
                 map.put("ttl2", SecurityUtils.sessionTTL2(key));
-                map.put("created_at", null != sessionObject ? DateUtils.formatDateTime(Instant.ofEpochMilli(sessionObject.getCreated_at()).toDate()) :null);
-                map.put("lastAccess_at", null != sessionObject ? DateUtils.formatDateTime(Instant.ofEpochMilli(sessionObject.getLastAccess_at()).toDate()) :null);
-                map.put("data", null != sessionObject ? sessionObject.getAttributes() :null);
+                map.put("created_at", null != sessionObject ? DateUtils.formatDateTime(Instant.ofEpochMilli(sessionObject.getCreated_at()).toDate()) : null);
+                map.put("loginUser", null != sessionObject && null != sessionObject.getAttributes() ? sessionObject.getAttributes().get("loginUser") : null);
+                map.put("clientIP", null != sessionObject ? sessionObject.getClientIP() : null);
+                map.put("host", null != sessionObject ? sessionObject.getHost() : null);
+                map.put("lastAccess_at", null != sessionObject ? DateUtils.formatDateTime(Instant.ofEpochMilli(sessionObject.getLastAccess_at()).toDate()) : null);
+                map.put("data", null != sessionObject ? sessionObject.getAttributes() : null);
                 dataList.add(map);
             });
             page.autoResult(dataList);
@@ -269,7 +271,7 @@ public class SystemMonitorController extends SimpleController {
      * @param key 缓存id
      * @return
      */
-    @Logging(value = "系统监控-清空会话缓存",remark = "#region",data = "#key", logType = LogType.access)
+    @Logging(value = "系统监控-清空会话缓存",data = "#key", logType = LogType.access)
     @RequiresPermissions("sys:systemMonitor:edit")
     @GetMapping(value = "clearSessionCacheKey")
     public String clearSessionCacheKey(String key, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
