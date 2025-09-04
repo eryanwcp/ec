@@ -876,6 +876,22 @@ public class SecurityUtils {
     }
 
     /**
+     * 获取当前登录用户信息.
+     */
+    public static String getCurrentUserToken() {
+        SessionInfo sessionInfo = getCurrentSessionInfo();
+        return null == sessionInfo ? null : sessionInfo.getToken();
+    }
+
+    /**
+     * 获取当前登录用户信息.
+     */
+    public static String getCurrentUserRefreshToken() {
+        SessionInfo sessionInfo = getCurrentSessionInfo();
+        return null == sessionInfo ? null : sessionInfo.getRefreshToken();
+    }
+
+    /**
      * 判断当前用户登录用户 是否是超级管理员
      * @return
      */
