@@ -23,6 +23,7 @@ import com.eryansky.core.security.annotation.RequiresUser;
 import com.eryansky.core.security.annotation.RestApi;
 import com.eryansky.core.security.interceptor.AuthorityInterceptor;
 import com.eryansky.core.security.jwt.JWTUtils;
+import com.eryansky.j2cache.session.SessionObject;
 import com.eryansky.modules.sys._enum.DataScope;
 import com.eryansky.modules.sys.mapper.*;
 import com.eryansky.modules.sys.service.*;
@@ -1039,6 +1040,23 @@ public class SecurityUtils {
         return Static.applicationSessionContext.findSessionInfoKeys();
     }
 
+    /**
+     * @param sessionId
+     * @return
+     */
+    public static SessionObject getSessionObjectBySessionId(String sessionId) {
+        return Static.applicationSessionContext.getSessionObjectBySessionId(sessionId);
+    }
+    public static void removeSession(String sessionId) {
+        Static.applicationSessionContext.removeSession(sessionId);
+    }
+
+    public static Long sessionTTL1(String sessionId) {
+        return Static.applicationSessionContext.sessionTTL1(sessionId);
+    }
+    public static Long sessionTTL2(String sessionId) {
+        return Static.applicationSessionContext.sessionTTL2(sessionId);
+    }
 
     /**
      * 查看某个用户登录信息

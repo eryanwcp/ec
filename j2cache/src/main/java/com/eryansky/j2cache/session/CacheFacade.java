@@ -389,6 +389,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         }
     }
 
+
     public void removeSessionAttribute(SessionObject session, String key) {
         try {
             cache1.put(session.getId(), session);
@@ -431,4 +432,24 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         return keys;
     }
 
+    /**
+     * 获取key的ttl时间
+     * @param key
+     * @return
+     */
+    public Long ttl1(String key)  {
+        return cache1.ttl(key);
+    }
+
+    /**
+     * 获取key的ttl时间
+     * @param key
+     * @return
+     */
+    public Long ttl2(String key)  {
+        if(null != cache2){
+            return cache2.ttl(key);
+        }
+        return null;
+    }
 }

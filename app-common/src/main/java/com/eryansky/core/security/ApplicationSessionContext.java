@@ -62,6 +62,14 @@ public class ApplicationSessionContext {
 		}
 	}
 
+	public Long sessionTTL1(String sessionId) {
+		return cacheFacade.ttl1(sessionId);
+	}
+
+	public Long sessionTTL2(String sessionId) {
+		return cacheFacade.ttl2(sessionId);
+	}
+
 	public SessionInfo getSession(String sessionId) {
 		if (sessionId == null) return null;
 		SessionObject sessionObject = cacheFacade.getSession(sessionId);
@@ -97,6 +105,13 @@ public class ApplicationSessionContext {
 	public int findSessionInfoKeySize() {
 		return findSessionInfoKeys().size();
 	}
+
+	public SessionObject getSessionObjectBySessionId(String sessionId) {
+		if (sessionId == null) return null;
+		SessionObject sessionObject = cacheFacade.getSession(sessionId);
+		return sessionObject;
+	}
+
 
 	public int findSessionKeySize() {
 		Collection<String> keys = cacheFacade.keys();

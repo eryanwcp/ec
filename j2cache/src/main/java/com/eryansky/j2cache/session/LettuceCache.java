@@ -167,4 +167,11 @@ public class LettuceCache {
 
     }
 
+    public Long ttl(String key) {
+        try(StatefulConnection<String, byte[]> connection = connect()) {
+            RedisKeyCommands<String, byte[]> cmd = (RedisKeyCommands)sync(connection);
+            return cmd.ttl(key);
+        }
+    }
+
 }

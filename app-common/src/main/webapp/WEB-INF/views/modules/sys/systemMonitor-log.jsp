@@ -63,6 +63,7 @@
 <ul class="nav nav-tabs">
 	<li><a href="${ctxAdmin}/sys/systemMonitor">系统监控</a></li>
 	<li class="active"><a href="${ctxAdmin}/sys/systemMonitor/log">系统日志</a></li>
+	<li><a href="${ctxAdmin}/sys/systemMonitor/sessionCache">会话缓存管理</a></li>
 	<li><a href="${ctxAdmin}/sys/systemMonitor/cache">缓存管理</a></li>
 	<li><a href="${ctxAdmin}/sys/systemMonitor/queue">队列管理</a></li>
 	<li><a href="${ctxAdmin}/sys/systemMonitor/asyncTask">异步任务</a></li>

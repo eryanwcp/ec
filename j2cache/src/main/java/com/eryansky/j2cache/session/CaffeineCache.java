@@ -18,10 +18,12 @@ package com.eryansky.j2cache.session;
 import com.eryansky.j2cache.util.SerializationUtils;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Policy;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
@@ -91,5 +93,12 @@ public class CaffeineCache {
 
     public ConcurrentMap<String,Object> map() {
         return cache.asMap();
+    }
+
+    public Long ttl(String key) {
+        Policy.FixedExpiration<String,Object> p = cache.policy().expireAfterAccess().orElse(null);
+        long  total = null == p ? 0:p.getExpiresAfter(TimeUnit.SECONDS);
+        Duration d = null == p ? null:p.ageOf(key).orElse(null);
+        return null == d ? null:total - d.getSeconds();
     }
 }
