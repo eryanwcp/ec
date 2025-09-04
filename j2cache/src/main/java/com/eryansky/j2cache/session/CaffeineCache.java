@@ -95,10 +95,12 @@ public class CaffeineCache {
         return cache.asMap();
     }
 
+    @Deprecated
     public Long ttl(String key) {
         Policy.Expiration<String,Object> p = cache.policy().expireAfterAccess().orElse(null);
         long  total = null == p ? 0:p.getExpiresAfter(TimeUnit.SECONDS);
         Duration d = null == p ? null:p.ageOf(key).orElse(null);
         return null == d ? null:total - d.getSeconds();
     }
+
 }
