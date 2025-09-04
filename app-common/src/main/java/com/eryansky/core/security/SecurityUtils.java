@@ -1049,11 +1049,19 @@ public class SecurityUtils {
     }
 
     /**
-     * Session keys
+     * SessionInfo keys
      * @return
      */
     public static Collection<String> findSessionInfoKeys() {
         return Static.applicationSessionContext.findSessionInfoKeys();
+    }
+
+    /**
+     * Session keys
+     * @return
+     */
+    public static Collection<String> findSessionKeys() {
+        return Static.applicationSessionContext.findSessionKeys();
     }
 
     /**
