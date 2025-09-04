@@ -2,7 +2,7 @@
 <%@ include file="/WEB-INF/views/include/taglib.jsp"%>
 <html>
 <head>
-	<title>缓存管理</title>
+	<title>会话缓存管理</title>
 	<meta name="decorator" content="default_sys"/>
 	<script type="text/javascript">
 		$(function(){
@@ -49,7 +49,7 @@
 		<table id="contentTable" class="table table-striped table-bordered table-condensed">
 			<thead>
 			<tr>
-				<th>KEY</th>
+				<th>会话ID</th>
 				<th>数据</th>
 				<th>创建时间</th>
 				<th>更新时间</th>
