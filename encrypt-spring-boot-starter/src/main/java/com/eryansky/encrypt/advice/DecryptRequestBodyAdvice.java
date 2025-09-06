@@ -78,8 +78,8 @@ public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
                         return httpInputMessage.getBody();
                     } catch (Exception e) {
                         log.error(e.getMessage(),e);
-//                        throw new RuntimeException(e);
                         return httpInputMessage.getBody();
+//                        throw new RuntimeException(e);
                     }
                 }
 

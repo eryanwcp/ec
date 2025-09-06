@@ -513,7 +513,8 @@ public class WebUtils extends org.springframework.web.util.WebUtils {
             }
         }else{
             String scheme = request.getScheme();
-            url.append(scheme);
+            String headerScheme = request.getHeader("X-Forwarded-Proto");
+            url.append(StringUtils.isNotBlank(headerScheme) ? headerScheme : scheme);
             url.append("://");
             url.append(request.getServerName());
             if (((scheme.equals("http")) && (port != 80))
