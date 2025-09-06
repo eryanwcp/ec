@@ -1058,10 +1058,8 @@ public abstract class CacheChannel implements Closeable , AutoCloseable {
 	 * @param region 锁对象
 	 * @param key
 	 * @return
-	 * @throws LockInsideExecutedException
-	 * @throws LockCantObtainException
 	 */
-	public boolean  tryLock(String region, String key) throws LockInsideExecutedException, LockCantObtainException {
+	public boolean  tryLock(String region, String key) {
 		CacheObject cacheObject = get(region,key);
 		return null == cacheObject || null == cacheObject.getValue();
 	}

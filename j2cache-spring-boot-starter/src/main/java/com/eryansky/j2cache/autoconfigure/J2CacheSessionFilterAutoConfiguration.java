@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.boot.web.servlet.filter.OrderedFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
 import org.springframework.util.ObjectUtils;
@@ -62,6 +63,7 @@ public class J2CacheSessionFilterAutoConfiguration {
         map.put("redis.sentinelMasterId",redisConfig.getSentinelMasterId());
         map.put("redis.sentinelPassword",redisConfig.getSentinelPassword());
         map.put("redis.clusterTopologyRefresh",redisConfig.getClusterTopologyRefresh());
+        map.put("redis.protocolVersion",redisConfig.getProtocolVersion());
 
         String password_encrypt = redisConfig.getPasswordEncrypt();
         String passwordEncryptKey = redisConfig.getPasswordEncryptKey();//长度16位
@@ -87,7 +89,7 @@ public class J2CacheSessionFilterAutoConfiguration {
         Map<String,String> param = map.entrySet().stream().filter(m->m.getValue() != null).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         bean.setInitParameters(param);
         Integer order = filterConfig.getOrder();
-        bean.setOrder(order != null ? order:Ordered.HIGHEST_PRECEDENCE+30);
+        bean.setOrder(order != null ? order: OrderedFilter.REQUEST_WRAPPER_FILTER_MAX_ORDER+50);
         return bean;
     }
 }

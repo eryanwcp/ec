@@ -44,7 +44,8 @@ public class CaffeineCache {
     public CaffeineCache(int size, int expire, CacheExpiredListener listener) {
         cache = Caffeine.newBuilder()
                 .maximumSize(size)
-                .expireAfterAccess(expire, TimeUnit.SECONDS)
+                .expireAfterAccess(expire + 1, TimeUnit.SECONDS)
+                .expireAfterWrite(expire, TimeUnit.SECONDS)
                 .removalListener((k,v, cause) -> {
                     //程序删除的缓存不做通知处理，因为上层已经做了处理
                     if (!RemovalCause.EXPLICIT.equals(cause) && !RemovalCause.REPLACED.equals(cause) && !RemovalCause.SIZE.equals(cause)) {
@@ -95,9 +96,8 @@ public class CaffeineCache {
         return cache.asMap();
     }
 
-    @Deprecated
     public Long ttl(String key) {
-        Policy.Expiration<String,Object> p = cache.policy().expireAfterAccess().orElse(null);
+        Policy.Expiration<String,Object> p = cache.policy().expireAfterWrite().orElse(cache.policy().expireAfterAccess().orElse(null));
         long  total = null == p ? 0:p.getExpiresAfter(TimeUnit.SECONDS);
         Duration d = null == p ? null:p.ageOf(key).orElse(null);
         return null == d ? null:total - d.getSeconds();

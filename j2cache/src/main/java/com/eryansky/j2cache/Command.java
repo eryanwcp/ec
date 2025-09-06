@@ -134,4 +134,11 @@ public class Command implements java.io.Serializable{
 		return json();
 	}
 
+	public static void main(String[] args) throws IOException {
+		System.out.println(new Command(OPT_JOIN, null).toString());
+		System.out.println(parse(new Command(OPT_JOIN, null).toString()));
+
+		Command cmd = Command.parse(new String(new Command(OPT_JOIN, "123").toString().getBytes(StandardCharsets.UTF_8)));
+		System.out.println(cmd);
+	}
 }

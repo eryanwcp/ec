@@ -161,6 +161,7 @@ public class J2CacheSessionProperties {
         private String maxIdle;
         private String minIdle;
         private String clusterTopologyRefresh;
+        private String protocolVersion;
 
 
         public String isEnabled() {
@@ -289,6 +290,14 @@ public class J2CacheSessionProperties {
 
         public void setClusterTopologyRefresh(String clusterTopologyRefresh) {
             this.clusterTopologyRefresh = clusterTopologyRefresh;
+        }
+
+        public String getProtocolVersion() {
+            return protocolVersion;
+        }
+
+        public void setProtocolVersion(String protocolVersion) {
+            this.protocolVersion = protocolVersion;
         }
     }
 }

@@ -190,8 +190,7 @@ public class J2CacheSessionFilter implements Filter {
                     String session_id = ssnCookie.getValue();
                     SessionObject ssnObject = g_cache.getSession(session_id);
                     if(ssnObject != null) {
-                        session = new J2CacheSession(servletContext, session_id, g_cache);
-                        session.setSessionObject(ssnObject);
+                        session = new J2CacheSession(servletContext, g_cache,ssnObject);
                         session.setNew(false);
                     }
                 }

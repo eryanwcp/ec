@@ -87,7 +87,7 @@ public class LettuceHashCache extends LettuceCache {
 
     @Override
     public void setBytes(Map<String, byte[]> bytes, long timeToLiveInSeconds) {
-        super.setBytes(bytes, timeToLiveInSeconds);
+        setBytes(bytes);
         try(StatefulConnection<String, byte[]> connection = super.connect()) {
             RedisKeyCommands<String, byte[]> cmd = (RedisKeyCommands)sync(connection);
             cmd.expire(this.region,timeToLiveInSeconds);
