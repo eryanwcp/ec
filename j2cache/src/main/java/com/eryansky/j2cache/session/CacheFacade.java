@@ -261,8 +261,6 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
     @Override
     public void notifyElementExpired(String session_id) {
         if(this.cache2 == null){
-            //仅清空一级缓存
-            this.cache1.evict(session_id);
             return;
         }
         this.publish(new Command(Command.OPT_DELETE_SESSION, session_id, null));
