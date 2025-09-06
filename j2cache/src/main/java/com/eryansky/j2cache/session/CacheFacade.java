@@ -260,9 +260,6 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
 
     @Override
     public void notifyElementExpired(String session_id) {
-        if(this.cache2 == null){
-            return;
-        }
         this.publish(new Command(Command.OPT_DELETE_SESSION, session_id, null));
     }
 
