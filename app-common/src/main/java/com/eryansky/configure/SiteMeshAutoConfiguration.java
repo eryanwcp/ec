@@ -82,14 +82,14 @@ public class SiteMeshAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(name = "sitemesh")
     public FilterRegistrationBean<ConfigurableSiteMeshFilter> sitemesh(ConfigurableSiteMeshFilter siteMeshFilter){
-        FilterRegistrationBean<ConfigurableSiteMeshFilter> registrationBean
+        FilterRegistrationBean<ConfigurableSiteMeshFilter> bean
                 = new FilterRegistrationBean<>();
-        registrationBean.setFilter(siteMeshFilter);
-        registrationBean.addUrlPatterns("/*");
+        bean.setFilter(siteMeshFilter);
+        bean.addUrlPatterns("/*");
         if (includeErrorPages) {
-            registrationBean.setDispatcherTypes(EnumSet.of(DispatcherType.REQUEST, DispatcherType.ERROR));
+            bean.setDispatcherTypes(EnumSet.of(DispatcherType.REQUEST, DispatcherType.ERROR));
         }
-        registrationBean.setOrder(OrderedFilter.REQUEST_WRAPPER_FILTER_MAX_ORDER + 29);
-        return registrationBean;
+        bean.setOrder(OrderedFilter.REQUEST_WRAPPER_FILTER_MAX_ORDER + 60);
+        return bean;
     }
 }

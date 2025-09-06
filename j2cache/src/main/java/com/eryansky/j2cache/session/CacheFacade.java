@@ -234,12 +234,8 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
      */
     @Override
     public void message(String channel, String message) {
-        if(this.cache2 == null){
-            return;
-        }
-        Command cmd = Command.parse(message);
-
         try {
+            Command cmd = Command.parse(message);
             if (cmd == null || cmd.isLocal())
                 return;
 
@@ -265,6 +261,8 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
     @Override
     public void notifyElementExpired(String session_id) {
         if(this.cache2 == null){
+            //仅清空一级缓存
+            this.cache1.evict(session_id);
             return;
         }
         this.publish(new Command(Command.OPT_DELETE_SESSION, session_id, null));
@@ -435,14 +433,22 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
     }
 
     /**
+     * 获取session超时时间
+     * @return
+     */
+    public int getExpire() {
+        return cache1.getExpire();
+    }
+
+    /**
      * 获取session_id的ttl时间
      * @param session_id
      * @return
      */
     public Long ttl1(String session_id) {
-//        return cache1.ttl(session_id);
-        SessionObject sessionObject = (SessionObject)cache1.get(session_id);
-        return null != sessionObject ? cache1.getExpire() - Duration.ofMillis(Calendar.getInstance().getTimeInMillis() - sessionObject.getLastAccess_at()).getSeconds() : null;
+        return cache1.ttl(session_id);
+//        SessionObject sessionObject = (SessionObject)cache1.get(session_id);
+//        return null != sessionObject ? cache1.getExpire() - Duration.ofMillis(System.currentTimeMillis() - sessionObject.getLastAccess_at()).getSeconds() : null;
     }
 
     /**

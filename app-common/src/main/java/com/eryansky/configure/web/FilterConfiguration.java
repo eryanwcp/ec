@@ -9,6 +9,7 @@ import com.eryansky.core.web.filter.ChinesePathFilter;
 import com.eryansky.utils.AppConstants;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.boot.web.servlet.filter.OrderedFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -43,7 +44,7 @@ public class FilterConfiguration {
         FilterRegistrationBean<CustomHttpServletRequestFilter> bean = new FilterRegistrationBean<>(filter);
         bean.addInitParameter("blackListURL", "/static/**;/api/**;/rest/**");
         bean.addInitParameter("whiteListURL", "/a/sys/proxy/**");
-        bean.setOrder(Ordered.HIGHEST_PRECEDENCE + 200);
+        bean.setOrder(OrderedFilter.REQUEST_WRAPPER_FILTER_MAX_ORDER + 500);
         return bean;
     }
 
@@ -61,7 +62,7 @@ public class FilterConfiguration {
         bean.setFilter(filter);
         bean.addInitParameter("blackListURL", "/static/**");
         bean.addInitParameter("whiteListURL", "/**");
-        bean.setOrder(Ordered.HIGHEST_PRECEDENCE + 100);
+        bean.setOrder(OrderedFilter.REQUEST_WRAPPER_FILTER_MAX_ORDER + 200);
         return bean;
     }
 
@@ -79,7 +80,7 @@ public class FilterConfiguration {
         String xssBlackUrl = environment.getProperty("system.security.xssFilter.blackListURL");
         bean.addInitParameter("blackListURL", "/static/**;/druid/**" + (StringUtils.isNotBlank(xssBlackUrl) ? (";" + xssBlackUrl) : ""));
         bean.addInitParameter("whiteListURL", "/**");
-        bean.setOrder(Ordered.HIGHEST_PRECEDENCE + 80);
+        bean.setOrder(OrderedFilter.REQUEST_WRAPPER_FILTER_MAX_ORDER + 40);
         return bean;
     }
 
@@ -118,7 +119,7 @@ public class FilterConfiguration {
         CorsFilter filter = new CorsFilter(source);
         FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(filter);
         bean.setFilter(filter);
-        bean.setOrder(Ordered.HIGHEST_PRECEDENCE + 25);
+        bean.setOrder(OrderedFilter.REQUEST_WRAPPER_FILTER_MAX_ORDER + 30);
         return bean;
     }
 
