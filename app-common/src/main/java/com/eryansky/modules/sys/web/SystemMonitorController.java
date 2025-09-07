@@ -249,11 +249,11 @@ public class SystemMonitorController extends SimpleController {
                 sessionVo.setLoginUser(null != sessionObject && null != sessionObject.getAttributes() ? (String) sessionObject.getAttributes().get("loginUser") : null);
                 sessionVo.setHost(Optional.ofNullable(sessionObject).map(SessionObject::getHost).orElse(null));
                 sessionVo.setClientIP(Optional.ofNullable(sessionObject).map(SessionObject::getClientIP).orElse(null));
-                sessionVo.setCreated_at(null != sessionObject ? DateUtils.formatDateTime(Instant.ofEpochMilli(sessionObject.getCreated_at()).toDate()) : null);
-                sessionVo.setLastAccess_at(null != sessionObject ? DateUtils.formatDateTime(Instant.ofEpochMilli(sessionObject.getLastAccess_at()).toDate()) : null);
+                sessionVo.setCreatedTime(Optional.ofNullable(sessionObject).map(v-> Instant.ofEpochMilli(sessionObject.getCreated_at()).toDate()).orElse(null));
+                sessionVo.setUpdateTime(Optional.ofNullable(sessionObject).map(v-> Instant.ofEpochMilli(sessionObject.getLastAccess_at()).toDate()).orElse(null));
                 sessionVo.setData(Optional.ofNullable(sessionObject).map(SessionObject::getAttributes).orElse(null));
                 return sessionVo;
-            }).sorted(Comparator.comparing(SessionVo::getLastAccess_at).reversed()).collect(Collectors.toList());
+            }).sorted(Comparator.comparing(SessionVo::getUpdateTime).reversed().thenComparing(SessionVo::getCreatedTime).reversed()).collect(Collectors.toList());
             List<SessionVo> dataList = AppUtils.getPagedList(list, page.getPageNo(), page.getPageSize());
             page.autoTotalCount(keys.size());
             page.autoResult(dataList);

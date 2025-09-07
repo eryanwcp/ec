@@ -86,8 +86,8 @@
 				</td>
 				<td>{{ttl1}}</td>
 				<td>{{ttl2}}</td>
-				<td>{{created_at}}</td>
-				<td>{{lastAccess_at}}</td>
+				<td>{{createdTime}}</td>
+				<td>{{updateTime}}</td>
 				<td>
 					<e:hasPermission name="sys:systemMonitor:edit">
 						<a href="${ctxAdmin}/sys/systemMonitor/clearSessionCacheKey?key={{keyEncodeUrl}}"  onclick="return confirmx('确认要清除缓存KEY吗？', this.href)">删除</a>

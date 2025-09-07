@@ -1,7 +1,13 @@
 package com.eryansky.modules.sys.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Map;
+
+import static com.eryansky.client.common.utils.Constants.DATE_TIME_FORMAT;
+import static com.eryansky.client.common.utils.Constants.TIMEZONE;
 
 /**
  * Session 信息
@@ -18,8 +24,8 @@ public class SessionVo implements Serializable {
     private Long ttl1;
     private Long ttl2;
 
-    private String created_at;
-    private String lastAccess_at;
+    private Date createdTime;
+    private Date updateTime;
 
     public SessionVo() {
     }
@@ -88,19 +94,21 @@ public class SessionVo implements Serializable {
         this.ttl2 = ttl2;
     }
 
-    public String getCreated_at() {
-        return created_at;
+    @JsonFormat(pattern = DATE_TIME_FORMAT, timezone = TIMEZONE)
+    public Date getCreatedTime() {
+        return createdTime;
     }
 
-    public void setCreated_at(String created_at) {
-        this.created_at = created_at;
+    public void setCreatedTime(Date createdTime) {
+        this.createdTime = createdTime;
     }
 
-    public String getLastAccess_at() {
-        return lastAccess_at;
+    @JsonFormat(pattern = DATE_TIME_FORMAT, timezone = TIMEZONE)
+    public Date getUpdateTime() {
+        return updateTime;
     }
 
-    public void setLastAccess_at(String lastAccess_at) {
-        this.lastAccess_at = lastAccess_at;
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 }
