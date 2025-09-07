@@ -31,6 +31,7 @@ import com.eryansky.j2cache.session.SessionObject;
 import com.eryansky.j2cache.util.SerializationUtils;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys.monitor.domain.Server;
+import com.eryansky.modules.sys.vo.SessionVo;
 import com.eryansky.utils.*;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -234,28 +235,27 @@ public class SystemMonitorController extends SimpleController {
     @Logging(value = "系统监控-会话监控", logType = LogType.access, logging = "!#isAjax")
     @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST}, value = "sessionCache")
     public String sessionCache(Model uiModel, HttpServletRequest request, HttpServletResponse response) {
-        Page<Map<String, Object>> page = new Page<>(request, response);
+        Page<SessionVo> page = new Page<>(request, response);
         String region = AppConstants.getConfigValue("j2cache.session.redis.cluster_name","j2cache-session");
         if (WebUtils.isAjaxRequest(request)) {
             Collection<String> keys = SecurityUtils.findSessionKeys();
-            page.autoTotalCount(keys.size());
-            List<String> pKeys = AppUtils.getPagedList(Collections3.union(keys, Collections.emptyList()), page.getPageNo(), page.getPageSize());
-            List<Map<String, Object>> dataList = Lists.newArrayList();
-            pKeys.forEach(key -> {
+            List<SessionVo> list = keys.parallelStream().map(key->{
                 SessionObject sessionObject = SecurityUtils.getSessionObjectBySessionId(key);
-                Map<String, Object> map = Maps.newHashMap();
-                map.put("key", key);
-                map.put("keyEncodeUrl", EncodeUtils.urlEncode(key));
-                map.put("ttl1", SecurityUtils.sessionTTL1(key));
-                map.put("ttl2", SecurityUtils.sessionTTL2(key));
-                map.put("created_at", null != sessionObject ? DateUtils.formatDateTime(Instant.ofEpochMilli(sessionObject.getCreated_at()).toDate()) : null);
-                map.put("loginUser", null != sessionObject && null != sessionObject.getAttributes() ? sessionObject.getAttributes().get("loginUser") : null);
-                map.put("clientIP", null != sessionObject ? sessionObject.getClientIP() : null);
-                map.put("host", null != sessionObject ? sessionObject.getHost() : null);
-                map.put("lastAccess_at", null != sessionObject ? DateUtils.formatDateTime(Instant.ofEpochMilli(sessionObject.getLastAccess_at()).toDate()) : null);
-                map.put("data", null != sessionObject ? sessionObject.getAttributes() : null);
-                dataList.add(map);
-            });
+                SessionVo sessionVo = new SessionVo();
+                sessionVo.setKey(key);
+                sessionVo.setKeyEncodeUrl(EncodeUtils.urlEncode(key));
+                sessionVo.setTtl1(SecurityUtils.sessionTTL1(key));
+                sessionVo.setTtl2(SecurityUtils.sessionTTL2(key));
+                sessionVo.setLoginUser(null != sessionObject && null != sessionObject.getAttributes() ? (String) sessionObject.getAttributes().get("loginUser") : null);
+                sessionVo.setHost(Optional.ofNullable(sessionObject).map(SessionObject::getHost).orElse(null));
+                sessionVo.setClientIP(Optional.ofNullable(sessionObject).map(SessionObject::getClientIP).orElse(null));
+                sessionVo.setCreated_at(null != sessionObject ? DateUtils.formatDateTime(Instant.ofEpochMilli(sessionObject.getCreated_at()).toDate()) : null);
+                sessionVo.setLastAccess_at(null != sessionObject ? DateUtils.formatDateTime(Instant.ofEpochMilli(sessionObject.getLastAccess_at()).toDate()) : null);
+                sessionVo.setData(Optional.ofNullable(sessionObject).map(SessionObject::getAttributes).orElse(null));
+                return sessionVo;
+            }).sorted(Comparator.comparing(SessionVo::getLastAccess_at).reversed()).collect(Collectors.toList());();
+            List<SessionVo> dataList = AppUtils.getPagedList(list, page.getPageNo(), page.getPageSize());
+            page.autoTotalCount(keys.size());
             page.autoResult(dataList);
             return renderString(response, page);
         }

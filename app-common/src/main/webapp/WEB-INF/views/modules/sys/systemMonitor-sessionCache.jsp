@@ -26,7 +26,7 @@
 							delete r['data']['loginUser'];
 							r['sessionData'] = typeof r['data']['SESSION_DATA'] === 'object' ? JSON.stringify(r['data']['SESSION_DATA']) : r['data']['SESSION_DATA'];
 							delete r['data']['SESSION_DATA'];
-							r['dataList'] = Object.entries(r['data']).map(([key, value]) => ({
+							r['data'] = Object.entries(r['data']).map(([key, value]) => ({
 								key,
 								value: typeof value === 'object' ? JSON.stringify(value) : value,
 								type: typeof value
@@ -75,12 +75,12 @@
 				<td>
 					<table class="table table-striped table-bordered table-condensed">
 						<tbody>
-						{{#dataList}}
+						{{#data}}
 						<tr>
 							<td>{{key}}</td>
 							<td>{{value}}</td>
 						</tr>
-						{{/dataList}}
+						{{/data}}
 						</tbody>
 					</table>
 				</td>
