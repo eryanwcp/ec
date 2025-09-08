@@ -61,7 +61,7 @@
 	</form:form>
 	<tags:message content="${message}"/>
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
-		<thead><tr><th>模块</th><th>访问次数</th>
+		<thead><tr><th>模块</th><th>请求次数</th>
 		<tbody>
 		<c:forEach items="${page.result}" var="m">
 			<tr>

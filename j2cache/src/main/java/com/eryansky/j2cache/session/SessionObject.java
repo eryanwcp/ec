@@ -46,7 +46,7 @@ public class SessionObject implements Serializable {
     private String clientIP;
     private int maxInactiveInterval;
     /**
-     * 访问次数
+     * 请求次数
      */
     private long accessCount;
     private final ConcurrentHashMap<String, Object> attributes = new ConcurrentHashMap<>();
