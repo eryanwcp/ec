@@ -45,11 +45,18 @@ public class SessionObject implements Serializable {
     private String host;
     private String clientIP;
     private int maxInactiveInterval;
+    /**
+     * 访问次数
+     */
+    private long accessCount;
     private final ConcurrentHashMap<String, Object> attributes = new ConcurrentHashMap<>();
 
-    public SessionObject(){}
+    public SessionObject(){
+        this.accessCount = 0L;
+    }
 
     public SessionObject(String session_id, List<String> keys, List<byte[]> datas) throws IOException, ClassNotFoundException {
+        this.accessCount = 0L;
         this.id = session_id;
         for(int i=0;i<keys.size();i++) {
             String key = keys.get(i);
@@ -139,6 +146,14 @@ public class SessionObject implements Serializable {
 
     public void setMaxInactiveInterval(int maxInactiveInterval) {
         this.maxInactiveInterval = maxInactiveInterval;
+    }
+
+    public long getAccessCount() {
+        return accessCount;
+    }
+
+    public void setAccessCount(long accessCount) {
+        this.accessCount = accessCount;
     }
 
     public ConcurrentHashMap<String, Object> getAttributes() {

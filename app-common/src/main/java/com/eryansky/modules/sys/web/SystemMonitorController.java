@@ -242,8 +242,7 @@ public class SystemMonitorController extends SimpleController {
             List<SessionVo> list = keys.parallelStream().map(key->{
                 SessionObject sessionObject = SecurityUtils.getSessionObjectBySessionId(key);
                 SessionVo sessionVo = new SessionVo();
-                sessionVo.setKey(key);
-                sessionVo.setKeyEncodeUrl(EncodeUtils.urlEncode(key));
+                sessionVo.setId(key);
                 sessionVo.setTtl1(SecurityUtils.sessionTTL1(key));
                 sessionVo.setTtl2(SecurityUtils.sessionTTL2(key));
                 sessionVo.setLoginUser(null != sessionObject && null != sessionObject.getAttributes() ? (String) sessionObject.getAttributes().get("loginUser") : null);
@@ -252,6 +251,7 @@ public class SystemMonitorController extends SimpleController {
                 sessionVo.setCreatedTime(Optional.ofNullable(sessionObject).map(v-> Instant.ofEpochMilli(sessionObject.getCreated_at()).toDate()).orElse(null));
                 sessionVo.setUpdateTime(Optional.ofNullable(sessionObject).map(v-> Instant.ofEpochMilli(sessionObject.getLastAccess_at()).toDate()).orElse(null));
                 sessionVo.setData(Optional.ofNullable(sessionObject).map(SessionObject::getAttributes).orElse(null));
+                sessionVo.setAccessCount(Optional.ofNullable(sessionObject).map(SessionObject::getAccessCount).orElse(null));
                 return sessionVo;
             }).sorted(Comparator.comparing(SessionVo::getUpdateTime).reversed().thenComparing(Comparator.comparing(SessionVo::getCreatedTime).reversed())).collect(Collectors.toList());
             List<SessionVo> dataList = AppUtils.getPagedList(list, page.getPageNo(), page.getPageSize());
@@ -268,14 +268,14 @@ public class SystemMonitorController extends SimpleController {
     /**
      * 清空会话缓存
      *
-     * @param key 缓存id
+     * @param id 缓存id/sessionid
      * @return
      */
-    @Logging(value = "系统监控-清空会话缓存",data = "#key", logType = LogType.access)
+    @Logging(value = "系统监控-清空会话缓存",data = "#id", logType = LogType.access)
     @RequiresPermissions("sys:systemMonitor:edit")
     @GetMapping(value = "clearSessionCacheKey")
-    public String clearSessionCacheKey(String key, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
-        SecurityUtils.removeSession(key);
+    public String clearSessionCacheKey(String id, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
+        SecurityUtils.removeSession(id);
         addMessage(redirectAttributes, "操作成功！");
         return "redirect:" + AppConstants.getAdminPath() + "/sys/systemMonitor/sessionCache?" + "repage";
     }

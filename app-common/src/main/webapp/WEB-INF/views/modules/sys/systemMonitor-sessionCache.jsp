@@ -69,7 +69,7 @@
 			{{#result}}
 			<tr>
 				<td>{{host}}</td>
-				<td><a href="javascript:" onclick="$('#c_{{key}}').toggle()">{{key}}</a></td>
+				<td><a href="javascript:" onclick="$('#c_{{id}}').toggle()">{{id}}</a></td>
 				<td>{{loginUser}}</td>
 				<td>{{clientIP}}</td>
 				<td>
@@ -90,7 +90,7 @@
 				<td>{{updateTime}}</td>
 				<td>
 					<e:hasPermission name="sys:systemMonitor:edit">
-						<a href="${ctxAdmin}/sys/systemMonitor/clearSessionCacheKey?key={{keyEncodeUrl}}"  onclick="return confirmx('确认要清除缓存KEY吗？', this.href)">删除</a>
+						<a href="${ctxAdmin}/sys/systemMonitor/clearSessionCacheKey?id={{id}}"  onclick="return confirmx('确认要清除缓存KEY吗？', this.href)">删除</a>
 					</e:hasPermission>
 				</td>
 			</tr>

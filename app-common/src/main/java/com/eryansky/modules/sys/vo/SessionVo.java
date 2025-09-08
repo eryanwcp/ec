@@ -13,13 +13,17 @@ import static com.eryansky.client.common.utils.Constants.TIMEZONE;
  * Session 信息
  */
 public class SessionVo implements Serializable {
-    private String key;
-    private String keyEncodeUrl;
+    private String id;
     private String loginUser;
     private String host;
     private String clientIP;
 
     private Map<String, Object> data;
+
+    /**
+     * 访问次数
+     */
+    private Long accessCount;
 
     private Long ttl1;
     private Long ttl2;
@@ -30,20 +34,12 @@ public class SessionVo implements Serializable {
     public SessionVo() {
     }
 
-    public String getKey() {
-        return key;
+    public String getId() {
+        return id;
     }
 
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getKeyEncodeUrl() {
-        return keyEncodeUrl;
-    }
-
-    public void setKeyEncodeUrl(String keyEncodeUrl) {
-        this.keyEncodeUrl = keyEncodeUrl;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getLoginUser() {
@@ -76,6 +72,14 @@ public class SessionVo implements Serializable {
 
     public void setData(Map<String, Object> data) {
         this.data = data;
+    }
+
+    public Long getAccessCount() {
+        return accessCount;
+    }
+
+    public void setAccessCount(Long accessCount) {
+        this.accessCount = accessCount;
     }
 
     public Long getTtl1() {
