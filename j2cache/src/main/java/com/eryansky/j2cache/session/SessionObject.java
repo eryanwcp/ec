@@ -52,21 +52,21 @@ public class SessionObject implements Serializable {
     private final ConcurrentHashMap<String, Object> attributes = new ConcurrentHashMap<>();
 
     public SessionObject(){
-        this.accessCount = 0L;
+        this.accessCount = 1L;
     }
 
     public SessionObject(String session_id, List<String> keys, List<byte[]> datas) throws IOException, ClassNotFoundException {
-        this.accessCount = 0L;
+        this.accessCount = 1L;
         this.id = session_id;
-        for(int i=0;i<keys.size();i++) {
+        for (int i = 0; i < keys.size(); i++) {
             String key = keys.get(i);
-            if(KEY_CREATE_AT.equals(key))
+            if (KEY_CREATE_AT.equals(key))
                 this.created_at = Long.parseLong(new String(datas.get(i)));
-            else if(KEY_ACCESS_AT.equals(key))
+            else if (KEY_ACCESS_AT.equals(key))
                 this.access_at = Long.parseLong(new String(datas.get(i)));
-            else if(KEY_SERVICE_HOST.equals(key))
+            else if (KEY_SERVICE_HOST.equals(key))
                 this.host = new String(datas.get(i));
-            else if(KEY_CLIENT_IP.equals(key))
+            else if (KEY_CLIENT_IP.equals(key))
                 this.clientIP = new String(datas.get(i));
             else {
                 attributes.put(key, SerializationUtils.deserialize(datas.get(i)));
