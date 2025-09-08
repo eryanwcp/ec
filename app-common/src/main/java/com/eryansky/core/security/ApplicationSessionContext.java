@@ -5,7 +5,6 @@ import com.eryansky.common.utils.StringUtils;
 import com.eryansky.j2cache.session.CacheFacade;
 import com.eryansky.j2cache.session.J2CacheSessionFilter;
 import com.eryansky.j2cache.session.SessionObject;
-import com.eryansky.utils.CacheUtils;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 
 import java.util.Collection;
@@ -52,7 +51,7 @@ public class ApplicationSessionContext {
 	}
 
 
-	public void removeSession(String sessionId) {
+	public void removeSessionInfo(String sessionId) {
 		if (sessionId != null) {
 			SessionObject sessionObject = cacheFacade.getSession(sessionId);
 			if(null != sessionObject){
@@ -112,6 +111,15 @@ public class ApplicationSessionContext {
 		return sessionObject;
 	}
 
+	public void removeSession(String sessionId) {
+		if (sessionId != null) {
+			SessionObject sessionObject = cacheFacade.getSession(sessionId);
+			if(null != sessionObject){
+				sessionObject.remove(SessionObject.KEY_SESSION_DATA);
+				cacheFacade.removeSessionAttribute(sessionObject,SessionObject.KEY_SESSION_DATA);
+			}
+		}
+	}
 
 	public int findSessionKeySize() {
 		Collection<String> keys = cacheFacade.keys();
@@ -129,7 +137,7 @@ public class ApplicationSessionContext {
 	 * @param sessionId
 	 * @return
 	 */
-	public void addExtendSession(String sessionId,String sessionInfoId) {
+	public void addExtendSessionInfo(String sessionId, String sessionInfoId) {
 		SessionObject sessionObject = cacheFacade.getSession(sessionId);
 		sessionObject.put(SessionObject.KEY_SESSION_EXTEND,sessionInfoId);
 		cacheFacade.setSessionAttribute(sessionObject,SessionObject.KEY_SESSION_EXTEND);
@@ -140,7 +148,7 @@ public class ApplicationSessionContext {
 	 * @param sessionId
 	 * @return
 	 */
-	public void removeExtendSession(String sessionId) {
+	public void removeExtendSessionInfo(String sessionId) {
 		SessionObject sessionObject = cacheFacade.getSession(sessionId);
 		if(null != sessionObject){
 			sessionObject.remove(SessionObject.KEY_SESSION_EXTEND);

@@ -40,7 +40,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.net.InetAddress;
@@ -968,7 +967,7 @@ public class SecurityUtils {
         if (_sessionInfo != null) {
             Static.userService.logout(_sessionInfo.getUserId(), securityType);
         }
-        Static.applicationSessionContext.removeSession(sessionId);
+        Static.applicationSessionContext.removeSessionInfo(sessionId);
         removeExtendSession(sessionId);
         if (null != invalidate && invalidate) {
             try {
@@ -1206,7 +1205,7 @@ public class SecurityUtils {
      * @return
      */
     public static void addExtendSession(String sessionId,String sessionInfoId) {
-       Static.applicationSessionContext.addExtendSession(sessionId,sessionInfoId);
+       Static.applicationSessionContext.addExtendSessionInfo(sessionId,sessionInfoId);
     }
 
     /**
@@ -1265,7 +1264,7 @@ public class SecurityUtils {
      */
     public static void removeExtendSession(String sessionInfoId) {
         Collection<String> sessionIds = Static.applicationSessionContext.findSessionExtendKeys();
-        sessionIds.stream().filter(v -> sessionInfoId.equals(getExtendSessionId(v))).forEach(v -> Static.applicationSessionContext.removeExtendSession(v));
+        sessionIds.stream().filter(v -> sessionInfoId.equals(getExtendSessionId(v))).forEach(v -> Static.applicationSessionContext.removeExtendSessionInfo(v));
     }
 
 
