@@ -323,7 +323,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
      */
     public void saveSession(SessionObject session) {
         session.setHost(IpUtils.getActivityLocalIp());
-        session.setClientIP(IpUtils.getIp(SpringMVCHolder.getRequest()));
+        session.setClientIP(com.eryansky.common.utils.net.IpUtils.getIpAddr(SpringMVCHolder.getRequest()));
         //write to caffeine
         cache1.put(session.getId(), session);
         if(this.cache2 == null){
