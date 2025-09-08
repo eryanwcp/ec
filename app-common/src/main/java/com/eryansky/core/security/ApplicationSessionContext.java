@@ -52,9 +52,13 @@ public class ApplicationSessionContext {
 	}
 
 
-	public void removeSession(String sessionId) {
+	public void removeSessionInfo(String sessionId) {
 		if (sessionId != null) {
-			cacheFacade.deleteSession(sessionId);
+			SessionObject sessionObject = cacheFacade.getSession(sessionId);
+			if(null != sessionObject){
+				sessionObject.remove(SessionObject.KEY_SESSION_DATA);
+				cacheFacade.removeSessionAttribute(sessionObject,SessionObject.KEY_SESSION_DATA);
+			}
 		}
 	}
 
@@ -108,6 +112,11 @@ public class ApplicationSessionContext {
 		return sessionObject;
 	}
 
+	public void removeSession(String sessionId) {
+		if (sessionId != null) {
+			cacheFacade.deleteSession(sessionId);
+		}
+	}
 
 	public int findSessionKeySize() {
 		Collection<String> keys = cacheFacade.keys();
@@ -125,7 +134,7 @@ public class ApplicationSessionContext {
 	 * @param sessionId
 	 * @return
 	 */
-	public void addExtendSession(String sessionId,String sessionInfoId) {
+	public void addExtendSessionInfo(String sessionId, String sessionInfoId) {
 		SessionObject sessionObject = cacheFacade.getSession(sessionId);
 		sessionObject.put(SessionObject.KEY_SESSION_EXTEND,sessionInfoId);
 		cacheFacade.setSessionAttribute(sessionObject,SessionObject.KEY_SESSION_EXTEND);
@@ -136,7 +145,7 @@ public class ApplicationSessionContext {
 	 * @param sessionId
 	 * @return
 	 */
-	public void removeExtendSession(String sessionId) {
+	public void removeExtendSessionInfo(String sessionId) {
 		SessionObject sessionObject = cacheFacade.getSession(sessionId);
 		if(null != sessionObject){
 			sessionObject.remove(SessionObject.KEY_SESSION_EXTEND);
