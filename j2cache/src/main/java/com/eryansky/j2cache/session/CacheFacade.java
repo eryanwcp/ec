@@ -352,6 +352,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
      */
     public void updateSessionAccessTime(SessionObject session) {
         try {
+            session.setAccessCount(session.getAccessCount() + 1);
             session.setLastAccess_at(System.currentTimeMillis());
             cache1.put(session.getId(), session);
             if(this.cache2 != null){

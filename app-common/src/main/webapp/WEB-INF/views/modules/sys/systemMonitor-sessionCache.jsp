@@ -57,6 +57,7 @@
 				<th>会话ID</th>
 				<th>用户标识</th>
 				<th>客户端IP</th>
+				<th>访问次数</th>
 				<th>数据</th>
 				<th>一级TTL</th>
 				<th>二级TTL</th>
@@ -69,9 +70,10 @@
 			{{#result}}
 			<tr>
 				<td>{{host}}</td>
-				<td><a href="javascript:" onclick="$('#c_{{key}}').toggle()">{{key}}</a></td>
+				<td><a href="javascript:" onclick="$('#c_{{id}}').toggle()">{{id}}</a></td>
 				<td>{{loginUser}}</td>
 				<td>{{clientIP}}</td>
+				<td>{{accessCount}}</td>
 				<td>
 					<table class="table table-striped table-bordered table-condensed">
 						<tbody>
@@ -90,11 +92,11 @@
 				<td>{{updateTime}}</td>
 				<td>
 					<e:hasPermission name="sys:systemMonitor:edit">
-						<a href="${ctxAdmin}/sys/systemMonitor/clearSessionCacheKey?key={{keyEncodeUrl}}"  onclick="return confirmx('确认要清除缓存KEY吗？', this.href)">删除</a>
+						<a href="${ctxAdmin}/sys/systemMonitor/clearSessionCacheKey?id={{id}}"  onclick="return confirmx('确认要清除选中的会话吗？', this.href)">删除</a>
 					</e:hasPermission>
 				</td>
 			</tr>
-			<tr id="c_{{key}}" style="background:#fdfdfd;display:none;"><td colspan="10"><pre>{{sessionData}}</pre></td></tr>
+			<tr id="c_{{id}}" style="background:#fdfdfd;display:none;"><td colspan="10"><pre>{{sessionData}}</pre></td></tr>
 			{{/result}}
 			</tbody>
 		</table>
