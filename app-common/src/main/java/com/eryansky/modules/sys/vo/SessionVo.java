@@ -21,7 +21,7 @@ public class SessionVo implements Serializable {
     private Map<String, Object> data;
 
     /**
-     * 访问次数
+     * 请求次数
      */
     private Long accessCount;
 

@@ -44,7 +44,7 @@ public @interface RateLimiterApi {
 	String paramKey() default "CDPathSta";
 
 	/**
-	 * 访问次数
+	 * 请求次数
 	 * @return
 	 */
 	int frequency() default 500;

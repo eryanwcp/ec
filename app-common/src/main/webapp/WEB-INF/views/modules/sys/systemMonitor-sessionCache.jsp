@@ -57,7 +57,7 @@
 				<th>会话ID</th>
 				<th>用户标识</th>
 				<th>客户端IP</th>
-				<th>访问次数</th>
+				<th>请求次数</th>
 				<th>数据</th>
 				<th>一级TTL</th>
 				<th>二级TTL</th>
