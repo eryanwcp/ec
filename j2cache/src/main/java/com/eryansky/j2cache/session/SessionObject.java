@@ -56,7 +56,6 @@ public class SessionObject implements Serializable {
     }
 
     public SessionObject(String session_id, List<String> keys, List<byte[]> datas) throws IOException, ClassNotFoundException {
-        this.accessCount = 1L;
         this.id = session_id;
         for (int i = 0; i < keys.size(); i++) {
             String key = keys.get(i);
