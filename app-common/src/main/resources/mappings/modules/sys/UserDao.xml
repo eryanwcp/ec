@@ -1381,6 +1381,15 @@
         WHERE id = #{id}
     </delete>
 
+    <delete id="clear">
+        DELETE FROM t_sys_user
+        WHERE id = #{id}
+    </delete>
+
+    <delete id="clearAll">
+        DELETE FROM t_sys_user
+    </delete>
+
     <!--用户机构-->
     <delete id="deleteUserOrgansByUserId">
         DELETE FROM t_sys_user_organ WHERE user_id = #{id}

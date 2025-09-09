@@ -312,6 +312,15 @@
 		WHERE id = #{id}
 	</update>
 
+	<delete id="clear">
+		DELETE FROM t_notice
+		WHERE id = #{id}
+	</delete>
+
+	<delete id="clearAll">
+		DELETE FROM t_notice
+	</delete>
+
 
 	<!--通知附件-->
 	<select id="findFileIdsByNoticeId" resultType="java.lang.String">

@@ -292,6 +292,15 @@
         WHERE id = #{id}
     </delete>
 
+    <delete id="clear">
+        DELETE FROM t_sys_post
+        WHERE id = #{id}
+    </delete>
+
+    <delete id="clearAll">
+        DELETE FROM t_sys_post
+    </delete>
+
 
     <!--岗位机构-->
     <delete id="deletePostOrgansByPostId">

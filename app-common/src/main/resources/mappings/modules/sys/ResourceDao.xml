@@ -533,6 +533,15 @@
         WHERE id = #{id}
     </delete>
 
+    <delete id="clear">
+        DELETE FROM t_sys_resource
+        WHERE id = #{id}
+    </delete>
+
+    <delete id="clearAll">
+        DELETE FROM t_sys_resource
+    </delete>
+
 
     <delete id="deleteOwnerAndChilds">
         UPDATE t_sys_resource SET

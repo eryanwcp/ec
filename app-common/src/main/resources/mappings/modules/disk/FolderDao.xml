@@ -366,4 +366,13 @@
         )
     </delete>
 
+    <delete id="clear">
+        DELETE FROM t_disk_folder
+        WHERE id = #{id}
+    </delete>
+
+    <delete id="clearAll">
+        DELETE FROM t_disk_folder
+    </delete>
+
 </mapper>

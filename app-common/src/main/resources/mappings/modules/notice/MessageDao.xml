@@ -317,4 +317,13 @@
 		WHERE id = #{id}
 	</update>
 
+	<delete id="clear">
+		DELETE FROM t_notice_message
+		WHERE id = #{id}
+	</delete>
+
+	<delete id="clearAll">
+		DELETE FROM t_notice_message
+	</delete>
+
 </mapper>
