@@ -335,6 +335,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             put(SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
             put(SessionObject.KEY_SERVICE_HOST, session.getHost().getBytes());
             put(SessionObject.KEY_CLIENT_IP, session.getClientIP().getBytes());
+            put(SessionObject.KEY_ACCESS_COUNT,String.valueOf(session.getAccessCount()).getBytes());
             session.getAttributes().forEach((key, value) -> {
                 try {
                     put(key, SerializationUtils.serialize(value));

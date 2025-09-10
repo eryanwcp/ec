@@ -35,6 +35,7 @@ public class SessionObject implements Serializable {
     public static final String KEY_CLIENT_IP = "CLIENT_IP" ;
     public static final String KEY_SESSION_DATA = "SESSION_DATA" ;
     public static final String KEY_SESSION_EXTEND = "SESSION_EXTEND" ;
+    public static final String KEY_ACCESS_COUNT = "ACCESS_COUNT" ;
 
     private String id;
     private long created_at;
@@ -67,6 +68,8 @@ public class SessionObject implements Serializable {
                 this.host = new String(datas.get(i));
             else if (KEY_CLIENT_IP.equals(key))
                 this.clientIP = new String(datas.get(i));
+            else if (KEY_ACCESS_COUNT.equals(key))
+                this.accessCount = Long.parseLong(new String(datas.get(i)));
             else {
                 attributes.put(key, SerializationUtils.deserialize(datas.get(i)));
             }
