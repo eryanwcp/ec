@@ -307,6 +307,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
 
                 List<byte[]> datas = cache2.getBytes(session_id, keys);
                 session = new SessionObject(session_id, keys, datas);
+                session.setHost(IpUtils.getActivityLocalIp());
                 cache1.put(session_id, session);
             } catch (Exception e) {
                 logger.error("Failed to read session from j2cache", e);
