@@ -253,7 +253,7 @@ public class SystemMonitorController extends SimpleController {
                 sessionVo.setData(Optional.ofNullable(sessionObject).map(SessionObject::getAttributes).orElse(null));
                 sessionVo.setAccessCount(Optional.ofNullable(sessionObject).map(SessionObject::getAccessCount).orElse(null));
                 return sessionVo;
-            }).sorted(Comparator.comparing(SessionVo::getUpdateTime).reversed().thenComparing(Comparator.comparing(SessionVo::getCreatedTime).reversed())).collect(Collectors.toList());
+            }).sorted(Comparator.comparing(SessionVo::getUpdateTime,Comparator.nullsLast(Comparator.naturalOrder())).reversed().thenComparing(Comparator.comparing(SessionVo::getCreatedTime,Comparator.nullsLast(Comparator.naturalOrder())).reversed())).collect(Collectors.toList());
             List<SessionVo> dataList = AppUtils.getPagedList(list, page.getPageNo(), page.getPageSize());
             page.autoTotalCount(keys.size());
             page.autoResult(dataList);
