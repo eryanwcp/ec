@@ -358,6 +358,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             cache1.put(session.getId(), session);
             if(this.cache2 != null){
                 cache2.setBytes(session.getId(), SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
+                cache2.setBytes(session.getId(), SessionObject.KEY_ACCESS_COUNT, String.valueOf(session.getAccessCount()).getBytes());
                 cache2.ttl(session.getId(), cache1.getExpire());
             }
         } finally {
