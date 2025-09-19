@@ -98,7 +98,7 @@ public class CommonHandlerUrl {
      *
      * @param rpcService
      * @param methodName
-     * @param paramsÏ
+     * @param params
      * @return
      * @throws InvocationTargetException
      * @throws IllegalAccessException
