@@ -65,9 +65,9 @@ public class SessionObject implements Serializable {
             else if (KEY_ACCESS_AT.equals(key))
                 this.access_at = Long.parseLong(new String(datas.get(i)));
             else if (KEY_SERVICE_HOST.equals(key))
-                this.host = new String(datas.get(i));
+                this.host = null != datas.get(i) ? new String(datas.get(i)) : null;
             else if (KEY_CLIENT_IP.equals(key))
-                this.clientIP = new String(datas.get(i));
+                this.clientIP = null != datas.get(i) ? new String(datas.get(i)) : null;
             else if (KEY_ACCESS_COUNT.equals(key))
                 this.accessCount = Long.parseLong(new String(datas.get(i)));
             else {
