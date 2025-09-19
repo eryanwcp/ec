@@ -5,7 +5,7 @@
 
     <groupId>com.eryansky</groupId>
     <artifactId>ec-parent</artifactId>
-    <version>4.3.20250822.06</version>
+    <version>4.3.20250919.01</version>
     <modules>
         <module>common</module>
         <module>j2cache</module>
@@ -35,14 +35,14 @@
         <java.version>17</java.version>
         <tomcat-plugin.version>2.2</tomcat-plugin.version>
 
-        <spring-boot.version>3.4.9</spring-boot.version>
+        <spring-boot.version>3.4.10</spring-boot.version>
         <spring-integration-redis.version>6.4.6</spring-integration-redis.version>
         <logstash-logback-encoder.version>8.1</logstash-logback-encoder.version>
         <logback-classic.version>1.5.18</logback-classic.version>
         <byte-buddy.version>1.17.6</byte-buddy.version>
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
 
-        <tomcat.version>10.1.44</tomcat.version>
+        <tomcat.version>10.1.46</tomcat.version>
 
         <mybatis-spring-boot.version>3.0.5</mybatis-spring-boot.version>
         <commons-pool2.version>2.12.1</commons-pool2.version>
@@ -56,13 +56,13 @@
         <commons-codec.version>1.19.0</commons-codec.version>
 
 
-        <ec-common.version>4.3.20250822.06</ec-common.version>
-        <ec-app-common.version>4.3.20250822.06</ec-app-common.version>
-        <ec-client-common.version>4.3.20250822.06</ec-client-common.version>
-        <ec-j2cache.version>4.3.20250822.06</ec-j2cache.version>
-        <ec-j2cache-spring-boot-starter.version>4.3.20250822.06</ec-j2cache-spring-boot-starter.version>
-        <ec-fastweixin.version>4.3.20250822.06</ec-fastweixin.version>
-        <ec-encrypt-spring-boot-starter.version>4.3.20250822.06</ec-encrypt-spring-boot-starter.version>
+        <ec-common.version>4.3.20250919.01</ec-common.version>
+        <ec-app-common.version>4.3.20250919.01</ec-app-common.version>
+        <ec-client-common.version>4.3.20250919.01</ec-client-common.version>
+        <ec-j2cache.version>4.3.20250919.01</ec-j2cache.version>
+        <ec-j2cache-spring-boot-starter.version>4.3.20250919.01</ec-j2cache-spring-boot-starter.version>
+        <ec-fastweixin.version>4.3.20250919.01</ec-fastweixin.version>
+        <ec-encrypt-spring-boot-starter.version>4.3.20250919.01</ec-encrypt-spring-boot-starter.version>
 
         <jackson.version>2.19.2</jackson.version>
     </properties>
