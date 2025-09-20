@@ -126,7 +126,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                     notPermittedPermission(request, response, requestUrl, "未授权访问:Header['X-API-Key']=" + apiKey);
                     return false;
                 }
-
+                request.getSession().setAttribute("loginUser","内部系统[" + ip + "]");
                 return true;
             }
 
