@@ -41,12 +41,20 @@ public class ConsumerExecutor {
 //            responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, String.class);//多一层引号““””
 //            responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Serializable.class);
             responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
+
+            if (!responseEntity.getStatusCode().is2xxSuccessful()) {
+                log.error("RPC请求异常：{} {} {}", url, responseEntity.getStatusCode().value(), responseEntity.getBody());
+                throw new RuntimeException("RPC请求异常：" + url + " " + responseEntity.getStatusCode().value());
+            }
+
             String data = null;
+            String decryptData = null;
             try {
                 data = (String) responseEntity.getBody();
             } catch (Exception e) {
                 log.error(e.getMessage(),e);
             }
+
             JavaType javaType = jsonMapper.getTypeFactory().constructType(responseType.getType());
             if(CipherMode.SM4.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)){
                 if(StringUtils.isNotBlank(data) && !StringUtils.equals(data,"null")){
@@ -57,7 +65,8 @@ public class ConsumerExecutor {
                         } catch (Exception e) {
                             key = requestEncryptKey;
                         }
-                        return jsonMapper.toJavaObject(Sm4Utils.decrypt(key,data),javaType);
+                        decryptData = Sm4Utils.decrypt(key,data);
+                        return jsonMapper.toJavaObject(decryptData,javaType);
                     } catch (Exception e) {
                         log.error(e.getMessage(),e);
                         throw new RuntimeException(e);
@@ -72,7 +81,8 @@ public class ConsumerExecutor {
                         } catch (Exception e) {
                             key = requestEncryptKey;
                         }
-                        return jsonMapper.toJavaObject(Cryptos.aesECBDecryptBase64String(data,key),javaType);
+                        decryptData = Cryptos.aesECBDecryptBase64String(data,key);
+                        return jsonMapper.toJavaObject(decryptData,javaType);
                     } catch (Exception e) {
                         log.error(e.getMessage(),e);
                         throw new RuntimeException(e);
@@ -82,13 +92,8 @@ public class ConsumerExecutor {
             }else if(CipherMode.BASE64.name().equals(requestEncrypt)){
                 if(StringUtils.isNotBlank(data) && !StringUtils.equals(data,"null")){
                     try {
-                        String key = null;
-                        try {
-                            key = RSAUtils.decryptBase64String(requestEncryptKey);
-                        } catch (Exception e) {
-                            key = requestEncryptKey;
-                        }
-                        return jsonMapper.toJavaObject(Cryptos.aesECBDecryptBase64String(data,key),javaType);
+                        decryptData = new String(EncodeUtils.base64Decode(data));
+                        return jsonMapper.toJavaObject(decryptData,javaType);
                     } catch (Exception e) {
                         log.error(e.getMessage(),e);
                         throw new RuntimeException(e);

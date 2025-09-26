@@ -1,15 +1,15 @@
 package com.eryansky.core.rpc.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 
 public class RestTemplateHolder {
 
     private static RestTemplateHolder restTemplateHolder;
 
-    @Autowired
+    @Resource
     private RestTemplate restTemplate;
 
     @PostConstruct

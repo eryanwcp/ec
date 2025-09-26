@@ -2,6 +2,7 @@ package com.eryansky.core.rpc.provider;
 
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.encode.Cryptos;
+import com.eryansky.common.utils.encode.EncodeUtils;
 import com.eryansky.common.utils.encode.RSAUtils;
 import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.utils.mapper.JsonMapper;
@@ -78,12 +79,7 @@ public class CommonHandlerUrl {
                 }
                 requestBodyJsonString = Cryptos.aesECBDecryptBase64String(requestBodyJsonString,key);
             }else if(CipherMode.BASE64.name().equals(encrypt)){
-                try {
-                    key = RSAUtils.decryptBase64String(encryptKey);
-                } catch (Exception e) {
-                    key = encryptKey;
-                }
-                requestBodyJsonString = Cryptos.aesECBDecryptBase64String(requestBodyJsonString,key);
+                requestBodyJsonString = new String(EncodeUtils.base64Decode(requestBodyJsonString.getBytes(StandardCharsets.UTF_8)));
             }
         }
 
