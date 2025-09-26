@@ -83,7 +83,7 @@ public class ProviderScanAndReleaseListener implements ApplicationListener<Appli
                             ProviderHolder.ProviderInfo checkProviderInfo = ProviderHolder.RPC_PROVIDER_MAP.values().stream()
                                     .filter(v->v.getName().equals(app.name()) || v.getUrlPrefix().equals(providerInfo.getUrlPrefix())).findFirst().orElse(null);
                             if(null != checkProviderInfo){
-                                log.error("RPC服务已存在：{} {}",providerInfo.getName(),JsonMapper.toJsonString(checkProviderInfo));
+                                log.error("RPC服务已存在：{} {}",providerInfo.getRpcBeanName()+"."+providerInfo.getName(),JsonMapper.toJsonString(checkProviderInfo));
                             }
 
                             Method[] methods = clazz.getMethods(); //获取所有方法
