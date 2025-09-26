@@ -17,7 +17,6 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
@@ -41,18 +40,20 @@ public class ConsumerExecutor {
 //            responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, String.class);//多一层引号““””
 //            responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Serializable.class);
             responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
-
+            Object body = responseEntity.getBody();
             if (!responseEntity.getStatusCode().is2xxSuccessful()) {
                 log.error("RPC请求异常：{} {} {}", url, responseEntity.getStatusCode().value(), responseEntity.getBody());
-                throw new RuntimeException("RPC请求异常：" + url + " " + responseEntity.getStatusCode().value());
+                throw new RuntimeException("RPC请求异常：" + url + " " + responseEntity.getStatusCode().value()+" "+ JsonMapper.toJsonString(body));
             }
 
             String data = null;
             String decryptData = null;
             try {
-                data = (String) responseEntity.getBody();
+                data = (String) body;
             } catch (Exception e) {
                 log.error(e.getMessage(),e);
+                log.error("RPC请求异常：{} {} {}", responseEntity.getStatusCode().value(),url,JsonMapper.toJsonString(body));
+                throw new RuntimeException("RPC请求异常：" + url + " " + responseEntity.getStatusCode().value() +" "+ JsonMapper.toJsonString(body));
             }
 
             JavaType javaType = jsonMapper.getTypeFactory().constructType(responseType.getType());

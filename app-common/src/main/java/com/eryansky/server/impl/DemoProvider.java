@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @RPCProvider
-@Component
+//@Component
 public class DemoProvider implements DemoAPI {
 
     @Autowired
@@ -24,18 +24,13 @@ public class DemoProvider implements DemoAPI {
 
     @Logging(value = "rest1",logType = LogType.API)
     @Override
-    public String test1(String param1) {
-        return param1;
+    public R<String> test1(String param1) {
+        return new R<String>().setCode(R.SUCCESS).setData(param1);
     }
 
     @Override
-    public String test1(String param1, String param2) {
-        return param1+" "+param2;
-    }
-
-    @Override
-    public int test2(String param1) {
-        return 0;
+    public R<String> test1(String param1, String param2) {
+        return new R<String>().setCode(R.SUCCESS).setData( param1+" "+param2);
     }
 
     @Override
@@ -63,11 +58,6 @@ public class DemoProvider implements DemoAPI {
     public Page<User> test001(Page<User> page, User user) {
         page = userService.findPage(page,user);
         return page;
-    }
-
-    @Override
-    public String test002() {
-        return "test002";
     }
 
     @Override
