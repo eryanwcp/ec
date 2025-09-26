@@ -19,10 +19,7 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -109,6 +106,19 @@ public class ProviderScanAndReleaseListener implements ApplicationListener<Appli
                             ProviderHolder.RPC_PROVIDER_MAP.put(app.name(), providerInfo);
                         }
                     }
+                }
+                // 检验重复映射
+                long distinctCount = ProviderHolder.RPC_PROVIDER_MAP.values().stream()
+                        .map(ProviderHolder.ProviderInfo::getUrlPrefix)
+                        .filter(Objects::nonNull)
+                        .count();
+                long originalCount = ProviderHolder.RPC_PROVIDER_MAP.values().stream()
+                        .map(ProviderHolder.ProviderInfo::getUrlPrefix)
+                        .filter(Objects::nonNull)
+                        .count();
+                if(distinctCount != originalCount){
+                    log.error("RPC服务定义存在重复：{} {}",originalCount - distinctCount,JsonMapper.toJsonString(ProviderHolder.RPC_PROVIDER_MAP.values().stream()
+                            .map(ProviderHolder.ProviderInfo::getUrlPrefix).sorted().collect(Collectors.toList())));
                 }
             }
         }
