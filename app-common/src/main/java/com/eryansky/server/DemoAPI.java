@@ -13,13 +13,12 @@ import java.util.Map;
 //@RPCExchange(name = "demo-service", serverUrl = "${ec.api.serverUrl:http://localhost:8080}",apiKey = "${ec.api.apiKey:}",encrypt = RPCExchange.ENCRYPT_AES)
 @RPCExchange(name = "demo-service", serverUrl = "${ec.api.serverUrl:http://localhost:8080/ec}",apiKey = "${ec.api.apiKey:}",encrypt = "${ec.api.encrypt:}")
 public interface DemoAPI {
-    String test1(String param1);
+    R<String> test1(String param1);
 
 
     @RPCMethodConfig(alias = "test120",encrypt = RPCMethodConfig.ENCRYPT_NONE)
-    String test1(String param1,String param2);
+    R<String> test1(String param1,String param2);
 
-    int test2(String param1);
 
     R<Boolean> test10(String param1);
 
@@ -30,7 +29,6 @@ public interface DemoAPI {
     @RPCPermissions(value = {"123"})
     Page<User> test001(Page<User> page,User user);
 
-    String test002();
     void test003();
 
     R<Object> encrypt(String param1);
