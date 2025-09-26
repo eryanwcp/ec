@@ -48,6 +48,11 @@ public class ConsumerExecutor {
             } catch (Exception e) {
                 log.error(e.getMessage(),e);
             }
+            if (!responseEntity.getStatusCode().is2xxSuccessful()) {
+                log.error("RPC请求异常：{} {} {}", url, responseEntity.getStatusCode().value(), data);
+                throw new RuntimeException("RPC请求异常：" + url + " " + responseEntity.getStatusCode().value());
+            }
+
             JavaType javaType = jsonMapper.getTypeFactory().constructType(responseType.getType());
             if(CipherMode.SM4.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)){
                 if(StringUtils.isNotBlank(data) && !StringUtils.equals(data,"null")){
@@ -62,8 +67,6 @@ public class ConsumerExecutor {
                         return jsonMapper.toJavaObject(decryptData,javaType);
                     } catch (Exception e) {
                         log.error(e.getMessage(),e);
-                        log.error("{} {}",url,data);
-                        log.error("{} {}",url,decryptData);
                         throw new RuntimeException(e);
                     }
                 }
@@ -80,8 +83,6 @@ public class ConsumerExecutor {
                         return jsonMapper.toJavaObject(decryptData,javaType);
                     } catch (Exception e) {
                         log.error(e.getMessage(),e);
-                        log.error("{} {}",url,data);
-                        log.error("{} {}",url,decryptData);
                         throw new RuntimeException(e);
                     }
                 }
@@ -93,8 +94,6 @@ public class ConsumerExecutor {
                         return jsonMapper.toJavaObject(decryptData,javaType);
                     } catch (Exception e) {
                         log.error(e.getMessage(),e);
-                        log.error("{} {}",url,data);
-                        log.error("{} {}",url,decryptData);
                         throw new RuntimeException(e);
                     }
                 }
