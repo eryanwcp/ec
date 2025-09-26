@@ -41,16 +41,18 @@ public class ConsumerExecutor {
 //            responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, String.class);//多一层引号““””
 //            responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Serializable.class);
             responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
+
+            if (!responseEntity.getStatusCode().is2xxSuccessful()) {
+                log.error("RPC请求异常：{} {} {}", url, responseEntity.getStatusCode().value(), responseEntity.getBody());
+                throw new RuntimeException("RPC请求异常：" + url + " " + responseEntity.getStatusCode().value());
+            }
+
             String data = null;
             String decryptData = null;
             try {
                 data = (String) responseEntity.getBody();
             } catch (Exception e) {
                 log.error(e.getMessage(),e);
-            }
-            if (!responseEntity.getStatusCode().is2xxSuccessful()) {
-                log.error("RPC请求异常：{} {} {}", url, responseEntity.getStatusCode().value(), data);
-                throw new RuntimeException("RPC请求异常：" + url + " " + responseEntity.getStatusCode().value());
             }
 
             JavaType javaType = jsonMapper.getTypeFactory().constructType(responseType.getType());
