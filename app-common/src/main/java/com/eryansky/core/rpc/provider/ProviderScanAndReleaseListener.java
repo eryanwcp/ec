@@ -78,6 +78,12 @@ public class ProviderScanAndReleaseListener implements ApplicationListener<Appli
                             providerInfo.setUrlPrefix(app.urlPrefix()+"/" +app.name()); // url前缀取接口名称
                             providerInfo.setRpcBean(bean);
 
+                            ProviderHolder.ProviderInfo checkProviderInfo = ProviderHolder.RPC_PROVIDER_MAP.values().stream()
+                                    .filter(v -> v.getName().equals(app.name()) || v.getUrlPrefix().equals(providerInfo.getUrlPrefix())).findFirst().orElse(null);
+                            if (null != checkProviderInfo) {
+                                log.error("RPC服务已存在：{} {}", providerInfo.getRpcBeanName() + "." + providerInfo.getName(), checkProviderInfo.getRpcBeanName() + "." + checkProviderInfo.getName());
+                            }
+
                             Method[] methods = clazz.getMethods(); //获取所有方法
                             if (methods != null && methods.length != 0) {
                                 List<ProviderHolder.RPCMethod> methodList = new ArrayList<>();
@@ -107,20 +113,6 @@ public class ProviderScanAndReleaseListener implements ApplicationListener<Appli
                         }
                     }
                 }
-            }
-
-            // 检验重复映射
-            long distinctCount = ProviderHolder.RPC_PROVIDER_MAP.values().stream()
-                    .map(ProviderHolder.ProviderInfo::getUrlPrefix)
-                    .filter(Objects::nonNull)
-                    .count();
-            long originalCount = ProviderHolder.RPC_PROVIDER_MAP.values().stream()
-                    .map(ProviderHolder.ProviderInfo::getUrlPrefix)
-                    .filter(Objects::nonNull)
-                    .count();
-            if(distinctCount != originalCount){
-                log.error("RPC服务定义存在重复：{} {}",originalCount - distinctCount,JsonMapper.toJsonString(ProviderHolder.RPC_PROVIDER_MAP.values().stream()
-                        .map(ProviderHolder.ProviderInfo::getUrlPrefix).sorted().collect(Collectors.toList())));
             }
         }
     }
