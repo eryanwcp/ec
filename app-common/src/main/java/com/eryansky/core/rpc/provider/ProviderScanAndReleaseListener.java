@@ -72,11 +72,19 @@ public class ProviderScanAndReleaseListener implements ApplicationListener<Appli
                         RPCExchange app = (RPCExchange) clazz.getAnnotation(RPCExchange.class);
                         if (app != null) { // 判断当前类上是否有标识指定发布接口的应用名称
                             // 如果符合我们的自定义发布规范
+
+
                             ProviderHolder.ProviderInfo providerInfo = new ProviderHolder.ProviderInfo();
                             providerInfo.setName(app.name());
                             providerInfo.setRpcBeanName(beanName);
                             providerInfo.setUrlPrefix(app.urlPrefix()+"/" +app.name()); // url前缀取接口名称
                             providerInfo.setRpcBean(bean);
+
+                            ProviderHolder.ProviderInfo checkProviderInfo = ProviderHolder.RPC_PROVIDER_MAP.values().stream()
+                                    .filter(v->v.getName().equals(app.name()) || v.getUrlPrefix().equals(providerInfo.getUrlPrefix())).findFirst().orElse(null);
+                            if(null != checkProviderInfo){
+                                log.error("RPC服务已存在：{} {}",providerInfo.getName(),JsonMapper.toJsonString(checkProviderInfo));
+                            }
 
                             Method[] methods = clazz.getMethods(); //获取所有方法
                             if (methods != null && methods.length != 0) {
@@ -107,20 +115,6 @@ public class ProviderScanAndReleaseListener implements ApplicationListener<Appli
                         }
                     }
                 }
-            }
-
-            // 检验重复映射
-            long distinctCount = ProviderHolder.RPC_PROVIDER_MAP.values().stream()
-                    .map(ProviderHolder.ProviderInfo::getUrlPrefix)
-                    .filter(Objects::nonNull)
-                    .count();
-            long originalCount = ProviderHolder.RPC_PROVIDER_MAP.values().stream()
-                    .map(ProviderHolder.ProviderInfo::getUrlPrefix)
-                    .filter(Objects::nonNull)
-                    .count();
-            if(distinctCount != originalCount){
-                log.error("RPC服务定义存在重复：{} {}",originalCount - distinctCount,JsonMapper.toJsonString(ProviderHolder.RPC_PROVIDER_MAP.values().stream()
-                        .map(ProviderHolder.ProviderInfo::getUrlPrefix).sorted().collect(Collectors.toList())));
             }
         }
     }
