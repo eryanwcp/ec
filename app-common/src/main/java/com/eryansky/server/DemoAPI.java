@@ -15,7 +15,6 @@ import java.util.Map;
 public interface DemoAPI {
     R<String> test1(String param1);
 
-
     @RPCMethodConfig(alias = "test120",encrypt = RPCMethodConfig.ENCRYPT_NONE)
     R<String> test1(String param1,String param2);
 
