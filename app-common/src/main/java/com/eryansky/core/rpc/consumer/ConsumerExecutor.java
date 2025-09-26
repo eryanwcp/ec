@@ -42,6 +42,7 @@ public class ConsumerExecutor {
 //            responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Serializable.class);
             responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
             String data = null;
+            String decryptData = null;
             try {
                 data = (String) responseEntity.getBody();
             } catch (Exception e) {
@@ -57,9 +58,12 @@ public class ConsumerExecutor {
                         } catch (Exception e) {
                             key = requestEncryptKey;
                         }
-                        return jsonMapper.toJavaObject(Sm4Utils.decrypt(key,data),javaType);
+                        decryptData = Sm4Utils.decrypt(key,data);
+                        return jsonMapper.toJavaObject(decryptData,javaType);
                     } catch (Exception e) {
                         log.error(e.getMessage(),e);
+                        log.error("{} {}",url,data);
+                        log.error("{} {}",url,decryptData);
                         throw new RuntimeException(e);
                     }
                 }
@@ -72,9 +76,12 @@ public class ConsumerExecutor {
                         } catch (Exception e) {
                             key = requestEncryptKey;
                         }
-                        return jsonMapper.toJavaObject(Cryptos.aesECBDecryptBase64String(data,key),javaType);
+                        decryptData = Cryptos.aesECBDecryptBase64String(data,key);
+                        return jsonMapper.toJavaObject(decryptData,javaType);
                     } catch (Exception e) {
                         log.error(e.getMessage(),e);
+                        log.error("{} {}",url,data);
+                        log.error("{} {}",url,decryptData);
                         throw new RuntimeException(e);
                     }
                 }
@@ -82,15 +89,12 @@ public class ConsumerExecutor {
             }else if(CipherMode.BASE64.name().equals(requestEncrypt)){
                 if(StringUtils.isNotBlank(data) && !StringUtils.equals(data,"null")){
                     try {
-                        String key = null;
-                        try {
-                            key = RSAUtils.decryptBase64String(requestEncryptKey);
-                        } catch (Exception e) {
-                            key = requestEncryptKey;
-                        }
-                        return jsonMapper.toJavaObject(Cryptos.aesECBDecryptBase64String(data,key),javaType);
+                        decryptData = new String(EncodeUtils.base64Decode(data));
+                        return jsonMapper.toJavaObject(decryptData,javaType);
                     } catch (Exception e) {
                         log.error(e.getMessage(),e);
+                        log.error("{} {}",url,data);
+                        log.error("{} {}",url,decryptData);
                         throw new RuntimeException(e);
                     }
                 }
