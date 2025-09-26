@@ -69,7 +69,7 @@ public class SessionObject implements Serializable {
             else if (KEY_CLIENT_IP.equals(key))
                 this.clientIP = null != datas.get(i) ? new String(datas.get(i)) : null;
             else if (KEY_ACCESS_COUNT.equals(key))
-                this.accessCount = Long.parseLong(new String(datas.get(i)));
+                this.accessCount = null != datas.get(i) ? Long.parseLong(new String(datas.get(i))):0L;
             else {
                 attributes.put(key, SerializationUtils.deserialize(datas.get(i)));
             }
