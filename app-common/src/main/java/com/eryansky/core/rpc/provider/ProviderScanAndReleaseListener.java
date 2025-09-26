@@ -72,8 +72,6 @@ public class ProviderScanAndReleaseListener implements ApplicationListener<Appli
                         RPCExchange app = (RPCExchange) clazz.getAnnotation(RPCExchange.class);
                         if (app != null) { // 判断当前类上是否有标识指定发布接口的应用名称
                             // 如果符合我们的自定义发布规范
-
-
                             ProviderHolder.ProviderInfo providerInfo = new ProviderHolder.ProviderInfo();
                             providerInfo.setName(app.name());
                             providerInfo.setRpcBeanName(beanName);
