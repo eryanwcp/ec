@@ -1,5 +1,6 @@
 package com.eryansky.core.rpc.consumer;
 
+import com.eryansky.common.model.R;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.encode.Cryptos;
 import com.eryansky.common.utils.encode.EncodeUtils;
@@ -9,6 +10,7 @@ import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.core.rpc.config.RestTemplateHolder;
 import com.eryansky.core.rpc.utils.RPCUtils;
 import com.eryansky.encrypt.enums.CipherMode;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
@@ -39,21 +41,31 @@ public class ConsumerExecutor {
         if (StringUtils.isNotBlank(requestEncrypt)){
 //            responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, String.class);//多一层引号““””
 //            responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Serializable.class);
+
             responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
-            Object body = responseEntity.getBody();
+
             if (!responseEntity.getStatusCode().is2xxSuccessful()) {
                 log.error("RPC请求异常：{} {} {}", url, responseEntity.getStatusCode().value(), responseEntity.getBody());
-                throw new RuntimeException("RPC请求异常：" + url + " " + responseEntity.getStatusCode().value()+" "+ JsonMapper.toJsonString(body));
+                throw new RuntimeException("RPC请求异常：" + url + " " + responseEntity.getStatusCode().value()+" "+ JsonMapper.toJsonString(responseEntity));
             }
 
             String data = null;
             String decryptData = null;
+            Object body = responseEntity.getBody();
             try {
+                if (body instanceof Map) {
+                    R<Boolean> r = JsonMapper.getInstance().toJavaObject(body, new TypeReference<R<Boolean>>() {
+                    });
+                    if (null != r && !r.isSuccess()) {
+                        log.error("RPC请求异常：{} {} {}", responseEntity.getStatusCode().value(), url, JsonMapper.toJsonString(r));
+                        throw new RuntimeException("RPC请求异常：" + url + " " + responseEntity.getStatusCode().value() + " " + JsonMapper.toJsonString(r));
+                    }
+                }
                 data = (String) body;
             } catch (Exception e) {
                 log.error(e.getMessage(),e);
-                log.error("RPC请求异常：{} {} {}", responseEntity.getStatusCode().value(),url,JsonMapper.toJsonString(body));
-                throw new RuntimeException("RPC请求异常：" + url + " " + responseEntity.getStatusCode().value() +" "+ JsonMapper.toJsonString(body));
+                log.error("RPC请求异常：{} {} {}", responseEntity.getStatusCode().value(),url,JsonMapper.toJsonString(responseEntity));
+                throw new RuntimeException("RPC请求异常：" + url + " " + responseEntity.getStatusCode().value() +" "+ JsonMapper.toJsonString(responseEntity));
             }
 
             JavaType javaType = jsonMapper.getTypeFactory().constructType(responseType.getType());

@@ -6,7 +6,12 @@
 package com.eryansky.core.security.interceptor;
 
 import com.eryansky.common.model.R;
+import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
+import com.eryansky.common.utils.encode.Cryptos;
+import com.eryansky.common.utils.encode.EncodeUtils;
+import com.eryansky.common.utils.encode.RSAUtils;
+import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.utils.WebUtils;
@@ -14,10 +19,9 @@ import com.eryansky.core.rpc.utils.RPCUtils;
 import com.eryansky.core.security.annotation.RequiresUser;
 import com.eryansky.core.security.annotation.RestApi;
 import com.eryansky.utils.AppConstants;
-import com.eryansky.utils.CacheUtils;
+import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -39,13 +43,12 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
-    public static final String CACHE_REST_PREFIX = "Rest_Authority_";
+    public static final String SESSION_KEY_REST_AUTHORITY = "REST_AUTHORITY";
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) throws Exception {
-        String sessionId = request.getSession().getId();
-        String cacheKey = CACHE_REST_PREFIX + sessionId;
-        Boolean handlerResult = CacheUtils.get(cacheKey);
+        HttpSession httpSession = request.getSession();
+        Boolean handlerResult = (Boolean) httpSession.getAttribute(SESSION_KEY_REST_AUTHORITY);
         if (null != handlerResult && handlerResult) {
             return handlerResult;
         }
@@ -56,20 +59,83 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
         boolean restEnable = AppConstants.getIsSystemRestEnable();
         if (!restEnable) {
             R<Boolean> result = R.rest(false).setMsg("系统维护中，请稍后再试！");
-            logger.warn("{} {} {}",IpUtils.getIpAddr0(request) ,JsonMapper.toJsonString(request),requestUrl);
-            WebUtils.renderJson(response, result);
+            renderJson(request,response, result);
             return false;
         }
 
         //注解处理
         handlerResult = this.defaultHndler(request, response, o, requestUrl);
-        CacheUtils.put(cacheKey, handlerResult);
+        httpSession.setAttribute(SESSION_KEY_REST_AUTHORITY, handlerResult);
         if (null != handlerResult) {
             return handlerResult;
         }
         return true;
     }
 
+    /**
+     * 根据客户端请求返回（是否加密）
+     * @param request
+     * @param response
+     * @param r
+     */
+    private void renderJson(HttpServletRequest request, HttpServletResponse response, R<Boolean> r){
+        String requestUrl = request.getRequestURI().replaceAll("//", "/");
+        logger.warn("{} {} {}",IpUtils.getIpAddr0(request) ,JsonMapper.toJsonString(WebUtils.getHeaders(request)),requestUrl);
+        WebUtils.renderJson(response, r);
+
+        // 返回接口 数据解密
+//        String rpcService = request.getHeader(RPCUtils.HEADER_API_SERVICE_NAME);
+//        String methodName = request.getHeader(RPCUtils.HEADER_API_SERVICE_METHOD);
+//        String encrypt = request.getHeader(RPCUtils.HEADER_ENCRYPT);
+//        String encryptKey = request.getHeader(RPCUtils.HEADER_ENCRYPT_KEY);
+
+//        String data = JsonMapper.toJsonString(r);
+//        String encryptData = data;
+        //返回数据加密
+//        if (StringUtils.isNotBlank(encrypt)) {
+//            if (CipherMode.SM4.name().equals(encrypt) && StringUtils.isNotBlank(encryptKey)) {
+//                if (StringUtils.isNotBlank(data) && !StringUtils.equals(data, "null")) {
+//                    try {
+//                        String key = null;
+//                        try {
+//                            key = RSAUtils.decryptHexString(encryptKey, EncryptProvider.privateKeyBase64());
+//                        } catch (Exception e) {
+//                            key = encryptKey;
+//                        }
+//                        encryptData = Sm4Utils.encrypt(key, data);
+//                    } catch (Exception e) {
+//                        logger.error(e.getMessage(), e);
+//                    }
+//                }
+//            } else if (CipherMode.AES.name().equals(encrypt) && StringUtils.isNotBlank(encryptKey)) {
+//                if (StringUtils.isNotBlank(data) && !StringUtils.equals(data, "null")) {
+//                    try {
+//                        String key = null;
+//                        try {
+//                            key = RSAUtils.decryptBase64String(encryptKey, EncryptProvider.privateKeyBase64());
+//                        } catch (Exception e) {
+//                            key = encryptKey;
+//                        }
+//                        encryptData = Cryptos.aesECBEncryptBase64String(data, key);
+//                    } catch (Exception e) {
+//                        logger.error(e.getMessage(), e);
+//                    }
+//                }
+//
+//            } else if (CipherMode.BASE64.name().equals(encrypt)) {
+//                if (StringUtils.isNotBlank(data) && !StringUtils.equals(data, "null")) {
+//                    try {
+//                        encryptData = EncodeUtils.base64Encode(data.getBytes(StandardCharsets.UTF_8));
+//                    } catch (Exception e) {
+//                        logger.error(e.getMessage(), e);
+//                    }
+//                }
+//
+//            }
+//        }
+
+//        WebUtils.renderJson(response, encryptData);
+    }
 
     /**
      * 注解处理
@@ -164,8 +230,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
     private void notPermittedPermission(HttpServletRequest request, HttpServletResponse response, String requestUrl, String msg) throws ServletException, IOException {
 //        response.setStatus(HttpStatus.FORBIDDEN.value());
         R<Boolean> result = new R<>(false).setCode(R.NO_PERMISSION).setMsg(msg);
-        logger.warn("{} {} {}",IpUtils.getIpAddr0(request) , JsonMapper.toJsonString(result),requestUrl);
-        WebUtils.renderJson(response, result);
+        renderJson(request,response, result);
     }
 
 
