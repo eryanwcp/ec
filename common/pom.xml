@@ -260,7 +260,7 @@
             <groupId>jakarta.xml.ws</groupId>
             <artifactId>jakarta.xml.ws-api</artifactId>
             <version>4.0.2</version>
-        </dependency>
+        </dependency>jdk18on
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
@@ -287,7 +287,7 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk18on</artifactId>
-            <version>1.81</version>
+            <version>1.82</version>
         </dependency>
         <dependency>
             <groupId>net.coobird</groupId>
