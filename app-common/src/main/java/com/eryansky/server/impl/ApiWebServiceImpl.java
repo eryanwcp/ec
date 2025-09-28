@@ -20,6 +20,7 @@ import com.eryansky.modules.sys.service.OrganService;
 import com.eryansky.server.IApiWebService;
 import com.eryansky.server.IFunction;
 import com.google.common.collect.Lists;
+import org.apache.commons.compress.utils.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -131,7 +132,7 @@ public class ApiWebServiceImpl implements IApiWebService {
                 return WSResult.buildResult(WSResult.class, WSResult.PARAMETER_ERROR, "参数[receiveType]异常："+receiveType);
             }
 
-            List<String> receiveObjectIds = new ArrayList<>();
+            Set<String> receiveObjectIds = Sets.newHashSet();
             if(MessageReceiveObjectType.User.equals(messageReceiveObjectType)){
                 for (String localLoginName : receiveIds) {
                     User receiveUser = Static.userService.getUserByIdOrLoginName(localLoginName);
@@ -156,9 +157,7 @@ public class ApiWebServiceImpl implements IApiWebService {
                     if(Collections3.isNotEmpty(organList)){
                         receiveObjectIds.addAll(organList);
                     }
-                    if(!receiveObjectIds.contains(company.getId())){
-                        receiveObjectIds.add(company.getId());
-                    }
+                    receiveObjectIds.add(company.getId());
                 }
             }else {
                 return WSResult.buildResult(WSResult.class, WSResult.PARAMETER_ERROR, "参数[receiveType]异常："+receiveType);
@@ -348,7 +347,7 @@ public class ApiWebServiceImpl implements IApiWebService {
                 senderUser = Static.userService.getSuperUser();
             }
 
-            List<String> organIds = new ArrayList<>();
+            Set<String> organIds = Sets.newHashSet();
             for (String companyCode : receiveIds) {
                 Organ company = Static.organService.getByIdOrCode(companyCode);
                 if (company == null) {
@@ -359,9 +358,7 @@ public class ApiWebServiceImpl implements IApiWebService {
                 if(Collections3.isNotEmpty(organList)){
                     organIds.addAll(organList);
                 }
-                if(!organIds.contains(company.getId())){
-                    organIds.add(company.getId());
-                }
+                organIds.add(company.getId());
             }
 
             //发送
