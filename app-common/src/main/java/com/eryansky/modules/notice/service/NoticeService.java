@@ -254,7 +254,7 @@ public class NoticeService extends CrudService<NoticeDao, Notice> {
      * @param organIds
      * @param messageChannels
      */
-    public void sendToOrganNotice(String appId, String type, String title, String content, Date sendTime, String userId, String organId, List<String> organIds,List<MessageChannel> messageChannels) {
+    public void sendToOrganNotice(String appId, String type, String title, String content, Date sendTime, String userId, String organId, Collection<String> organIds,List<MessageChannel> messageChannels) {
         //保存到notice表
         Notice notice = new Notice();
         notice.setId(Identities.uuid2());
