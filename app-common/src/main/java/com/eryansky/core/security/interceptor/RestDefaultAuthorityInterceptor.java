@@ -64,7 +64,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
         }
 
         //注解处理
-        handlerResult = this.defaultHndler(request, response, o, requestUrl);
+        handlerResult = this.defaultHandler(request, response, o, requestUrl);
         httpSession.setAttribute(SESSION_KEY_REST_AUTHORITY, handlerResult);
         if (null != handlerResult) {
             return handlerResult;
@@ -146,7 +146,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
      * @return
      * @throws Exception
      */
-    private Boolean defaultHndler(HttpServletRequest request, HttpServletResponse response, Object handler, String requestUrl) throws Exception {
+    private Boolean defaultHandler(HttpServletRequest request, HttpServletResponse response, Object handler, String requestUrl) throws Exception {
         HandlerMethod handlerMethod = null;
         //注解处理 满足设置不拦截
         if(handler instanceof HandlerMethod) {
