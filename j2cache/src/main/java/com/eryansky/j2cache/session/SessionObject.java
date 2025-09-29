@@ -60,6 +60,9 @@ public class SessionObject implements Serializable {
         this.id = session_id;
         for (int i = 0; i < keys.size(); i++) {
             String key = keys.get(i);
+            if(null == datas.get(i)){
+                continue;
+            }
             if (KEY_CREATE_AT.equals(key))
                 this.created_at = Long.parseLong(new String(datas.get(i)));
             else if (KEY_ACCESS_AT.equals(key))
