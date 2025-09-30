@@ -8,6 +8,7 @@ package com.eryansky.configure;
 import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceBuilder;
 import com.eryansky.common.orm.mybatis.MyBatisDao;
 import com.eryansky.common.utils.StringUtils;
+import com.eryansky.common.utils.collections.ArrayUtils;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.utils.AppUtils;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -28,6 +29,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
@@ -88,6 +90,7 @@ public class DBConfigurer {
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         sqlSessionFactoryBean.setConfigLocation(new ClassPathResource("mybatis-config.xml"));
         sqlSessionFactoryBean.setVfs(SpringBootVFS.class);
+
         StringBuilder sb = new StringBuilder();
         String typeAliasesPackage = environment.getProperty("spring.dataSource.mybatis.typeAliasesPackage");
         sb.append("com.eryansky.modules.sys.mapper,com.eryansky.modules.disk.mapper,com.eryansky.modules.notice.mapper");
@@ -95,7 +98,19 @@ public class DBConfigurer {
             sb.append(StringUtils.startsWith(typeAliasesPackage,",") ? typeAliasesPackage :","+ typeAliasesPackage);
         }
         sqlSessionFactoryBean.setTypeAliasesPackage(sb.toString());
-        sqlSessionFactoryBean.setMapperLocations(resolver.getResources("classpath*:mappings/modules/**/*Dao.xml"));
+
+        Resource[] defaultResource = resolver.getResources("classpath*:mappings/modules/**/*Dao.xml");
+        Resource[] allResources = defaultResource;
+        String mapperLocations = environment.getProperty("spring.dataSource.mybatis.mapperLocations");
+        if(StringUtils.isNotBlank(mapperLocations)){
+            for(String path:StringUtils.split(mapperLocations,",")){
+                Resource[] resources = resolver.getResources(path);
+                if(resources.length > 0){
+                    allResources = ArrayUtils.concatAll(defaultResource, resources);
+                }
+            }
+        }
+        sqlSessionFactoryBean.setMapperLocations(allResources);
 
         String mybatisProperties = environment.getProperty("spring.dataSource.mybatis.properties");
         Map<String,Object> map =  JsonMapper.getInstance().toMap(mybatisProperties);
