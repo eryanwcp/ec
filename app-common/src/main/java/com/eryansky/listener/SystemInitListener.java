@@ -47,7 +47,8 @@ public class SystemInitListener extends DefaultSystemInitListener{
 		//核心线程池数量，方法: 返回可用处理器的Java虚拟机的数量。
 		int processors = Runtime.getRuntime().availableProcessors();
 		int initProcessors = processors < 4 ? processors - 1 : processors - 2;
-		System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", String.valueOf(initProcessors));
+		Integer configParallelism = AppConstants.getPoolParallelism();
+		System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", String.valueOf(null != configParallelism ? configParallelism : initProcessors));
 		super.contextInitialized(sce);
 		AppUtils.init(sce.getServletContext());
 		logger.info("当前启动系统：{}-V{}",AppConstants.getAppFullName(),AppConstants.getAppVersion());

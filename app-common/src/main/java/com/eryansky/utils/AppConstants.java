@@ -829,4 +829,17 @@ public class AppConstants extends SysConstants {
         }
         return Collections.emptyList();
     }
+
+
+    /**
+     * 并发线程数
+     *
+     * @return
+     */
+    public static Integer getPoolParallelism() {
+        String code = "system.pool.parallelism";
+        String value = getConfigValue(code,"");
+        return null != value  && !value.isEmpty() ? Integer.valueOf(value):null;
+    }
+
 }
