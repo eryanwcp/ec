@@ -82,7 +82,7 @@ public class ConsumerExecutor {
                         return jsonMapper.toJavaObject(decryptData,javaType);
                     } catch (Exception e) {
                         log.error(e.getMessage(),e);
-                        log.error("RPC请求异常：{} {} {}", responseEntity.getStatusCode().value(),url,JsonMapper.toJsonString(responseEntity));
+                        log.error("RPC请求异常：{} {} {}", responseEntity.getStatusCode().value(),url,decryptData);
                         throw new RuntimeException(e);
                     }
                 }
@@ -99,7 +99,7 @@ public class ConsumerExecutor {
                         return jsonMapper.toJavaObject(decryptData,javaType);
                     } catch (Exception e) {
                         log.error(e.getMessage(),e);
-                        log.error("RPC请求异常：{} {} {}", responseEntity.getStatusCode().value(),url,JsonMapper.toJsonString(responseEntity));
+                        log.error("RPC请求异常：{} {} {}", responseEntity.getStatusCode().value(),url,decryptData);
                         throw new RuntimeException(e);
                     }
                 }
@@ -111,7 +111,7 @@ public class ConsumerExecutor {
                         return jsonMapper.toJavaObject(decryptData,javaType);
                     } catch (Exception e) {
                         log.error(e.getMessage(),e);
-                        log.error("RPC请求异常：{} {} {}", responseEntity.getStatusCode().value(),url,JsonMapper.toJsonString(responseEntity));
+                        log.error("RPC请求异常：{} {} {}", responseEntity.getStatusCode().value(),url,decryptData);
                         throw new RuntimeException(e);
                     }
                 }
