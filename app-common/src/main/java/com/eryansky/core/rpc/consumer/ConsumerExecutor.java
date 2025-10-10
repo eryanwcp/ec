@@ -79,10 +79,17 @@ public class ConsumerExecutor {
                             key = requestEncryptKey;
                         }
                         decryptData = Sm4Utils.decrypt(key,data);
-                        return jsonMapper.toJavaObject(decryptData,javaType);
                     } catch (Exception e) {
                         log.error(e.getMessage(),e);
                         log.error("RPC请求异常：{} {} {}", responseEntity.getStatusCode().value(),url,JsonMapper.toJsonString(responseEntity));
+                        throw new RuntimeException(e);
+                    }
+
+                    try {
+                        return jsonMapper.toJavaObject(decryptData,javaType);
+                    } catch (Exception e) {
+                        log.error(e.getMessage(),e);
+                        log.error("RPC请求异常：{} {} {}", responseEntity.getStatusCode().value(),url,decryptData);
                         throw new RuntimeException(e);
                     }
                 }
@@ -96,10 +103,16 @@ public class ConsumerExecutor {
                             key = requestEncryptKey;
                         }
                         decryptData = Cryptos.aesECBDecryptBase64String(data,key);
-                        return jsonMapper.toJavaObject(decryptData,javaType);
                     } catch (Exception e) {
                         log.error(e.getMessage(),e);
                         log.error("RPC请求异常：{} {} {}", responseEntity.getStatusCode().value(),url,JsonMapper.toJsonString(responseEntity));
+                        throw new RuntimeException(e);
+                    }
+                    try {
+                        return jsonMapper.toJavaObject(decryptData,javaType);
+                    } catch (Exception e) {
+                        log.error(e.getMessage(),e);
+                        log.error("RPC请求异常：{} {} {}", responseEntity.getStatusCode().value(),url,decryptData);
                         throw new RuntimeException(e);
                     }
                 }
@@ -108,12 +121,18 @@ public class ConsumerExecutor {
                 if(StringUtils.isNotBlank(data) && !StringUtils.equals(data,"null")){
                     try {
                         decryptData = new String(EncodeUtils.base64Decode(data));
-                        return jsonMapper.toJavaObject(decryptData,javaType);
                     } catch (Exception e) {
                         log.error(e.getMessage(),e);
                         log.error("RPC请求异常：{} {} {}", responseEntity.getStatusCode().value(),url,JsonMapper.toJsonString(responseEntity));
                         throw new RuntimeException(e);
                     }
+                }
+                try {
+                    return jsonMapper.toJavaObject(decryptData,javaType);
+                } catch (Exception e) {
+                    log.error(e.getMessage(),e);
+                    log.error("RPC请求异常：{} {} {}", responseEntity.getStatusCode().value(),url,decryptData);
+                    throw new RuntimeException(e);
                 }
 
             }else{
