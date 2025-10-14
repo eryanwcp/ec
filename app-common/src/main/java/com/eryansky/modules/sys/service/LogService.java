@@ -231,23 +231,6 @@ public class LogService extends CrudService<LogDao, Log> {
     }
 
     /**
-     * 数据修复 title
-     */
-    public void dataAutoFix() {
-        List<Log> list = dao.findNullData();
-        if (Collections3.isNotEmpty(list)) {
-            for (Log log : list) {
-                Log _log = dao.getNotNullData(log.getModule());
-                if (_log != null && StringUtils.isBlank(log.getTitle())) {
-                    log.setTitle(_log.getTitle());
-                    dao.update(log);
-                }
-            }
-        }
-
-    }
-
-    /**
      * 用户登录统计
      */
     public Page<Map<String, Object>> getLoginStatistics(Page pg, String query, String startTime, String endTime) {

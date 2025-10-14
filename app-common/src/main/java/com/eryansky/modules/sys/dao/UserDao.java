@@ -28,7 +28,7 @@ public interface UserDao extends CrudDao<User> {
 
     List<User> findByCodes(Parameter parameter);
 
-    User getUserByLoginName(Parameter parameter);
+    List<User> findByLoginName(Parameter parameter);
 
     User getUserByMobile(Parameter parameter);
 

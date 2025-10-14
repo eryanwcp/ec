@@ -57,23 +57,6 @@ public interface LogDao extends CrudDao<Log> {
 
 
     /**
-     * 查询标题为null的数据
-     *
-     * @return
-     */
-    List<Log> findNullData();
-
-
-    /**
-     * 根据“module”查询标题不为null的数据
-     *
-     * @param module
-     * @return
-     */
-    Log getNotNullData(String module);
-
-
-    /**
      * 员工登录统计
      */
 
