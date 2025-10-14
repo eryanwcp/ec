@@ -876,7 +876,7 @@
         WHERE u.id = #{userId}
     </select>
 
-    <select id="getOrganExtendByUserLoginName" resultType="OrganExtend">
+    <select id="findOrganExtendByUserLoginName" resultType="OrganExtend">
         SELECT
         <include refid="organExtendColumns"/>,
         p.code AS "parentCode",
@@ -891,7 +891,6 @@
             </if>
             AND u.login_name = #{loginName}
         </where>
-        LIMIT 1
     </select>
 
     <select id="getCompanyByUserId" resultType="OrganExtend">

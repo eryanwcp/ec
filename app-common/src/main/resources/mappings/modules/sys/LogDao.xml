@@ -428,27 +428,6 @@
         2 DESC
     </select>
 
-    <!--查询标题为null的数据-->
-    <select id="findNullData" resultType="Log">
-        SELECT
-        <include refid="sysLogColumns"/>
-        FROM t_sys_log a
-        <include refid="sysLogJoins"/>
-        WHERE
-        a.title IS NULL
-    </select>
-
-    <!--根据“module”查询标题不为null的数据-->
-    <select id="getNotNullData" resultType="Log">
-        SELECT
-        <include refid="sysLogColumns"/>
-        FROM t_sys_log a
-        <include refid="sysLogJoins"/>
-        WHERE
-        a.title IS NOT NULL
-        AND
-        a.module = #{module} LIMIT 1;
-    </select>
 
     <select id="findByWhereSQL" resultType="Log">
         SELECT

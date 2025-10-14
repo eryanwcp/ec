@@ -92,7 +92,7 @@
         ORDER BY a.sort ASC
     </select>
 
-    <select id="getUserByLoginName" resultType="User">
+    <select id="findByLoginName" resultType="User">
         SELECT
         <include refid="userColumns"/>
         FROM t_sys_user a
@@ -102,7 +102,6 @@
                 AND a.status = #{status}
             </if>
         </where>
-        LIMIT 1
     </select>
 
     <select id="getUserByMobile" resultType="User">

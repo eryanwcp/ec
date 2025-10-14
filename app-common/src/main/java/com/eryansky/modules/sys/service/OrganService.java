@@ -1199,10 +1199,21 @@ public class OrganService extends TreeService<OrganDao, Organ> {
      * @return
      */
     public OrganExtend getOrganExtendByUserLoginName(String loginName) {
+        List<OrganExtend> list = findOrganExtendByUserLoginName(loginName);
+        return Collections3.isNotEmpty(list) ? list.get(0) : null;
+    }
+
+    /**
+     * 根据用户账号查找
+     *
+     * @param loginName
+     * @return
+     */
+    public List<OrganExtend> findOrganExtendByUserLoginName(String loginName) {
         Parameter parameter = Parameter.newParameter();
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put("loginName", loginName);
-        return dao.getOrganExtendByUserLoginName(parameter);
+        return dao.findOrganExtendByUserLoginName(parameter);
     }
 
 
