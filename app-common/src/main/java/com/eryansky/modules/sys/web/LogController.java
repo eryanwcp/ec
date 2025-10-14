@@ -190,16 +190,4 @@ public class LogController extends SimpleController {
         return cList;
     }
 
-    /**
-     * 数据修复 title
-     * @return
-     */
-    @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"dataAutoFix"})
-    @ResponseBody
-    public Result dataAutoFix() {
-        logService.dataAutoFix();
-        return Result.successResult();
-    }
-
-
 }
