@@ -58,7 +58,6 @@ import java.util.stream.Collectors;
 public class SecurityUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityUtils.class);
-    private static final RateLimiter rateLimiter = RateLimiter.create(1.0); // 每秒1个许可
 
 
     /**
@@ -688,18 +687,6 @@ public class SecurityUtils {
         Static.applicationSessionContext.addSession(sessionInfo);
 //        removeExtendSession(sessionInfo.getId());
         //syncExtendSession(sessionInfo);
-    }
-
-
-    /**
-     * 尝试 刷新用户信息
-     * @param sessionInfo sessionInfo
-     * @return
-     */
-    public static void tryRefreshSessionInfo(SessionInfo sessionInfo) {
-        if (rateLimiter.tryAcquire()) {
-            refreshSessionInfo(sessionInfo);
-        }
     }
 
     /**

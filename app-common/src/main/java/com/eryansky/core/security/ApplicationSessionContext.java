@@ -6,8 +6,10 @@ import com.eryansky.j2cache.session.CacheFacade;
 import com.eryansky.j2cache.session.J2CacheSessionFilter;
 import com.eryansky.j2cache.session.SessionObject;
 import com.eryansky.utils.CacheUtils;
+import org.joda.time.Instant;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -73,7 +75,11 @@ public class ApplicationSessionContext {
 	public SessionInfo getSession(String sessionId) {
 		if (sessionId == null) return null;
 		SessionObject sessionObject = cacheFacade.getSession(sessionId);
-		return (SessionInfo) sessionObject.get(SessionObject.KEY_SESSION_DATA);
+        SessionInfo sessionInfo = null != sessionObject ? (SessionInfo) sessionObject.get(SessionObject.KEY_SESSION_DATA) : null;
+        if(null != sessionInfo){
+            sessionInfo.setUpdateTime(Instant.ofEpochMilli(sessionObject.getLastAccess_at()).toDate());
+        }
+        return sessionInfo;
 	}
 
 	public List<SessionInfo> findSessionInfoDataRemoveDuplicate() {
@@ -90,7 +96,11 @@ public class ApplicationSessionContext {
 	public List<SessionInfo> findSessionInfoData(Collection<String> keys) {
 		return keys.parallelStream().map(key -> {
 			SessionObject sessionObject = cacheFacade.getSession(key);
-			return null != sessionObject ? (SessionInfo) sessionObject.get(SessionObject.KEY_SESSION_DATA) : null;
+            SessionInfo sessionInfo = null != sessionObject ? (SessionInfo) sessionObject.get(SessionObject.KEY_SESSION_DATA) : null;
+            if(null != sessionInfo){
+                sessionInfo.setUpdateTime(Instant.ofEpochMilli(sessionObject.getLastAccess_at()).toDate());
+            }
+            return sessionInfo;
 		}).filter(Objects::nonNull).collect(Collectors.toList());
 	}
 

@@ -71,8 +71,6 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
         request.setAttribute(ATTR_SESSIONINFO,sessionInfo);
         if(null != sessionInfo){
             response.setHeader(ATTR_AUTHORIZATION, sessionInfo.getToken());
-            //降低更新频率
-            SecurityUtils.tryRefreshSessionInfo(sessionInfo);
         }
         String requestUrl = request.getRequestURI();
         requestUrl = requestUrl.replaceAll("//","/");
