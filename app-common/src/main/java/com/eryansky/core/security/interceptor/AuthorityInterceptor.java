@@ -71,6 +71,8 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
         request.setAttribute(ATTR_SESSIONINFO,sessionInfo);
         if(null != sessionInfo){
             response.setHeader(ATTR_AUTHORIZATION, sessionInfo.getToken());
+            //降低更新频率
+            SecurityUtils.tryRefreshSessionInfo(sessionInfo);
         }
         String requestUrl = request.getRequestURI();
         requestUrl = requestUrl.replaceAll("//","/");
@@ -193,7 +195,7 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
      * @param requestUrl
      * @param permission
      * @throws javax.servlet.ServletException
-     * @throws java.io.IOException
+     * @throws IOException
      */
     private void notPermittedPermission(HttpServletRequest request,HttpServletResponse response,
                                         SessionInfo sessionInfo,String requestUrl,String permission) throws ServletException, IOException {
@@ -213,7 +215,7 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
      * @param sessionInfo
      * @param requestUrl
      * @throws javax.servlet.ServletException
-     * @throws java.io.IOException
+     * @throws IOException
      */
     private void notPermitted(HttpServletRequest request,HttpServletResponse response,
                               SessionInfo sessionInfo,String requestUrl) throws ServletException, IOException {
@@ -299,8 +301,8 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
      * @param sessionInfo
      * @param requestUrl
      * @param role
-     * @throws jakarta.servlet.ServletException
-     * @throws java.io.IOException
+     * @throws ServletException
+     * @throws IOException
      */
     private void notPermittedRole(HttpServletRequest request,HttpServletResponse response,
                                   SessionInfo sessionInfo,String requestUrl,String role) throws ServletException, IOException {
