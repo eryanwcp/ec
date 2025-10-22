@@ -173,16 +173,16 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         poolConfig.setMaxIdle(Integer.parseInt(redisConf.getProperty("maxIdle", "10")));
         poolConfig.setMinIdle(Integer.parseInt(redisConf.getProperty("minIdle", "10")));
 
-        poolConfig.setMaxWaitMillis(Integer.parseInt(redisConf.getProperty("maxWaitMillis", "100")));
-        poolConfig.setMinEvictableIdleTimeMillis(Integer.parseInt(redisConf.getProperty("minEvictableIdleTimeMillis", "864000000")));
+        poolConfig.setMaxWaitMillis(Integer.parseInt(redisConf.getProperty("maxWaitMillis", "100")));// 获取连接时的最大等待毫秒数
+        poolConfig.setMinEvictableIdleTimeMillis(Integer.parseInt(redisConf.getProperty("minEvictableIdleTimeMillis", "864000000")));// 最小空闲检查时间间隔（毫秒）
         poolConfig.setSoftMinEvictableIdleTimeMillis(Integer.parseInt(redisConf.getProperty("softMinEvictableIdleTimeMillis", "10")));
         poolConfig.setTimeBetweenEvictionRunsMillis(Integer.parseInt(redisConf.getProperty("timeBetweenEvictionRunsMillis", "300000")));
         poolConfig.setNumTestsPerEvictionRun(Integer.parseInt(redisConf.getProperty("numTestsPerEvictionRun", "10")));
-        poolConfig.setLifo(Boolean.parseBoolean(redisConf.getProperty("lifo", "false")));
-        poolConfig.setTestOnBorrow(Boolean.parseBoolean(redisConf.getProperty("testOnBorrow", "true")));
-        poolConfig.setTestOnReturn(Boolean.parseBoolean(redisConf.getProperty("testOnReturn", "false")));
+        poolConfig.setLifo(Boolean.parseBoolean(redisConf.getProperty("lifo", "false")));// 设置是否使用 LIFO（后进先出）算法管理空闲对象队列，这对于长生命周期的连接很有用。
+        poolConfig.setTestOnBorrow(Boolean.parseBoolean(redisConf.getProperty("testOnBorrow", "true"))); // 在每次借用连接时进行有效性检查
+        poolConfig.setTestOnReturn(Boolean.parseBoolean(redisConf.getProperty("testOnReturn", "false"))); // 在每次归还连接时进行有效性检查
         poolConfig.setTestWhileIdle(Boolean.parseBoolean(redisConf.getProperty("testWhileIdle", "true")));
-        poolConfig.setBlockWhenExhausted(Boolean.parseBoolean(redisConf.getProperty("blockWhenExhausted", "false")));
+        poolConfig.setBlockWhenExhausted(Boolean.parseBoolean(redisConf.getProperty("blockWhenExhausted", "false")));// 连接耗尽时是否阻塞
 
         pool = ConnectionPoolSupport.createGenericObjectPool(() -> {
             if(redisClient instanceof io.lettuce.core.RedisClient)
