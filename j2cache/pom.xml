@@ -19,7 +19,7 @@
         <fst.version>3.0.4-jdk17</fst.version>
         <snappy.version>1.1.10.8</snappy.version>
         <fory.version>0.12.3</fory.version>
-        <guava.version>33.4.8-jre</guava.version>
+        <guava.version>33.5.0-jre</guava.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
