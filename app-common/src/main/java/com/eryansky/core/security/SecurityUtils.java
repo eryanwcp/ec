@@ -683,7 +683,6 @@ public class SecurityUtils {
      * @return
      */
     public static void refreshSessionInfo(SessionInfo sessionInfo) {
-        sessionInfo.setUpdateTime(Calendar.getInstance().getTime());
         Static.applicationSessionContext.addSession(sessionInfo);
 //        removeExtendSession(sessionInfo.getId());
         //syncExtendSession(sessionInfo);
