@@ -182,7 +182,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         poolConfig.setTestOnBorrow(Boolean.parseBoolean(redisConf.getProperty("testOnBorrow", "true")));
         poolConfig.setTestOnReturn(Boolean.parseBoolean(redisConf.getProperty("testOnReturn", "false")));
         poolConfig.setTestWhileIdle(Boolean.parseBoolean(redisConf.getProperty("testWhileIdle", "true")));
-        poolConfig.setTestWhileIdle(Boolean.parseBoolean(redisConf.getProperty("blockWhenExhausted", "false")));
+        poolConfig.setBlockWhenExhausted(Boolean.parseBoolean(redisConf.getProperty("blockWhenExhausted", "false")));
 
         pool = ConnectionPoolSupport.createGenericObjectPool(() -> {
             if(redisClient instanceof io.lettuce.core.RedisClient)
