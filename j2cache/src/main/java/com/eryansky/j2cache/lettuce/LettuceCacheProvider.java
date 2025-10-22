@@ -189,6 +189,17 @@ public class LettuceCacheProvider extends RedisPubSubAdapter<String, String> imp
         poolConfig.setMaxIdle(Integer.parseInt(props.getProperty("maxIdle", "10")));
         poolConfig.setMinIdle(Integer.parseInt(props.getProperty("minIdle", "10")));
 
+        poolConfig.setMaxWaitMillis(Integer.parseInt(props.getProperty("maxWaitMillis", "100")));// 获取连接时的最大等待毫秒数
+        poolConfig.setMinEvictableIdleTimeMillis(Integer.parseInt(props.getProperty("minEvictableIdleTimeMillis", "864000000")));// 最小空闲检查时间间隔（毫秒）
+        poolConfig.setSoftMinEvictableIdleTimeMillis(Integer.parseInt(props.getProperty("softMinEvictableIdleTimeMillis", "10")));
+        poolConfig.setTimeBetweenEvictionRunsMillis(Integer.parseInt(props.getProperty("timeBetweenEvictionRunsMillis", "300000")));
+        poolConfig.setNumTestsPerEvictionRun(Integer.parseInt(props.getProperty("numTestsPerEvictionRun", "10")));
+        poolConfig.setLifo(Boolean.parseBoolean(props.getProperty("lifo", "false")));// 设置是否使用 LIFO（后进先出）算法管理空闲对象队列，这对于长生命周期的连接很有用。
+        poolConfig.setTestOnBorrow(Boolean.parseBoolean(props.getProperty("testOnBorrow", "true"))); // 在每次借用连接时进行有效性检查
+        poolConfig.setTestOnReturn(Boolean.parseBoolean(props.getProperty("testOnReturn", "false"))); // 在每次归还连接时进行有效性检查
+        poolConfig.setTestWhileIdle(Boolean.parseBoolean(props.getProperty("testWhileIdle", "true")));
+        poolConfig.setBlockWhenExhausted(Boolean.parseBoolean(props.getProperty("blockWhenExhausted", "false")));// 连接耗尽时是否阻塞
+
 
 
 
