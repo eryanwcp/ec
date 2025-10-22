@@ -173,6 +173,17 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         poolConfig.setMaxIdle(Integer.parseInt(redisConf.getProperty("maxIdle", "10")));
         poolConfig.setMinIdle(Integer.parseInt(redisConf.getProperty("minIdle", "10")));
 
+        poolConfig.setMaxWaitMillis(Integer.parseInt(redisConf.getProperty("maxWaitMillis", "100")));
+        poolConfig.setMinEvictableIdleTimeMillis(Integer.parseInt(redisConf.getProperty("minEvictableIdleTimeMillis", "864000000")));
+        poolConfig.setSoftMinEvictableIdleTimeMillis(Integer.parseInt(redisConf.getProperty("softMinEvictableIdleTimeMillis", "10")));
+        poolConfig.setTimeBetweenEvictionRunsMillis(Integer.parseInt(redisConf.getProperty("timeBetweenEvictionRunsMillis", "300000")));
+        poolConfig.setNumTestsPerEvictionRun(Integer.parseInt(redisConf.getProperty("numTestsPerEvictionRun", "10")));
+        poolConfig.setLifo(Boolean.parseBoolean(redisConf.getProperty("lifo", "false")));
+        poolConfig.setTestOnBorrow(Boolean.parseBoolean(redisConf.getProperty("testOnBorrow", "true")));
+        poolConfig.setTestOnReturn(Boolean.parseBoolean(redisConf.getProperty("testOnReturn", "false")));
+        poolConfig.setTestWhileIdle(Boolean.parseBoolean(redisConf.getProperty("testWhileIdle", "true")));
+        poolConfig.setTestWhileIdle(Boolean.parseBoolean(redisConf.getProperty("blockWhenExhausted", "false")));
+
         pool = ConnectionPoolSupport.createGenericObjectPool(() -> {
             if(redisClient instanceof io.lettuce.core.RedisClient)
                 return ((io.lettuce.core.RedisClient)redisClient).connect(codec);
