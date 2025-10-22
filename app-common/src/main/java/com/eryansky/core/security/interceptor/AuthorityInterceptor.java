@@ -192,8 +192,8 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
      * @param sessionInfo
      * @param requestUrl
      * @param permission
-     * @throws javax.servlet.ServletException
-     * @throws java.io.IOException
+     * @throws ServletException
+     * @throws IOException
      */
     private void notPermittedPermission(HttpServletRequest request,HttpServletResponse response,
                                         SessionInfo sessionInfo,String requestUrl,String permission) throws ServletException, IOException {
@@ -212,8 +212,8 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
      * @param response
      * @param sessionInfo
      * @param requestUrl
-     * @throws javax.servlet.ServletException
-     * @throws java.io.IOException
+     * @throws ServletException
+     * @throws IOException
      */
     private void notPermitted(HttpServletRequest request,HttpServletResponse response,
                               SessionInfo sessionInfo,String requestUrl) throws ServletException, IOException {
@@ -299,8 +299,8 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
      * @param sessionInfo
      * @param requestUrl
      * @param role
-     * @throws javax.servlet.ServletException
-     * @throws java.io.IOException
+     * @throws ServletException
+     * @throws IOException
      */
     private void notPermittedRole(HttpServletRequest request,HttpServletResponse response,
                                   SessionInfo sessionInfo,String requestUrl,String role) throws ServletException, IOException {
