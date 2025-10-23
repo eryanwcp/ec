@@ -13,6 +13,7 @@
     <version>${ec-encrypt-spring-boot-starter.version}</version>
     <packaging>jar</packaging>
     <properties>
+        <maven.deploy.skip>false</maven.deploy.skip>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <hutool.version>5.8.41</hutool.version>

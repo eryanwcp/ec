@@ -15,6 +15,7 @@
     <description>web</description>
 
     <properties>
+        <maven.deploy.skip>false</maven.deploy.skip>
         <poi.version>5.4.1</poi.version>
         <xwpf.version>2.0.6</xwpf.version>
         <bsh.version>2.0b6</bsh.version>

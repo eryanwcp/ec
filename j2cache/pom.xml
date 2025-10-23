@@ -13,6 +13,11 @@
     <version>${ec-j2cache.version}</version>
     <packaging>jar</packaging>
     <properties>
+        <maven.deploy.skip>false</maven.deploy.skip>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+
         <caffeine.version>2.9.3</caffeine.version>
         <lettuce.version>6.2.7.RELEASE</lettuce.version>
         <objenesis.version>3.3</objenesis.version>
@@ -20,10 +25,6 @@
         <snappy.version>1.1.10.8</snappy.version>
         <fory.version>0.12.3</fory.version>
         <guava.version>33.4.8-jre</guava.version>
-
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>1.8</java.version>
     </properties>
 
     <dependencies>
