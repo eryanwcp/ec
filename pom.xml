@@ -40,7 +40,7 @@
         <spring-integration-redis.version>6.4.8</spring-integration-redis.version>
         <logstash-logback-encoder.version>8.1</logstash-logback-encoder.version>
         <logback-classic.version>1.5.20</logback-classic.version>
-        <byte-buddy.version>1.17.6</byte-buddy.version>
+        <byte-buddy.version>1.17.8</byte-buddy.version>
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
 
         <tomcat.version>10.1.48</tomcat.version>
