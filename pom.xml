@@ -37,13 +37,13 @@
         <tomcat-plugin.version>2.2</tomcat-plugin.version>
 
         <spring-boot.version>3.4.11</spring-boot.version>
-        <spring-integration-redis.version>6.4.7</spring-integration-redis.version>
+        <spring-integration-redis.version>6.4.8</spring-integration-redis.version>
         <logstash-logback-encoder.version>8.1</logstash-logback-encoder.version>
         <logback-classic.version>1.5.20</logback-classic.version>
         <byte-buddy.version>1.17.6</byte-buddy.version>
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
 
-        <tomcat.version>10.1.46</tomcat.version>
+        <tomcat.version>10.1.48</tomcat.version>
 
         <mybatis-spring-boot.version>3.0.5</mybatis-spring-boot.version>
         <commons-pool2.version>2.12.1</commons-pool2.version>
