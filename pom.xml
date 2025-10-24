@@ -53,7 +53,7 @@
         <db2.driver.version>10.1</db2.driver.version>
 
         <httpcomponents.version>4.5.14</httpcomponents.version>
-        <httpclient5.version>5.5</httpclient5.version>
+        <httpclient5.version>5.5.1</httpclient5.version>
         <commons-codec.version>1.19.0</commons-codec.version>
 
 
