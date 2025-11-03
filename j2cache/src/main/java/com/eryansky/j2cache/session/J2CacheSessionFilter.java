@@ -72,7 +72,8 @@ public class J2CacheSessionFilter implements Filter {
         this.cookieDomain   = config.getInitParameter("cookie.domain");
         this.cookiePath     = config.getInitParameter("cookie.path");
         this.cookieSecure = "true".equalsIgnoreCase(config.getInitParameter("cookie.secure"));
-        this.rateLimit = "true".equalsIgnoreCase(config.getInitParameter("cookie.rateLimit"));
+        String rateLimit = config.getInitParameter("cookie.rateLimit");
+        this.rateLimit = "true".equalsIgnoreCase(rateLimit != null ? rateLimit:"true");
         String rateLimitPerSecond     = config.getInitParameter("session.rateLimitPerSecond");
         this.rateLimitPerSecond   = Double.parseDouble(rateLimitPerSecond != null ? rateLimitPerSecond:"1");
 
