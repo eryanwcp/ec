@@ -15,6 +15,7 @@
  */
 package com.eryansky.j2cache.session;
 
+import com.google.common.util.concurrent.RateLimiter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.AntPathMatcher;
@@ -24,6 +25,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 实现基于 J2Cache 的分布式的 Session 管理
@@ -56,6 +58,9 @@ public class J2CacheSessionFilter implements Filter {
      * 黑名单
      */
     private String[] blackListURLs = null;
+
+
+    private final ConcurrentHashMap<String, RateLimiter> sessionLimiters = new ConcurrentHashMap<>();
 
 
     @Override
@@ -155,9 +160,13 @@ public class J2CacheSessionFilter implements Filter {
         } finally {
             //更新 session 的有效时间
             J2CacheSession session = (J2CacheSession)j2cacheRequest.getSession(false);
-            if(session != null && !session.isNew() && !session.isInvalid())
-                g_cache.tryUpdateSessionAccessTime(session.getSessionObject());
+            if(session != null && !session.isNew() && !session.isInvalid()){
 //                g_cache.updateSessionAccessTime(session.getSessionObject());
+                RateLimiter limiter = sessionLimiters.computeIfAbsent(session.getId(), id -> RateLimiter.create(1.0));
+                if(limiter.tryAcquire()){
+                    g_cache.updateSessionAccessTime(session.getSessionObject());
+                }
+            }
         }
     }
 

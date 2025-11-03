@@ -69,8 +69,6 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
 
     private final boolean discardNonSerializable;
 
-    private static final RateLimiter rateLimiter = RateLimiter.create(1.0); // 每秒1个许可
-
     public CacheFacade(int maxSizeInMemory, int maxAge, Properties redisConf, boolean discardNonSerializable)  {
         this.discardNonSerializable = discardNonSerializable;
         this.cache1 = new CaffeineCache(maxSizeInMemory, maxAge, this);
@@ -361,23 +359,6 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             });
         }}, cache1.getExpire());
     }
-
-
-
-    /**
-     * 尝试更新 session 的最后一次访问时间
-     * @param session 会话对象
-     */
-    public void tryUpdateSessionAccessTime(SessionObject session) {
-        try {
-            if (rateLimiter.tryAcquire()) {
-                updateSessionAccessTime(session);
-            }
-        } catch (Exception e) {
-            logger.error(e.getMessage(),e);
-        }
-    }
-
 
     /**
      * 更新 session 的最后一次访问时间
