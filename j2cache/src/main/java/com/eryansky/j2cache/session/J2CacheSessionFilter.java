@@ -41,6 +41,7 @@ public class J2CacheSessionFilter implements Filter {
     private int cookieMaxAge;
     private boolean cookieSecure;
     private boolean rateLimit;
+    private Double rateLimitPerSecond;
 
     private boolean discardNonSerializable;
 
@@ -72,6 +73,9 @@ public class J2CacheSessionFilter implements Filter {
         this.cookiePath     = config.getInitParameter("cookie.path");
         this.cookieSecure = "true".equalsIgnoreCase(config.getInitParameter("cookie.secure"));
         this.rateLimit = "true".equalsIgnoreCase(config.getInitParameter("cookie.rateLimit"));
+        String rateLimitPerSecond     = config.getInitParameter("session.rateLimitPerSecond");
+        this.rateLimitPerSecond   = Double.parseDouble(rateLimitPerSecond != null ? rateLimitPerSecond:"1");
+
         String ctx = config.getServletContext().getContextPath();
         this.cookiePath = null != this.cookiePath && !"".equals(this.cookiePath) ? this.cookiePath:"".equals(ctx) ? "/":ctx;
         String maxAge     = config.getInitParameter("session.maxAge");
@@ -166,7 +170,7 @@ public class J2CacheSessionFilter implements Filter {
 //                g_cache.updateSessionAccessTime(session.getSessionObject());
                 if(rateLimit){
                     try {
-                        RateLimiter limiter = sessionLimiters.computeIfAbsent(session.getId(), id -> RateLimiter.create(1.0));
+                        RateLimiter limiter = sessionLimiters.computeIfAbsent(session.getId(), id -> RateLimiter.create(this.rateLimitPerSecond));
                         if(limiter.tryAcquire()){
                             g_cache.updateSessionAccessTime(session.getSessionObject());
                         }
