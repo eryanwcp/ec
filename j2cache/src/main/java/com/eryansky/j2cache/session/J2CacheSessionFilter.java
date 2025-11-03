@@ -40,6 +40,7 @@ public class J2CacheSessionFilter implements Filter {
     private String cookieDomain;
     private int cookieMaxAge;
     private boolean cookieSecure;
+    private boolean rateLimit;
 
     private boolean discardNonSerializable;
 
@@ -70,6 +71,7 @@ public class J2CacheSessionFilter implements Filter {
         this.cookieDomain   = config.getInitParameter("cookie.domain");
         this.cookiePath     = config.getInitParameter("cookie.path");
         this.cookieSecure = "true".equalsIgnoreCase(config.getInitParameter("cookie.secure"));
+        this.rateLimit = "true".equalsIgnoreCase(config.getInitParameter("cookie.rateLimit"));
         String ctx = config.getServletContext().getContextPath();
         this.cookiePath = null != this.cookiePath && !"".equals(this.cookiePath) ? this.cookiePath:"".equals(ctx) ? "/":ctx;
         String maxAge     = config.getInitParameter("session.maxAge");
@@ -162,10 +164,19 @@ public class J2CacheSessionFilter implements Filter {
             J2CacheSession session = (J2CacheSession)j2cacheRequest.getSession(false);
             if(session != null && !session.isNew() && !session.isInvalid()){
 //                g_cache.updateSessionAccessTime(session.getSessionObject());
-                RateLimiter limiter = sessionLimiters.computeIfAbsent(session.getId(), id -> RateLimiter.create(1.0));
-                if(limiter.tryAcquire()){
+                if(rateLimit){
+                    try {
+                        RateLimiter limiter = sessionLimiters.computeIfAbsent(session.getId(), id -> RateLimiter.create(1.0));
+                        if(limiter.tryAcquire()){
+                            g_cache.updateSessionAccessTime(session.getSessionObject());
+                        }
+                    } catch (Exception e) {
+                        logger.error(e.getMessage(),e);
+                    }
+                }else{
                     g_cache.updateSessionAccessTime(session.getSessionObject());
                 }
+
             }
         }
     }
