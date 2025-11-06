@@ -16,6 +16,7 @@
 package com.eryansky.j2cache.session;
 
 import com.eryansky.j2cache.lettuce.LettuceByteCodec;
+import com.eryansky.j2cache.util.IpUtils;
 import com.eryansky.j2cache.util.SerializationUtils;
 import io.lettuce.core.AbstractRedisClient;
 import io.lettuce.core.ClientOptions;
@@ -316,6 +317,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
 
                 List<byte[]> datas = cache2.getBytes(session_id, keys);
                 session = new SessionObject(session_id, keys, datas);
+                session.setHost(IpUtils.getActivityLocalIp());
                 cache1.put(session_id, session);
             } catch (Exception e) {
                 logger.error("Failed to read session from j2cache", e);
