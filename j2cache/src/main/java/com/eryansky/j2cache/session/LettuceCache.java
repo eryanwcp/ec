@@ -18,8 +18,12 @@ package com.eryansky.j2cache.session;
 import com.eryansky.j2cache.CacheException;
 import com.google.common.collect.Maps;
 import io.lettuce.core.AbstractRedisClient;
+import io.lettuce.core.RedisFuture;
 import io.lettuce.core.api.StatefulConnection;
 import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.async.BaseRedisAsyncCommands;
+import io.lettuce.core.api.async.RedisHashAsyncCommands;
+import io.lettuce.core.api.async.RedisKeyAsyncCommands;
 import io.lettuce.core.api.sync.BaseRedisCommands;
 import io.lettuce.core.api.sync.RedisHashCommands;
 import io.lettuce.core.api.sync.RedisKeyCommands;
@@ -66,6 +70,14 @@ public class LettuceCache {
             return ((StatefulRedisClusterConnection)conn).sync();
         else if(conn instanceof StatefulRedisConnection)
             return ((StatefulRedisConnection)conn).sync();
+        return null;
+    }
+
+    protected BaseRedisAsyncCommands async(StatefulConnection conn) {
+        if(conn instanceof StatefulRedisClusterConnection)
+            return ((StatefulRedisClusterConnection)conn).async();
+        else if(conn instanceof StatefulRedisConnection)
+            return ((StatefulRedisConnection)conn).async();
         return null;
     }
 
@@ -122,6 +134,19 @@ public class LettuceCache {
         }
     }
 
+    public void setBytesAsync(String session_id,  String key, byte[] bytes) {
+        try(StatefulConnection<String, byte[]> connection = connect()) {
+            RedisHashAsyncCommands<String, byte[]> cmd = (RedisHashAsyncCommands)async(connection);
+            cmd.hset(_key(session_id),key,bytes);
+        }
+    }
+
+    public void hincrby(String session_id, String key, long amount) {
+        try(StatefulConnection<String, byte[]> connection = connect()) {
+            RedisHashCommands<String, byte[]> cmd = (RedisHashCommands)sync(connection);
+            cmd.hincrby(_key(session_id),key,amount);
+        }
+    }
 
     public void setBytes(String session_id, Map<String,byte[]> bytes, int expireInSeconds) {
         try(StatefulConnection<String, byte[]> connection = connect()) {
@@ -144,6 +169,14 @@ public class LettuceCache {
             return cmd.expire(_key(session_id),ttl);
         }
     }
+
+    public RedisFuture<Boolean> ttlAsync(String session_id, int ttl) {
+        try(StatefulConnection<String, byte[]> connection = connect()) {
+            RedisKeyAsyncCommands<String, byte[]> cmd = (RedisKeyAsyncCommands)async(connection);
+            return cmd.expire(_key(session_id),ttl);
+        }
+    }
+
 
     public List<String> keys(String session_id) {
         try(StatefulConnection<String, byte[]> connection = connect()) {
