@@ -19,7 +19,6 @@ import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.j2cache.lettuce.LettuceByteCodec;
 import com.eryansky.j2cache.util.IpUtils;
 import com.eryansky.j2cache.util.SerializationUtils;
-import com.google.common.util.concurrent.RateLimiter;
 import io.lettuce.core.AbstractRedisClient;
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.RedisClient;
