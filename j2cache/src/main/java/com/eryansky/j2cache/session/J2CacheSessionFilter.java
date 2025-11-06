@@ -157,8 +157,12 @@ public class J2CacheSessionFilter implements Filter {
             //更新 session 的有效时间
             J2CacheSession session = (J2CacheSession)j2cacheRequest.getSession(false);
             if(session != null && !session.isNew() && !session.isInvalid()){
+                try {
 //                g_cache.updateSessionAccessTime(session.getSessionObject());
-                g_cache.updateSessionAccessTimeAsync(session.getSessionObject());//异步
+                    g_cache.updateSessionAccessTimeAsync(session.getSessionObject());//异步
+                } catch (Exception e) {
+                    logger.error(currentURL + ":" + e.getMessage(), e);
+                }
             }
         }
     }
