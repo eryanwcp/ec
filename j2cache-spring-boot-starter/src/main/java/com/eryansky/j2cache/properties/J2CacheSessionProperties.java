@@ -65,8 +65,6 @@ public class J2CacheSessionProperties {
         private String cookiePath;
         private String cookieSecure;
         private String discardNonSerializable;
-        private String rateLimit;
-        private String rateLimitPerSecond;
 
 
         public boolean isEnabled() {
@@ -139,22 +137,6 @@ public class J2CacheSessionProperties {
 
         public void setDiscardNonSerializable(String discardNonSerializable) {
             this.discardNonSerializable = discardNonSerializable;
-        }
-
-        public String getRateLimit() {
-            return rateLimit;
-        }
-
-        public void setRateLimit(String rateLimit) {
-            this.rateLimit = rateLimit;
-        }
-
-        public String getRateLimitPerSecond() {
-            return rateLimitPerSecond;
-        }
-
-        public void setRateLimitPerSecond(String rateLimitPerSecond) {
-            this.rateLimitPerSecond = rateLimitPerSecond;
         }
     }
 

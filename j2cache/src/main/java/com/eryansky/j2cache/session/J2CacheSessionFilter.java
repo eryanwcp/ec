@@ -15,7 +15,6 @@
  */
 package com.eryansky.j2cache.session;
 
-import com.google.common.util.concurrent.RateLimiter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.AntPathMatcher;
@@ -25,7 +24,6 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 实现基于 J2Cache 的分布式的 Session 管理
@@ -40,8 +38,6 @@ public class J2CacheSessionFilter implements Filter {
     private String cookieDomain;
     private int cookieMaxAge;
     private boolean cookieSecure;
-    private boolean rateLimit;
-    private Double rateLimitPerSecond;
 
     private boolean discardNonSerializable;
 
@@ -62,9 +58,6 @@ public class J2CacheSessionFilter implements Filter {
     private String[] blackListURLs = null;
 
 
-    private final ConcurrentHashMap<String, RateLimiter> sessionLimiters = new ConcurrentHashMap<>();
-
-
     @Override
     public void init(FilterConfig config) {
         this.cookieName     = config.getInitParameter("cookie.name");
@@ -72,11 +65,6 @@ public class J2CacheSessionFilter implements Filter {
         this.cookieDomain   = config.getInitParameter("cookie.domain");
         this.cookiePath     = config.getInitParameter("cookie.path");
         this.cookieSecure = "true".equalsIgnoreCase(config.getInitParameter("cookie.secure"));
-
-        String rateLimit = config.getInitParameter("session.rateLimit");
-        this.rateLimit = "true".equalsIgnoreCase(rateLimit != null ? rateLimit:"true");
-        String rateLimitPerSecond     = config.getInitParameter("session.rateLimitPerSecond");
-        this.rateLimitPerSecond   = Double.parseDouble(rateLimitPerSecond != null ? rateLimitPerSecond:"1");
 
         String ctx = config.getServletContext().getContextPath();
         this.cookiePath = null != this.cookiePath && !"".equals(this.cookiePath) ? this.cookiePath:"".equals(ctx) ? "/":ctx;
@@ -171,19 +159,6 @@ public class J2CacheSessionFilter implements Filter {
             if(session != null && !session.isNew() && !session.isInvalid()){
 //                g_cache.updateSessionAccessTime(session.getSessionObject());
                 g_cache.updateSessionAccessTimeAsync(session.getSessionObject());//异步
-//                if(rateLimit){
-//                    try {
-//                        RateLimiter limiter = sessionLimiters.computeIfAbsent(session.getId(), id -> RateLimiter.create(this.rateLimitPerSecond));
-//                        if(limiter.tryAcquire()){
-//                            g_cache.updateSessionAccessTime(session.getSessionObject());
-//                        }
-//                    } catch (Exception e) {
-//                        logger.error(e.getMessage(),e);
-//                    }
-//                }else{
-//                    g_cache.updateSessionAccessTime(session.getSessionObject());
-//                }
-
             }
         }
     }
