@@ -208,7 +208,6 @@ public class J2CacheSessionFilter implements Filter {
                 if(session == null && create) {
                     String session_id = UUID.randomUUID().toString().replaceAll("-", "");
                     session = new J2CacheSession(servletContext, session_id, g_cache);
-                    session.getSessionObject().setHost(IpUtils.getActivityLocalIp());
                     session.getSessionObject().setClientIP(com.eryansky.common.utils.net.IpUtils.getIpAddr(request));
                     g_cache.saveSession(session.getSessionObject());
                     setCookie(cookieName, session_id);

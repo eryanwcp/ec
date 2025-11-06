@@ -15,6 +15,7 @@
  */
 package com.eryansky.j2cache.session;
 
+import com.eryansky.j2cache.util.IpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +48,7 @@ public class J2CacheSession implements HttpSession {
         this.session.setCreated_at(System.currentTimeMillis());
         this.session.setLastAccess_at(this.session.getLastAccess_at());
         this.session.setMaxInactiveInterval(cache.getExpire());
+        this.session.setHost(IpUtils.getActivityLocalIp());
     }
 
     public J2CacheSession(ServletContext servletContext, CacheFacade cache, SessionObject sessionObject) {
