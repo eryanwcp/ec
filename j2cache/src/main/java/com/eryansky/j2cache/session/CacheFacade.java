@@ -15,9 +15,7 @@
  */
 package com.eryansky.j2cache.session;
 
-import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.j2cache.lettuce.LettuceByteCodec;
-import com.eryansky.j2cache.util.IpUtils;
 import com.eryansky.j2cache.util.SerializationUtils;
 import io.lettuce.core.AbstractRedisClient;
 import io.lettuce.core.ClientOptions;
@@ -333,8 +331,6 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
      * @param session 会话对象
      */
     public void saveSession(SessionObject session) {
-        session.setHost(IpUtils.getActivityLocalIp());
-        session.setClientIP(com.eryansky.common.utils.net.IpUtils.getIpAddr(SpringMVCHolder.getRequest()));
         //write to caffeine
         cache1.put(session.getId(), session);
         if(this.cache2 == null){
