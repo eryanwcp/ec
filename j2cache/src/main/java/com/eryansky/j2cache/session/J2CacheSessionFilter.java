@@ -15,6 +15,8 @@
  */
 package com.eryansky.j2cache.session;
 
+import com.eryansky.common.web.springmvc.SpringMVCHolder;
+import com.eryansky.j2cache.util.IpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.AntPathMatcher;
@@ -178,12 +180,14 @@ public class J2CacheSessionFilter implements Filter {
      *************************************************/
     public class J2CacheRequestWrapper extends HttpServletRequestWrapper {
 
+        private final HttpServletRequest request;
         private final HttpServletResponse response;
         private final ServletContext servletContext;
         private J2CacheSession session;
 
         public J2CacheRequestWrapper(ServletRequest req, ServletResponse res) {
             super((HttpServletRequest)req);
+            this.request = (HttpServletRequest)req;
             this.response = (HttpServletResponse)res;
             this.servletContext = req.getServletContext();
         }
@@ -204,6 +208,8 @@ public class J2CacheSessionFilter implements Filter {
                 if(session == null && create) {
                     String session_id = UUID.randomUUID().toString().replaceAll("-", "");
                     session = new J2CacheSession(servletContext, session_id, g_cache);
+                    session.getSessionObject().setHost(IpUtils.getActivityLocalIp());
+                    session.getSessionObject().setClientIP(com.eryansky.common.utils.net.IpUtils.getIpAddr(request));
                     g_cache.saveSession(session.getSessionObject());
                     setCookie(cookieName, session_id);
                 }
