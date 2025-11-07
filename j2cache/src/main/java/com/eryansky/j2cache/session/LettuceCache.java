@@ -133,6 +133,26 @@ public class LettuceCache {
         }
     }
 
+    public void updateKeyBytes(String session_id, Map<String,byte[]> bytes, int expireInSeconds) {
+        try(StatefulConnection<String, byte[]> connection = connect()) {
+            RedisHashCommands<String, byte[]> cmd = (RedisHashCommands)sync(connection);
+            bytes.forEach((key,d)->{
+                cmd.hset(_key(session_id),key,d);
+            });
+        }
+        ttl(session_id,expireInSeconds);
+    }
+
+    public void updateKeyBytesAsync(String session_id, Map<String,byte[]> bytes, int expireInSeconds) {
+        try(StatefulConnection<String, byte[]> connection = connect()) {
+            RedisHashAsyncCommands<String, byte[]> cmd = (RedisHashAsyncCommands)async(connection);
+            bytes.forEach((key,d)->{
+                cmd.hset(_key(session_id),key,d);
+            });
+        }
+        ttlAsync(session_id,expireInSeconds);
+    }
+
     public void setBytesAsync(String session_id,  String key, byte[] bytes) {
         try(StatefulConnection<String, byte[]> connection = connect()) {
             RedisHashAsyncCommands<String, byte[]> cmd = (RedisHashAsyncCommands)async(connection);
