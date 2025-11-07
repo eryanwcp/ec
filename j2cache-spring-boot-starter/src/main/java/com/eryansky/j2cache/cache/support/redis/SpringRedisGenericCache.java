@@ -14,10 +14,12 @@ import com.eryansky.j2cache.lock.LockInsideExecutedException;
 import com.eryansky.j2cache.lock.LockRetryFrequency;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import com.eryansky.j2cache.Level2Cache;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.integration.redis.util.RedisLockRegistry;
 
 public class SpringRedisGenericCache implements Level2Cache {
@@ -30,8 +32,9 @@ public class SpringRedisGenericCache implements Level2Cache {
 
 	private final RedisTemplate<String, Serializable> redisTemplate;
 	private final RedisLockRegistry redisLockRegistry;
+    private final int scanCount;
 
-	public SpringRedisGenericCache(String namespace, String region, RedisTemplate<String, Serializable> redisTemplate,RedisLockRegistry redisLockRegistry) {
+	public SpringRedisGenericCache(String namespace, String region, RedisTemplate<String, Serializable> redisTemplate,RedisLockRegistry redisLockRegistry, int scanCount) {
 		if (region == null || region.isEmpty()) {
 			region = "_"; // 缺省region
 		}
@@ -39,6 +42,7 @@ public class SpringRedisGenericCache implements Level2Cache {
 		this.redisTemplate = redisTemplate;
 		this.redisLockRegistry = redisLockRegistry;
 		this.region = getRegionName(region);
+		this.scanCount = scanCount;
 	}
 
 	private String getRegionName(String region) {
@@ -57,7 +61,7 @@ public class SpringRedisGenericCache implements Level2Cache {
 
 	@Override
 	public boolean exists(String key) {
-		return 	redisTemplate.execute((RedisCallback<Boolean>) redis -> redis.exists(_key(key)));
+		return Boolean.TRUE.equals(redisTemplate.execute((RedisCallback<Boolean>) redis -> redis.exists(_key(key))));
 	}
 
 	@Override
@@ -67,10 +71,30 @@ public class SpringRedisGenericCache implements Level2Cache {
 		}
 	}
 
-	@Override
-	public Collection<String> keys() {
-		return redisTemplate.keys(this.region + ":*").stream().map(k->k.substring(this.region.length()+1)).collect(Collectors.toSet());
-	}
+//	@Override
+//	public Collection<String> keys() {
+//		return redisTemplate.keys(this.region + ":*").stream().map(k->k.substring(this.region.length()+1)).collect(Collectors.toSet());
+//	}
+
+    @Override
+    public Collection<String> keys() {
+        return redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
+            Set<String> keys = new HashSet<>();
+            ScanOptions scanOptions = ScanOptions.scanOptions()
+                    .match(this.region + ":*")  // 匹配命名空间前缀
+                    .count(this.scanCount)         // 每次扫描数量
+                    .build();
+
+            try (Cursor<byte[]> cursor = connection.scan(scanOptions)) {
+                while (cursor.hasNext()) {
+                    String fullKey = new String(cursor.next(), StandardCharsets.UTF_8);
+                    String keyWithoutNamespace = fullKey.substring(this.region.length() + 1);
+                    keys.add(keyWithoutNamespace);
+                }
+            }
+            return keys;
+        });
+    }
 
 	@Override
 	public byte[] getBytes(String key) {
@@ -82,7 +106,7 @@ public class SpringRedisGenericCache implements Level2Cache {
 	@Override
 	public List<byte[]> getBytes(Collection<String> keys) {
 		return redisTemplate.execute((RedisCallback<List<byte[]>>) redis -> {
-			byte[][] bytes = keys.stream().map(k -> _key(k)).toArray(byte[][]::new);
+			byte[][] bytes = keys.stream().map(this::_key).toArray(byte[][]::new);
 			return redis.mGet(bytes);
 		});
 	}

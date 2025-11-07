@@ -17,8 +17,7 @@ package com.eryansky.j2cache.session;
 
 import com.eryansky.j2cache.CacheException;
 import com.google.common.collect.Maps;
-import io.lettuce.core.AbstractRedisClient;
-import io.lettuce.core.RedisFuture;
+import io.lettuce.core.*;
 import io.lettuce.core.api.StatefulConnection;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.async.BaseRedisAsyncCommands;
@@ -192,10 +191,33 @@ public class LettuceCache {
         }
     }
 
+//    public Collection<String> keys() {
+//        try(StatefulConnection<String, byte[]> connection = connect()) {
+//            RedisKeyCommands<String, byte[]> cmd = (RedisKeyCommands)sync(connection);
+//            return cmd.keys(namespace+":*").stream().map(k->k.substring(this.namespace.length()+1)).collect(Collectors.toSet());
+//        }
+//
+//    }
+
+
     public Collection<String> keys() {
         try(StatefulConnection<String, byte[]> connection = connect()) {
             RedisKeyCommands<String, byte[]> cmd = (RedisKeyCommands)sync(connection);
-            return cmd.keys(namespace+":*").parallelStream().map(k->k.substring(this.namespace.length()+1)).collect(Collectors.toSet());
+            Collection<String> keys = new ArrayList<>();
+            Collection<String> partKeys = null;
+            ScanCursor scanCursor = ScanCursor.INITIAL;
+            ScanArgs scanArgs = new ScanArgs();
+            scanArgs.match(this.namespace + ":*").limit(scanCount);
+            KeyScanCursor<String> keyScanCursor = null;
+            while (!scanCursor.isFinished()) {
+                keyScanCursor = cmd.scan(scanCursor, scanArgs);
+                partKeys = keyScanCursor.getKeys();
+                if(partKeys != null && partKeys.size() != 0) {
+                    keys.addAll(partKeys);
+                }
+                scanCursor = keyScanCursor;
+            }
+            return keys.stream().map(k->k.substring(this.namespace.length()+1)).collect(Collectors.toSet());
         }
 
     }

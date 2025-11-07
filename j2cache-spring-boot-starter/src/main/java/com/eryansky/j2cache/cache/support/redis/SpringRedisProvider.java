@@ -60,7 +60,7 @@ public class SpringRedisProvider implements CacheProvider {
 	                if("hash".equalsIgnoreCase(this.storage))
 	                    cache = new SpringRedisCache(this.namespace, region, redisTemplate,redisLockRegistry);
 	                else {
-	                	cache = new SpringRedisGenericCache(this.namespace, region, redisTemplate,redisLockRegistry);
+	                	cache = new SpringRedisGenericCache(this.namespace, region, redisTemplate,redisLockRegistry,1000);
 					}
 					caches.put(region, cache);
 				}
