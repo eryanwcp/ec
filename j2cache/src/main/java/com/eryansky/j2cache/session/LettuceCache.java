@@ -133,17 +133,37 @@ public class LettuceCache {
         }
     }
 
-    public void setBytesAsync(String session_id,  String key, byte[] bytes) {
+    public void updateKeyBytes(String session_id, Map<String,byte[]> bytes, int expireInSeconds) {
+        try(StatefulConnection<String, byte[]> connection = connect()) {
+            RedisHashCommands<String, byte[]> cmd = (RedisHashCommands)sync(connection);
+            bytes.forEach((key,d)->{
+                cmd.hset(_key(session_id),key,d);
+            });
+        }
+        ttl(session_id,expireInSeconds);
+    }
+
+    public RedisFuture<Boolean> updateKeyBytesAsync(String session_id, Map<String,byte[]> bytes, int expireInSeconds) {
         try(StatefulConnection<String, byte[]> connection = connect()) {
             RedisHashAsyncCommands<String, byte[]> cmd = (RedisHashAsyncCommands)async(connection);
-            cmd.hset(_key(session_id),key,bytes);
+            bytes.forEach((key,d)->{
+                cmd.hset(_key(session_id),key,d);
+            });
+        }
+        return ttlAsync(session_id,expireInSeconds);
+    }
+
+    public RedisFuture<Boolean> setBytesAsync(String session_id,  String key, byte[] bytes) {
+        try(StatefulConnection<String, byte[]> connection = connect()) {
+            RedisHashAsyncCommands<String, byte[]> cmd = (RedisHashAsyncCommands)async(connection);
+            return cmd.hset(_key(session_id),key,bytes);
         }
     }
 
-    public void hincrby(String session_id, String key, long amount) {
+    public Long hincrby(String session_id, String key, long amount) {
         try(StatefulConnection<String, byte[]> connection = connect()) {
             RedisHashCommands<String, byte[]> cmd = (RedisHashCommands)sync(connection);
-            cmd.hincrby(_key(session_id),key,amount);
+            return cmd.hincrby(_key(session_id),key,amount);
         }
     }
 

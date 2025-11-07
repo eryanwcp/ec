@@ -365,9 +365,10 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             session.setLastAccess_at(System.currentTimeMillis());
             cache1.put(session.getId(), session);
             if(this.cache2 != null){
-                cache2.setBytes(session.getId(), SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
-                cache2.setBytes(session.getId(), SessionObject.KEY_ACCESS_COUNT, String.valueOf(session.getAccessCount()).getBytes());
-                cache2.ttl(session.getId(), cache1.getExpire());
+                cache2.updateKeyBytes(session.getId(), new HashMap<>() {{
+                    put(SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
+                    put(SessionObject.KEY_ACCESS_COUNT, String.valueOf(session.getAccessCount()).getBytes());
+                }},cache1.getExpire());
             }
         } finally {
             if(this.cache2 != null){
@@ -386,9 +387,10 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             session.setLastAccess_at(System.currentTimeMillis());
             cache1.put(session.getId(), session);
             if(this.cache2 != null){
-                cache2.setBytesAsync(session.getId(), SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
-                cache2.setBytesAsync(session.getId(), SessionObject.KEY_ACCESS_COUNT, String.valueOf(session.getAccessCount()).getBytes());
-                cache2.ttlAsync(session.getId(), cache1.getExpire());
+                cache2.updateKeyBytesAsync(session.getId(), new HashMap<>() {{
+                    put(SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
+                    put(SessionObject.KEY_ACCESS_COUNT, String.valueOf(session.getAccessCount()).getBytes());
+                }},cache1.getExpire());
             }
         } finally {
             if(this.cache2 != null){
