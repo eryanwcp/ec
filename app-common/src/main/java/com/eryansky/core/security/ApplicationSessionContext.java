@@ -90,7 +90,7 @@ public class ApplicationSessionContext {
 	}
 
 	public List<SessionInfo> findSessionInfoData(Collection<String> keys) {
-		return keys.stream().map(key -> {
+		return keys.parallelStream().map(key -> {
 			SessionObject sessionObject = cacheFacade.getSession(key);
             SessionInfo sessionInfo = null != sessionObject ? (SessionInfo) sessionObject.get(SessionObject.KEY_SESSION_DATA) : null;
             if(null != sessionInfo){
@@ -102,7 +102,7 @@ public class ApplicationSessionContext {
 
 	public Collection<String> findSessionInfoKeys() {
 		Collection<String> keys = cacheFacade.keys();
-		return keys.stream().filter(key -> {
+		return keys.parallelStream().filter(key -> {
 			SessionObject sessionObject = cacheFacade.getSession(key);
 			return  null != sessionObject && null != sessionObject.get(SessionObject.KEY_SESSION_DATA);
 		}).collect(Collectors.toList());
@@ -176,7 +176,7 @@ public class ApplicationSessionContext {
 	 */
 	public Collection<String> findSessionExtendKeys() {
 		Collection<String> keys = cacheFacade.keys();
-		return keys.stream().filter(key->{
+		return keys.parallelStream().filter(key->{
 			SessionObject sessionObject = cacheFacade.getSession(key);
 			return  null != sessionObject && null != sessionObject.get(SessionObject.KEY_SESSION_EXTEND);
 		}).collect(Collectors.toList());
