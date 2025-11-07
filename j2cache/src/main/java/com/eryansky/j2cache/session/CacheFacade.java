@@ -365,7 +365,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             session.setLastAccess_at(System.currentTimeMillis());
             cache1.put(session.getId(), session);
             if(this.cache2 != null){
-                cache2.updateKeyBytes(session.getId(), new HashMap<>() {{
+                cache2.updateKeyBytes(session.getId(), new HashMap<String,byte[]>() {{
                     put(SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
                     put(SessionObject.KEY_ACCESS_COUNT, String.valueOf(session.getAccessCount()).getBytes());
                 }},cache1.getExpire());
@@ -387,7 +387,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             session.setLastAccess_at(System.currentTimeMillis());
             cache1.put(session.getId(), session);
             if(this.cache2 != null){
-                cache2.updateKeyBytesAsync(session.getId(), new HashMap<>() {{
+                cache2.updateKeyBytesAsync(session.getId(), new HashMap<String,byte[]>() {{
                     put(SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
                     put(SessionObject.KEY_ACCESS_COUNT, String.valueOf(session.getAccessCount()).getBytes());
                 }},cache1.getExpire());
