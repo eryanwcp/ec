@@ -8,9 +8,7 @@ import com.eryansky.j2cache.session.SessionObject;
 import org.joda.time.Instant;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -82,7 +80,7 @@ public class ApplicationSessionContext {
 
 	public List<SessionInfo> findSessionInfoDataRemoveDuplicate() {
 		List<SessionInfo> list = findSessionInfoData();
-		return list.parallelStream().collect(Collectors.toSet()).parallelStream().collect(Collectors.toList());
+		return new ArrayList<>(new HashSet<>(list));
 	}
 
 	public List<SessionInfo> findSessionInfoData() {
@@ -92,7 +90,7 @@ public class ApplicationSessionContext {
 	}
 
 	public List<SessionInfo> findSessionInfoData(Collection<String> keys) {
-		return keys.parallelStream().map(key -> {
+		return keys.stream().map(key -> {
 			SessionObject sessionObject = cacheFacade.getSession(key);
             SessionInfo sessionInfo = null != sessionObject ? (SessionInfo) sessionObject.get(SessionObject.KEY_SESSION_DATA) : null;
             if(null != sessionInfo){
@@ -104,7 +102,7 @@ public class ApplicationSessionContext {
 
 	public Collection<String> findSessionInfoKeys() {
 		Collection<String> keys = cacheFacade.keys();
-		return keys.parallelStream().filter(key -> {
+		return keys.stream().filter(key -> {
 			SessionObject sessionObject = cacheFacade.getSession(key);
 			return  null != sessionObject && null != sessionObject.get(SessionObject.KEY_SESSION_DATA);
 		}).collect(Collectors.toList());
@@ -178,7 +176,7 @@ public class ApplicationSessionContext {
 	 */
 	public Collection<String> findSessionExtendKeys() {
 		Collection<String> keys = cacheFacade.keys();
-		return keys.parallelStream().filter(key->{
+		return keys.stream().filter(key->{
 			SessionObject sessionObject = cacheFacade.getSession(key);
 			return  null != sessionObject && null != sessionObject.get(SessionObject.KEY_SESSION_EXTEND);
 		}).collect(Collectors.toList());
