@@ -23,14 +23,16 @@
 				success: function (data) {
 					if (data['totalCount'] > 0) {
 						$.each(data['result'],function (i,r){
-							delete r['data']['loginUser'];
-							r['sessionData'] = typeof r['data']['SESSION_DATA'] === 'object' ? JSON.stringify(r['data']['SESSION_DATA']) : r['data']['SESSION_DATA'];
-							delete r['data']['SESSION_DATA'];
-							r['data'] = Object.entries(r['data']).map(([key, value]) => ({
-								key,
-								value: typeof value === 'object' ? JSON.stringify(value) : value,
-								type: typeof value
-							}));
+                            if(r['data']){
+    							delete r['data']['loginUser'];
+                                r['sessionData'] = typeof r['data']['SESSION_DATA'] === 'object' ? JSON.stringify(r['data']['SESSION_DATA']) : r['data']['SESSION_DATA'];
+                                delete r['data']['SESSION_DATA'];
+                                r['data'] = Object.entries(r['data']).map(([key, value]) => ({
+                                    key,
+                                    value: typeof value === 'object' ? JSON.stringify(value) : value,
+                                    type: typeof value
+                                }));
+                            }
 
 						});
 						var html = Mustache.render($("#list_template").html(), data);
