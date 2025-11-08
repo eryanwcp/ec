@@ -402,28 +402,6 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         }
     }
 
-    /**
-     * 更新(异步) session 的最后一次访问时间
-     * @param session 会话对象
-     */
-    public void updateSessionAccessTimeAsync(SessionObject session) {
-        try {
-            session.setAccessCount(session.getAccessCount() + 1);//非严谨设置 无并发控制
-            session.setLastAccess_at(System.currentTimeMillis());
-            cache1.put(session.getId(), session);
-            if(this.cache2 != null){
-                cache2.updateKeyBytesAsync(session.getId(), new HashMap<String,byte[]>() {{
-                    put(SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
-                    put(SessionObject.KEY_ACCESS_COUNT, String.valueOf(session.getAccessCount()).getBytes());
-                }},cache1.getExpire());
-            }
-        } finally {
-            if(this.cache2 != null){
-                this.publish(new Command(Command.OPT_DELETE_SESSION, session.getId(), null));
-            }
-        }
-    }
-
     public void setSessionAttribute(SessionObject session, String key) {
         try {
             cache1.put(session.getId(), session);
