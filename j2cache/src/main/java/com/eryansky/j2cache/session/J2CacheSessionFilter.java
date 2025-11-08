@@ -170,24 +170,17 @@ public class J2CacheSessionFilter implements Filter {
             //更新 session 的有效时间
             J2CacheSession session = (J2CacheSession)j2cacheRequest.getSession(false);
             if(session != null && !session.isNew() && !session.isInvalid()){
-//                g_cache.updateSessionAccessTime(session.getSessionObject());
-                if(rateLimit){
-                    try {
+                try {
+                    if(rateLimit){
                         RateLimiter limiter = sessionLimiters.computeIfAbsent(session.getId(), id -> RateLimiter.create(this.rateLimitPerSecond));
                         g_cache.updateSessionAccessTimeWithL2Cache(session.getSessionObject(),limiter);
-                    } catch (Exception e) {
-//                        logger.error(currentURL + ":" + e.getMessage(), e);
-                        logger.error(currentURL + ":" + e.getMessage());
-                    }
-                }else{
-                    try {
+                    }else{
                         g_cache.updateSessionAccessTime(session.getSessionObject());
-                    } catch (Exception e) {
-//                        logger.error(currentURL + ":" + e.getMessage(), e);
-                        logger.error(currentURL + ":" + e.getMessage());
                     }
+                } catch (Exception e) {
+    //                        logger.error(currentURL + ":" + e.getMessage(), e);
+                    logger.error(currentURL + ":" + e.getMessage());
                 }
-
             }
         }
     }
