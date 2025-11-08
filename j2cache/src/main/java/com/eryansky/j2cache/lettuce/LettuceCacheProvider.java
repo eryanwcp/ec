@@ -216,6 +216,7 @@ public class LettuceCacheProvider extends RedisPubSubAdapter<String, String> imp
     public void stop() {
         pool.close();
         regions.clear();
+        redisClient.close();
         redisClient.shutdown();
     }
 
