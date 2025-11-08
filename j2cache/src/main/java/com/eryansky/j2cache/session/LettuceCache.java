@@ -136,8 +136,9 @@ public class LettuceCache {
     public void updateKeyBytes(String session_id, Map<String,byte[]> bytes, int expireInSeconds) {
         try(StatefulConnection<String, byte[]> connection = connect()) {
             RedisHashCommands<String, byte[]> cmd = (RedisHashCommands)sync(connection);
-            bytes.forEach((key,d)->{
-                cmd.hset(_key(session_id),key,d);
+            String redisKey = _key(session_id);
+            bytes.forEach((key,data)->{
+                cmd.hset(redisKey,key,data);
             });
         }
         ttl(session_id,expireInSeconds);
@@ -146,8 +147,9 @@ public class LettuceCache {
     public RedisFuture<Boolean> updateKeyBytesAsync(String session_id, Map<String,byte[]> bytes, int expireInSeconds) {
         try(StatefulConnection<String, byte[]> connection = connect()) {
             RedisHashAsyncCommands<String, byte[]> cmd = (RedisHashAsyncCommands)async(connection);
-            bytes.forEach((key,d)->{
-                cmd.hset(_key(session_id),key,d);
+            String redisKey = _key(session_id);
+            bytes.forEach((key,data)->{
+                cmd.hset(redisKey,key,data);
             });
         }
         return ttlAsync(session_id,expireInSeconds);
@@ -232,7 +234,7 @@ public class LettuceCache {
             while (!scanCursor.isFinished()) {
                 keyScanCursor = cmd.scan(scanCursor, scanArgs);
                 partKeys = keyScanCursor.getKeys();
-                if(partKeys != null && partKeys.size() != 0) {
+                if(partKeys != null && !partKeys.isEmpty()) {
                     keys.addAll(partKeys);
                 }
                 scanCursor = keyScanCursor;
