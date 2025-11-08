@@ -388,7 +388,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             session.setAccessCount(session.getAccessCount() + 1);//非严谨设置 无并发控制
             session.setLastAccess_at(System.currentTimeMillis());
             cache1.put(session.getId(), session);
-            flag = flag && null != limiter && limiter.tryAcquire();
+            flag = flag && limiter.tryAcquire();
             if(flag){
                 cache2.updateKeyBytesAsync(session.getId(), new HashMap<>() {{
                     put(SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
