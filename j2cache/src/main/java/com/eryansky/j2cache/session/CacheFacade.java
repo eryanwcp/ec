@@ -291,6 +291,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
                 this.pool.close();
             }
             if(null != this.redisClient){
+                this.redisClient.close();
                 this.redisClient.shutdown();
             }
 
