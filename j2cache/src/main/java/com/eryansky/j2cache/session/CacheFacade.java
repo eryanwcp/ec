@@ -18,6 +18,7 @@ package com.eryansky.j2cache.session;
 import com.eryansky.j2cache.lettuce.LettuceByteCodec;
 import com.eryansky.j2cache.util.IpUtils;
 import com.eryansky.j2cache.util.SerializationUtils;
+import com.google.common.util.concurrent.RateLimiter;
 import io.lettuce.core.AbstractRedisClient;
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.RedisClient;
@@ -372,6 +373,30 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             }
         } finally {
             if(this.cache2 != null){
+                this.publish(new Command(Command.OPT_DELETE_SESSION, session.getId(), null));
+            }
+        }
+    }
+
+    /**
+     * 更新 session 的最后一次访问时间 1s内仅更新一次二级缓存
+     * @param session 会话对象
+     */
+    public void updateSessionAccessTimeWithL2Cache(SessionObject session,RateLimiter limiter) {
+        boolean flag = this.cache2 != null;
+        try {
+            session.setAccessCount(session.getAccessCount() + 1);//非严谨设置 无并发控制
+            session.setLastAccess_at(System.currentTimeMillis());
+            cache1.put(session.getId(), session);
+            flag = flag && null != limiter && limiter.tryAcquire();
+            if(flag){
+                cache2.updateKeyBytesAsync(session.getId(), new HashMap<>() {{
+                    put(SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
+                    put(SessionObject.KEY_ACCESS_COUNT, String.valueOf(session.getAccessCount()).getBytes());
+                }},cache1.getExpire());
+            }
+        } finally {
+            if(flag){
                 this.publish(new Command(Command.OPT_DELETE_SESSION, session.getId(), null));
             }
         }

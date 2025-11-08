@@ -174,9 +174,7 @@ public class J2CacheSessionFilter implements Filter {
                 if(rateLimit){
                     try {
                         RateLimiter limiter = sessionLimiters.computeIfAbsent(session.getId(), id -> RateLimiter.create(this.rateLimitPerSecond));
-                        if(limiter.tryAcquire()){
-                            g_cache.updateSessionAccessTime(session.getSessionObject());
-                        }
+                        g_cache.updateSessionAccessTimeWithL2Cache(session.getSessionObject(),limiter);
                     } catch (Exception e) {
 //                        logger.error(currentURL + ":" + e.getMessage(), e);
                         logger.error(currentURL + ":" + e.getMessage());
