@@ -15,8 +15,9 @@
  */
 package com.eryansky.j2cache.session;
 
+import com.eryansky.common.utils.StringUtils;
+import com.eryansky.common.utils.encode.MD5Util;
 import com.google.common.util.concurrent.RateLimiter;
-import com.eryansky.j2cache.util.IpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.AntPathMatcher;
@@ -196,6 +197,9 @@ public class J2CacheSessionFilter implements Filter {
      *************************************************/
     public class J2CacheRequestWrapper extends HttpServletRequestWrapper {
 
+        public static final String ATTR_AUTHORIZATION = "Authorization";
+        public static final String ATTR_TOKEN = "token";
+
         private final HttpServletRequest request;
         private final HttpServletResponse response;
         private final ServletContext servletContext;
@@ -222,7 +226,21 @@ public class J2CacheSessionFilter implements Filter {
                     }
                 }
                 if(session == null && create) {
-                    String session_id = UUID.randomUUID().toString().replaceAll("-", "");
+                    String authorization = request.getParameter(ATTR_AUTHORIZATION);
+                    if (StringUtils.isBlank(authorization)) {
+                        authorization = request.getParameter(ATTR_TOKEN);
+                    }
+                    if (StringUtils.isBlank(authorization)) {
+                        authorization = request.getHeader(ATTR_AUTHORIZATION);
+                    }
+                    String session_id = null;
+                    if (StringUtils.isNotBlank(authorization)) {
+                        String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""),"Bearer","");
+                        session_id = MD5Util.getStringMD5(token);
+                    }else{
+                        session_id = UUID.randomUUID().toString().replaceAll("-", "");
+                    }
+
                     session = new J2CacheSession(servletContext, session_id, g_cache);
                     session.getSessionObject().setClientIP(com.eryansky.common.utils.net.IpUtils.getIpAddr(request));
                     g_cache.saveSession(session.getSessionObject());
