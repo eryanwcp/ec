@@ -1196,33 +1196,13 @@ public class SecurityUtils {
     }
 
     /**
-     * APP与Webview session同步兼容 添加关联已有sessionId
+     * APP与Webview session同步兼容
      * @param sessionId
      * @return
      */
-    public static void addExtendSession(String sessionId,String sessionInfoId) {
-       Static.applicationSessionContext.addExtendSessionInfo(sessionId,sessionInfoId);
-    }
-
-    /**
-     * APP与Webview session cache keys
-     * @return
-     */
-    public static Collection<String> findExtendSessionIdKeys() {
-        return Static.applicationSessionContext.findSessionExtendKeys();
-    }
-
-
-    /**
-     * APP与Webview session cache data
-     * @return
-     */
-    public static List<Map<String, String>> findExtendSessionIds() {
-        return Lists.newArrayList(findExtendSessionIdKeys()).parallelStream().map(v -> {
-            Map<String, String> data = Maps.newHashMap();
-            data.put(v, getExtendSessionId(v));
-            return data;
-        }).collect(Collectors.toList());
+    public static String getFixedSessionId(String sessionId) {
+        String sessionInfoId = getExtendSessionId(sessionId);
+        return null != sessionInfoId ? sessionInfoId:sessionId;
     }
 
     /**
@@ -1235,24 +1215,13 @@ public class SecurityUtils {
     }
 
     /**
-     * APP与Webview session同步兼容
+     * APP与Webview session同步兼容 添加关联已有sessionId
      * @param sessionId
      * @return
      */
-    public static String getFixedSessionId(String sessionId) {
-        String sessionInfoId = getExtendSessionId(sessionId);
-        return null != sessionInfoId ? sessionInfoId:sessionId;
+    public static void addExtendSession(String sessionId, String sessionInfoId) {
+        Static.applicationSessionContext.addExtendSessionInfo(sessionId,sessionInfoId);
     }
-
-    /**
-     * APP与Webview 同步刷新关联信息
-     * @param sessionInfo
-     */
-    public static void syncExtendSession(SessionInfo sessionInfo) {
-        Collection<String> sessionInfoIds = Static.applicationSessionContext.findSessionExtendKeys();
-        sessionInfoIds.stream().filter(v -> sessionInfo.getId().equals(getExtendSessionId(v))).forEach(v -> addExtendSession(v, sessionInfo.getId()));
-    }
-
 
     /**
      * APP与Webview 同步删除关联信息
