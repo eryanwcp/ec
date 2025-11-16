@@ -237,7 +237,8 @@ public class J2CacheSessionFilter implements Filter {
                     if (StringUtils.isNotBlank(authorization)) {
                         String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""),"Bearer","");
                         session_id = MD5Util.getStringMD5(token);
-                    }else{
+                    }
+                    if (StringUtils.isBlank(session_id)) {
                         session_id = UUID.randomUUID().toString().replaceAll("-", "");
                     }
 
