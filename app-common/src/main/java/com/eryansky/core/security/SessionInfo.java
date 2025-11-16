@@ -7,6 +7,7 @@ package com.eryansky.core.security;
 
 import com.eryansky.common.orm.persistence.AbstractBaseEntity;
 import com.eryansky.common.utils.StringUtils;
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.google.common.collect.Maps;
 import eu.bitwalker.useragentutils.DeviceType;
@@ -22,6 +23,7 @@ import java.util.*;
  * @author Eryan
  * @date 2013-3-24 下午2:53:59
  */
+@JsonFilter(" ")
 @SuppressWarnings("serial")
 public class SessionInfo implements Serializable {
 
@@ -29,6 +31,10 @@ public class SessionInfo implements Serializable {
      * ID
      */
     private String id;
+    /**
+     * sessionID
+     */
+    private String sessionId;
     /**
      * 服务主机
      */
@@ -231,6 +237,21 @@ public class SessionInfo implements Serializable {
      */
     public SessionInfo setId(String id) {
         this.id = id;
+        return this;
+    }
+
+    /**
+     * sessionID
+     */
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    /**
+     * 设置 sessionID
+     */
+    public SessionInfo setSessionId(String sessionId) {
+        this.sessionId = sessionId;
         return this;
     }
 
