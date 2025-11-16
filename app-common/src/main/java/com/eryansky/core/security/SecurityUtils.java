@@ -592,6 +592,8 @@ public class SecurityUtils {
 
         refreshSessionInfo(sessionInfo);
         Static.applicationSessionContext.bindSessionInfoId(sessionInfo.getId(),sessionInfo.getSessionId());
+        //TODO  兼容性代码
+        Static.applicationSessionContext.bindSessionInfoId(MD5Util.getStringMD5(sessionInfo.getRefreshToken()),sessionInfo.getSessionId());
         request.getSession().setAttribute("loginUser", sessionInfo.getName() + "[" + sessionInfo.getLoginName() + "]");
         return sessionInfo;
     }
@@ -955,6 +957,8 @@ public class SecurityUtils {
         if (_sessionInfo != null) {
             Static.userService.logout(_sessionInfo.getUserId(), securityType);
             Static.applicationSessionContext.unBindSessionInfoId(_sessionInfo.getId());
+            //TODO 兼容性代码 临时用
+            Static.applicationSessionContext.unBindSessionInfoId(MD5Util.getStringMD5(_sessionInfo.getRefreshToken()));
         }
         Static.applicationSessionContext.removeSessionInfo(sessionId);
 
