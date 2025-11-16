@@ -1086,6 +1086,26 @@ public class SecurityUtils {
 
     /**
      * 查看某个用户登录信息
+     * @param refreshToken
+     * @return
+     */
+    public static SessionInfo getSessionInfoByRefreshToken(String refreshToken) {
+        List<SessionInfo> list = findSessionInfoList();
+        return list.parallelStream().filter(sessionInfo -> refreshToken.equals(sessionInfo.getRefreshToken())).findFirst().orElse(null);
+    }
+
+    /**
+     * 查看某个用户登录信息
+     * @param token
+     * @return
+     */
+    public static SessionInfo getSessionInfoByTokenOrRefreshToken(String token) {
+        List<SessionInfo> list = findSessionInfoList();
+        return list.parallelStream().filter(sessionInfo -> token.equals(sessionInfo.getToken()) || token.equals(sessionInfo.getRefreshToken())).findFirst().orElse(null);
+    }
+
+    /**
+     * 查看某个用户登录信息
      * @param token
      * @return
      */
