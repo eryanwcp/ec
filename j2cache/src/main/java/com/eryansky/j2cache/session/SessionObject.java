@@ -34,7 +34,6 @@ public class SessionObject implements Serializable {
     public static final String KEY_SERVICE_HOST = "SERVICE_HOST" ;
     public static final String KEY_CLIENT_IP = "CLIENT_IP" ;
     public static final String KEY_SESSION_DATA = "SESSION_DATA" ;
-    public static final String KEY_SESSION_EXTEND = "SESSION_EXTEND" ;
     public static final String KEY_ACCESS_COUNT = "ACCESS_COUNT" ;
 
     private String id;
