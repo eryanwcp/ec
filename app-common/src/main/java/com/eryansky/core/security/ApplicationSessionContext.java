@@ -158,7 +158,7 @@ public class ApplicationSessionContext {
 	 */
 	public String getbindSessionId(String sessionInfoId) {
 		String sessionId = CacheUtils.get(CACHE_SESSION_ID_BIND,sessionInfoId);
-		return null != sessionId ? sessionInfoId:sessionInfoId;
+		return null != sessionId ? sessionId:sessionInfoId;
 	}
 
 
