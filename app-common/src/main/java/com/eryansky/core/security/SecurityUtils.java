@@ -283,7 +283,8 @@ public class SecurityUtils {
                 }
             }
             if (userId == null) {
-                throw new SystemException("用户[" + userId + "]不存在.");
+                return  false;
+//                throw new SystemException("用户[" + userId + "]不存在.");
             }
 
             if (sessionInfo != null && userId.equals(sessionInfo.getUserId())) {
@@ -444,7 +445,7 @@ public class SecurityUtils {
     }
 
     /**
-     * 判断某个用户是否有某个刚问
+     * 判断某个用户是否有某个岗位
      *
      * @param userId   用户ID
      * @param postCode 角色编码
@@ -460,7 +461,8 @@ public class SecurityUtils {
                 }
             }
             if (userId == null) {
-                throw new SystemException("用户[" + userId + "]不存在.");
+                return  false;
+//                throw new SystemException("用户[" + userId + "]不存在.");
             }
 
             if (sessionInfo != null && userId.equals(sessionInfo.getUserId())) {
