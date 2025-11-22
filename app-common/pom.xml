@@ -16,13 +16,13 @@
 
     <properties>
         <maven.deploy.skip>false</maven.deploy.skip>
-        <poi.version>5.4.1</poi.version>
+        <poi.version>5.5.0</poi.version>
         <xwpf.version>2.0.6</xwpf.version>
         <bsh.version>2.0b6</bsh.version>
 
         <sitemesh.version>2.5.0</sitemesh.version>
         <commons-csv.version>1.14.1</commons-csv.version>
-        <commons-cli.version>1.10.0</commons-cli.version>
+        <commons-cli.version>1.11.0</commons-cli.version>
         <commons-compress.version>1.28.0</commons-compress.version>
         <ckfinder.version>2.3</ckfinder.version>
         <jwt.version>4.5.0</jwt.version>
@@ -144,7 +144,7 @@
         <dependency>
             <groupId>org.javadelight</groupId>
             <artifactId>delight-rhino-sandbox</artifactId>
-            <version>0.0.18</version>
+            <version>0.2.1</version>
         </dependency>
 
 

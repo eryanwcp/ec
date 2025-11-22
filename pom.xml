@@ -43,7 +43,7 @@
         <logback-classic.version>1.2.13</logback-classic.version>
         <byte-buddy.version>1.14.19</byte-buddy.version>
 
-        <tomcat.version>9.0.111</tomcat.version>
+        <tomcat.version>9.0.112</tomcat.version>
 
         <mybatis-spring-boot.version>2.3.2</mybatis-spring-boot.version>
         <commons-pool2.version>2.12.1</commons-pool2.version>
@@ -54,7 +54,7 @@
         <oscar.driver.version>4.0.2</oscar.driver.version>
 
         <httpcomponents.version>4.5.14</httpcomponents.version>
-        <commons-codec.version>1.19.0</commons-codec.version>
+        <commons-codec.version>1.20.0</commons-codec.version>
 
 
         <ec-common.version>4.2.20241221.53</ec-common.version>
