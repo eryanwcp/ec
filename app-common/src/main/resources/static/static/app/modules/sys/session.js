@@ -34,7 +34,13 @@ $(function () {
             title: 'ID',
             field: 'id',
             width: 260,formatter: function (value, rowData, rowIndex) {
-                return "<a target='_blank' href='" + ctxAdmin + "/sys/session/detail?id=" + rowData['id'] + "'>" + value + "</a>";
+                return "<a target='_blank' href='" + ctxAdmin + "/sys/session/detail?sessionId=" + rowData['sessionId'] + "'>" + value + "</a>";
+            }
+        },{
+            title: 'SESSIONID',
+            field: 'sessionId',
+            width: 260,formatter: function (value, rowData, rowIndex) {
+                return "<a target='_blank' href='" + ctxAdmin + "/sys/session/detail?sessionId=" + rowData['sessionId'] + "'>" + value + "</a>";
             }
         }, {
             title: 'HOST',
@@ -151,14 +157,14 @@ function offline(rowIndex) {
     if (rows.length > 0) {
         $.messager.confirm('确认提示！', tipMsg, function (r) {
             if (r) {
-                var ids = [];
+                var sessionIds = [];
                 $.each(rows, function (i, row) {
-                    ids[i] = row.id;
+                    sessionIds[i] = row['sessionId'];
                 });
                 $.ajax({
                     url: ctxAdmin + '/sys/session/offline',
                     type: 'post',
-                    data: {sessionIds: ids},
+                    data: {sessionIds: sessionIds},
                     traditional: true,
                     dataType: 'json',
                     success: function (data) {

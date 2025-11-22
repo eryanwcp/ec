@@ -9,20 +9,24 @@ import com.eryansky.common.exception.ActionException;
 import com.eryansky.common.model.Datagrid;
 import com.eryansky.common.model.Result;
 import com.eryansky.common.orm.Page;
-import com.eryansky.common.utils.StringUtils;
+import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SimpleController;
+import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
+import com.eryansky.core.security.annotation.PrepareOauth2;
 import com.eryansky.core.security.annotation.RequiresPermissions;
 import com.eryansky.core.web.annotation.Mobile;
 import com.eryansky.core.web.annotation.MobileValue;
 import com.eryansky.modules.sys._enum.LogType;
+import com.eryansky.modules.sys.mapper.Log;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -31,6 +35,7 @@ import java.util.List;
  * @author Eryan
  * @date 2015-05-18
  */
+@PrepareOauth2(enable = false)
 @Controller
 @RequestMapping(value = "${adminPath}/sys/session")
 public class SessionController extends SimpleController {
@@ -49,11 +54,12 @@ public class SessionController extends SimpleController {
      * @return
      */
     @PostMapping(value = {"onLineSessions"})
-    @ResponseBody
-    public Datagrid<SessionInfo> onlineDatagrid(HttpServletRequest request, String query) {
+    public String onlineDatagrid(HttpServletRequest request, HttpServletResponse response, String query) {
         Page<SessionInfo> page = new Page<>(request);
         page = SecurityUtils.findSessionInfoPage(page,null,query);
-        return new Datagrid<>(page.getTotalCount(), page.getResult());
+        Datagrid dg = new Datagrid<>(page.getTotalCount(), page.getResult());
+        String json = SecurityUtils.isCurrentUserAdmin() ? JsonMapper.getInstance().toJson(dg):JsonMapper.getInstance().toJsonWithExcludeProperties(dg, SessionInfo.class, new String[]{"token","refreshToken"});
+        return renderString(response, json, WebUtils.JSON_TYPE);
     }
 
     /**
@@ -62,12 +68,13 @@ public class SessionController extends SimpleController {
      * @return
      */
     @PostMapping(value = {"winthPermissionsOnLineSessions"})
-    @ResponseBody
-    public Datagrid<SessionInfo> winthPermissionsOnLineSessions(HttpServletRequest request, String query) {
+    public String winthPermissionsOnLineSessions(HttpServletRequest request, HttpServletResponse response, String query) {
         Page<SessionInfo> page = new Page<>(request);
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         page = SecurityUtils.findSessionInfoPage(page,(sessionInfo.isSuperUser() || SecurityUtils.isPermittedMaxRoleDataScope()) ? null:sessionInfo.getLoginCompanyId(),query);
-        return new Datagrid<>(page.getTotalCount(), page.getResult());
+        Datagrid dg = new Datagrid<>(page.getTotalCount(), page.getResult());
+        String json = SecurityUtils.isCurrentUserAdmin() ? JsonMapper.getInstance().toJson(dg):JsonMapper.getInstance().toJsonWithExcludeProperties(dg, SessionInfo.class, new String[]{"token","refreshToken"});
+        return renderString(response, json, WebUtils.JSON_TYPE);
     }
     /**
      * 强制用户下线
@@ -101,36 +108,14 @@ public class SessionController extends SimpleController {
     /**
      * 详细信息
      *
-     * @param id
+     * @param sessionId
      * @return
      */
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"detail"})
-    @ResponseBody
-    public Result detail(String id) {
-        SessionInfo sessionInfo = SecurityUtils.getSessionInfo(id);
-        return Result.successResult().setObj(sessionInfo);
-    }
-
-    /**
-     * 根据token同步sessionid
-     *
-     * @param token
-     * @param sessionId
-     * @param request
-     * @return
-     */
-    @Logging(value = "同步Token到Session",logType = LogType.access)
-    @PostMapping(value = {"syncTokenToSession"})
-    @ResponseBody
-    public Result syncTokenToSession(String token,String sessionId,HttpServletRequest request) {
-        SessionInfo sessionInfo = SecurityUtils.getSessionInfoByTokenOrRefreshToken(token);
-        String _sessionId = StringUtils.isNotBlank(sessionId) ? sessionId:request.getSession().getId();
-        //更新真实的SessionID
-        if (sessionInfo != null && _sessionId != null && !sessionInfo.getId().equals(_sessionId)) {
-            sessionInfo.setId(_sessionId);
-            SecurityUtils.refreshSessionInfo(sessionInfo);
-        }
-        return Result.successResult().setData(sessionInfo);
+    public String detail(HttpServletResponse response,String sessionId) {
+        SessionInfo sessionInfo = SecurityUtils.getSessionInfo(sessionId);
+        String json = SecurityUtils.isCurrentUserAdmin() ? JsonMapper.getInstance().toJson(sessionInfo):JsonMapper.getInstance().toJsonWithExcludeProperties(sessionInfo, SessionInfo.class, new String[]{"token","refreshToken"});
+        return renderString(response, json, WebUtils.JSON_TYPE);
     }
 
 

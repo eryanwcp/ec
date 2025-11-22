@@ -56,7 +56,7 @@ public class SSORedirctController extends SimpleController {
             token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""),"Bearer","");
         }
         if (StringUtils.isBlank(token) && null != sessionInfo) {
-            token =  sessionInfo.getRefreshToken();
+            token =  sessionInfo.getToken();
         }
 
         if(!StringUtils.contains(url,AuthorityInterceptor.ATTR_AUTHORIZATION)){
