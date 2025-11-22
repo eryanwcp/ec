@@ -19,7 +19,7 @@
         <maven.deploy.skip>true</maven.deploy.skip>
         <velocity.version>2.4.1</velocity.version>
         <liquibase.version>4.33.0</liquibase.version>
-        <commons-cli.version>1.10.0</commons-cli.version>
+        <commons-cli.version>1.11.0</commons-cli.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>

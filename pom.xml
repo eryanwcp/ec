@@ -36,20 +36,20 @@
         <java.version>17</java.version>
         <tomcat-plugin.version>2.2</tomcat-plugin.version>
 
-        <spring-boot.version>3.4.11</spring-boot.version>
-        <spring-integration-redis.version>6.4.8</spring-integration-redis.version>
-        <logstash-logback-encoder.version>8.1</logstash-logback-encoder.version>
-        <logback-classic.version>1.5.20</logback-classic.version>
+        <spring-boot.version>3.4.12</spring-boot.version>
+        <spring-integration-redis.version>6.4.9</spring-integration-redis.version>
+        <logstash-logback-encoder.version>9.0</logstash-logback-encoder.version>
+        <logback-classic.version>1.5.21</logback-classic.version>
         <byte-buddy.version>1.17.8</byte-buddy.version>
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
 
-        <tomcat.version>10.1.48</tomcat.version>
+        <tomcat.version>10.1.49</tomcat.version>
 
         <mybatis-spring-boot.version>3.0.5</mybatis-spring-boot.version>
         <commons-pool2.version>2.12.1</commons-pool2.version>
         <druid-version>1.2.27</druid-version>
         <mariadb.driver.version>3.5.6</mariadb.driver.version>
-        <mysql.driver.version>9.4.0</mysql.driver.version>
+        <mysql.driver.version>9.5.0</mysql.driver.version>
         <db2.driver.version>10.1</db2.driver.version>
 
         <httpcomponents.version>4.5.14</httpcomponents.version>
