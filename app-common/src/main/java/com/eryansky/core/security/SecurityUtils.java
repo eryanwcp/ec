@@ -12,6 +12,7 @@ import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.UserAgentUtils;
 import com.eryansky.common.utils.collections.Collections3;
+import com.eryansky.common.utils.encode.MD5Util;
 import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.common.web.utils.WebUtils;
@@ -538,7 +539,7 @@ public class SecurityUtils {
      */
     public static SessionInfo putUserToSession(HttpServletRequest request, User user) {
         HttpSession session = request.getSession();
-        String sessionId = session.getId();
+        String sessionId = SecurityUtils.getNoSuffixSessionId(session);
         if (logger.isDebugEnabled()) {
             logger.debug("putUserToSession:{}", sessionId);
         }
@@ -560,7 +561,8 @@ public class SecurityUtils {
         sessionInfo.setDeviceCode(deviceCode_s);
         sessionInfo.setDeviceType(StringUtils.isNotBlank(platform_s) ? platform_s:UserAgentUtils.getDeviceType(request).toString());
         setOrRefreshSessionInfoToken(sessionInfo,user.getPassword());
-        sessionInfo.setId(SecurityUtils.getNoSuffixSessionId(session));
+        sessionInfo.setId(MD5Util.getStringMD5(sessionInfo.getToken()));
+        sessionInfo.setSessionId(sessionId);
 //        sessionInfo.addIfNotExistLoginName(sessionInfo.getLoginName());
         //可选账号
 //        List<User> users = UserUtils.findByCode(sessionInfo.getCode());
@@ -589,7 +591,9 @@ public class SecurityUtils {
         initPermission(sessionInfo);
 
         refreshSessionInfo(sessionInfo);
-//        Static.applicationSessionContext.addServletSession(sessionInfo.getSessionId(),session);
+        Static.applicationSessionContext.bindSessionInfoId(sessionInfo.getId(),sessionInfo.getSessionId());
+        //TODO  兼容性代码
+        Static.applicationSessionContext.bindSessionInfoId(MD5Util.getStringMD5(sessionInfo.getRefreshToken()),sessionInfo.getSessionId());
         request.getSession().setAttribute("loginUser", sessionInfo.getName() + "[" + sessionInfo.getLoginName() + "]");
         return sessionInfo;
     }
@@ -684,8 +688,6 @@ public class SecurityUtils {
      */
     public static void refreshSessionInfo(SessionInfo sessionInfo) {
         Static.applicationSessionContext.addSession(sessionInfo);
-//        removeExtendSession(sessionInfo.getId());
-        //syncExtendSession(sessionInfo);
     }
 
     /**
@@ -694,12 +696,9 @@ public class SecurityUtils {
      * @return
      */
     public static void setOrRefreshSessionInfoToken(SessionInfo sessionInfo, String secret) {
-        sessionInfo.setToken(JWTUtils.sign(sessionInfo.getLoginName(), null == secret ? StringUtils.EMPTY : secret));
-        sessionInfo.setRefreshToken(JWTUtils.sign(sessionInfo.getLoginName(), null == secret ? StringUtils.EMPTY : secret, 7 * 24 * 60 * 60 * 1000L));
+        sessionInfo.setToken(JWTUtils.sign(sessionInfo.getLoginName(), null == secret ? StringUtils.EMPTY : secret, 7 * 24 * 60 * 60 * 1000L));
+        sessionInfo.setRefreshToken(JWTUtils.sign(sessionInfo.getLoginName(), null == secret ? StringUtils.EMPTY : secret, 30 * 24 * 60 * 60 * 1000L));
     }
-
-
-
 
     /**
      * 用户Token信息 校验
@@ -813,11 +812,6 @@ public class SecurityUtils {
             String sessionId = getNoSuffixSessionId(session);
             sessionInfo = getSessionInfo(sessionId);
 
-            //关联sessionId
-            if (sessionInfo == null) {
-                String fixedSessionId = getFixedSessionId(sessionId);
-                sessionInfo = getSessionInfo(fixedSessionId);
-            }
             //Authorization 请求头或请求参数
             if (sessionInfo == null) {
                 String authorization = request.getParameter(AuthorityInterceptor.ATTR_AUTHORIZATION);
@@ -829,7 +823,7 @@ public class SecurityUtils {
                 }
                 if (StringUtils.isNotBlank(authorization)) {
                     String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""),"Bearer","");
-                    sessionInfo = getSessionInfoByTokenOrRefreshToken(token);
+                    sessionInfo = getSessionInfoByTokenOrRefreshTokenWithMd5(token);
                 }
             }
         } catch (Exception e) {
@@ -938,7 +932,7 @@ public class SecurityUtils {
      */
     public static void offLineAll() {
         List<SessionInfo> sessionInfos = SecurityUtils.findSessionInfoList();
-        sessionInfos.forEach(sessionInfo -> removeSessionInfoFromSession(sessionInfo.getId(), SecurityType.offline));
+        sessionInfos.forEach(sessionInfo -> removeSessionInfoFromSession(sessionInfo.getSessionId(), SecurityType.offline));
     }
 
     /**
@@ -959,12 +953,15 @@ public class SecurityUtils {
      * @param invalidate 刷新
      */
     public static void removeSessionInfoFromSession(String sessionId, SecurityType securityType, Boolean invalidate) {
-        SessionInfo _sessionInfo = Static.applicationSessionContext.getSession(sessionId);
+        SessionInfo _sessionInfo = getSessionInfo(sessionId);
         if (_sessionInfo != null) {
             Static.userService.logout(_sessionInfo.getUserId(), securityType);
+            Static.applicationSessionContext.unBindSessionInfoId(_sessionInfo.getId());
+            //TODO 兼容性代码 临时用
+            Static.applicationSessionContext.unBindSessionInfoId(MD5Util.getStringMD5(_sessionInfo.getRefreshToken()));
         }
         Static.applicationSessionContext.removeSessionInfo(sessionId);
-        removeExtendSession(sessionId);
+
         if (null != invalidate && invalidate) {
             try {
 
@@ -1078,7 +1075,7 @@ public class SecurityUtils {
     }
 
     /**
-     * 查看某个用户登录信息
+     * 查看某个用户登录信息 （低并发使用）
      * @param token
      * @return
      */
@@ -1105,6 +1102,16 @@ public class SecurityUtils {
     public static SessionInfo getSessionInfoByTokenOrRefreshToken(String token) {
         List<SessionInfo> list = findSessionInfoList();
         return list.parallelStream().filter(sessionInfo -> token.equals(sessionInfo.getToken()) || token.equals(sessionInfo.getRefreshToken())).findFirst().orElse(null);
+    }
+
+    /**
+     * 查看某个用户登录信息
+     * @param token
+     * @return
+     */
+    public static SessionInfo getSessionInfoByTokenOrRefreshTokenWithMd5(String token) {
+        String sessionInfoId = MD5Util.getStringMD5(token);
+        return getSessionInfoById(sessionInfoId);
     }
 
     /**
@@ -1163,12 +1170,23 @@ public class SecurityUtils {
     }
 
     /**
-     * 根据SessionId查找对应的SessionInfo信息
+     * 根据sessionId查找对应的SessionInfo信息
+     * @param sessionId
+     * @return
+     */
+    public static SessionInfo getSessionInfo(String sessionId) {
+        return Static.applicationSessionContext.getSession(sessionId);
+    }
+
+
+    /**
+     * 根据SessionInfoId查找对应的SessionInfo信息
      * @param id
      * @return
      */
-    public static SessionInfo getSessionInfo(String id) {
-        return Static.applicationSessionContext.getSession(id);
+    public static SessionInfo getSessionInfoById(String id) {
+        String sessionId = Static.applicationSessionContext.getbindSessionId(id);
+        return getSessionInfo(sessionId);
     }
 
     public static boolean isMobileLogin() {
@@ -1194,75 +1212,6 @@ public class SecurityUtils {
         List<SessionInfo> list = findSessionInfoList();
         return list.stream().map(SessionInfo::getHost).filter(Objects::nonNull).collect(Collectors.toSet());
     }
-
-    /**
-     * APP与Webview session同步兼容 添加关联已有sessionId
-     * @param sessionId
-     * @return
-     */
-    public static void addExtendSession(String sessionId,String sessionInfoId) {
-       Static.applicationSessionContext.addExtendSessionInfo(sessionId,sessionInfoId);
-    }
-
-    /**
-     * APP与Webview session cache keys
-     * @return
-     */
-    public static Collection<String> findExtendSessionIdKeys() {
-        return Static.applicationSessionContext.findSessionExtendKeys();
-    }
-
-
-    /**
-     * APP与Webview session cache data
-     * @return
-     */
-    public static List<Map<String, String>> findExtendSessionIds() {
-        return Lists.newArrayList(findExtendSessionIdKeys()).parallelStream().map(v -> {
-            Map<String, String> data = Maps.newHashMap();
-            data.put(v, getExtendSessionId(v));
-            return data;
-        }).collect(Collectors.toList());
-    }
-
-    /**
-     * APP与Webview session同步兼容 查找关联已有sessionId
-     * @param sessionId
-     * @return
-     */
-    public static String getExtendSessionId(String sessionId) {
-        return Static.applicationSessionContext.getExtendSession(sessionId);
-    }
-
-    /**
-     * APP与Webview session同步兼容
-     * @param sessionId
-     * @return
-     */
-    public static String getFixedSessionId(String sessionId) {
-        String sessionInfoId = getExtendSessionId(sessionId);
-        return null != sessionInfoId ? sessionInfoId:sessionId;
-    }
-
-    /**
-     * APP与Webview 同步刷新关联信息
-     * @param sessionInfo
-     */
-    public static void syncExtendSession(SessionInfo sessionInfo) {
-        Collection<String> sessionInfoIds = Static.applicationSessionContext.findSessionExtendKeys();
-        sessionInfoIds.stream().filter(v -> sessionInfo.getId().equals(getExtendSessionId(v))).forEach(v -> addExtendSession(v, sessionInfo.getId()));
-    }
-
-
-    /**
-     * APP与Webview 同步删除关联信息
-     * @param sessionInfoId
-     */
-    public static void removeExtendSession(String sessionInfoId) {
-        Collection<String> sessionIds = Static.applicationSessionContext.findSessionExtendKeys();
-        sessionIds.stream().filter(v -> sessionInfoId.equals(getExtendSessionId(v))).forEach(v -> Static.applicationSessionContext.removeExtendSessionInfo(v));
-    }
-
 
     public static final String LOCK_URL_LIMIT_REGION = "lock_url_limit";
 

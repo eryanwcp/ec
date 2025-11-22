@@ -5,6 +5,7 @@ import com.eryansky.common.utils.StringUtils;
 import com.eryansky.j2cache.session.CacheFacade;
 import com.eryansky.j2cache.session.J2CacheSessionFilter;
 import com.eryansky.j2cache.session.SessionObject;
+import com.eryansky.utils.CacheUtils;
 import org.joda.time.Instant;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 
@@ -16,6 +17,9 @@ import java.util.stream.Collectors;
  */
 public class ApplicationSessionContext {
 
+	private static final String CACHE_SESSION_ID_BIND = "session_id_bind";
+
+	private J2CacheSessionFilter sessionFilter;
 	private CacheFacade cacheFacade;
 
 	/**
@@ -23,14 +27,15 @@ public class ApplicationSessionContext {
 	 */
 	public static final class Static {
 		private static final FilterRegistrationBean<J2CacheSessionFilter> filterRegistrationBean = SpringContextHolder.getBean("j2CacheSessionFilter", FilterRegistrationBean.class);
-		private static final ApplicationSessionContext instance = new ApplicationSessionContext(filterRegistrationBean.getFilter().getCache());
+		private static final ApplicationSessionContext instance = new ApplicationSessionContext(filterRegistrationBean.getFilter());
 	}
 
 	private ApplicationSessionContext() {
 	}
 
-	public ApplicationSessionContext(CacheFacade cacheFacade) {
-		this.cacheFacade = cacheFacade;
+	public ApplicationSessionContext(J2CacheSessionFilter sessionFilter) {
+		this.sessionFilter = sessionFilter;
+		this.cacheFacade = sessionFilter.getCache();
 	}
 
 	public static ApplicationSessionContext getInstance() {
@@ -38,12 +43,8 @@ public class ApplicationSessionContext {
 	}
 
 	public void addSession(SessionInfo sessionInfo) {
-		addSession(null,sessionInfo);
-	}
-
-	public void addSession(String sessionId,SessionInfo sessionInfo) {
 		if (sessionInfo != null) {
-			SessionObject sessionObject = cacheFacade.getSession(StringUtils.isNotBlank(sessionId) ? sessionId:sessionInfo.getId());
+			SessionObject sessionObject = cacheFacade.getSession(sessionInfo.getSessionId());
 			sessionObject.put(SessionObject.KEY_SESSION_DATA,sessionInfo);
 			cacheFacade.setSessionAttribute(sessionObject,SessionObject.KEY_SESSION_DATA);
 		}
@@ -76,11 +77,6 @@ public class ApplicationSessionContext {
             sessionInfo.setUpdateTime(Instant.ofEpochMilli(sessionObject.getLastAccess_at()).toDate());
         }
         return sessionInfo;
-	}
-
-	public List<SessionInfo> findSessionInfoDataRemoveDuplicate() {
-		List<SessionInfo> list = findSessionInfoData();
-		return new ArrayList<>(new HashSet<>(list));
 	}
 
 	public List<SessionInfo> findSessionInfoData() {
@@ -136,51 +132,35 @@ public class ApplicationSessionContext {
 
 
 	/**
-	 * APP与Webview session同步兼容 添加关联已有sessionId
+	 * 绑定sessionInfoId 与 sessionId
+	 * @param sessionInfoId
 	 * @param sessionId
 	 * @return
 	 */
-	public void addExtendSessionInfo(String sessionId, String sessionInfoId) {
-		SessionObject sessionObject = cacheFacade.getSession(sessionId);
-		sessionObject.put(SessionObject.KEY_SESSION_EXTEND,sessionInfoId);
-		cacheFacade.setSessionAttribute(sessionObject,SessionObject.KEY_SESSION_EXTEND);
+	public void bindSessionInfoId(String sessionInfoId, String sessionId) {
+		CacheUtils.put(CACHE_SESSION_ID_BIND,sessionInfoId,sessionId);
 	}
 
 	/**
-	 * APP与Webview session同步兼容 添加关联已有sessionId
-	 * @param sessionId
+	 * 解除绑定sessionInfoId 与 sessionId
+	 * @param sessionInfoId
 	 * @return
 	 */
-	public void removeExtendSessionInfo(String sessionId) {
-		SessionObject sessionObject = cacheFacade.getSession(sessionId);
-		if(null != sessionObject){
-			sessionObject.remove(SessionObject.KEY_SESSION_EXTEND);
-			cacheFacade.removeSessionAttribute(sessionObject,SessionObject.KEY_SESSION_EXTEND);
-		}
-
+	public void unBindSessionInfoId(String sessionInfoId) {
+		CacheUtils.remove(CACHE_SESSION_ID_BIND,sessionInfoId);
 	}
+
 
 	/**
-	 * APP与Webview session同步兼容 查找关联已有sessionId
-	 * @param sessionId
+	 * 获取sessionInfoId 绑定的sessionId
+	 * @param sessionInfoId
 	 * @return
 	 */
-	public String getExtendSession(String sessionId) {
-		SessionObject sessionObject = cacheFacade.getSession(sessionId);
-		return null == sessionObject ? null:(String)sessionObject.get(SessionObject.KEY_SESSION_EXTEND);
+	public String getbindSessionId(String sessionInfoId) {
+		String sessionId = CacheUtils.get(CACHE_SESSION_ID_BIND,sessionInfoId);
+		return null != sessionId ? sessionId:sessionInfoId;
 	}
 
-	/**
-	 * APP与Webview session同步兼容 查找所有关联sessionId
-	 * @return
-	 */
-	public Collection<String> findSessionExtendKeys() {
-		Collection<String> keys = cacheFacade.keys();
-		return keys.parallelStream().filter(key->{
-			SessionObject sessionObject = cacheFacade.getSession(key);
-			return  null != sessionObject && null != sessionObject.get(SessionObject.KEY_SESSION_EXTEND);
-		}).collect(Collectors.toList());
-	}
 
 
 
