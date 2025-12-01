@@ -41,7 +41,6 @@ import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.net.InetAddress;
@@ -284,7 +283,8 @@ public class SecurityUtils {
                 }
             }
             if (userId == null) {
-                throw new SystemException("用户[" + userId + "]不存在.");
+                return  false;
+//                throw new SystemException("用户[" + userId + "]不存在.");
             }
 
             if (sessionInfo != null && userId.equals(sessionInfo.getUserId())) {
@@ -445,7 +445,7 @@ public class SecurityUtils {
     }
 
     /**
-     * 判断某个用户是否有某个刚问
+     * 判断某个用户是否有某个岗位
      *
      * @param userId   用户ID
      * @param postCode 角色编码
@@ -461,7 +461,8 @@ public class SecurityUtils {
                 }
             }
             if (userId == null) {
-                throw new SystemException("用户[" + userId + "]不存在.");
+                return  false;
+//                throw new SystemException("用户[" + userId + "]不存在.");
             }
 
             if (sessionInfo != null && userId.equals(sessionInfo.getUserId())) {
@@ -591,13 +592,39 @@ public class SecurityUtils {
         initPermission(sessionInfo);
 
         refreshSessionInfo(sessionInfo);
-        Static.applicationSessionContext.bindSessionInfoId(sessionInfo.getId(),sessionInfo.getSessionId());
+        bindSessionInfoId(sessionInfo.getId(),sessionInfo.getSessionId());
         //TODO  兼容性代码
-        Static.applicationSessionContext.bindSessionInfoId(MD5Util.getStringMD5(sessionInfo.getRefreshToken()),sessionInfo.getSessionId());
+        bindSessionInfoId(MD5Util.getStringMD5(sessionInfo.getRefreshToken()),sessionInfo.getSessionId());
         request.getSession().setAttribute("loginUser", sessionInfo.getName() + "[" + sessionInfo.getLoginName() + "]");
         return sessionInfo;
     }
 
+
+    /**
+     * 查询绑定会话ID
+     * @param sessionId
+     * @return
+     */
+    public static String getbindSessionId(String sessionId){
+        return Static.applicationSessionContext.getbindSessionId(sessionId);
+    }
+
+    /**
+     * 绑定会话ID
+     * @param sessionId 会话ID
+     * @param bindSessionId 关联对象ID
+     */
+    public static void bindSessionInfoId(String sessionId,String bindSessionId){
+        Static.applicationSessionContext.bindSessionInfoId(sessionId,bindSessionId);
+    }
+
+    /**
+     * 解除绑定会话ID
+     * @param sessionId 会话ID
+     */
+    public static void unBindSessionInfoId(String sessionId){
+        Static.applicationSessionContext.unBindSessionInfoId(sessionId);
+    }
 
     /**
      * 将用户放入session中. 测试用
@@ -811,6 +838,10 @@ public class SecurityUtils {
             }
             String sessionId = getNoSuffixSessionId(session);
             sessionInfo = getSessionInfo(sessionId);
+            //关联sessionId
+            if (sessionInfo == null) {
+                sessionInfo = getSessionInfoById(sessionId);
+            }
 
             //Authorization 请求头或请求参数
             if (sessionInfo == null) {
@@ -956,9 +987,9 @@ public class SecurityUtils {
         SessionInfo _sessionInfo = getSessionInfo(sessionId);
         if (_sessionInfo != null) {
             Static.userService.logout(_sessionInfo.getUserId(), securityType);
-            Static.applicationSessionContext.unBindSessionInfoId(_sessionInfo.getId());
+            unBindSessionInfoId(_sessionInfo.getId());
             //TODO 兼容性代码 临时用
-            Static.applicationSessionContext.unBindSessionInfoId(MD5Util.getStringMD5(_sessionInfo.getRefreshToken()));
+            unBindSessionInfoId(MD5Util.getStringMD5(_sessionInfo.getRefreshToken()));
         }
         Static.applicationSessionContext.removeSessionInfo(sessionId);
 
