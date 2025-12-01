@@ -592,12 +592,40 @@ public class SecurityUtils {
         initPermission(sessionInfo);
 
         refreshSessionInfo(sessionInfo);
-        Static.applicationSessionContext.bindSessionInfoId(sessionInfo.getId(),sessionInfo.getSessionId());
+        bindSessionInfoId(sessionInfo.getId(),sessionInfo.getSessionId());
         //TODO  兼容性代码
-        Static.applicationSessionContext.bindSessionInfoId(MD5Util.getStringMD5(sessionInfo.getRefreshToken()),sessionInfo.getSessionId());
+        bindSessionInfoId(MD5Util.getStringMD5(sessionInfo.getRefreshToken()),sessionInfo.getSessionId());
         request.getSession().setAttribute("loginUser", sessionInfo.getName() + "[" + sessionInfo.getLoginName() + "]");
         return sessionInfo;
     }
+
+
+    /**
+     * 查询绑定会话ID
+     * @param sessionId
+     * @return
+     */
+    public static String getbindSessionId(String sessionId){
+        return Static.applicationSessionContext.getbindSessionId(sessionId);
+    }
+
+    /**
+     * 绑定会话ID
+     * @param sessionId 会话ID
+     * @param bindSessionId 关联对象ID
+     */
+    public static void bindSessionInfoId(String sessionId,String bindSessionId){
+        Static.applicationSessionContext.bindSessionInfoId(sessionId,bindSessionId);
+    }
+
+    /**
+     * 解除绑定会话ID
+     * @param sessionId 会话ID
+     */
+    public static void unBindSessionInfoId(String sessionId){
+        Static.applicationSessionContext.unBindSessionInfoId(sessionId);
+    }
+
 
 
     /**
@@ -812,6 +840,10 @@ public class SecurityUtils {
             }
             String sessionId = getNoSuffixSessionId(session);
             sessionInfo = getSessionInfo(sessionId);
+            //关联sessionId
+            if (sessionInfo == null) {
+                sessionInfo = getSessionInfoById(sessionId);
+            }
 
             //Authorization 请求头或请求参数
             if (sessionInfo == null) {
@@ -957,9 +989,9 @@ public class SecurityUtils {
         SessionInfo _sessionInfo = getSessionInfo(sessionId);
         if (_sessionInfo != null) {
             Static.userService.logout(_sessionInfo.getUserId(), securityType);
-            Static.applicationSessionContext.unBindSessionInfoId(_sessionInfo.getId());
+            unBindSessionInfoId(_sessionInfo.getId());
             //TODO 兼容性代码 临时用
-            Static.applicationSessionContext.unBindSessionInfoId(MD5Util.getStringMD5(_sessionInfo.getRefreshToken()));
+            unBindSessionInfoId(MD5Util.getStringMD5(_sessionInfo.getRefreshToken()));
         }
         Static.applicationSessionContext.removeSessionInfo(sessionId);
 
