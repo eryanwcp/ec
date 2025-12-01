@@ -1215,8 +1215,8 @@ public class SecurityUtils {
      * @return
      */
     public static SessionInfo getSessionInfoById(String id) {
-        String sessionId = Static.applicationSessionContext.getbindSessionId(id);
-        return getSessionInfo(sessionId);
+        String bindSessionId = getbindSessionId(id);
+        return getSessionInfo(bindSessionId);
     }
 
     public static boolean isMobileLogin() {
