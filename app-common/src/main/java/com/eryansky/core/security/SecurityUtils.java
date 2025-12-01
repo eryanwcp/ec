@@ -987,7 +987,6 @@ public class SecurityUtils {
         if (_sessionInfo != null) {
             Static.userService.logout(_sessionInfo.getUserId(), securityType);
             unBindSessionInfoId(_sessionInfo.getId());
-            //TODO 兼容性代码 临时用
             unBindSessionInfoId(MD5Util.getStringMD5(_sessionInfo.getRefreshToken()));
         }
         Static.applicationSessionContext.removeSessionInfo(sessionId);
