@@ -593,7 +593,6 @@ public class SecurityUtils {
 
         refreshSessionInfo(sessionInfo);
         bindSessionInfoId(sessionInfo.getId(),sessionInfo.getSessionId());
-        //TODO  兼容性代码
         bindSessionInfoId(MD5Util.getStringMD5(sessionInfo.getRefreshToken()),sessionInfo.getSessionId());
         request.getSession().setAttribute("loginUser", sessionInfo.getName() + "[" + sessionInfo.getLoginName() + "]");
         return sessionInfo;

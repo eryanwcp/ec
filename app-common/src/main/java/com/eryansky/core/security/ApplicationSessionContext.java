@@ -133,32 +133,32 @@ public class ApplicationSessionContext {
 
 	/**
 	 * 绑定sessionInfoId 与 sessionId
-	 * @param sessionInfoId
+	 * @param sessionId 会话ID
+	 * @param bindSessionId 关联对象ID
+	 * @return
+	 */
+	public void bindSessionInfoId(String sessionId, String bindSessionId) {
+		CacheUtils.put(CACHE_SESSION_ID_BIND,sessionId,bindSessionId);
+	}
+
+	/**
+	 * 解除绑定sessionId
 	 * @param sessionId
 	 * @return
 	 */
-	public void bindSessionInfoId(String sessionInfoId, String sessionId) {
-		CacheUtils.put(CACHE_SESSION_ID_BIND,sessionInfoId,sessionId);
-	}
-
-	/**
-	 * 解除绑定sessionInfoId 与 sessionId
-	 * @param sessionInfoId
-	 * @return
-	 */
-	public void unBindSessionInfoId(String sessionInfoId) {
-		CacheUtils.remove(CACHE_SESSION_ID_BIND,sessionInfoId);
+	public void unBindSessionInfoId(String sessionId) {
+		CacheUtils.remove(CACHE_SESSION_ID_BIND,sessionId);
 	}
 
 
 	/**
-	 * 获取sessionInfoId 绑定的sessionId
-	 * @param sessionInfoId
+	 * 获取绑定的sessionId
+	 * @param sessionId
 	 * @return
 	 */
-	public String getbindSessionId(String sessionInfoId) {
-		String sessionId = CacheUtils.get(CACHE_SESSION_ID_BIND,sessionInfoId);
-		return null != sessionId ? sessionId:sessionInfoId;
+	public String getbindSessionId(String sessionId) {
+		String bindSessionId = CacheUtils.get(CACHE_SESSION_ID_BIND,sessionId);
+		return null != bindSessionId ? bindSessionId:sessionId;
 	}
 
 
