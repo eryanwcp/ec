@@ -72,12 +72,6 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
         request.setAttribute(ATTR_SESSIONINFO,sessionInfo);
         if(null != sessionInfo){
             response.setHeader(ATTR_AUTHORIZATION, sessionInfo.getToken());
-            //自动修复APP跳转webview关联
-            HttpSession httpSession = request.getSession();
-            if(!sessionInfo.getId().equals(httpSession.getId()) && !sessionInfo.getSessionId().equals(httpSession.getId())  && null != SecurityUtils.getbindSessionId(httpSession.getId()) ){
-                SecurityUtils.bindSessionInfoId(httpSession.getId(),sessionInfo.getSessionId());
-            }
-
         }
         String requestUrl = request.getRequestURI();
         requestUrl = requestUrl.replaceAll("//","/");
