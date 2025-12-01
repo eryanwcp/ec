@@ -593,7 +593,6 @@ public class SecurityUtils {
 
         refreshSessionInfo(sessionInfo);
         bindSessionInfoId(sessionInfo.getId(),sessionInfo.getSessionId());
-        //TODO  兼容性代码
         bindSessionInfoId(MD5Util.getStringMD5(sessionInfo.getRefreshToken()),sessionInfo.getSessionId());
         request.getSession().setAttribute("loginUser", sessionInfo.getName() + "[" + sessionInfo.getLoginName() + "]");
         return sessionInfo;
@@ -1216,8 +1215,8 @@ public class SecurityUtils {
      * @return
      */
     public static SessionInfo getSessionInfoById(String id) {
-        String sessionId = Static.applicationSessionContext.getbindSessionId(id);
-        return getSessionInfo(sessionId);
+        String bindSessionId = getbindSessionId(id);
+        return getSessionInfo(bindSessionId);
     }
 
     public static boolean isMobileLogin() {
