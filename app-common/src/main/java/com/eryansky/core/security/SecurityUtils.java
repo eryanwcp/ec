@@ -626,8 +626,6 @@ public class SecurityUtils {
         Static.applicationSessionContext.unBindSessionInfoId(sessionId);
     }
 
-
-
     /**
      * 将用户放入session中. 测试用
      *
