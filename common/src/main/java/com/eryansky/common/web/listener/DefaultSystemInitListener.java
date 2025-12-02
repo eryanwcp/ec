@@ -53,7 +53,7 @@ public class DefaultSystemInitListener implements ServletContextListener,
      */
     @Override
     public void sessionCreated(HttpSessionEvent se) {
-        logger.debug("sessionCreated");
+        logger.debug("sessionDestroyed {}",se.getSession().getId());
     }
 
     /**
@@ -61,22 +61,22 @@ public class DefaultSystemInitListener implements ServletContextListener,
      */
     @Override
     public void sessionDestroyed(HttpSessionEvent evt) {
-        logger.debug("sessionDestroyed");
+        logger.debug("sessionDestroyed {}",evt.getSession().getId());
     }
 
     @Override
     public void attributeAdded(HttpSessionBindingEvent sbe) {
-        logger.debug("attributeAdded");
+        logger.debug("attributeAdded {} {}={}",sbe.getSession().getId(),sbe.getName(),sbe.getValue());
     }
 
     @Override
     public void attributeRemoved(HttpSessionBindingEvent sbe) {
-        logger.debug("attributeRemoved");
+        logger.debug("attributeRemoved {} {}={}",sbe.getSession().getId(),sbe.getName(),sbe.getValue());
     }
 
     @Override
     public void attributeReplaced(HttpSessionBindingEvent sbe) {
-        logger.debug("attributeReplaced");
+        logger.debug("attributeReplaced {} {}={}",sbe.getSession().getId(),sbe.getName(),sbe.getValue());
     }
 
 }

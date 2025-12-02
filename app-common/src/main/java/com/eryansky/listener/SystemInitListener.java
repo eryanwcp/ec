@@ -74,8 +74,8 @@ public class SystemInitListener extends DefaultSystemInitListener{
 	 * session销毁
 	 */
 	public void sessionDestroyed(HttpSessionEvent evt) {
-		logger.debug("sessionDestroyed");
 		String sessionId = SecurityUtils.getNoSuffixSessionId(evt.getSession());
+		logger.debug("sessionDestroyed {}",sessionId);
 		SecurityUtils.removeSessionInfoFromSession(sessionId,SecurityType.logout_abnormal);
 	}
 
