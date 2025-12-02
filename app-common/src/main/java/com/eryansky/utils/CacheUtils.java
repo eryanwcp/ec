@@ -5,11 +5,9 @@
  */
 package com.eryansky.utils;
 
-import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.j2cache.CacheChannel;
 import com.eryansky.j2cache.CacheObject;
 import com.eryansky.j2cache.J2Cache;
-import com.eryansky.listener.SystemInitListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +24,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unchecked")
 public class CacheUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(SystemInitListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(CacheUtils.class);
 
     private static final String SYS_CACHE = "sysCache";
 
