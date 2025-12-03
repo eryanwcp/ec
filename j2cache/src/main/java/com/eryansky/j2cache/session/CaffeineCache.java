@@ -50,9 +50,7 @@ public class CaffeineCache {
                     //程序删除的缓存不做通知处理，因为上层已经做了处理
                     if (!RemovalCause.EXPLICIT.equals(cause) && !RemovalCause.REPLACED.equals(cause) && !RemovalCause.SIZE.equals(cause)) {
                         try {
-                            synchronized (CaffeineCache.class){
-                                listener.notifyElementExpired((String) k);
-                            }
+                            listener.notifyElementExpired((String) k);
                         } catch (Exception e) {
                             logger.error("{}:{} {}",k, v, cause);
                             logger.error(e.getMessage());
