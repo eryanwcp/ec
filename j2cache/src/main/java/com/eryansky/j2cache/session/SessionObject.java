@@ -168,4 +168,11 @@ public class SessionObject implements Serializable {
     public void setAttributes(HashMap<String, Object> attributes) {
         this.attributes.putAll(attributes);
     }
+
+    public Object getAttribute(String key) {
+        return attributes.get(key);
+    }
+    public void setAttribute(String key,Object value) {
+        this.attributes.put(key,value);
+    }
 }
