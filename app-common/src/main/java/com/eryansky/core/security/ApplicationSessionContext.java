@@ -174,11 +174,8 @@ public class ApplicationSessionContext {
 		return findSessionKeys().parallelStream().filter(key -> {
 			SessionObject sessionObject = cacheFacade.getSession(key);
 			Set<String> bindIds = null != sessionObject ? (Set<String>) sessionObject.get(SessionObject.KEY_SESION_ID_BIND) : null;
-			if(null != bindIds && bindIds.contains(sessionId)){
-				return true;
-			}
-			return false;
-		}).findFirst().orElse(null);
+            return null != bindIds && bindIds.contains(sessionId);
+        }).findFirst().orElse(null);
 	}
 
 
