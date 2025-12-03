@@ -32,8 +32,6 @@ import com.eryansky.modules.sys.utils.OrganUtils;
 import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.utils.AppUtils;
 import com.eryansky.utils.CacheUtils;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.net.InetAddresses;
 import org.slf4j.Logger;
@@ -614,7 +612,7 @@ public class SecurityUtils {
      * @return
      */
     public static String getbindSessionId(String sessionId,String defaultSessionId){
-        String bindSessionId = Static.applicationSessionContext.getbindSessionId(sessionId);
+        String bindSessionId = Static.applicationSessionContext.getBindSessionId(sessionId);
         return null != bindSessionId ? bindSessionId:defaultSessionId;
     }
 

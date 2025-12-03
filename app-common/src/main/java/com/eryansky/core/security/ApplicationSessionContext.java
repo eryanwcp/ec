@@ -1,7 +1,6 @@
 package com.eryansky.core.security;
 
 import com.eryansky.common.spring.SpringContextHolder;
-import com.eryansky.common.utils.StringUtils;
 import com.eryansky.j2cache.session.CacheFacade;
 import com.eryansky.j2cache.session.J2CacheSessionFilter;
 import com.eryansky.j2cache.session.SessionObject;
@@ -156,7 +155,7 @@ public class ApplicationSessionContext {
 	 * @param sessionId
 	 * @return
 	 */
-	public String getbindSessionId(String sessionId) {
+	public String getBindSessionId(String sessionId) {
 		return CacheUtils.get(CACHE_SESSION_ID_BIND,sessionId);
 	}
 
