@@ -1,11 +1,10 @@
 package com.eryansky.core.security;
 
 import com.eryansky.common.spring.SpringContextHolder;
-import com.eryansky.common.utils.StringUtils;
 import com.eryansky.j2cache.session.CacheFacade;
 import com.eryansky.j2cache.session.J2CacheSessionFilter;
 import com.eryansky.j2cache.session.SessionObject;
-import com.eryansky.utils.CacheUtils;
+import com.google.common.collect.Sets;
 import org.joda.time.Instant;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 
@@ -16,9 +15,6 @@ import java.util.stream.Collectors;
  * 应用Session上下文
  */
 public class ApplicationSessionContext {
-
-	private static final String CACHE_SESSION_ID_BIND = "session_id_bind";
-
 	private J2CacheSessionFilter sessionFilter;
 	private CacheFacade cacheFacade;
 
@@ -138,16 +134,34 @@ public class ApplicationSessionContext {
 	 * @return
 	 */
 	public void bindSessionInfoId(String sessionId, String bindSessionId) {
-		CacheUtils.put(CACHE_SESSION_ID_BIND,sessionId,bindSessionId);
+		SessionObject sessionObject = cacheFacade.getSession(bindSessionId);
+		if(null != sessionObject){
+			Set<String> bindIds = (Set<String>) sessionObject.getAttribute(SessionObject.KEY_SESION_ID_BIND);
+			if(null == bindIds){
+				bindIds = Sets.newHashSet();
+			}
+			bindIds.add(sessionId);
+			sessionObject.setAttribute(SessionObject.KEY_SESION_ID_BIND, bindIds);
+			cacheFacade.setSessionAttribute(sessionObject,SessionObject.KEY_SESION_ID_BIND);
+		}
 	}
 
 	/**
 	 * 解除绑定sessionId
 	 * @param sessionId
+	 * @param bindSessionId
 	 * @return
 	 */
-	public void unBindSessionInfoId(String sessionId) {
-		CacheUtils.remove(CACHE_SESSION_ID_BIND,sessionId);
+	public void unBindSessionInfoId(String sessionId, String bindSessionId) {
+		SessionObject sessionObject = cacheFacade.getSession(bindSessionId);
+		if(null != sessionObject){
+			Set<String> bindIds = (Set<String>) sessionObject.getAttribute(SessionObject.KEY_SESION_ID_BIND);
+			if(null != bindIds){
+				bindIds.remove(sessionId);
+			}
+			sessionObject.setAttribute(SessionObject.KEY_SESION_ID_BIND, bindIds);
+			cacheFacade.setSessionAttribute(sessionObject,SessionObject.KEY_SESION_ID_BIND);
+		}
 	}
 
 
@@ -156,9 +170,15 @@ public class ApplicationSessionContext {
 	 * @param sessionId
 	 * @return
 	 */
-	public String getbindSessionId(String sessionId) {
-		String bindSessionId = CacheUtils.get(CACHE_SESSION_ID_BIND,sessionId);
-		return null != bindSessionId ? bindSessionId:sessionId;
+	public String getBindSessionId(String sessionId) {
+		return findSessionKeys().parallelStream().filter(key -> {
+			SessionObject sessionObject = cacheFacade.getSession(key);
+			Set<String> bindIds = null != sessionObject ? (Set<String>) sessionObject.get(SessionObject.KEY_SESION_ID_BIND) : null;
+			if(null != bindIds && bindIds.contains(sessionId)){
+				return true;
+			}
+			return false;
+		}).findFirst().orElse(null);
 	}
 
 

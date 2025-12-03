@@ -32,8 +32,6 @@ import com.eryansky.modules.sys.utils.OrganUtils;
 import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.utils.AppUtils;
 import com.eryansky.utils.CacheUtils;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.net.InetAddresses;
 import org.slf4j.Logger;
@@ -604,8 +602,18 @@ public class SecurityUtils {
      * @param sessionId
      * @return
      */
-    public static String getbindSessionId(String sessionId){
-        return Static.applicationSessionContext.getbindSessionId(sessionId);
+    public static String getBindSessionId(String sessionId){
+        return getBindSessionId(sessionId,null);
+    }
+
+    /**
+     * 查询绑定会话ID
+     * @param sessionId
+     * @return
+     */
+    public static String getBindSessionId(String sessionId, String defaultSessionId){
+        String bindSessionId = Static.applicationSessionContext.getBindSessionId(sessionId);
+        return null != bindSessionId ? bindSessionId:defaultSessionId;
     }
 
     /**
@@ -621,8 +629,8 @@ public class SecurityUtils {
      * 解除绑定会话ID
      * @param sessionId 会话ID
      */
-    public static void unBindSessionInfoId(String sessionId){
-        Static.applicationSessionContext.unBindSessionInfoId(sessionId);
+    public static void unBindSessionInfoId(String sessionId, String bindSessionId){
+        Static.applicationSessionContext.unBindSessionInfoId(sessionId,bindSessionId);
     }
 
     /**
@@ -986,8 +994,8 @@ public class SecurityUtils {
         SessionInfo _sessionInfo = getSessionInfo(sessionId);
         if (_sessionInfo != null) {
             Static.userService.logout(_sessionInfo.getUserId(), securityType);
-            unBindSessionInfoId(_sessionInfo.getId());
-            unBindSessionInfoId(MD5Util.getStringMD5(_sessionInfo.getRefreshToken()));
+            unBindSessionInfoId(_sessionInfo.getId(),_sessionInfo.getSessionId());
+            unBindSessionInfoId(MD5Util.getStringMD5(_sessionInfo.getRefreshToken()),_sessionInfo.getSessionId());
         }
         Static.applicationSessionContext.removeSessionInfo(sessionId);
 
