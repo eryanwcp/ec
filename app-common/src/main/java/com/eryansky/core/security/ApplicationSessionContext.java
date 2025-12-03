@@ -134,7 +134,6 @@ public class ApplicationSessionContext {
 	 * @return
 	 */
 	public void bindSessionInfoId(String sessionId, String bindSessionId) {
-//		CacheUtils.put(CACHE_SESSION_ID_BIND,sessionId,bindSessionId);
 		SessionObject sessionObject = cacheFacade.getSession(bindSessionId);
 		if(null != sessionObject){
 			Set<String> bindIds = (Set<String>) sessionObject.getAttribute(SessionObject.KEY_SESION_ID_BIND);
