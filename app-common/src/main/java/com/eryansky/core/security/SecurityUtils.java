@@ -976,6 +976,17 @@ public class SecurityUtils {
             Static.userService.logout(_sessionInfo.getUserId(), securityType);
         }
         Static.applicationSessionContext.removeSession(sessionId);
+        if (null != invalidate && invalidate) {
+            try {
+
+                HttpSession httpSession = SpringMVCHolder.getSession();
+                if (httpSession != null && SecurityUtils.getNoSuffixSessionId(httpSession).equals(sessionId)) {
+                    httpSession.invalidate();
+                }
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+            }
+        }
     }
 
     /**

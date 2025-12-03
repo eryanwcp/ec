@@ -317,7 +317,7 @@ public class LoginController extends SimpleController {
         if (sessionInfo != null) {
             //由监听器更新在线用户列表
             SecurityUtils.removeSessionInfoFromSession(sessionInfo.getSessionId(), SecurityType.logout);
-            logger.info("用户退出系统：{}", sessionInfo.getLoginName());
+            logger.info("退出系统：{} {}", sessionInfo.getSessionId(),sessionInfo.getLoginName());
         }
         return Result.successResult();
     }
@@ -336,7 +336,7 @@ public class LoginController extends SimpleController {
         if (sessionInfo != null) {
             //由监听器更新在线用户列表
             SecurityUtils.removeSessionInfoFromSession(sessionInfo.getSessionId(), SecurityType.logout);
-            logger.info("用户退出系统：{}", sessionInfo.getLoginName());
+            logger.info("退出系统：{} {}", sessionInfo.getSessionId(),sessionInfo.getLoginName());
         }
         return "redirect:/";
     }
