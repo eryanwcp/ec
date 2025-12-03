@@ -605,7 +605,17 @@ public class SecurityUtils {
      * @return
      */
     public static String getbindSessionId(String sessionId){
-        return Static.applicationSessionContext.getbindSessionId(sessionId);
+        return getbindSessionId(sessionId,null);
+    }
+
+    /**
+     * 查询绑定会话ID
+     * @param sessionId
+     * @return
+     */
+    public static String getbindSessionId(String sessionId,String defaultSessionId){
+        String bindSessionId = Static.applicationSessionContext.getbindSessionId(sessionId);
+        return null != bindSessionId ? bindSessionId:defaultSessionId;
     }
 
     /**
@@ -1214,7 +1224,7 @@ public class SecurityUtils {
      * @return
      */
     public static SessionInfo getSessionInfoById(String id) {
-        String bindSessionId = getbindSessionId(id);
+        String bindSessionId = getbindSessionId(id,id);
         return getSessionInfo(bindSessionId);
     }
 
