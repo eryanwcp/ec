@@ -602,8 +602,8 @@ public class SecurityUtils {
      * @param sessionId
      * @return
      */
-    public static String getbindSessionId(String sessionId){
-        return getbindSessionId(sessionId,null);
+    public static String getBindSessionId(String sessionId){
+        return getBindSessionId(sessionId,null);
     }
 
     /**
@@ -611,7 +611,7 @@ public class SecurityUtils {
      * @param sessionId
      * @return
      */
-    public static String getbindSessionId(String sessionId,String defaultSessionId){
+    public static String getBindSessionId(String sessionId, String defaultSessionId){
         String bindSessionId = Static.applicationSessionContext.getBindSessionId(sessionId);
         return null != bindSessionId ? bindSessionId:defaultSessionId;
     }
@@ -1222,7 +1222,7 @@ public class SecurityUtils {
      * @return
      */
     public static SessionInfo getSessionInfoById(String id) {
-        String bindSessionId = getbindSessionId(id,id);
+        String bindSessionId = getBindSessionId(id,id);
         return getSessionInfo(bindSessionId);
     }
 
