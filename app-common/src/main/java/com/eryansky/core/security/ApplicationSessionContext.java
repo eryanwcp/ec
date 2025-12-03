@@ -15,9 +15,6 @@ import java.util.stream.Collectors;
  * 应用Session上下文
  */
 public class ApplicationSessionContext {
-
-	private static final String CACHE_SESSION_ID_BIND = "session_id_bind";
-
 	private J2CacheSessionFilter sessionFilter;
 	private CacheFacade cacheFacade;
 
@@ -157,9 +154,6 @@ public class ApplicationSessionContext {
 	 * @return
 	 */
 	public void unBindSessionInfoId(String sessionId, String bindSessionId) {
-//		CacheUtils.remove(CACHE_SESSION_ID_BIND,sessionId);
-
-
 		SessionObject sessionObject = cacheFacade.getSession(bindSessionId);
 		if(null != sessionObject){
 			Set<String> bindIds = (Set<String>) sessionObject.getAttribute(SessionObject.KEY_SESION_ID_BIND);
@@ -178,15 +172,14 @@ public class ApplicationSessionContext {
 	 * @return
 	 */
 	public String getBindSessionId(String sessionId) {
-//		return CacheUtils.get(CACHE_SESSION_ID_BIND,sessionId);
-		return cacheFacade.keys().parallelStream().map(key -> {
+		return findSessionKeys().parallelStream().filter(key -> {
 			SessionObject sessionObject = cacheFacade.getSession(key);
 			Set<String> bindIds = null != sessionObject ? (Set<String>) sessionObject.get(SessionObject.KEY_SESION_ID_BIND) : null;
 			if(null != bindIds && bindIds.contains(sessionId)){
-				return sessionObject.getId();
+				return true;
 			}
-			return null;
-		}).filter(Objects::nonNull).findFirst().orElse(null);
+			return false;
+		}).findFirst().orElse(null);
 	}
 
 
