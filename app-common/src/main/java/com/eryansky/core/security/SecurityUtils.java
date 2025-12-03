@@ -975,7 +975,7 @@ public class SecurityUtils {
         if (_sessionInfo != null) {
             Static.userService.logout(_sessionInfo.getUserId(), securityType);
         }
-        Static.applicationSessionContext.removeSessionInfo(sessionId);
+        Static.applicationSessionContext.removeSession(sessionId);
     }
 
     /**

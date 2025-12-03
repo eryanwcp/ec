@@ -49,7 +49,11 @@ public class ApplicationSessionContext {
 
 	public void removeSessionInfo(String sessionId) {
 		if (sessionId != null) {
-			cacheFacade.deleteSession(sessionId);
+			SessionObject sessionObject = cacheFacade.getSession(sessionId);
+			if(null != sessionObject){
+				sessionObject.remove(SessionObject.KEY_SESSION_DATA);
+				cacheFacade.removeSessionAttribute(sessionObject,SessionObject.KEY_SESSION_DATA);
+			}
 		}
 	}
 
