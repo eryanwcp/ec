@@ -46,17 +46,6 @@ public class ApplicationSessionContext {
 		}
 	}
 
-
-	public void removeSessionInfo(String sessionId) {
-		if (sessionId != null) {
-			SessionObject sessionObject = cacheFacade.getSession(sessionId);
-			if(null != sessionObject){
-				sessionObject.remove(SessionObject.KEY_SESSION_DATA);
-				cacheFacade.removeSessionAttribute(sessionObject,SessionObject.KEY_SESSION_DATA);
-			}
-		}
-	}
-
 	public Long sessionTTL1(String sessionId) {
 		return cacheFacade.ttl1(sessionId);
 	}
@@ -76,7 +65,6 @@ public class ApplicationSessionContext {
 	}
 
 	public List<SessionInfo> findSessionInfoData() {
-//		Collection<String> keys = findSessionInfoKeys();
 		Collection<String> keys = cacheFacade.keys();
 		return findSessionInfoData(keys);
 	}
@@ -180,8 +168,6 @@ public class ApplicationSessionContext {
             return null != bindIds && bindIds.contains(sessionId);
         }).findFirst().orElse(null);
 	}
-
-
 
 
 }
