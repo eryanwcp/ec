@@ -641,7 +641,7 @@ public class SecurityUtils {
      * @param sessionInfo
      * @param user
      */
-    public static SessionInfo putUserToSession(SessionInfo sessionInfo, User user) {
+    public static SessionInfo updateSessionInfoFromUser(SessionInfo sessionInfo, User user) {
         SessionInfo _sessionInfo = userToSessionInfo(sessionInfo,user);
         initPermission(_sessionInfo);
         refreshSessionInfo(_sessionInfo);
@@ -658,7 +658,7 @@ public class SecurityUtils {
     public static void reloadSession(String userId) {
         List<SessionInfo> sessionInfos = findSessionInfoByUserId(userId);
         sessionInfos.forEach(sessionInfo -> {
-            putUserToSession(sessionInfo,UserUtils.getUser(sessionInfo.getUserId()));
+            updateSessionInfoFromUser(sessionInfo,UserUtils.getUser(sessionInfo.getUserId()));
         });
     }
 
