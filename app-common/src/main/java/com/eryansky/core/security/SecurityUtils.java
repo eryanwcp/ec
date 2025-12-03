@@ -1222,7 +1222,7 @@ public class SecurityUtils {
      * @return
      */
     public static SessionInfo getSessionInfoById(String id) {
-        String bindSessionId = getbindSessionId(id);
+        String bindSessionId = getBindSessionId(id,id);
         return getSessionInfo(bindSessionId);
     }
 
