@@ -157,10 +157,13 @@ public class ApplicationSessionContext {
 		if(null != sessionObject){
 			Set<String> bindIds = (Set<String>) sessionObject.getAttribute(SessionObject.KEY_SESION_ID_BIND);
 			if(null != bindIds){
-				bindIds.remove(sessionId);
+				boolean flag = bindIds.remove(sessionId);
+				if(flag){
+					sessionObject.setAttribute(SessionObject.KEY_SESION_ID_BIND, bindIds);
+					cacheFacade.setSessionAttribute(sessionObject,SessionObject.KEY_SESION_ID_BIND);
+				}
 			}
-			sessionObject.setAttribute(SessionObject.KEY_SESION_ID_BIND, bindIds);
-			cacheFacade.setSessionAttribute(sessionObject,SessionObject.KEY_SESION_ID_BIND);
+
 		}
 	}
 
