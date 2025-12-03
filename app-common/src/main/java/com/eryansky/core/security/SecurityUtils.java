@@ -998,18 +998,6 @@ public class SecurityUtils {
             unBindSessionInfoId(MD5Util.getStringMD5(_sessionInfo.getRefreshToken()),_sessionInfo.getSessionId());
         }
         Static.applicationSessionContext.removeSessionInfo(sessionId);
-
-        if (null != invalidate && invalidate) {
-            try {
-
-                HttpSession httpSession = SpringMVCHolder.getSession();
-                if (httpSession != null && SecurityUtils.getNoSuffixSessionId(httpSession).equals(sessionId)) {
-                    httpSession.invalidate();
-                }
-            } catch (Exception e) {
-                logger.error(e.getMessage());
-            }
-        }
     }
 
     /**
