@@ -629,8 +629,8 @@ public class SecurityUtils {
      * 解除绑定会话ID
      * @param sessionId 会话ID
      */
-    public static void unBindSessionInfoId(String sessionId){
-        Static.applicationSessionContext.unBindSessionInfoId(sessionId);
+    public static void unBindSessionInfoId(String sessionId, String bindSessionId){
+        Static.applicationSessionContext.unBindSessionInfoId(sessionId,bindSessionId);
     }
 
     /**
@@ -994,8 +994,8 @@ public class SecurityUtils {
         SessionInfo _sessionInfo = getSessionInfo(sessionId);
         if (_sessionInfo != null) {
             Static.userService.logout(_sessionInfo.getUserId(), securityType);
-            unBindSessionInfoId(_sessionInfo.getId());
-            unBindSessionInfoId(MD5Util.getStringMD5(_sessionInfo.getRefreshToken()));
+            unBindSessionInfoId(_sessionInfo.getId(),_sessionInfo.getSessionId());
+            unBindSessionInfoId(MD5Util.getStringMD5(_sessionInfo.getRefreshToken()),_sessionInfo.getSessionId());
         }
         Static.applicationSessionContext.removeSessionInfo(sessionId);
 

@@ -35,6 +35,7 @@ public class SessionObject implements Serializable {
     public static final String KEY_CLIENT_IP = "CLIENT_IP" ;
     public static final String KEY_SESSION_DATA = "SESSION_DATA" ;
     public static final String KEY_ACCESS_COUNT = "ACCESS_COUNT" ;
+    public static final String KEY_SESION_ID_BIND = "SESSION_ID_BIND" ;
 
     private String id;
     private long created_at;
@@ -166,5 +167,12 @@ public class SessionObject implements Serializable {
 
     public void setAttributes(HashMap<String, Object> attributes) {
         this.attributes.putAll(attributes);
+    }
+
+    public Object getAttribute(String key) {
+        return attributes.get(key);
+    }
+    public void setAttribute(String key,Object value) {
+        this.attributes.put(key,value);
     }
 }
