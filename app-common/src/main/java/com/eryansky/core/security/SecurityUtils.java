@@ -481,8 +481,10 @@ public class SecurityUtils {
      * @param user
      * @return
      */
-    private static SessionInfo userToSessionInfo(User user) {
-        SessionInfo sessionInfo = new SessionInfo();
+    private static SessionInfo userToSessionInfo(SessionInfo sessionInfo,User user) {
+        if(null == sessionInfo){
+            sessionInfo = new SessionInfo();
+        }
         sessionInfo.setUserId(user.getId());
         sessionInfo.setName(user.getName());
         sessionInfo.setLoginName(user.getLoginName());
@@ -542,7 +544,7 @@ public class SecurityUtils {
         if (logger.isDebugEnabled()) {
             logger.debug("putUserToSession:{}", sessionId);
         }
-        SessionInfo sessionInfo = userToSessionInfo(user);
+        SessionInfo sessionInfo = userToSessionInfo(null,user);
         sessionInfo.setIp(IpUtils.getIpAddr0(request));
         sessionInfo.addAttribute("clientIPs",IpUtils.getIpAddr(request));
         sessionInfo.setUserAgent(UserAgentUtils.getHTTPUserAgent(request));
@@ -590,8 +592,8 @@ public class SecurityUtils {
         initPermission(sessionInfo);
 
         refreshSessionInfo(sessionInfo);
-        bindSessionInfoId(sessionInfo.getId(),sessionInfo.getSessionId());
-        bindSessionInfoId(MD5Util.getStringMD5(sessionInfo.getRefreshToken()),sessionInfo.getSessionId());
+        bindSessionId(sessionInfo.getId(),sessionInfo.getSessionId());
+        bindSessionId(MD5Util.getStringMD5(sessionInfo.getRefreshToken()),sessionInfo.getSessionId());
         request.getSession().setAttribute("loginUser", sessionInfo.getName() + "[" + sessionInfo.getLoginName() + "]");
         return sessionInfo;
     }
@@ -621,7 +623,7 @@ public class SecurityUtils {
      * @param sessionId 会话ID
      * @param bindSessionId 关联对象ID
      */
-    public static void bindSessionInfoId(String sessionId,String bindSessionId){
+    public static void bindSessionId(String sessionId, String bindSessionId){
         Static.applicationSessionContext.bindSessionInfoId(sessionId,bindSessionId);
     }
 
@@ -629,46 +631,24 @@ public class SecurityUtils {
      * 解除绑定会话ID
      * @param sessionId 会话ID
      */
-    public static void unBindSessionInfoId(String sessionId, String bindSessionId){
+    public static void unBindSessionId(String sessionId, String bindSessionId){
         Static.applicationSessionContext.unBindSessionInfoId(sessionId,bindSessionId);
     }
 
     /**
-     * 将用户放入session中. 测试用
+     * 将用户放入或更新session中
      *
-     * @param sessionId
+     * @param sessionInfo
      * @param user
      */
-    public static SessionInfo putUserToSession(String sessionId, User user) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("putUserToSession:{}", sessionId);
-        }
-        SessionInfo sessionInfo = userToSessionInfo(user);
-        sessionInfo.setId(sessionId);
-
-        sessionInfo.setSystemDeviceType(DeviceType.PC.getDescription());
-
-        initPermission(sessionInfo);
-
-        refreshSessionInfo(sessionInfo);
-//        HttpSession session = Static.applicationSessionContext.getServletSession(sessionId);
-//        if(null != session){
-//            Static.applicationSessionContext.addServletSession(sessionInfo.getSessionId(),session);
-//        }
-        return sessionInfo;
+    public static SessionInfo putUserToSession(SessionInfo sessionInfo, User user) {
+        SessionInfo _sessionInfo = userToSessionInfo(sessionInfo,user);
+        initPermission(_sessionInfo);
+        refreshSessionInfo(_sessionInfo);
+        return _sessionInfo;
     }
 
-    /**
-     * 重新加载当前登录用户Session信息
-     * @return
-     */
-    public static SessionInfo reloadCurrentSession() {
-        SessionInfo sessionInfo = getCurrentSessionInfo();
-        if (null == sessionInfo) {
-            return null;
-        }
-        return putUserToSession(sessionInfo.getId(), getCurrentUser());
-    }
+
 
     /**
      * 重新加载用户Session信息
@@ -678,7 +658,7 @@ public class SecurityUtils {
     public static void reloadSession(String userId) {
         List<SessionInfo> sessionInfos = findSessionInfoByUserId(userId);
         sessionInfos.forEach(sessionInfo -> {
-            putUserToSession(sessionInfo.getId(), UserUtils.getUser(sessionInfo.getUserId()));
+            putUserToSession(sessionInfo,UserUtils.getUser(sessionInfo.getUserId()));
         });
     }
 
@@ -994,22 +974,10 @@ public class SecurityUtils {
         SessionInfo _sessionInfo = getSessionInfo(sessionId);
         if (_sessionInfo != null) {
             Static.userService.logout(_sessionInfo.getUserId(), securityType);
-            unBindSessionInfoId(_sessionInfo.getId(),_sessionInfo.getSessionId());
-            unBindSessionInfoId(MD5Util.getStringMD5(_sessionInfo.getRefreshToken()),_sessionInfo.getSessionId());
+            unBindSessionId(_sessionInfo.getId(),_sessionInfo.getSessionId());
+            unBindSessionId(MD5Util.getStringMD5(_sessionInfo.getRefreshToken()),_sessionInfo.getSessionId());
         }
         Static.applicationSessionContext.removeSessionInfo(sessionId);
-
-        if (null != invalidate && invalidate) {
-            try {
-
-                HttpSession httpSession = SpringMVCHolder.getSession();
-                if (httpSession != null && SecurityUtils.getNoSuffixSessionId(httpSession).equals(sessionId)) {
-                    httpSession.invalidate();
-                }
-            } catch (Exception e) {
-                logger.error(e.getMessage());
-            }
-        }
     }
 
     /**
