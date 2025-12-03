@@ -590,8 +590,8 @@ public class SecurityUtils {
         initPermission(sessionInfo);
 
         refreshSessionInfo(sessionInfo);
-        bindSessionInfoId(sessionInfo.getId(),sessionInfo.getSessionId());
-        bindSessionInfoId(MD5Util.getStringMD5(sessionInfo.getRefreshToken()),sessionInfo.getSessionId());
+        bindSessionId(sessionInfo.getId(),sessionInfo.getSessionId());
+        bindSessionId(MD5Util.getStringMD5(sessionInfo.getRefreshToken()),sessionInfo.getSessionId());
         request.getSession().setAttribute("loginUser", sessionInfo.getName() + "[" + sessionInfo.getLoginName() + "]");
         return sessionInfo;
     }
@@ -621,7 +621,7 @@ public class SecurityUtils {
      * @param sessionId 会话ID
      * @param bindSessionId 关联对象ID
      */
-    public static void bindSessionInfoId(String sessionId,String bindSessionId){
+    public static void bindSessionId(String sessionId, String bindSessionId){
         Static.applicationSessionContext.bindSessionInfoId(sessionId,bindSessionId);
     }
 
@@ -629,7 +629,7 @@ public class SecurityUtils {
      * 解除绑定会话ID
      * @param sessionId 会话ID
      */
-    public static void unBindSessionInfoId(String sessionId, String bindSessionId){
+    public static void unBindSessionId(String sessionId, String bindSessionId){
         Static.applicationSessionContext.unBindSessionInfoId(sessionId,bindSessionId);
     }
 
@@ -994,8 +994,8 @@ public class SecurityUtils {
         SessionInfo _sessionInfo = getSessionInfo(sessionId);
         if (_sessionInfo != null) {
             Static.userService.logout(_sessionInfo.getUserId(), securityType);
-            unBindSessionInfoId(_sessionInfo.getId(),_sessionInfo.getSessionId());
-            unBindSessionInfoId(MD5Util.getStringMD5(_sessionInfo.getRefreshToken()),_sessionInfo.getSessionId());
+            unBindSessionId(_sessionInfo.getId(),_sessionInfo.getSessionId());
+            unBindSessionId(MD5Util.getStringMD5(_sessionInfo.getRefreshToken()),_sessionInfo.getSessionId());
         }
         Static.applicationSessionContext.removeSessionInfo(sessionId);
     }
