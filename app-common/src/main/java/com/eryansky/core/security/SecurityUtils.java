@@ -641,17 +641,9 @@ public class SecurityUtils {
      * @param sessionInfo
      * @param user
      */
-    public static SessionInfo putUserToSession(SessionInfo sessionInfo, User user) {
+    public static SessionInfo updateSessionInfoFromUser(SessionInfo sessionInfo, User user) {
         SessionInfo _sessionInfo = userToSessionInfo(sessionInfo,user);
-        _sessionInfo.setId(_sessionInfo.getId());
-        _sessionInfo.setSessionId(_sessionInfo.getSessionId());
-        _sessionInfo.setUserAgent(_sessionInfo.getUserAgent());
-        _sessionInfo.setUserAgent(_sessionInfo.getUserAgent());
-
-        _sessionInfo.setSystemDeviceType(DeviceType.PC.getDescription());
-
         initPermission(_sessionInfo);
-
         refreshSessionInfo(_sessionInfo);
         return _sessionInfo;
     }
@@ -666,7 +658,7 @@ public class SecurityUtils {
     public static void reloadSession(String userId) {
         List<SessionInfo> sessionInfos = findSessionInfoByUserId(userId);
         sessionInfos.forEach(sessionInfo -> {
-            putUserToSession(sessionInfo,UserUtils.getUser(sessionInfo.getUserId()));
+            updateSessionInfoFromUser(sessionInfo,UserUtils.getUser(sessionInfo.getUserId()));
         });
     }
 
