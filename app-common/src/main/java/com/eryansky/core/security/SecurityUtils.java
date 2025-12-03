@@ -481,8 +481,10 @@ public class SecurityUtils {
      * @param user
      * @return
      */
-    private static SessionInfo userToSessionInfo(User user) {
-        SessionInfo sessionInfo = new SessionInfo();
+    private static SessionInfo userToSessionInfo(SessionInfo sessionInfo,User user) {
+        if(null == sessionInfo){
+            sessionInfo = new SessionInfo();
+        }
         sessionInfo.setUserId(user.getId());
         sessionInfo.setName(user.getName());
         sessionInfo.setLoginName(user.getLoginName());
@@ -542,7 +544,7 @@ public class SecurityUtils {
         if (logger.isDebugEnabled()) {
             logger.debug("putUserToSession:{}", sessionId);
         }
-        SessionInfo sessionInfo = userToSessionInfo(user);
+        SessionInfo sessionInfo = userToSessionInfo(null,user);
         sessionInfo.setIp(IpUtils.getIpAddr0(request));
         sessionInfo.addAttribute("clientIPs",IpUtils.getIpAddr(request));
         sessionInfo.setUserAgent(UserAgentUtils.getHTTPUserAgent(request));
@@ -634,41 +636,27 @@ public class SecurityUtils {
     }
 
     /**
-     * 将用户放入session中. 测试用
+     * 将用户放入或更新session中
      *
-     * @param sessionId
+     * @param sessionInfo
      * @param user
      */
-    public static SessionInfo putUserToSession(String sessionId, User user) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("putUserToSession:{}", sessionId);
-        }
-        SessionInfo sessionInfo = userToSessionInfo(user);
-        sessionInfo.setId(sessionId);
+    public static SessionInfo putUserToSession(SessionInfo sessionInfo, User user) {
+        SessionInfo _sessionInfo = userToSessionInfo(sessionInfo,user);
+        _sessionInfo.setId(_sessionInfo.getId());
+        _sessionInfo.setSessionId(_sessionInfo.getSessionId());
+        _sessionInfo.setUserAgent(_sessionInfo.getUserAgent());
+        _sessionInfo.setUserAgent(_sessionInfo.getUserAgent());
 
-        sessionInfo.setSystemDeviceType(DeviceType.PC.getDescription());
+        _sessionInfo.setSystemDeviceType(DeviceType.PC.getDescription());
 
-        initPermission(sessionInfo);
+        initPermission(_sessionInfo);
 
-        refreshSessionInfo(sessionInfo);
-//        HttpSession session = Static.applicationSessionContext.getServletSession(sessionId);
-//        if(null != session){
-//            Static.applicationSessionContext.addServletSession(sessionInfo.getSessionId(),session);
-//        }
-        return sessionInfo;
+        refreshSessionInfo(_sessionInfo);
+        return _sessionInfo;
     }
 
-    /**
-     * 重新加载当前登录用户Session信息
-     * @return
-     */
-    public static SessionInfo reloadCurrentSession() {
-        SessionInfo sessionInfo = getCurrentSessionInfo();
-        if (null == sessionInfo) {
-            return null;
-        }
-        return putUserToSession(sessionInfo.getId(), getCurrentUser());
-    }
+
 
     /**
      * 重新加载用户Session信息
@@ -678,7 +666,7 @@ public class SecurityUtils {
     public static void reloadSession(String userId) {
         List<SessionInfo> sessionInfos = findSessionInfoByUserId(userId);
         sessionInfos.forEach(sessionInfo -> {
-            putUserToSession(sessionInfo.getId(), UserUtils.getUser(sessionInfo.getUserId()));
+            putUserToSession(sessionInfo,UserUtils.getUser(sessionInfo.getUserId()));
         });
     }
 
