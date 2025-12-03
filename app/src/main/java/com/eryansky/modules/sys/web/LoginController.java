@@ -72,6 +72,7 @@ public class LoginController extends SimpleController {
     private static final int RESULT_CODE_APP_VERSION_ERROR = 5;//APP版本禁止登录
     private static final int RESULT_CODE_DEVICE_ERROR = 4;//移动设备校验错误码
     private static final int RESULT_CODE_PASSWORD_ERROR = 6;//密码过期等
+
     /**
      * 欢迎页面
      *
@@ -316,7 +317,7 @@ public class LoginController extends SimpleController {
         if (sessionInfo != null) {
             //由监听器更新在线用户列表
             SecurityUtils.removeSessionInfoFromSession(sessionInfo.getSessionId(), SecurityType.logout);
-            logger.info("用户退出系统：{}", sessionInfo.getLoginName());
+            logger.info("退出系统：{} {}", sessionInfo.getSessionId(),sessionInfo.getLoginName());
         }
         return Result.successResult();
     }
@@ -335,7 +336,7 @@ public class LoginController extends SimpleController {
         if (sessionInfo != null) {
             //由监听器更新在线用户列表
             SecurityUtils.removeSessionInfoFromSession(sessionInfo.getSessionId(), SecurityType.logout);
-            logger.info("用户退出系统：{}", sessionInfo.getLoginName());
+            logger.info("退出系统：{} {}", sessionInfo.getSessionId(),sessionInfo.getLoginName());
         }
         return "redirect:/";
     }
