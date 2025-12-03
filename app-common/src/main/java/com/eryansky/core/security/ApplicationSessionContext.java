@@ -124,12 +124,12 @@ public class ApplicationSessionContext {
 	public void bindSessionInfoId(String sessionId, String bindSessionId) {
 		SessionObject sessionObject = cacheFacade.getSession(bindSessionId);
 		if(null != sessionObject){
-			Set<String> bindIds = (Set<String>) sessionObject.getAttribute(SessionObject.KEY_SESION_ID_BIND);
+			Set<String> bindIds = (Set<String>) sessionObject.get(SessionObject.KEY_SESION_ID_BIND);
 			if(null == bindIds){
 				bindIds = Sets.newHashSet();
 			}
 			bindIds.add(sessionId);
-			sessionObject.setAttribute(SessionObject.KEY_SESION_ID_BIND, bindIds);
+			sessionObject.put(SessionObject.KEY_SESION_ID_BIND, bindIds);
 			cacheFacade.setSessionAttribute(sessionObject,SessionObject.KEY_SESION_ID_BIND);
 		}
 	}
@@ -143,11 +143,11 @@ public class ApplicationSessionContext {
 	public void unBindSessionInfoId(String sessionId, String bindSessionId) {
 		SessionObject sessionObject = cacheFacade.getSession(bindSessionId);
 		if(null != sessionObject){
-			Set<String> bindIds = (Set<String>) sessionObject.getAttribute(SessionObject.KEY_SESION_ID_BIND);
+			Set<String> bindIds = (Set<String>) sessionObject.get(SessionObject.KEY_SESION_ID_BIND);
 			if(null != bindIds){
 				boolean flag = bindIds.remove(sessionId);
 				if(flag){
-					sessionObject.setAttribute(SessionObject.KEY_SESION_ID_BIND, bindIds);
+					sessionObject.put(SessionObject.KEY_SESION_ID_BIND, bindIds);
 					cacheFacade.setSessionAttribute(sessionObject,SessionObject.KEY_SESION_ID_BIND);
 				}
 			}

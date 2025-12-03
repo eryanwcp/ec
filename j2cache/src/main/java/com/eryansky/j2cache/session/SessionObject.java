@@ -169,10 +169,4 @@ public class SessionObject implements Serializable {
         this.attributes.putAll(attributes);
     }
 
-    public Object getAttribute(String key) {
-        return attributes.get(key);
-    }
-    public void setAttribute(String key,Object value) {
-        this.attributes.put(key,value);
-    }
 }
