@@ -941,7 +941,7 @@ public class SecurityUtils {
      */
     public static void offLine(List<String> sessionIds) {
         if (Collections3.isNotEmpty(sessionIds)) {
-            sessionIds.forEach(sessionId -> removeSessionInfoFromSession(sessionId, SecurityType.offline));
+            sessionIds.forEach(sessionId -> removeSession(sessionId, SecurityType.offline));
         }
     }
 
@@ -950,7 +950,7 @@ public class SecurityUtils {
      */
     public static void offLineAll() {
         List<SessionInfo> sessionInfos = SecurityUtils.findSessionInfoList();
-        sessionInfos.forEach(sessionInfo -> removeSessionInfoFromSession(sessionInfo.getSessionId(), SecurityType.offline));
+        sessionInfos.forEach(sessionInfo -> removeSession(sessionInfo.getSessionId(), SecurityType.offline));
     }
 
     /**
@@ -974,8 +974,11 @@ public class SecurityUtils {
         SessionInfo _sessionInfo = getSessionInfo(sessionId);
         if (_sessionInfo != null) {
             Static.userService.logout(_sessionInfo.getUserId(), securityType);
+            unBindSessionId(_sessionInfo.getId(),_sessionInfo.getSessionId());
+            unBindSessionId(MD5Util.getStringMD5(_sessionInfo.getRefreshToken()),_sessionInfo.getSessionId());
         }
-        Static.applicationSessionContext.removeSession(sessionId);
+        Static.applicationSessionContext.removeSessionInfo(sessionId);
+
         if (null != invalidate && invalidate) {
             try {
 
@@ -987,6 +990,25 @@ public class SecurityUtils {
                 logger.error(e.getMessage());
             }
         }
+    }
+
+
+    /**
+     * 将用户信息从session中移除
+     *
+     * @param sessionId session ID
+     * @param securityType {@link SecurityType}
+     */
+    public static void removeSession(String sessionId, SecurityType securityType) {
+        SessionInfo _sessionInfo = getSessionInfo(sessionId);
+        if (_sessionInfo != null) {
+            Static.userService.logout(_sessionInfo.getUserId(), securityType);
+        }
+        removeSession(sessionId);
+    }
+
+    public static void removeSession(String sessionId) {
+        Static.applicationSessionContext.removeSession(sessionId);
     }
 
     /**
@@ -1077,9 +1099,7 @@ public class SecurityUtils {
     public static SessionObject getSessionObjectBySessionId(String sessionId) {
         return Static.applicationSessionContext.getSessionObjectBySessionId(sessionId);
     }
-    public static void removeSession(String sessionId) {
-        Static.applicationSessionContext.removeSession(sessionId);
-    }
+
 
     public static Long sessionTTL1(String sessionId) {
         return Static.applicationSessionContext.sessionTTL1(sessionId);
