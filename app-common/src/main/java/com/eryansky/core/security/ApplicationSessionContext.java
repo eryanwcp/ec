@@ -46,6 +46,17 @@ public class ApplicationSessionContext {
 		}
 	}
 
+
+	public void removeSessionInfo(String sessionId) {
+		if (sessionId != null) {
+			SessionObject sessionObject = cacheFacade.getSession(sessionId);
+			if(null != sessionObject){
+				sessionObject.remove(SessionObject.KEY_SESSION_DATA);
+				cacheFacade.removeSessionAttribute(sessionObject,SessionObject.KEY_SESSION_DATA);
+			}
+		}
+	}
+
 	public Long sessionTTL1(String sessionId) {
 		return cacheFacade.ttl1(sessionId);
 	}
