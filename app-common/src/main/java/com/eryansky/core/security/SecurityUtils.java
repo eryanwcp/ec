@@ -980,17 +980,6 @@ public class SecurityUtils {
      * @param securityType {@link SecurityType}
      */
     public static void removeSessionInfoFromSession(String sessionId, SecurityType securityType) {
-        removeSessionInfoFromSession(sessionId, securityType, true);
-    }
-
-    /**
-     * 将用户信息从session中移除
-     *
-     * @param sessionId session ID
-     * @param securityType {@link SecurityType}
-     * @param invalidate 刷新
-     */
-    public static void removeSessionInfoFromSession(String sessionId, SecurityType securityType, Boolean invalidate) {
         SessionInfo _sessionInfo = getSessionInfo(sessionId);
         if (_sessionInfo != null) {
             Static.userService.logout(_sessionInfo.getUserId(), securityType);
@@ -998,18 +987,6 @@ public class SecurityUtils {
             unBindSessionId(MD5Util.getStringMD5(_sessionInfo.getRefreshToken()),_sessionInfo.getSessionId());
         }
         Static.applicationSessionContext.removeSessionInfo(sessionId);
-
-        if (null != invalidate && invalidate) {
-            try {
-
-                HttpSession httpSession = SpringMVCHolder.getSession();
-                if (httpSession != null && SecurityUtils.getNoSuffixSessionId(httpSession).equals(sessionId)) {
-                    httpSession.invalidate();
-                }
-            } catch (Exception e) {
-                logger.error(e.getMessage());
-            }
-        }
     }
 
     /**

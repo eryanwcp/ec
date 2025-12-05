@@ -418,7 +418,7 @@ public class LoginController extends SimpleController {
             return Result.errorResult().setMsg("账号不存在【"+loginName+"】！");
         }
 
-        SecurityUtils.removeSessionInfoFromSession(sessionInfo.getSessionId(),SecurityType.logout,false);
+        SecurityUtils.removeSessionInfoFromSession(sessionInfo.getSessionId(),SecurityType.logout);
         SessionInfo newSessionInfo = SecurityUtils.putUserToSession(request,user);
         userService.login(newSessionInfo.getUserId());
 
