@@ -932,7 +932,7 @@ public class SecurityUtils {
      * @param sessionId sessionID
      */
     public static void offLine(String sessionId) {
-        removeSessionInfoFromSession(sessionId, SecurityType.offline);
+        removeSession(sessionId, SecurityType.offline);
     }
 
     /**
@@ -952,6 +952,26 @@ public class SecurityUtils {
         List<SessionInfo> sessionInfos = SecurityUtils.findSessionInfoList();
         sessionInfos.forEach(sessionInfo -> removeSession(sessionInfo.getSessionId(), SecurityType.offline));
     }
+
+
+    /**
+     * 将用户信息从session中移除
+     *
+     * @param sessionId session ID
+     * @param securityType {@link SecurityType}
+     */
+    public static void removeSession(String sessionId, SecurityType securityType) {
+        SessionInfo _sessionInfo = getSessionInfo(sessionId);
+        if (_sessionInfo != null) {
+            Static.userService.logout(_sessionInfo.getUserId(), securityType);
+        }
+        removeSession(sessionId);
+    }
+
+    public static void removeSession(String sessionId) {
+        Static.applicationSessionContext.removeSession(sessionId);
+    }
+
 
     /**
      * 将用户信息从session中移除
@@ -990,25 +1010,6 @@ public class SecurityUtils {
                 logger.error(e.getMessage());
             }
         }
-    }
-
-
-    /**
-     * 将用户信息从session中移除
-     *
-     * @param sessionId session ID
-     * @param securityType {@link SecurityType}
-     */
-    public static void removeSession(String sessionId, SecurityType securityType) {
-        SessionInfo _sessionInfo = getSessionInfo(sessionId);
-        if (_sessionInfo != null) {
-            Static.userService.logout(_sessionInfo.getUserId(), securityType);
-        }
-        removeSession(sessionId);
-    }
-
-    public static void removeSession(String sessionId) {
-        Static.applicationSessionContext.removeSession(sessionId);
     }
 
     /**
