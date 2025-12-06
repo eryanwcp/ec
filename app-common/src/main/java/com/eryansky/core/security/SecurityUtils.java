@@ -963,11 +963,33 @@ public class SecurityUtils {
      * @param securityType {@link SecurityType}
      */
     public static void removeSession(String sessionId, SecurityType securityType) {
+        removeSession(sessionId,securityType,true);
+    }
+
+
+    /**
+     * 将用户信息从session中移除
+     *
+     * @param sessionId session ID
+     * @param securityType {@link SecurityType}
+     * @param invalidate
+     */
+    public static void removeSession(String sessionId, SecurityType securityType,boolean invalidate) {
         SessionInfo _sessionInfo = getSessionInfo(sessionId);
         if (_sessionInfo != null) {
             Static.userService.logout(_sessionInfo.getUserId(), securityType);
         }
         removeSession(sessionId);
+        if (invalidate) {
+            try {
+                HttpSession httpSession = SpringMVCHolder.getSession();
+                if (httpSession != null) {
+                    httpSession.invalidate();
+                }
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+            }
+        }
     }
 
     public static void removeSession(String sessionId) {
