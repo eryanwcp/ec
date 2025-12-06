@@ -1018,9 +1018,9 @@ public class SecurityUtils {
      * @return
      */
     public static List<SessionInfo> findSessionInfoListWithOrder() {
-        List<SessionInfo> sessionInfoData = Static.applicationSessionContext.findSessionInfoData();
+        List<SessionInfo> sessionInfoData = findSessionInfoList();
         //排序
-        sessionInfoData.sort((o1, o2) -> o2.getLoginTime().compareTo(o1.getLoginTime()));
+        sessionInfoData.sort((o1, o2) -> o2.getUpdateTime().compareTo(o1.getUpdateTime()));
         return sessionInfoData;
     }
 
@@ -1156,7 +1156,7 @@ public class SecurityUtils {
      * @return
      */
     public static List<SessionInfo> findSessionInfoByLoginName(String loginName) {
-        List<SessionInfo> list = findSessionInfoListWithOrder();
+        List<SessionInfo> list = findSessionInfoList();
         return list.parallelStream().filter(sessionInfo -> loginName.equalsIgnoreCase(sessionInfo.getLoginName())).collect(Collectors.toList());
     }
 
@@ -1166,7 +1166,7 @@ public class SecurityUtils {
      * @return
      */
     public static List<SessionInfo> findSessionInfoByLoginNameOrMobile(String loginNameOrMobile) {
-        List<SessionInfo> list = findSessionInfoListWithOrder();
+        List<SessionInfo> list = findSessionInfoList();
         return list.parallelStream().filter(sessionInfo -> loginNameOrMobile.equalsIgnoreCase(sessionInfo.getLoginName()) || loginNameOrMobile.equalsIgnoreCase(sessionInfo.getMobile())).collect(Collectors.toList());
     }
 
@@ -1191,7 +1191,7 @@ public class SecurityUtils {
         if (StringUtils.isBlank(query)) {
             return Collections.emptyList();
         }
-        List<SessionInfo> list = findSessionInfoListWithOrder();
+        List<SessionInfo> list = findSessionInfoList();
         return list.parallelStream().filter(sessionInfo -> StringUtils.contains(sessionInfo.getLoginName(), query)
                         || StringUtils.contains(sessionInfo.getMobile(), query)
                         || StringUtils.contains(sessionInfo.getName(), query)
@@ -1202,7 +1202,7 @@ public class SecurityUtils {
                         || StringUtils.contains(sessionInfo.getUserAgent(), query)
                         || StringUtils.contains(sessionInfo.getUserType(), query)
                         || StringUtils.contains(sessionInfo.getToken(), query)
-                ).collect(Collectors.toList());
+                ).sorted((o1, o2) -> o2.getUpdateTime().compareTo(o1.getUpdateTime())).collect(Collectors.toList());
     }
 
     /**
