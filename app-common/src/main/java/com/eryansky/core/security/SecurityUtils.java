@@ -934,7 +934,7 @@ public class SecurityUtils {
      * @param sessionId sessionID
      */
     public static void offLine(String sessionId) {
-        removeSession(sessionId, SecurityType.offline);
+        removeSession(sessionId, SecurityType.offline,false);
     }
 
     /**
@@ -943,7 +943,7 @@ public class SecurityUtils {
      */
     public static void offLine(List<String> sessionIds) {
         if (Collections3.isNotEmpty(sessionIds)) {
-            sessionIds.forEach(sessionId -> removeSession(sessionId, SecurityType.offline));
+            sessionIds.forEach(sessionId -> removeSession(sessionId, SecurityType.offline,false));
         }
     }
 
@@ -952,7 +952,7 @@ public class SecurityUtils {
      */
     public static void offLineAll() {
         List<SessionInfo> sessionInfos = SecurityUtils.findSessionInfoList();
-        sessionInfos.forEach(sessionInfo -> removeSession(sessionInfo.getSessionId(), SecurityType.offline));
+        sessionInfos.forEach(sessionInfo -> removeSession(sessionInfo.getSessionId(), SecurityType.offline,false));
     }
 
 
