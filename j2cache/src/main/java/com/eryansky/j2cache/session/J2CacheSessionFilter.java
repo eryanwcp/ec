@@ -225,7 +225,7 @@ public class J2CacheSessionFilter implements Filter {
                         session.setNew(false);
                     }
                 }
-                if(session_id == null) {
+                if(null == session) {
                     String authorization = request.getParameter(ATTR_AUTHORIZATION);
                     if (StringUtils.isBlank(authorization)) {
                         authorization = request.getParameter(ATTR_TOKEN);
