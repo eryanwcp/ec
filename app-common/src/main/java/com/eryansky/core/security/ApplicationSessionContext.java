@@ -66,8 +66,7 @@ public class ApplicationSessionContext {
 	}
 
 	public SessionInfo getSession(String sessionId) {
-		if (sessionId == null) return null;
-		SessionObject sessionObject = cacheFacade.getSession(sessionId);
+		SessionObject sessionObject = getSessionObjectBySessionId(sessionId);
         SessionInfo sessionInfo = null != sessionObject ? (SessionInfo) sessionObject.get(SessionObject.KEY_SESSION_DATA) : null;
         if(null != sessionInfo){
             sessionInfo.setUpdateTime(Instant.ofEpochMilli(sessionObject.getLastAccess_at()).toDate());
