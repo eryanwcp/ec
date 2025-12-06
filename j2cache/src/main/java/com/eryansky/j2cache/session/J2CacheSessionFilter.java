@@ -225,7 +225,7 @@ public class J2CacheSessionFilter implements Filter {
                         session.setNew(false);
                     }
                 }
-                if(null == session) {
+                if (null == session) {
                     String authorization = request.getParameter(ATTR_AUTHORIZATION);
                     if (StringUtils.isBlank(authorization)) {
                         authorization = request.getParameter(ATTR_TOKEN);
@@ -234,15 +234,23 @@ public class J2CacheSessionFilter implements Filter {
                         authorization = request.getHeader(ATTR_AUTHORIZATION);
                     }
                     if (StringUtils.isNotBlank(authorization)) {
-                        String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""),"Bearer","");
-                        session_id = MD5Util.getStringMD5(token);
-                        SessionObject ssnObject = g_cache.getSession(session_id);
-                        if(ssnObject != null) {
-                            session = new J2CacheSession(servletContext, g_cache,ssnObject);
-                            session.setNew(false);
+                        String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""), "Bearer", "");
+                        String tokenMd5Id = MD5Util.getStringMD5(token);
+                        session_id = g_cache.keys().parallelStream().filter(key -> {
+                            SessionObject sessionObject = g_cache.getSession(key);
+                            Set<String> bindIds = null != sessionObject ? (Set<String>) sessionObject.get(SessionObject.KEY_SESION_ID_BIND) : null;
+                            return null != bindIds && bindIds.contains(tokenMd5Id);
+                        }).findFirst().orElse(null);
+
+                        if (null != session_id) {
+                            SessionObject ssnObject = g_cache.getSession(session_id);
+                            if (ssnObject != null) {
+                                session = new J2CacheSession(servletContext, g_cache, ssnObject);
+                                session.setNew(false);
+                                setCookie(cookieName, session_id);
+                            }
                         }
                     }
-
                 }
 
                 if(session == null && create) {
