@@ -38,6 +38,12 @@ $(function () {
                 return "<a target='_blank' href='" + ctxAdmin + "/sys/session/detail?id=" + rowData['id'] + "'>" + value + "</a>";
             }
         },{
+            title: 'SESSIONID',
+            field: 'sessionId',
+            width: 260,formatter: function (value, rowData, rowIndex) {
+                return "<a target='_blank' href='" + ctxAdmin + "/sys/session/detail?sessionId=" + rowData['sessionId'] + "'>" + value + "</a>";
+            }
+        },{
             title: 'HOST',
             field: 'host',
             width: 120,
