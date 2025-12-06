@@ -802,13 +802,15 @@ public class SecurityUtils {
         } catch (Exception e) {
 //                logger.error(e.getMessage());
         }
-        return getCurrentSessionInfo(request);
+        return getCurrentSessionInfo(request,false);
     }
 
     /**
      * 获取当前用户session信息.
+     * @param request
+     * @param autoAuthorizationSession 自动创建会话
      */
-    public static SessionInfo getCurrentSessionInfo(HttpServletRequest request) {
+    public static SessionInfo getCurrentSessionInfo(HttpServletRequest request,boolean autoAuthorizationSession) {
         SessionInfo sessionInfo = null;
         try {
             if (null == request) {
@@ -831,7 +833,7 @@ public class SecurityUtils {
             }
 
             //Authorization 请求头或请求参数
-            if (sessionInfo == null) {
+            if (sessionInfo == null && autoAuthorizationSession) {
                 String authorization = request.getParameter(AuthorityInterceptor.ATTR_AUTHORIZATION);
                 if (StringUtils.isBlank(authorization)) {
                     authorization = request.getParameter(AuthorityInterceptor.ATTR_TOKEN);
