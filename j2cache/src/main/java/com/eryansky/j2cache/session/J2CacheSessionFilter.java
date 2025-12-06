@@ -216,16 +216,16 @@ public class J2CacheSessionFilter implements Filter {
         public HttpSession getSession(boolean create) {
             if(session == null){
                 Cookie ssnCookie = getCookie(cookieName);
-
+                String session_id = null;
                 if (ssnCookie != null) {
-                    String session_id = ssnCookie.getValue();
+                    session_id = ssnCookie.getValue();
                     SessionObject ssnObject = g_cache.getSession(session_id);
                     if(ssnObject != null) {
                         session = new J2CacheSession(servletContext, g_cache,ssnObject);
                         session.setNew(false);
                     }
                 }
-                if(session == null && create) {
+                if(session_id == null) {
                     String authorization = request.getParameter(ATTR_AUTHORIZATION);
                     if (StringUtils.isBlank(authorization)) {
                         authorization = request.getParameter(ATTR_TOKEN);
@@ -233,15 +233,20 @@ public class J2CacheSessionFilter implements Filter {
                     if (StringUtils.isBlank(authorization)) {
                         authorization = request.getHeader(ATTR_AUTHORIZATION);
                     }
-                    String session_id = null;
                     if (StringUtils.isNotBlank(authorization)) {
                         String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""),"Bearer","");
                         session_id = MD5Util.getStringMD5(token);
-                    }
-                    if (StringUtils.isBlank(session_id)) {
-                        session_id = UUID.randomUUID().toString().replaceAll("-", "");
+                        SessionObject ssnObject = g_cache.getSession(session_id);
+                        if(ssnObject != null) {
+                            session = new J2CacheSession(servletContext, g_cache,ssnObject);
+                            session.setNew(false);
+                        }
                     }
 
+                }
+
+                if(session == null && create) {
+                    session_id = UUID.randomUUID().toString().replaceAll("-", "");
                     session = new J2CacheSession(servletContext, session_id, g_cache);
                     session.getSessionObject().setClientIP(com.eryansky.common.utils.net.IpUtils.getIpAddr(request));
                     g_cache.saveSession(session.getSessionObject());
