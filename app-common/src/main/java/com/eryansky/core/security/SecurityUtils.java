@@ -983,7 +983,7 @@ public class SecurityUtils {
         if (invalidate) {
             try {
                 HttpSession httpSession = SpringMVCHolder.getSession();
-                if (httpSession != null) {
+                if (httpSession != null && httpSession.getId().equals(sessionId)) {
                     httpSession.invalidate();
                 }
             } catch (Exception e) {
