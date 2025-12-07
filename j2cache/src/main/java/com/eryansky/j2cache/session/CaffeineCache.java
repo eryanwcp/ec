@@ -40,24 +40,26 @@ public class CaffeineCache {
     private final int expire ;
 
     // 优化：有界固定线程池（核心/最大线程数=CPU核心数*1，有界队列，自定义线程名）
-    private final ExecutorService executorService;
+    private ExecutorService removalExecutorService;
     // 线程池核心参数（可根据业务调整）
     private static final int CORE_POOL_SIZE = Runtime.getRuntime().availableProcessors();
     private static final int MAX_POOL_SIZE = CORE_POOL_SIZE * 2;
     private static final int QUEUE_CAPACITY = 10000; // 任务队列容量，避免无界堆积
     private static final long KEEP_ALIVE_TIME = 60L; // 空闲线程存活时间
 
-    public CaffeineCache(int size, int expire, CacheExpiredListener listener) {
-        // 初始化有界线程池（替代newCachedThreadPool）
-        this.executorService = new ThreadPoolExecutor(
-                CORE_POOL_SIZE,
-                MAX_POOL_SIZE,
-                KEEP_ALIVE_TIME,
-                TimeUnit.SECONDS,
-                new LinkedBlockingQueue<>(QUEUE_CAPACITY), // 有界队列，避免OOM
-                new NamedThreadFactory("j2cache-caffeine-cache-expire"), // 自定义线程名
-                new ThreadPoolExecutor.CallerRunsPolicy() // 队列满时降级：提交线程执行，避免任务丢失
-        );
+    public CaffeineCache(int size, int expire, CacheExpiredListener listener,boolean enableL2) {
+        if(enableL2){
+            this.removalExecutorService = new ThreadPoolExecutor(
+                    CORE_POOL_SIZE,
+                    MAX_POOL_SIZE,
+                    KEEP_ALIVE_TIME,
+                    TimeUnit.SECONDS,
+                    new LinkedBlockingQueue<>(QUEUE_CAPACITY), // 有界队列，避免OOM
+                    new NamedThreadFactory("j2cache-caffeine-cache-expire"), // 自定义线程名
+                    new ThreadPoolExecutor.CallerRunsPolicy() // 队列满时降级：提交线程执行，避免任务丢失
+            );
+        }
+
 
         cache = Caffeine.newBuilder()
                 .maximumSize(size)
@@ -66,20 +68,20 @@ public class CaffeineCache {
                 .removalListener((k,v, cause) -> {
                     //程序删除的缓存不做通知处理，因为上层已经做了处理
                     if (!RemovalCause.EXPLICIT.equals(cause) && !RemovalCause.REPLACED.equals(cause) && !RemovalCause.SIZE.equals(cause)) {
-                        executorService.execute(()->{
-                            try {
-                                // 增加key类型校验，避免ClassCastException
-                                if (k instanceof String) {
+                        if(enableL2){
+                            removalExecutorService.execute(()->{
+                                try {
                                     listener.notifyElementExpired((String) k);
-                                } else {
-                                    logger.warn("缓存key类型非String，无法触发过期通知，key: {}, type: {}", k,
-                                            k != null ? k.getClass().getName() : "null");
+                                } catch (Exception e) {
+                                    // 优化：打印完整异常堆栈+上下文，便于定位问题
+                                    logger.error("J2Cache缓存过期通知执行失败，key: {}, value: {}, 移除原因: {}", k, v, cause, e);
                                 }
-                            } catch (Exception e) {
-                                // 优化：打印完整异常堆栈+上下文，便于定位问题
-                                logger.error("缓存过期通知执行失败，key: {}, value: {}, 移除原因: {}", k, v, cause, e);
-                            }
-                        });
+                            });
+                        }else{
+                            listener.notifyElementExpired((String) k);
+                        }
+
+
                     }
                 })
                 .build();
@@ -124,23 +126,26 @@ public class CaffeineCache {
      * 优化：优雅关闭线程池（等待任务完成+超时强制关闭）
      */
     public void close() {
-        executorService.shutdown(); // 拒绝新任务，等待现有任务执行
-        try {
-            // 等待30秒，让现有任务执行完成
-            if (!executorService.awaitTermination(30, TimeUnit.SECONDS)) {
-                logger.warn("缓存线程池关闭超时，强制关闭未完成任务");
-                executorService.shutdownNow(); // 强制关闭，中断未完成任务
-                // 再次等待10秒，确保线程池关闭
-                if (!executorService.awaitTermination(10, TimeUnit.SECONDS)) {
-                    logger.error("缓存线程池强制关闭失败");
+        if(null != removalExecutorService){
+            removalExecutorService.shutdown(); // 拒绝新任务，等待现有任务执行
+            try {
+                // 等待30秒，让现有任务执行完成
+                if (!removalExecutorService.awaitTermination(30, TimeUnit.SECONDS)) {
+                    logger.warn("J2Cache缓存过期线程池关闭超时，强制关闭未完成任务");
+                    removalExecutorService.shutdownNow(); // 强制关闭，中断未完成任务
+                    // 再次等待10秒，确保线程池关闭
+                    if (!removalExecutorService.awaitTermination(10, TimeUnit.SECONDS)) {
+                        logger.error("J2Cache缓存过期线程池强制关闭失败");
+                    }
                 }
+            } catch (InterruptedException e) {
+                logger.error("J2Cache缓存过期线程池关闭被中断", e);
+                removalExecutorService.shutdownNow();
+                // 恢复中断状态，避免上层逻辑异常
+                Thread.currentThread().interrupt();
             }
-        } catch (InterruptedException e) {
-            logger.error("缓存线程池关闭被中断", e);
-            executorService.shutdownNow();
-            // 恢复中断状态，避免上层逻辑异常
-            Thread.currentThread().interrupt();
         }
+
     }
 
 

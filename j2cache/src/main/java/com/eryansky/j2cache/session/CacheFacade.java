@@ -16,7 +16,6 @@
 package com.eryansky.j2cache.session;
 
 import com.eryansky.j2cache.lettuce.LettuceByteCodec;
-import com.eryansky.j2cache.util.IpUtils;
 import com.eryansky.j2cache.util.SerializationUtils;
 import com.google.common.util.concurrent.RateLimiter;
 import io.lettuce.core.AbstractRedisClient;
@@ -44,6 +43,9 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 缓存封装入口
@@ -68,14 +70,22 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
 
     private final boolean discardNonSerializable;
 
+    // 定时任务线程池：用于自动清理过期Session
+    private ScheduledExecutorService cleanExpireScheduledExecutorService;
+    private int maxAge;
+
     public CacheFacade(int maxSizeInMemory, int maxAge, Properties redisConf, boolean discardNonSerializable)  {
         this.discardNonSerializable = discardNonSerializable;
-        this.cache1 = new CaffeineCache(maxSizeInMemory, maxAge, this);
+        this.maxAge = maxAge;
+
+        String enabled = redisConf.getProperty("enabled");
+        boolean enableL2 = "true".equalsIgnoreCase(enabled);
+
+        this.cache1 = new CaffeineCache(maxSizeInMemory, maxAge, this,enableL2);
 
         logger.info("J2Cache Session L1 CacheProvider {}.",this.cache1.getClass().getName());
 
-        String enabled = redisConf.getProperty("enabled");
-        if(!"true".equalsIgnoreCase(enabled)){
+        if(!enableL2){
             logger.info("J2Cache Session L2/redis not enabled.");
             return;
         }
@@ -204,6 +214,37 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
 //        pubSubCommands = this.pubsub_subscriber.sync();
 //        this.pubConnection = this.pubsub();
         this.publish(Command.join());
+
+        this.cleanExpireScheduledExecutorService = Executors.newSingleThreadScheduledExecutor(runnable -> {
+            Thread thread = new Thread(runnable, "j2session-l2-cleanup-thread");
+            thread.setDaemon(true); // 守护线程：JVM退出时自动结束
+            return thread;
+        });
+
+        // 启动定时清理任务：延迟1分钟执行，之后每隔？执行一次
+        cleanExpireScheduledExecutorService.scheduleAtFixedRate(this::cleanupExpiredL2Sessions,
+                60 * 1000, 1 * 60 * 1000L, TimeUnit.MILLISECONDS);
+    }
+
+    private void cleanupExpiredL2Sessions() {
+        if(maxAge < 0){
+            return;
+        }
+        try {
+            Collection<String> keySets = cache2.keys();
+            long count = keySets.stream().filter(key -> {
+                long ttl2 = ttl2(key);
+                if (ttl2 < 0) {
+                    deleteSession(key);
+                    return true;
+                }
+                return false;
+            }).count();
+            logger.debug("清理过期Session完成，清理：{} 当前缓存：{}", count, keys().size());
+        } catch (Exception e) {
+            logger.error("清理过期Session时发生异常：" + e.getMessage(), e);
+        }
+
     }
 
     /**
