@@ -15,7 +15,6 @@
  */
 package com.eryansky.j2cache.session;
 
-import com.eryansky.j2cache.util.SerializationUtils;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Policy;
@@ -25,8 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Collection;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * Caffeine cache
@@ -41,7 +39,26 @@ public class CaffeineCache {
     private final int size ;
     private final int expire ;
 
+    // 优化：有界固定线程池（核心/最大线程数=CPU核心数*1，有界队列，自定义线程名）
+    private final ExecutorService executorService;
+    // 线程池核心参数（可根据业务调整）
+    private static final int CORE_POOL_SIZE = Runtime.getRuntime().availableProcessors();
+    private static final int MAX_POOL_SIZE = CORE_POOL_SIZE * 2;
+    private static final int QUEUE_CAPACITY = 10000; // 任务队列容量，避免无界堆积
+    private static final long KEEP_ALIVE_TIME = 60L; // 空闲线程存活时间
+
     public CaffeineCache(int size, int expire, CacheExpiredListener listener) {
+        // 初始化有界线程池（替代newCachedThreadPool）
+        this.executorService = new ThreadPoolExecutor(
+                CORE_POOL_SIZE,
+                MAX_POOL_SIZE,
+                KEEP_ALIVE_TIME,
+                TimeUnit.SECONDS,
+                new LinkedBlockingQueue<>(QUEUE_CAPACITY), // 有界队列，避免OOM
+                new NamedThreadFactory("j2cache-caffeine-cache-expire"), // 自定义线程名
+                new ThreadPoolExecutor.CallerRunsPolicy() // 队列满时降级：提交线程执行，避免任务丢失
+        );
+
         cache = Caffeine.newBuilder()
                 .maximumSize(size)
                 .expireAfterAccess(expire + 1, TimeUnit.SECONDS)
@@ -49,20 +66,46 @@ public class CaffeineCache {
                 .removalListener((k,v, cause) -> {
                     //程序删除的缓存不做通知处理，因为上层已经做了处理
                     if (!RemovalCause.EXPLICIT.equals(cause) && !RemovalCause.REPLACED.equals(cause) && !RemovalCause.SIZE.equals(cause)) {
-                        try {
-                            synchronized (CaffeineCache.class){
-                                listener.notifyElementExpired((String) k);
+                        executorService.execute(()->{
+                            try {
+                                // 增加key类型校验，避免ClassCastException
+                                if (k instanceof String) {
+                                    listener.notifyElementExpired((String) k);
+                                } else {
+                                    logger.warn("缓存key类型非String，无法触发过期通知，key: {}, type: {}", k,
+                                            k != null ? k.getClass().getName() : "null");
+                                }
+                            } catch (Exception e) {
+                                // 优化：打印完整异常堆栈+上下文，便于定位问题
+                                logger.error("缓存过期通知执行失败，key: {}, value: {}, 移除原因: {}", k, v, cause, e);
                             }
-                        } catch (Exception e) {
-                            logger.error("{}:{} {}",k, v, cause);
-                            logger.error(e.getMessage());
-                        }
+                        });
                     }
                 })
                 .build();
 
         this.size = size;
         this.expire = expire;
+    }
+
+    /**
+     * 自定义线程工厂（给线程命名，方便排查问题）
+     */
+    private static class NamedThreadFactory implements ThreadFactory {
+        private final String prefix;
+        private int threadCount = 0;
+
+        public NamedThreadFactory(String prefix) {
+            this.prefix = prefix;
+        }
+
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread thread = new Thread(r);
+            thread.setName(prefix + "-thread-" + (++threadCount));
+            thread.setDaemon(true); // 守护线程，不阻塞应用关闭
+            return thread;
+        }
     }
 
     public Object get(String session_id) {
@@ -77,8 +120,29 @@ public class CaffeineCache {
         cache.invalidate(session_id);
     }
 
+    /**
+     * 优化：优雅关闭线程池（等待任务完成+超时强制关闭）
+     */
     public void close() {
+        executorService.shutdown(); // 拒绝新任务，等待现有任务执行
+        try {
+            // 等待30秒，让现有任务执行完成
+            if (!executorService.awaitTermination(30, TimeUnit.SECONDS)) {
+                logger.warn("缓存线程池关闭超时，强制关闭未完成任务");
+                executorService.shutdownNow(); // 强制关闭，中断未完成任务
+                // 再次等待10秒，确保线程池关闭
+                if (!executorService.awaitTermination(10, TimeUnit.SECONDS)) {
+                    logger.error("缓存线程池强制关闭失败");
+                }
+            }
+        } catch (InterruptedException e) {
+            logger.error("缓存线程池关闭被中断", e);
+            executorService.shutdownNow();
+            // 恢复中断状态，避免上层逻辑异常
+            Thread.currentThread().interrupt();
+        }
     }
+
 
     public int getSize() {
         return size;
