@@ -223,7 +223,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
 
         // 启动定时清理任务：延迟1分钟执行，之后每隔？执行一次
         cleanExpireScheduledExecutorService.scheduleAtFixedRate(this::cleanupExpiredL2Sessions,
-                60 * 1000, 60 * 60 * 1000L, TimeUnit.MILLISECONDS);
+                60 * 1000, maxAge * 1000L, TimeUnit.MILLISECONDS);
     }
 
     private void cleanupExpiredL2Sessions() {
