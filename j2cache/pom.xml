@@ -19,7 +19,7 @@
         <java.version>17</java.version>
 
         <caffeine.version>3.2.3</caffeine.version>
-        <lettuce.version>6.8.1.RELEASE</lettuce.version>
+        <lettuce.version>7.2.0.RELEASE</lettuce.version>
         <objenesis.version>3.4</objenesis.version>
         <fst.version>3.0.4-jdk17</fst.version>
         <snappy.version>1.1.10.8</snappy.version>
