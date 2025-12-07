@@ -41,7 +41,6 @@ public class CaffeineCache {
 
     // 优化：有界固定线程池（核心/最大线程数=CPU核心数*1，有界队列，自定义线程名）
     private final ExecutorService executorService;
-
     // 线程池核心参数（可根据业务调整）
     private static final int CORE_POOL_SIZE = Runtime.getRuntime().availableProcessors();
     private static final int MAX_POOL_SIZE = CORE_POOL_SIZE * 2;
