@@ -44,7 +44,7 @@ public class CaffeineCache {
     // 线程池核心参数（可根据业务调整）
     private static final int CORE_POOL_SIZE = Runtime.getRuntime().availableProcessors();
     private static final int MAX_POOL_SIZE = CORE_POOL_SIZE * 2;
-    private static final int QUEUE_CAPACITY = 10000; // 任务队列容量，避免无界堆积
+    private static final int QUEUE_CAPACITY = CORE_POOL_SIZE * 1000; // 任务队列容量，避免无界堆积
     private static final long KEEP_ALIVE_TIME = 60L; // 空闲线程存活时间
 
     public CaffeineCache(int size, int expire, CacheExpiredListener listener,boolean enableL2) {
