@@ -36,7 +36,7 @@ import java.util.List;
 
 /**
  * Rest权限拦截器
- * @author wencp
+ * @author Eryan
  * @date 2020-09-09
  */
 public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor {
