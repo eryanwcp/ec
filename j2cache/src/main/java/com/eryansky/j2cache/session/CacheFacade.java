@@ -225,11 +225,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         async.subscribe(this.pubsub_channel);
         logger.info("Connected to redis session channel:{}, time {}ms.", this.pubsub_channel, System.currentTimeMillis()-ct);
 
-
-
         this.publish(Command.join());
-
-
 
         this.cleanExpireScheduledExecutorService = Executors.newSingleThreadScheduledExecutor(runnable -> {
             Thread thread = new Thread(runnable, "j2cache-l2-cleanup-thread");
