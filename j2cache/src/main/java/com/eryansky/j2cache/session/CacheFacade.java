@@ -249,7 +249,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
                         Long ttl = ttl2(key);
                         return ttl != null && ttl < 0;
                     })
-                    .collect(Collectors.toList());;
+                    .collect(Collectors.toList());
             expiredKeys.forEach(this::deleteSession);
             long count = expiredKeys.size();
             if (count > 0) {
