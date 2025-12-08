@@ -215,7 +215,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
                 KEEP_ALIVE_TIME,
                 TimeUnit.SECONDS,
                 new LinkedBlockingQueue<>(QUEUE_CAPACITY), // 有界队列，避免OOM
-                new NamedThreadFactory("j2cache--executor"), // 自定义线程名
+                new NamedThreadFactory("j2cache-executor"), // 自定义线程名
                 new ThreadPoolExecutor.CallerRunsPolicy() // 队列满时降级：提交线程执行，避免任务丢失
         );
 
@@ -232,7 +232,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
 
 
         this.cleanExpireScheduledExecutorService = Executors.newSingleThreadScheduledExecutor(runnable -> {
-            Thread thread = new Thread(runnable, "j2session-l2-cleanup-thread");
+            Thread thread = new Thread(runnable, "j2cache-l2-cleanup-thread");
             thread.setDaemon(true); // 守护线程：JVM退出时自动结束
             return thread;
         });
