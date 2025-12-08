@@ -246,8 +246,8 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         try {
             Collection<String> keySets = cache2.keys();
             count = keySets.stream().filter(key -> {
-                long ttl2 = ttl2(key);
-                if (ttl2 < 0) {
+                Long ttl2 = ttl2(key);
+                if (null != ttl2 && ttl2 < 0) {
                     deleteSession(key);
                     return true;
                 }
