@@ -232,7 +232,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
 
 
         this.cleanExpireScheduledExecutorService = Executors.newSingleThreadScheduledExecutor(runnable -> {
-            Thread thread = new Thread(runnable, "j2session-l2-cleanup-thread");
+            Thread thread = new Thread(runnable, "j2cache-l2-cleanup-thread");
             thread.setDaemon(true); // 守护线程：JVM退出时自动结束
             return thread;
         });
