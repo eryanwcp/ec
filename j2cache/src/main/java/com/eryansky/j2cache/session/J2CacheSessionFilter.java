@@ -172,12 +172,7 @@ public class J2CacheSessionFilter implements Filter {
             J2CacheSession session = (J2CacheSession)j2cacheRequest.getSession(false);
             if(session != null && !session.isNew() && !session.isInvalid()){
                 try {
-                    if(rateLimit){
-                        RateLimiter limiter = sessionLimiters.computeIfAbsent(session.getId(), id -> RateLimiter.create(this.rateLimitPerSecond));
-                        g_cache.updateSessionAccessTimeWithL2Cache(session.getSessionObject(),limiter);
-                    }else{
-                        g_cache.updateSessionAccessTime(session.getSessionObject());
-                    }
+                    g_cache.updateSessionAccessTimeWithL2Cache(session.getSessionObject());
                 } catch (Exception e) {
     //                        logger.error(currentURL + ":" + e.getMessage(), e);
                     logger.error(currentURL + ":" + e.getMessage());
