@@ -455,39 +455,15 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             session.setLastAccess_at(System.currentTimeMillis());
             cache1.put(session.getId(), session);
             if(this.cache2 != null){
-                cache2.updateKeyBytes(session.getId(), new HashMap<String,byte[]>() {{
-                    put(SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
-                    put(SessionObject.KEY_ACCESS_COUNT, String.valueOf(session.getAccessCount()).getBytes());
-                }},cache1.getExpire());
-            }
-        } finally {
-            if(this.cache2 != null){
-                this.publish(new Command(Command.OPT_DELETE_SESSION, session.getId(), null));
-            }
-        }
-    }
-
-    /**
-     * 更新 session 的最后一次访问时间 1s内仅更新一次二级缓存
-     * @param session 会话对象
-     */
-    public void updateSessionAccessTimeWithL2Cache(SessionObject session) {
-        boolean flag = this.cache2 != null;
-        try {
-            session.setAccessCount(session.getAccessCount() + 1);//非严谨设置 无并发控制
-            session.setLastAccess_at(System.currentTimeMillis());
-            cache1.put(session.getId(), session);
-            if(flag){
                 executorService.execute(()->{
-                    cache2.updateKeyBytesAsync(session.getId(), new HashMap<String,byte[]>() {{
+                    cache2.updateKeyBytes(session.getId(), new HashMap<String,byte[]>() {{
                         put(SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
                         put(SessionObject.KEY_ACCESS_COUNT, String.valueOf(session.getAccessCount()).getBytes());
                     }},cache1.getExpire());
                 });
-
             }
         } finally {
-            if(flag){
+            if(this.cache2 != null){
                 this.publish(new Command(Command.OPT_DELETE_SESSION, session.getId(), null));
             }
         }
