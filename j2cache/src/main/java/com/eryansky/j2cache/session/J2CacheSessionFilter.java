@@ -243,7 +243,7 @@ public class J2CacheSessionFilter implements Filter {
                             if (ssnObject != null) {
                                 session = new J2CacheSession(servletContext, g_cache, ssnObject);
                                 session.setNew(false);
-                                setCookie(cookieName, session_id);
+                                setCookie(cookieName, bindsSessionId);
                             }
                         }
                     }
