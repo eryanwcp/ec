@@ -17,7 +17,6 @@ package com.eryansky.j2cache.session;
 
 import com.eryansky.j2cache.lettuce.LettuceByteCodec;
 import com.eryansky.j2cache.util.SerializationUtils;
-import com.google.common.util.concurrent.RateLimiter;
 import io.lettuce.core.AbstractRedisClient;
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.RedisClient;
@@ -42,10 +41,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * 缓存封装入口
@@ -74,6 +70,14 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
     private ScheduledExecutorService cleanExpireScheduledExecutorService;
     private int maxAge;
 
+    // 优化：有界固定线程池（核心/最大线程数=CPU核心数*1，有界队列，自定义线程名）
+    private ExecutorService executorService;
+    // 线程池核心参数（可根据业务调整）
+    private static final int CORE_POOL_SIZE = Runtime.getRuntime().availableProcessors();
+    private static final int MAX_POOL_SIZE = CORE_POOL_SIZE * 2;
+    private static final int QUEUE_CAPACITY = CORE_POOL_SIZE * 1000; // 任务队列容量，避免无界堆积
+    private static final long KEEP_ALIVE_TIME = 60L; // 空闲线程存活时间
+
     public CacheFacade(int maxSizeInMemory, int maxAge, Properties redisConf, boolean discardNonSerializable)  {
         this.discardNonSerializable = discardNonSerializable;
         this.maxAge = maxAge;
@@ -81,7 +85,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         String enabled = redisConf.getProperty("enabled");
         boolean enableL2 = "true".equalsIgnoreCase(enabled);
 
-        this.cache1 = new CaffeineCache(maxSizeInMemory, maxAge, this,enableL2);
+        this.cache1 = new CaffeineCache(maxSizeInMemory, maxAge, this);
 
         logger.info("J2Cache Session L1 CacheProvider {}.",this.cache1.getClass().getName());
 
@@ -205,15 +209,27 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         this.cache2 = new LettuceCache(clusterName, redisClient,pool,scanCount);
         logger.info("J2Cache Session L2 CacheProvider {}.",this.cache2.getClass().getName());
 
+        this.executorService = new ThreadPoolExecutor(
+                CORE_POOL_SIZE,
+                MAX_POOL_SIZE,
+                KEEP_ALIVE_TIME,
+                TimeUnit.SECONDS,
+                new LinkedBlockingQueue<>(QUEUE_CAPACITY), // 有界队列，避免OOM
+                new NamedThreadFactory("j2cache--executor"), // 自定义线程名
+                new ThreadPoolExecutor.CallerRunsPolicy() // 队列满时降级：提交线程执行，避免任务丢失
+        );
+
         this.pubsub_subscriber = this.pubsub();
         this.pubsub_subscriber.addListener(this);
         RedisPubSubAsyncCommands<String, String> async = this.pubsub_subscriber.async();
         async.subscribe(this.pubsub_channel);
         logger.info("Connected to redis session channel:{}, time {}ms.", this.pubsub_channel, System.currentTimeMillis()-ct);
 
-//        pubSubCommands = this.pubsub_subscriber.sync();
-//        this.pubConnection = this.pubsub();
+
+
         this.publish(Command.join());
+
+
 
         this.cleanExpireScheduledExecutorService = Executors.newSingleThreadScheduledExecutor(runnable -> {
             Thread thread = new Thread(runnable, "j2session-l2-cleanup-thread");
@@ -248,6 +264,26 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
     }
 
     /**
+     * 自定义线程工厂（给线程命名，方便排查问题）
+     */
+    private static class NamedThreadFactory implements ThreadFactory {
+        private final String prefix;
+        private int threadCount = 0;
+
+        public NamedThreadFactory(String prefix) {
+            this.prefix = prefix;
+        }
+
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread thread = new Thread(r);
+            thread.setName(prefix + "-thread-" + (++threadCount));
+            thread.setDaemon(true); // 守护线程，不阻塞应用关闭
+            return thread;
+        }
+    }
+
+    /**
      * Get PubSub connection
      * @return connection instance
      */
@@ -267,10 +303,13 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         if(this.cache2 == null){
             return;
         }
-        try (StatefulRedisPubSubConnection<String, String> connection = this.pubsub()){
-            RedisPubSubCommands<String, String> sync = connection.sync();
-            sync.publish(this.pubsub_channel, cmd.toString());
-        }
+        executorService.execute(()->{
+            try (StatefulRedisPubSubConnection<String, String> connection = this.pubsub()){
+                RedisPubSubCommands<String, String> sync = connection.sync();
+                sync.publish(this.pubsub_channel, cmd.toString());
+            }
+        });
+
 
 //        RedisPubSubCommands<String, String> sync = pubConnection.sync();
 //        sync.publish(this.pubsub_channel, cmd.toString());
@@ -428,18 +467,20 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
      * 更新 session 的最后一次访问时间 1s内仅更新一次二级缓存
      * @param session 会话对象
      */
-    public void updateSessionAccessTimeWithL2Cache(SessionObject session,RateLimiter limiter) {
+    public void updateSessionAccessTimeWithL2Cache(SessionObject session) {
         boolean flag = this.cache2 != null;
         try {
             session.setAccessCount(session.getAccessCount() + 1);//非严谨设置 无并发控制
             session.setLastAccess_at(System.currentTimeMillis());
             cache1.put(session.getId(), session);
-            flag = flag && limiter.tryAcquire();
             if(flag){
-                cache2.updateKeyBytesAsync(session.getId(), new HashMap<String,byte[]>() {{
-                    put(SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
-                    put(SessionObject.KEY_ACCESS_COUNT, String.valueOf(session.getAccessCount()).getBytes());
-                }},cache1.getExpire());
+                executorService.execute(()->{
+                    cache2.updateKeyBytesAsync(session.getId(), new HashMap<>() {{
+                        put(SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
+                        put(SessionObject.KEY_ACCESS_COUNT, String.valueOf(session.getAccessCount()).getBytes());
+                    }},cache1.getExpire());
+                });
+
             }
         } finally {
             if(flag){
