@@ -59,8 +59,8 @@ public class SSORedirctController extends SimpleController {
             token =  sessionInfo.getToken();
         }
 
-        if(!StringUtils.contains(url,AuthorityInterceptor.ATTR_AUTHORIZATION)){
-            url = AppUtils.appendParaToUrl(url,AuthorityInterceptor.ATTR_AUTHORIZATION,token);
+        if(!StringUtils.contains(url,AuthorityInterceptor.ATTR_TOKEN)){
+            url = AppUtils.appendParaToUrl(url,AuthorityInterceptor.ATTR_TOKEN,token);
         }
         return "redirect:"+ url;
     }
