@@ -230,15 +230,16 @@ public class J2CacheSessionFilter implements Filter {
                     }
                     if (StringUtils.isNotBlank(authorization)) {
                         String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""), "Bearer", "");
-                        String tokenMd5Id = MD5Util.getStringMD5(token);
-                        session_id = g_cache.keys().parallelStream().filter(key -> {
+                        session_id = MD5Util.getStringMD5(token);
+                        String finalSession_id = session_id;
+                        String bindsSessionId = g_cache.keys().parallelStream().filter(key -> {
                             SessionObject sessionObject = g_cache.getSession(key);
                             Set<String> bindIds = null != sessionObject ? (Set<String>) sessionObject.get(SessionObject.KEY_SESION_ID_BIND) : null;
-                            return null != bindIds && bindIds.contains(tokenMd5Id);
+                            return null != bindIds && bindIds.contains(finalSession_id);
                         }).findFirst().orElse(null);
 
-                        if (null != session_id) {
-                            SessionObject ssnObject = g_cache.getSession(session_id);
+                        if (null != bindsSessionId) {
+                            SessionObject ssnObject = g_cache.getSession(bindsSessionId);
                             if (ssnObject != null) {
                                 session = new J2CacheSession(servletContext, g_cache, ssnObject);
                                 session.setNew(false);
@@ -249,7 +250,9 @@ public class J2CacheSessionFilter implements Filter {
                 }
 
                 if(session == null && create) {
-                    session_id = UUID.randomUUID().toString().replaceAll("-", "");
+                    if(null == session_id){
+                        session_id = UUID.randomUUID().toString().replaceAll("-", "");
+                    }
                     session = new J2CacheSession(servletContext, session_id, g_cache);
                     session.getSessionObject().setClientIP(com.eryansky.common.utils.net.IpUtils.getIpAddr(request));
                     g_cache.saveSession(session.getSessionObject());
