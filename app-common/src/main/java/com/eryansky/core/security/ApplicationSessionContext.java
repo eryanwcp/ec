@@ -114,6 +114,14 @@ public class ApplicationSessionContext {
 		}
 	}
 
+
+    /**
+     * 清空过期缓存L2
+     */
+    public long cleanupExpiredL2Sessions() {
+        return cacheFacade.cleanupExpiredL2Sessions();
+    }
+
 	public int findSessionKeySize() {
 		Collection<String> keys = cacheFacade.keys();
 		return keys.size();
