@@ -360,6 +360,9 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             if(null != cleanExpireScheduledExecutorService){
                 cleanExpireScheduledExecutorService.shutdown();
             }
+            if(null != executorService){
+                executorService.shutdown();
+            }
         } finally {
             this.cache1.close();
             if(null != this.pubConnection){
