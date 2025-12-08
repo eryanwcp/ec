@@ -270,9 +270,12 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
             //返回校验不通过页面
             try {
                 if(!response.isCommitted()){
-                    String authorization = request.getHeader("Authorization");
-                    if(StringUtils.isBlank(authorization)){
-                        authorization = SpringMVCHolder.getRequest().getParameter("Authorization");
+                    String authorization = request.getParameter(AuthorityInterceptor.ATTR_AUTHORIZATION);
+                    if (StringUtils.isBlank(authorization)) {
+                        authorization = request.getParameter(AuthorityInterceptor.ATTR_TOKEN);
+                    }
+                    if (StringUtils.isBlank(authorization)) {
+                        authorization = request.getHeader(AuthorityInterceptor.ATTR_AUTHORIZATION);
                     }
                     if(WebUtils.isAjaxRequest(request) || StringUtils.startsWith(authorization,"Bearer ")){
                         response.setStatus(HttpStatus.UNAUTHORIZED.value());
