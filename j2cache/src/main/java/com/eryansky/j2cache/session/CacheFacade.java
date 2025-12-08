@@ -244,10 +244,11 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             return 0;
         }
         try {
-            Collection<String> expiredKeys = cache2.keys().stream()
+            //清除一级缓存中的key 在二级缓存中无效的数据
+            Collection<String> expiredKeys = cache1.keys().stream()
                     .filter(key -> {
                         Long ttl = ttl2(key);
-                        return ttl != null && ttl < 0;
+                        return ttl == null || ttl < 0;
                     })
                     .collect(Collectors.toList());
             expiredKeys.forEach(this::deleteSession);
