@@ -209,16 +209,6 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         this.cache2 = new LettuceCache(clusterName, redisClient,pool,scanCount);
         logger.info("J2Cache Session L2 CacheProvider {}.",this.cache2.getClass().getName());
 
-        this.pubsub_subscriber = this.pubsub();
-        this.pubsub_subscriber.addListener(this);
-        RedisPubSubAsyncCommands<String, String> async = this.pubsub_subscriber.async();
-        async.subscribe(this.pubsub_channel);
-        logger.info("Connected to redis session channel:{}, time {}ms.", this.pubsub_channel, System.currentTimeMillis()-ct);
-
-//        pubSubCommands = this.pubsub_subscriber.sync();
-//        this.pubConnection = this.pubsub();
-        this.publish(Command.join());
-
         this.executorService = new ThreadPoolExecutor(
                 CORE_POOL_SIZE,
                 MAX_POOL_SIZE,
@@ -228,6 +218,18 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
                 new NamedThreadFactory("j2cache--executor"), // 自定义线程名
                 new ThreadPoolExecutor.CallerRunsPolicy() // 队列满时降级：提交线程执行，避免任务丢失
         );
+
+        this.pubsub_subscriber = this.pubsub();
+        this.pubsub_subscriber.addListener(this);
+        RedisPubSubAsyncCommands<String, String> async = this.pubsub_subscriber.async();
+        async.subscribe(this.pubsub_channel);
+        logger.info("Connected to redis session channel:{}, time {}ms.", this.pubsub_channel, System.currentTimeMillis()-ct);
+
+
+
+        this.publish(Command.join());
+
+
 
         this.cleanExpireScheduledExecutorService = Executors.newSingleThreadScheduledExecutor(runnable -> {
             Thread thread = new Thread(runnable, "j2session-l2-cleanup-thread");
