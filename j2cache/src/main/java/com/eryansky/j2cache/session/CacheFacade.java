@@ -256,7 +256,11 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
                 }
                 return false;
             }).count();
-            logger.debug("清理过期Session完成，清理：{} 当前缓存：{}", count, keys().size());
+            if (count > 0) {
+                logger.info("清理过期Session完成，清理：{} 当前缓存：{}", count, keys().size());
+            } else {
+                logger.debug("清理过期Session完成，清理：{} 当前缓存：{}", count, keys().size());
+            }
         } catch (Exception e) {
             logger.error("清理过期Session时发生异常：" + e.getMessage(), e);
         }
