@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 /**
  * 缓存封装入口
@@ -242,27 +243,25 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         if (maxAge < 0) {
             return 0;
         }
-        long count = 0;
         try {
-            Collection<String> keySets = cache2.keys();
-            count = keySets.stream().filter(key -> {
-                long ttl2 = ttl2(key);
-                if (ttl2 < 0) {
-                    deleteSession(key);
-                    return true;
-                }
-                return false;
-            }).count();
+            Collection<String> expiredKeys = cache2.keys().stream()
+                    .filter(key -> {
+                        Long ttl = ttl2(key);
+                        return ttl != null && ttl < 0;
+                    })
+                    .collect(Collectors.toList());;
+            expiredKeys.forEach(this::deleteSession);
+            long count = expiredKeys.size();
             if (count > 0) {
                 logger.info("清理过期Session完成，清理：{} 当前缓存：{}", count, keys().size());
             } else {
                 logger.debug("清理过期Session完成，清理：{} 当前缓存：{}", count, keys().size());
             }
+            return count;
         } catch (Exception e) {
             logger.error("清理过期Session时发生异常：" + e.getMessage(), e);
         }
-
-        return count;
+        return 0;
     }
 
     /**
