@@ -271,12 +271,43 @@ public class SystemMonitorController extends SimpleController {
      * @param id 缓存id/sessionid
      * @return
      */
-    @Logging(value = "系统监控-清空会话缓存",data = "#id", logType = LogType.access)
+    @Logging(value = "系统监控-清空会话缓存key",data = "#id", logType = LogType.access)
     @RequiresPermissions("sys:systemMonitor:edit")
     @GetMapping(value = "clearSessionCacheKey")
     public String clearSessionCacheKey(String id, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
         SecurityUtils.removeSession(id);
         addMessage(redirectAttributes, "操作成功！");
+        return "redirect:" + AppConstants.getAdminPath() + "/sys/systemMonitor/sessionCache?" + "repage";
+    }
+
+
+    /**
+     * 清空会话缓存
+     *
+     * @return
+     */
+    @Logging(value = "系统监控-清空全部会话", logType = LogType.access)
+    @RequiresPermissions("sys:systemMonitor:edit")
+    @GetMapping(value = "clearSession")
+    public String clearSessionCacheKey(RedirectAttributes redirectAttributes) {
+        SecurityUtils.findSessionKeys().forEach(SecurityUtils::removeSession);
+        addMessage(redirectAttributes, "操作成功！");
+        return "redirect:" + AppConstants.getAdminPath() + "/sys/systemMonitor/sessionCache?" + "repage";
+    }
+
+
+
+    /**
+     * 清空过期会话缓存
+     *
+     * @return
+     */
+    @Logging(value = "系统监控-清空过期会话", logType = LogType.access)
+    @RequiresPermissions("sys:systemMonitor:edit")
+    @GetMapping(value = "clearExpireSession")
+    public String clearExpireSession(RedirectAttributes redirectAttributes) {
+        long count = SecurityUtils.cleanupExpiredL2Sessions();
+        addMessage(redirectAttributes, "操作成功！清空："+count+"条");
         return "redirect:" + AppConstants.getAdminPath() + "/sys/systemMonitor/sessionCache?" + "repage";
     }
 

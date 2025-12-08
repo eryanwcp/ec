@@ -1119,6 +1119,14 @@ public class SecurityUtils {
         return Static.applicationSessionContext.sessionTTL2(sessionId);
     }
 
+
+    /**
+     * 清空过期缓存L2
+     */
+    public static long cleanupExpiredL2Sessions() {
+        return Static.applicationSessionContext.cleanupExpiredL2Sessions();
+    }
+
     /**
      * 查看某个用户登录信息 （低并发使用）
      * @param token

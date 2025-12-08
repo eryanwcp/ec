@@ -161,13 +161,13 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             builder.withDatabase(database).withPassword(password);
 
             RedisURI uri = builder.build();
-            redisClient = io.lettuce.core.RedisClient.create(uri);
+            redisClient = RedisClient.create(uri);
         }else {
             String[] redisArray = hosts.split(":");
             RedisURI uri = RedisURI.create(redisArray[0], Integer.valueOf(redisArray[1]));
             uri.setDatabase(database);
             uri.setPassword(password);
-            redisClient = io.lettuce.core.RedisClient.create(uri);
+            redisClient = RedisClient.create(uri);
         }
 
         if(StringUtils.hasText(protocolVersion) && redisClient instanceof RedisClient){
@@ -199,8 +199,8 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         poolConfig.setBlockWhenExhausted(Boolean.parseBoolean(redisConf.getProperty("blockWhenExhausted", "false")));// 连接耗尽时是否阻塞
 
         pool = ConnectionPoolSupport.createGenericObjectPool(() -> {
-            if(redisClient instanceof io.lettuce.core.RedisClient)
-                return ((io.lettuce.core.RedisClient)redisClient).connect(codec);
+            if(redisClient instanceof RedisClient)
+                return ((RedisClient)redisClient).connect(codec);
             else if(redisClient instanceof RedisClusterClient)
                 return ((RedisClusterClient)redisClient).connect(codec);
             return null;
@@ -238,13 +238,14 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
                 60 * 1000, maxAge * 1000L, TimeUnit.MILLISECONDS);
     }
 
-    private void cleanupExpiredL2Sessions() {
-        if(maxAge < 0){
-            return;
+    public long cleanupExpiredL2Sessions() {
+        if (maxAge < 0) {
+            return 0;
         }
+        long count = 0;
         try {
             Collection<String> keySets = cache2.keys();
-            long count = keySets.stream().filter(key -> {
+            count = keySets.stream().filter(key -> {
                 long ttl2 = ttl2(key);
                 if (ttl2 < 0) {
                     deleteSession(key);
@@ -261,6 +262,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             logger.error("清理过期Session时发生异常：" + e.getMessage(), e);
         }
 
+        return count;
     }
 
     /**
@@ -288,7 +290,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
      * @return connection instance
      */
     private StatefulRedisPubSubConnection pubsub() {
-        if(redisClient instanceof io.lettuce.core.RedisClient)
+        if(redisClient instanceof RedisClient)
             return ((RedisClient)redisClient).connectPubSub();
         else if(redisClient instanceof RedisClusterClient)
             return ((RedisClusterClient)redisClient).connectPubSub();
