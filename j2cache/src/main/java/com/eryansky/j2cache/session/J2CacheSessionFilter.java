@@ -219,9 +219,8 @@ public class J2CacheSessionFilter implements Filter {
                     String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""), "Bearer", "");
                     if (StringUtils.isNotBlank(token)) {
                         session_id = MD5Util.getStringMD5(token);
-                        Object lock = SESSION_LOCKS.computeIfAbsent(session_id, k -> new Object());
                         try {
-                            synchronized (lock) {
+                            synchronized (SESSION_LOCKS.computeIfAbsent(session_id, k -> new Object())) {
                                 SessionObject ssnObject = g_cache.getSession(session_id);
                                 if (ssnObject != null) {
                                     session = new J2CacheSession(servletContext, g_cache, ssnObject);
@@ -239,7 +238,7 @@ public class J2CacheSessionFilter implements Filter {
                                 }
                             }
                         } finally {
-                            SESSION_LOCKS.remove(session_id, lock);
+                            SESSION_LOCKS.remove(session_id);
                         }
 
                     }
