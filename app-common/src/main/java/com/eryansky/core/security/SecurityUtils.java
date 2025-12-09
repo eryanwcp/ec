@@ -764,6 +764,14 @@ public class SecurityUtils {
         } catch (Exception e) {
 //                logger.error(e.getMessage());
         }
+        return getCurrentSessionInfo(request);
+    }
+
+    /**
+     * 获取当前用户session信息.
+     * @param request
+     */
+    public static SessionInfo getCurrentSessionInfo(HttpServletRequest request) {
         return getCurrentSessionInfo(request,true);
     }
 
