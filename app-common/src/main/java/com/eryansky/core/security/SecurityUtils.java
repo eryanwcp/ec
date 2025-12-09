@@ -936,7 +936,7 @@ public class SecurityUtils {
         if (_sessionInfo != null) {
             Static.userService.logout(_sessionInfo.getUserId(), securityType);
             removeSession(_sessionInfo.getId());
-            removeSession(MD5Util.hash(_sessionInfo.getRefreshToken()));
+            removeSession(MD5Util.getStringMD5(_sessionInfo.getRefreshToken()));
         }
         removeSession(sessionId);
         if (invalidate) {
