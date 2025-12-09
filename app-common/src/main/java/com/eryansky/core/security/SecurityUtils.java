@@ -774,6 +774,7 @@ public class SecurityUtils {
     public static SessionInfo getCurrentSessionInfo(HttpServletRequest request) {
         return getCurrentSessionInfo(request,true);
     }
+
     /**
      * 获取当前用户session信息.
      * @param request
