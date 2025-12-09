@@ -297,11 +297,11 @@ public class SystemMonitorController extends SimpleController {
 
 
     /**
-     * 清空过期会话缓存
+     * 删除过期会话缓存
      *
      * @return
      */
-    @Logging(value = "系统监控-清空过期会话", logType = LogType.access)
+    @Logging(value = "系统监控-删除过期会话", logType = LogType.access)
     @RequiresPermissions("sys:systemMonitor:edit")
     @GetMapping(value = "clearExpireSession")
     public String clearExpireSession(RedirectAttributes redirectAttributes) {

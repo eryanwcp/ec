@@ -122,7 +122,7 @@
 
     <e:hasPermission name="sys:systemMonitor:edit">
         <a class="btn btn-link" href="${ctxAdmin}/sys/systemMonitor/clearSession">清空全部会话</a>&nbsp;&nbsp;
-        <a class="btn btn-link" href="${ctxAdmin}/sys/systemMonitor/clearExpireSession">清空过期会话</a>&nbsp;&nbsp;
+        <a class="btn btn-link" href="${ctxAdmin}/sys/systemMonitor/clearExpireSession">删除过期会话</a>&nbsp;&nbsp;
     </e:hasPermission>
 </form:form>
 <tags:message content="${message}"/>
