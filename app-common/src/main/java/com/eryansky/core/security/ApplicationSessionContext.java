@@ -144,7 +144,7 @@ public class ApplicationSessionContext {
 		if(null != sessionObject){
 			Set<String> bindIds = (Set<String>) sessionObject.get(SessionObject.KEY_SESION_ID_BIND);
 			if(null == bindIds){
-				bindIds = Sets.newHashSet();
+				bindIds = Sets.newConcurrentHashSet();
 			}
 			bindIds.add(sessionId);
 			sessionObject.put(SessionObject.KEY_SESION_ID_BIND, bindIds);
