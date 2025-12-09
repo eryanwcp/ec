@@ -219,30 +219,29 @@ public class J2CacheSessionFilter implements Filter {
                     String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""), "Bearer", "");
                     if (StringUtils.isNotBlank(token)) {
                         session_id = MD5Util.getStringMD5(token);
-                        if (create) {
-                            Object lock = SESSION_LOCKS.computeIfAbsent(session_id, k -> new Object());
-                            try {
-                                synchronized (lock) {
-                                    SessionObject ssnObject = g_cache.getSession(session_id);
-                                    if (ssnObject != null) {
-                                        session = new J2CacheSession(servletContext, g_cache, ssnObject);
-                                        session.setNew(false);
-                                    } else {
-                                        session = new J2CacheSession(servletContext, session_id, g_cache);
-                                        try {
-                                            String clientIp = com.eryansky.common.utils.net.IpUtils.getIpAddr(request);
-                                            session.getSessionObject().setClientIP(clientIp);
-                                        } catch (Exception e) {
-                                            logger.warn("获取客户端IP失败:"+e.getMessage(), e);
-                                        }
-                                        g_cache.saveSession(session.getSessionObject());
+                        Object lock = SESSION_LOCKS.computeIfAbsent(session_id, k -> new Object());
+                        try {
+                            synchronized (lock) {
+                                SessionObject ssnObject = g_cache.getSession(session_id);
+                                if (ssnObject != null) {
+                                    session = new J2CacheSession(servletContext, g_cache, ssnObject);
+                                    session.setNew(false);
+                                } else if (create) {
+                                    session = new J2CacheSession(servletContext, session_id, g_cache);
+                                    try {
+                                        String clientIp = com.eryansky.common.utils.net.IpUtils.getIpAddr(request);
+                                        session.getSessionObject().setClientIP(clientIp);
+                                    } catch (Exception e) {
+                                        logger.warn("获取客户端IP失败:" + e.getMessage(), e);
                                     }
+                                    g_cache.saveSession(session.getSessionObject());
+                                    setCookie(cookieName, session_id);
                                 }
-                            } finally {
-                                SESSION_LOCKS.remove(session_id, lock);
                             }
-                            setCookie(cookieName, session_id);
+                        } finally {
+                            SESSION_LOCKS.remove(session_id, lock);
                         }
+
                     }
                 }
 
