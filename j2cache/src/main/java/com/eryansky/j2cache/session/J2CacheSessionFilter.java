@@ -17,7 +17,6 @@ package com.eryansky.j2cache.session;
 
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.encode.MD5Util;
-import com.google.common.util.concurrent.RateLimiter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.AntPathMatcher;
