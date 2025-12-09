@@ -22,6 +22,7 @@ import com.eryansky.core.security.annotation.RequiresPermissions;
 import com.eryansky.core.security.annotation.RequiresRoles;
 import com.eryansky.core.security.annotation.RequiresUser;
 import com.eryansky.core.security.annotation.RestApi;
+import com.eryansky.core.security.interceptor.AuthorityInterceptor;
 import com.eryansky.core.security.jwt.JWTUtils;
 import com.eryansky.j2cache.session.SessionObject;
 import com.eryansky.modules.sys._enum.DataScope;
@@ -763,14 +764,15 @@ public class SecurityUtils {
         } catch (Exception e) {
 //                logger.error(e.getMessage());
         }
-        return getCurrentSessionInfo(request);
+        return getCurrentSessionInfo(request,true);
     }
 
     /**
      * 获取当前用户session信息.
      * @param request
+     * @param autoAuthorizationSession
      */
-    public static SessionInfo getCurrentSessionInfo(HttpServletRequest request) {
+    public static SessionInfo getCurrentSessionInfo(HttpServletRequest request,boolean autoAuthorizationSession) {
         SessionInfo sessionInfo = null;
         try {
             if (null == request) {
@@ -787,6 +789,20 @@ public class SecurityUtils {
             }
             String sessionId = getNoSuffixSessionId(session);
             sessionInfo = getSessionInfo(sessionId);
+            //Authorization 请求头或请求参数
+            if (sessionInfo == null && autoAuthorizationSession) {
+                String authorization = request.getParameter(AuthorityInterceptor.ATTR_AUTHORIZATION);
+                if (StringUtils.isBlank(authorization)) {
+                    authorization = request.getParameter(AuthorityInterceptor.ATTR_TOKEN);
+                }
+                if (StringUtils.isBlank(authorization)) {
+                    authorization = request.getHeader(AuthorityInterceptor.ATTR_AUTHORIZATION);
+                }
+                if (StringUtils.isNotBlank(authorization)) {
+                    String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""),"Bearer","");
+                    sessionInfo = getSessionInfoByTokenOrRefreshTokenWithMd5(token);
+                }
+            }
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
@@ -1089,6 +1105,16 @@ public class SecurityUtils {
 
     /**
      * 查看某个用户登录信息
+     * @param token
+     * @return
+     */
+    public static SessionInfo getSessionInfoByTokenOrRefreshTokenWithMd5(String token) {
+        String sessionInfoId = MD5Util.getStringMD5(token);
+        return getSessionInfoById(sessionInfoId);
+    }
+
+    /**
+     * 查看某个用户登录信息
      * @param loginName 登录帐号
      * @return
      */
@@ -1149,6 +1175,15 @@ public class SecurityUtils {
      */
     public static SessionInfo getSessionInfo(String sessionId) {
         return Static.applicationSessionContext.getSession(sessionId);
+    }
+
+    /**
+     * 根据sessionInfoId查找对应的SessionInfo信息
+     * @param sessionInfoId
+     * @return
+     */
+    public static SessionInfo getSessionInfoById(String sessionInfoId) {
+        return findSessionInfoList().parallelStream().filter(sessionInfo -> sessionInfo.getId().equals(sessionInfoId)).findFirst().orElse(null);
     }
 
     public static boolean isMobileLogin() {
