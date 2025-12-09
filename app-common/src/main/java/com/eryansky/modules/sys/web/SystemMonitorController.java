@@ -12,7 +12,6 @@ import ch.qos.logback.core.FileAppender;
 import com.eryansky.common.exception.SystemException;
 import com.eryansky.common.model.Result;
 import com.eryansky.common.orm.Page;
-import com.eryansky.common.utils.DateUtils;
 import com.eryansky.common.utils.PrettyMemoryUtils;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
@@ -306,7 +305,7 @@ public class SystemMonitorController extends SimpleController {
     @RequiresPermissions("sys:systemMonitor:edit")
     @GetMapping(value = "clearExpireSession")
     public String clearExpireSession(RedirectAttributes redirectAttributes) {
-        long count = SecurityUtils.cleanupExpiredL2Sessions();
+        long count = SecurityUtils.cleanupExpiredSessions();
         addMessage(redirectAttributes, "操作成功！清空："+count+"条");
         return "redirect:" + AppConstants.getAdminPath() + "/sys/systemMonitor/sessionCache?" + "repage";
     }

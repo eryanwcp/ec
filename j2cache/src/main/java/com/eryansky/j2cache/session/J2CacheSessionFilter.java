@@ -62,10 +62,7 @@ public class J2CacheSessionFilter implements Filter {
      * 黑名单
      */
     private String[] blackListURLs = null;
-
-
-    private final ConcurrentHashMap<String, RateLimiter> sessionLimiters = new ConcurrentHashMap<>();
-
+    private static final ConcurrentHashMap<String, Object> SESSION_LOCKS = new ConcurrentHashMap<>();
 
     @Override
     public void init(FilterConfig config) {
@@ -228,29 +225,38 @@ public class J2CacheSessionFilter implements Filter {
                     if (StringUtils.isBlank(authorization)) {
                         authorization = request.getHeader(ATTR_AUTHORIZATION);
                     }
-                    if (StringUtils.isNotBlank(authorization)) {
-                        String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""), "Bearer", "");
+                    String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""), "Bearer", "");
+                    if (StringUtils.isNotBlank(token)) {
                         session_id = MD5Util.getStringMD5(token);
-                        String finalSession_id = session_id;
-                        String bindsSessionId = g_cache.keys().parallelStream().filter(key -> {
-                            SessionObject sessionObject = g_cache.getSession(key);
-                            Set<String> bindIds = null != sessionObject ? (Set<String>) sessionObject.get(SessionObject.KEY_SESION_ID_BIND) : null;
-                            return null != bindIds && bindIds.contains(finalSession_id);
-                        }).findFirst().orElse(null);
-
-                        if (null != bindsSessionId) {
-                            SessionObject ssnObject = g_cache.getSession(bindsSessionId);
-                            if (ssnObject != null) {
-                                session = new J2CacheSession(servletContext, g_cache, ssnObject);
-                                session.setNew(false);
-                                setCookie(cookieName, bindsSessionId);
+                        if (create) {
+                            Object lock = SESSION_LOCKS.computeIfAbsent(session_id, k -> new Object());
+                            try {
+                                synchronized (lock) {
+                                    SessionObject ssnObject = g_cache.getSession(session_id);
+                                    if (ssnObject != null) {
+                                        session = new J2CacheSession(servletContext, g_cache, ssnObject);
+                                        session.setNew(false);
+                                    } else {
+                                        session = new J2CacheSession(servletContext, session_id, g_cache);
+                                        try {
+                                            String clientIp = com.eryansky.common.utils.net.IpUtils.getIpAddr(request);
+                                            session.getSessionObject().setClientIP(clientIp);
+                                        } catch (Exception e) {
+                                            logger.warn("获取客户端IP失败:"+e.getMessage(), e);
+                                        }
+                                        g_cache.saveSession(session.getSessionObject());
+                                    }
+                                }
+                            } finally {
+                                SESSION_LOCKS.remove(session_id, lock);
                             }
+                            setCookie(cookieName, session_id);
                         }
                     }
                 }
 
                 if(session == null && create) {
-                    if(null == session_id){
+                    if(null != session_id){
                         session_id = UUID.randomUUID().toString().replaceAll("-", "");
                     }
                     session = new J2CacheSession(servletContext, session_id, g_cache);
