@@ -236,13 +236,14 @@ public class J2CacheSessionFilter implements Filter {
                                             logger.warn("获取客户端IP失败:"+e.getMessage(), e);
                                         }
                                         g_cache.saveSession(session.getSessionObject());
+                                        setCookie(cookieName, session_id);
                                     }
                                 }
                             }
                         } finally {
                             SESSION_LOCKS.remove(session_id, lock);
                         }
-                        setCookie(cookieName, session_id);
+
                     }
                 }
 
