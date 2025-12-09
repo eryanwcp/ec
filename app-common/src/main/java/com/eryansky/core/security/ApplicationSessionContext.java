@@ -139,7 +139,7 @@ public class ApplicationSessionContext {
 	 * @param bindSessionId 关联对象ID
 	 * @return
 	 */
-	public void bindSessionInfoId(String sessionId, String bindSessionId) {
+	public void bindSessionId(String sessionId, String bindSessionId) {
 		SessionObject sessionObject = cacheFacade.getSession(bindSessionId);
 		if(null != sessionObject){
 			Set<String> bindIds = (Set<String>) sessionObject.get(SessionObject.KEY_SESION_ID_BIND);
@@ -158,7 +158,7 @@ public class ApplicationSessionContext {
 	 * @param bindSessionId
 	 * @return
 	 */
-	public void unBindSessionInfoId(String sessionId, String bindSessionId) {
+	public void unBindSessionId(String sessionId, String bindSessionId) {
 		SessionObject sessionObject = cacheFacade.getSession(bindSessionId);
 		if(null != sessionObject){
 			Set<String> bindIds = (Set<String>) sessionObject.get(SessionObject.KEY_SESION_ID_BIND);

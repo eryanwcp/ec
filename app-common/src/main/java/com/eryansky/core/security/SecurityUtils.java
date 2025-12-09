@@ -624,7 +624,7 @@ public class SecurityUtils {
      * @param bindSessionId 关联对象ID
      */
     public static void bindSessionId(String sessionId, String bindSessionId){
-        Static.applicationSessionContext.bindSessionInfoId(sessionId,bindSessionId);
+        Static.applicationSessionContext.bindSessionId(sessionId,bindSessionId);
     }
 
     /**
@@ -632,7 +632,7 @@ public class SecurityUtils {
      * @param sessionId 会话ID
      */
     public static void unBindSessionId(String sessionId, String bindSessionId){
-        Static.applicationSessionContext.unBindSessionInfoId(sessionId,bindSessionId);
+        Static.applicationSessionContext.unBindSessionId(sessionId,bindSessionId);
     }
 
     /**
