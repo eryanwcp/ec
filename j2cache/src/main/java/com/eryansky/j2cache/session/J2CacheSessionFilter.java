@@ -17,7 +17,6 @@ package com.eryansky.j2cache.session;
 
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.encode.MD5Util;
-import com.google.common.util.concurrent.RateLimiter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.AntPathMatcher;
@@ -42,9 +41,6 @@ public class J2CacheSessionFilter implements Filter {
     private String cookieDomain;
     private int cookieMaxAge;
     private boolean cookieSecure;
-    private boolean rateLimit;
-    private Double rateLimitPerSecond;
-
     private boolean discardNonSerializable;
 
     private final Logger logger = LoggerFactory.getLogger(J2CacheSessionFilter.class);
@@ -71,11 +67,6 @@ public class J2CacheSessionFilter implements Filter {
         this.cookieDomain   = config.getInitParameter("cookie.domain");
         this.cookiePath     = config.getInitParameter("cookie.path");
         this.cookieSecure = "true".equalsIgnoreCase(config.getInitParameter("cookie.secure"));
-
-        String rateLimit = config.getInitParameter("session.rateLimit");
-        this.rateLimit = "true".equalsIgnoreCase(rateLimit != null ? rateLimit:"true");
-        String rateLimitPerSecond     = config.getInitParameter("session.rateLimitPerSecond");
-        this.rateLimitPerSecond   = Double.parseDouble(rateLimitPerSecond != null ? rateLimitPerSecond:"1");
 
         String ctx = config.getServletContext().getContextPath();
         this.cookiePath = null != this.cookiePath && !"".equals(this.cookiePath) ? this.cookiePath:"".equals(ctx) ? "/":ctx;

@@ -45,8 +45,6 @@ public class J2CacheSessionFilterAutoConfiguration {
         map.put("cookie.path",filterConfig.getCookiePath());
         map.put("cookie.secure",filterConfig.getCookieSecure());
 
-        map.put("session.rateLimit",filterConfig.getRateLimit());
-        map.put("session.rateLimitPerSecond",filterConfig.getRateLimitPerSecond());
         map.put("session.maxAge",sessionProperties.getMaxAge());
         map.put("session.maxSizeInMemory",sessionProperties.getMaxSizeInMemory());
 
