@@ -4,7 +4,6 @@ import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.j2cache.session.CacheFacade;
 import com.eryansky.j2cache.session.J2CacheSessionFilter;
 import com.eryansky.j2cache.session.SessionObject;
-import com.google.common.collect.Sets;
 import org.joda.time.Instant;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 
@@ -118,7 +117,7 @@ public class ApplicationSessionContext {
     /**
      * 清空过期缓存L2
      */
-    public long cleanupExpiredL2Sessions() {
+    public long cleanupExpiredSessions() {
         return cacheFacade.cleanupExpiredL2Sessions();
     }
 
@@ -130,61 +129,6 @@ public class ApplicationSessionContext {
 	public Collection<String> findSessionKeys() {
 		Collection<String> keys = cacheFacade.keys();
 		return keys;
-	}
-
-
-	/**
-	 * 绑定sessionInfoId 与 sessionId
-	 * @param sessionId 会话ID
-	 * @param bindSessionId 关联对象ID
-	 * @return
-	 */
-	public void bindSessionId(String sessionId, String bindSessionId) {
-		SessionObject sessionObject = cacheFacade.getSession(bindSessionId);
-		if(null != sessionObject){
-			Set<String> bindIds = (Set<String>) sessionObject.get(SessionObject.KEY_SESION_ID_BIND);
-			if(null == bindIds){
-				bindIds = Sets.newConcurrentHashSet();
-			}
-			bindIds.add(sessionId);
-			sessionObject.put(SessionObject.KEY_SESION_ID_BIND, bindIds);
-			cacheFacade.setSessionAttribute(sessionObject,SessionObject.KEY_SESION_ID_BIND);
-		}
-	}
-
-	/**
-	 * 解除绑定sessionId
-	 * @param sessionId
-	 * @param bindSessionId
-	 * @return
-	 */
-	public void unBindSessionId(String sessionId, String bindSessionId) {
-		SessionObject sessionObject = cacheFacade.getSession(bindSessionId);
-		if(null != sessionObject){
-			Set<String> bindIds = (Set<String>) sessionObject.get(SessionObject.KEY_SESION_ID_BIND);
-			if(null != bindIds){
-				boolean flag = bindIds.remove(sessionId);
-				if(flag){
-					sessionObject.put(SessionObject.KEY_SESION_ID_BIND, bindIds);
-					cacheFacade.setSessionAttribute(sessionObject,SessionObject.KEY_SESION_ID_BIND);
-				}
-			}
-
-		}
-	}
-
-
-	/**
-	 * 获取绑定的sessionId
-	 * @param sessionId
-	 * @return
-	 */
-	public String getBindSessionId(String sessionId) {
-		return findSessionKeys().parallelStream().filter(key -> {
-			SessionObject sessionObject = cacheFacade.getSession(key);
-			Set<String> bindIds = null != sessionObject ? (Set<String>) sessionObject.get(SessionObject.KEY_SESION_ID_BIND) : null;
-            return null != bindIds && bindIds.contains(sessionId);
-        }).findFirst().orElse(null);
 	}
 
 

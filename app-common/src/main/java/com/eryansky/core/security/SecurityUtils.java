@@ -22,7 +22,6 @@ import com.eryansky.core.security.annotation.RequiresPermissions;
 import com.eryansky.core.security.annotation.RequiresRoles;
 import com.eryansky.core.security.annotation.RequiresUser;
 import com.eryansky.core.security.annotation.RestApi;
-import com.eryansky.core.security.interceptor.AuthorityInterceptor;
 import com.eryansky.core.security.jwt.JWTUtils;
 import com.eryansky.j2cache.session.SessionObject;
 import com.eryansky.modules.sys._enum.DataScope;
@@ -592,48 +591,10 @@ public class SecurityUtils {
         initPermission(sessionInfo);
 
         refreshSessionInfo(sessionInfo);
-        bindSessionId(sessionInfo.getId(),sessionInfo.getSessionId());
-        bindSessionId(MD5Util.getStringMD5(sessionInfo.getRefreshToken()),sessionInfo.getSessionId());
         request.getSession().setAttribute("loginUser", sessionInfo.getName() + "[" + sessionInfo.getLoginName() + "]");
         return sessionInfo;
     }
 
-
-    /**
-     * 查询绑定会话ID
-     * @param sessionId
-     * @return
-     */
-    public static String getBindSessionId(String sessionId){
-        return getBindSessionId(sessionId,null);
-    }
-
-    /**
-     * 查询绑定会话ID
-     * @param sessionId
-     * @return
-     */
-    public static String getBindSessionId(String sessionId, String defaultSessionId){
-        String bindSessionId = Static.applicationSessionContext.getBindSessionId(sessionId);
-        return null != bindSessionId ? bindSessionId:defaultSessionId;
-    }
-
-    /**
-     * 绑定会话ID
-     * @param sessionId 会话ID
-     * @param bindSessionId 关联对象ID
-     */
-    public static void bindSessionId(String sessionId, String bindSessionId){
-        Static.applicationSessionContext.bindSessionId(sessionId,bindSessionId);
-    }
-
-    /**
-     * 解除绑定会话ID
-     * @param sessionId 会话ID
-     */
-    public static void unBindSessionId(String sessionId, String bindSessionId){
-        Static.applicationSessionContext.unBindSessionId(sessionId,bindSessionId);
-    }
 
     /**
      * 将用户放入或更新session中
@@ -810,16 +771,6 @@ public class SecurityUtils {
      * @param request
      */
     public static SessionInfo getCurrentSessionInfo(HttpServletRequest request) {
-        return getCurrentSessionInfo(request,false);
-
-    }
-
-    /**
-     * 获取当前用户session信息.
-     * @param request
-     * @param autoAuthorizationSession 自动创建会话
-     */
-    public static SessionInfo getCurrentSessionInfo(HttpServletRequest request,boolean autoAuthorizationSession) {
         SessionInfo sessionInfo = null;
         try {
             if (null == request) {
@@ -836,25 +787,6 @@ public class SecurityUtils {
             }
             String sessionId = getNoSuffixSessionId(session);
             sessionInfo = getSessionInfo(sessionId);
-            //关联sessionId
-            if (sessionInfo == null) {
-                sessionInfo = getSessionInfoById(sessionId);
-            }
-
-            //Authorization 请求头或请求参数
-            if (sessionInfo == null && autoAuthorizationSession) {
-                String authorization = request.getParameter(AuthorityInterceptor.ATTR_AUTHORIZATION);
-                if (StringUtils.isBlank(authorization)) {
-                    authorization = request.getParameter(AuthorityInterceptor.ATTR_TOKEN);
-                }
-                if (StringUtils.isBlank(authorization)) {
-                    authorization = request.getHeader(AuthorityInterceptor.ATTR_AUTHORIZATION);
-                }
-                if (StringUtils.isNotBlank(authorization)) {
-                    String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""),"Bearer","");
-                    sessionInfo = getSessionInfoByTokenOrRefreshTokenWithMd5(token);
-                }
-            }
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
@@ -987,6 +919,8 @@ public class SecurityUtils {
         SessionInfo _sessionInfo = getSessionInfo(sessionId);
         if (_sessionInfo != null) {
             Static.userService.logout(_sessionInfo.getUserId(), securityType);
+            removeSession(_sessionInfo.getId());
+            removeSession(MD5Util.getStringMD5(_sessionInfo.getRefreshToken()));
         }
         removeSession(sessionId);
         if (invalidate) {
@@ -1005,7 +939,6 @@ public class SecurityUtils {
         Static.applicationSessionContext.removeSession(sessionId);
     }
 
-
     /**
      * 将用户信息从session中移除
      *
@@ -1016,10 +949,15 @@ public class SecurityUtils {
         SessionInfo _sessionInfo = getSessionInfo(sessionId);
         if (_sessionInfo != null) {
             Static.userService.logout(_sessionInfo.getUserId(), securityType);
-            unBindSessionId(_sessionInfo.getId(),_sessionInfo.getSessionId());
-            unBindSessionId(MD5Util.getStringMD5(_sessionInfo.getRefreshToken()),_sessionInfo.getSessionId());
         }
         Static.applicationSessionContext.removeSessionInfo(sessionId);
+    }
+
+    /**
+     * 清空过期缓存L2
+     */
+    public static long cleanupExpiredSessions() {
+        return Static.applicationSessionContext.cleanupExpiredSessions();
     }
 
     /**
@@ -1119,14 +1057,6 @@ public class SecurityUtils {
         return Static.applicationSessionContext.sessionTTL2(sessionId);
     }
 
-
-    /**
-     * 清空过期缓存L2
-     */
-    public static long cleanupExpiredL2Sessions() {
-        return Static.applicationSessionContext.cleanupExpiredL2Sessions();
-    }
-
     /**
      * 查看某个用户登录信息 （低并发使用）
      * @param token
@@ -1155,16 +1085,6 @@ public class SecurityUtils {
     public static SessionInfo getSessionInfoByTokenOrRefreshToken(String token) {
         List<SessionInfo> list = findSessionInfoList();
         return list.parallelStream().filter(sessionInfo -> token.equals(sessionInfo.getToken()) || token.equals(sessionInfo.getRefreshToken())).findFirst().orElse(null);
-    }
-
-    /**
-     * 查看某个用户登录信息
-     * @param token
-     * @return
-     */
-    public static SessionInfo getSessionInfoByTokenOrRefreshTokenWithMd5(String token) {
-        String sessionInfoId = MD5Util.getStringMD5(token);
-        return getSessionInfoById(sessionInfoId);
     }
 
     /**
@@ -1229,17 +1149,6 @@ public class SecurityUtils {
      */
     public static SessionInfo getSessionInfo(String sessionId) {
         return Static.applicationSessionContext.getSession(sessionId);
-    }
-
-
-    /**
-     * 根据SessionInfoId查找对应的SessionInfo信息
-     * @param id
-     * @return
-     */
-    public static SessionInfo getSessionInfoById(String id) {
-        String bindSessionId = getBindSessionId(id);
-        return null != bindSessionId ? getSessionInfo(bindSessionId) : null;
     }
 
     public static boolean isMobileLogin() {
