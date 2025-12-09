@@ -226,18 +226,16 @@ public class J2CacheSessionFilter implements Filter {
                                 if (ssnObject != null) {
                                     session = new J2CacheSession(servletContext, g_cache, ssnObject);
                                     session.setNew(false);
-                                } else {
-                                    if (create) {
-                                        session = new J2CacheSession(servletContext, session_id, g_cache);
-                                        try {
-                                            String clientIp = com.eryansky.common.utils.net.IpUtils.getIpAddr(request);
-                                            session.getSessionObject().setClientIP(clientIp);
-                                        } catch (Exception e) {
-                                            logger.warn("获取客户端IP失败:"+e.getMessage(), e);
-                                        }
-                                        g_cache.saveSession(session.getSessionObject());
-                                        setCookie(cookieName, session_id);
+                                } else if (create) {
+                                    session = new J2CacheSession(servletContext, session_id, g_cache);
+                                    try {
+                                        String clientIp = com.eryansky.common.utils.net.IpUtils.getIpAddr(request);
+                                        session.getSessionObject().setClientIP(clientIp);
+                                    } catch (Exception e) {
+                                        logger.warn("获取客户端IP失败:" + e.getMessage(), e);
                                     }
+                                    g_cache.saveSession(session.getSessionObject());
+                                    setCookie(cookieName, session_id);
                                 }
                             }
                         } finally {
