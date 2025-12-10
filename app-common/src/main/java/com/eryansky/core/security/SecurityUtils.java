@@ -12,6 +12,7 @@ import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.UserAgentUtils;
 import com.eryansky.common.utils.collections.Collections3;
+import com.eryansky.common.utils.encode.Encrypt;
 import com.eryansky.common.utils.encode.MD5Util;
 import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
@@ -562,7 +563,7 @@ public class SecurityUtils {
         sessionInfo.setDeviceCode(deviceCode_s);
         sessionInfo.setDeviceType(StringUtils.isNotBlank(platform_s) ? platform_s:UserAgentUtils.getDeviceType(request).toString());
         setOrRefreshSessionInfoToken(sessionInfo,user.getPassword());
-        sessionInfo.setId(MD5Util.getStringMD5(sessionInfo.getToken()));
+        sessionInfo.setId(Encrypt.md5(sessionInfo.getToken()));
         sessionInfo.setSessionId(sessionId);
 //        sessionInfo.addIfNotExistLoginName(sessionInfo.getLoginName());
         //可选账号
@@ -772,7 +773,7 @@ public class SecurityUtils {
      * @param request
      */
     public static SessionInfo getCurrentSessionInfo(HttpServletRequest request) {
-        return getCurrentSessionInfo(request,true);
+        return getCurrentSessionInfo(request,false);
     }
 
     /**
@@ -807,8 +808,8 @@ public class SecurityUtils {
                     authorization = request.getHeader(AuthorityInterceptor.ATTR_AUTHORIZATION);
                 }
                 if (StringUtils.isNotBlank(authorization)) {
-                    String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""),"Bearer","");
-                    sessionInfo = getSessionInfoByTokenOrRefreshTokenWithMd5(token);
+                    String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""), "Bearer", "");
+                    sessionInfo = StringUtils.isNotBlank(token) ? getSessionInfoByTokenOrRefreshTokenWithMd5(token) : null;
                 }
             }
         } catch (Exception e) {
@@ -944,7 +945,7 @@ public class SecurityUtils {
         if (_sessionInfo != null) {
             Static.userService.logout(_sessionInfo.getUserId(), securityType);
             removeSession(_sessionInfo.getId());
-            removeSession(MD5Util.getStringMD5(_sessionInfo.getRefreshToken()));
+            removeSession(Encrypt.md5(_sessionInfo.getRefreshToken()));
         }
         removeSession(sessionId);
         if (invalidate) {
@@ -1117,7 +1118,7 @@ public class SecurityUtils {
      * @return
      */
     public static SessionInfo getSessionInfoByTokenOrRefreshTokenWithMd5(String token) {
-        String sessionInfoId = MD5Util.getStringMD5(token);
+        String sessionInfoId = Encrypt.md5(token);
         return getSessionInfoById(sessionInfoId);
     }
 

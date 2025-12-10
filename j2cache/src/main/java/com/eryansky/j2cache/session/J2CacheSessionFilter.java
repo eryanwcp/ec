@@ -16,7 +16,7 @@
 package com.eryansky.j2cache.session;
 
 import com.eryansky.common.utils.StringUtils;
-import com.eryansky.common.utils.encode.MD5Util;
+import com.eryansky.common.utils.encode.Encrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.AntPathMatcher;
@@ -218,7 +218,7 @@ public class J2CacheSessionFilter implements Filter {
                     }
                     String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""), "Bearer", "");
                     if (StringUtils.isNotBlank(token)) {
-                        session_id = MD5Util.getStringMD5(token);
+                        session_id = Encrypt.md5(token);
                         try {
                             synchronized (SESSION_LOCKS.computeIfAbsent(session_id, k -> new Object())) {
                                 SessionObject ssnObject = g_cache.getSession(session_id);
@@ -234,7 +234,7 @@ public class J2CacheSessionFilter implements Filter {
                                         logger.warn("获取客户端IP失败:" + e.getMessage(), e);
                                     }
                                     g_cache.saveSession(session.getSessionObject());
-                                    setCookie(cookieName, session_id);
+                                    setCookie(response,cookieName, session_id);
                                 }
                             }
                         } finally {
@@ -251,7 +251,7 @@ public class J2CacheSessionFilter implements Filter {
                     session = new J2CacheSession(servletContext, session_id, g_cache);
                     session.getSessionObject().setClientIP(com.eryansky.common.utils.net.IpUtils.getIpAddr(request));
                     g_cache.saveSession(session.getSessionObject());
-                    setCookie(cookieName, session_id);
+                    setCookie(response,cookieName, session_id);
                 }
             }
             return session;
@@ -273,27 +273,36 @@ public class J2CacheSessionFilter implements Filter {
                         return cookie;
             return null;
         }
+    }
 
-        /**
-         * @param name
-         * @param value
-         */
-        private void setCookie(String name, String value) {
-            Cookie cookie = new Cookie(name, value);
-            cookie.setMaxAge(-1);
-            cookie.setPath(cookiePath);
-            if (cookieDomain != null && cookieDomain.trim().length() > 0) {
-                cookie.setDomain(cookieDomain);
-            }
-            try {
-                cookie.setHttpOnly(true);
-                //仅HTTPS环境设置微true
-                cookie.setSecure(cookieSecure);
-            } catch (Exception e) {
-            }
-            response.addCookie(cookie);
+    /**
+     * @param name
+     * @param value
+     */
+    private void setCookie(HttpServletResponse response,String name, String value) {
+        Cookie cookie = new Cookie(name, value);
+        cookie.setMaxAge(-1);
+        cookie.setPath(cookiePath);
+        if (cookieDomain != null && cookieDomain.trim().length() > 0) {
+            cookie.setDomain(cookieDomain);
         }
+        try {
+            cookie.setHttpOnly(true);
+            //仅HTTPS环境设置微true
+            cookie.setSecure(cookieSecure);
+        } catch (Exception e) {
+        }
+        response.addCookie(cookie);
+    }
 
+
+    /**
+     * 设置会话Cookie
+     * @param response
+     * @param value
+     */
+    public void setSessionCookie(HttpServletResponse response,String value) {
+        setCookie(response,cookieName,value);
     }
 
     public CacheFacade getCache() {
