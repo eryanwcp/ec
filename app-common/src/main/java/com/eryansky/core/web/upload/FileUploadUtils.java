@@ -6,7 +6,7 @@
 package com.eryansky.core.web.upload;
 
 import com.eryansky.common.utils.StringUtils;
-import com.eryansky.common.utils.encode.MD5Util;
+import com.eryansky.common.utils.encode.Encrypt;
 import com.eryansky.core.security.LogUtils;
 import com.eryansky.core.web.upload.exception.FileNameLengthLimitExceededException;
 import com.eryansky.core.web.upload.exception.InvalidExtensionException;
@@ -352,7 +352,7 @@ public class FileUploadUtils {
      * @return
      */
     public static final String encodingFilenamePrefix(String filename) {
-        filename = MD5Util.hash(filename + System.nanoTime() + counter++) ;
+        filename = Encrypt.hash(filename + System.nanoTime() + counter++) ;
         return filename;
     }
 

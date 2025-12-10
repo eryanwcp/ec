@@ -44,6 +44,9 @@ public class Encrypt {
 		System.out.println(e("1"));
 		System.out.println(md5("1"));
 
+        System.out.println(Encrypt.hash("123456"));
+        System.out.println(Encrypt.hash("123456"));
+
 	}
 
 	/**
@@ -140,5 +143,13 @@ public class Encrypt {
 		}
 		return sb.toString();
 	}
+
+    public static String hash(String s) {
+        try {
+            return new String(hex(md5(s).getBytes(StandardCharsets.UTF_8)).getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            return s;
+        }
+    }
 
 }
