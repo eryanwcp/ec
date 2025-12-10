@@ -6,7 +6,7 @@
 package com.eryansky.core.web.upload;
 
 import com.eryansky.common.utils.StringUtils;
-import com.eryansky.common.utils.encode.MD5Util;
+import com.eryansky.common.utils.encode.Encrypt;
 import com.eryansky.core.security.LogUtils;
 import com.eryansky.core.web.upload.exception.FileNameLengthLimitExceededException;
 import com.eryansky.core.web.upload.exception.InvalidExtensionException;
@@ -43,7 +43,7 @@ public class FileUploadUtils {
     protected static final int DEFAULT_FILE_NAME_LENGTH = 200;
 
     public static final String[] IMAGE_EXTENSION = {
-            "bmp", "gif", "jpg", "jpeg", "png","heic"
+            "bmp", "gif", "jpg", "jpeg", "png","heic","webp","svg"
     };
 
     public static final String[] FLASH_EXTENSION = {
@@ -56,7 +56,7 @@ public class FileUploadUtils {
 
     public static final String[] DEFAULT_ALLOWED_EXTENSION = {
             //图片
-            "bmp", "gif", "jpg", "jpeg", "png","heic",
+            "bmp", "gif", "jpg", "jpeg", "png","heic","webp","svg",
             //word excel powerpoint
             "doc", "docx", "xls", "xlsx", "ppt", "pptx", "wps",
             "html", "htm", "txt",
@@ -353,7 +353,7 @@ public class FileUploadUtils {
      */
     public static final String encodingFilenamePrefix(String userId,String filename) {
         filename = filename.replace("_", "");
-        filename = userId + "_" + MD5Util.hash(filename + System.nanoTime() + counter++) ;
+        filename = userId + "_" + Encrypt.hash(filename + System.nanoTime() + counter++) ;
         return filename;
     }
 
