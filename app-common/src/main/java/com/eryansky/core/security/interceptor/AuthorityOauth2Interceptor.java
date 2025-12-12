@@ -91,16 +91,13 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
                                 }
                                 String requestUrl = request.getRequestURI();
                                 String loginName = null;
-                                if (StringUtils.isNotBlank(token)) {
-                                    try {
-                                        loginName = SecurityUtils.getLoginNameByToken(token);
-                                    } catch (Exception e) {
-                                        if (!(e instanceof TokenExpiredException)) {
-                                            logger.error("Token校验失败：{},{},{},{},{}", loginName, SpringMVCHolder.getIp(), requestUrl, token, e.getMessage());
-                                        }
+                                try {
+                                    loginName = SecurityUtils.getLoginNameByToken(token);
+                                } catch (Exception e) {
+                                    if (!(e instanceof TokenExpiredException)) {
+                                        logger.error("Token校验失败：{},{},{},{},{}", loginName, SpringMVCHolder.getIp(), requestUrl, token, e.getMessage());
                                     }
                                 }
-
                                 if (StringUtils.isBlank(loginName)) {
                                     return true;
                                 }
@@ -122,7 +119,7 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
                                 if (verify) {
                                     SecurityUtils.putUserToSession(request, user);
                                     UserUtils.recordLogin(user.getId());
-                                    logger.debug("自动登录成功：{},{},{}", loginName, IpUtils.getIpAddr0(request), requestUrl);
+                                    logger.debug("自动登录成功：{},{},{} {}", loginName, IpUtils.getIpAddr0(request), requestUrl,lockKey);
                                 }
                                 return true;
                             }
