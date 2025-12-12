@@ -17,6 +17,8 @@ package com.eryansky.j2cache.session;
 
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.encode.Encrypt;
+import com.eryansky.j2cache.J2Cache;
+import com.eryansky.j2cache.lock.DefaultLockCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.AntPathMatcher;
@@ -219,14 +221,16 @@ public class J2CacheSessionFilter implements Filter {
                     String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""), "Bearer", "");
                     if (StringUtils.isNotBlank(token)) {
                         session_id = Encrypt.md5(token);
-                        try {
-                            synchronized (SESSION_LOCKS.computeIfAbsent(session_id, k -> new Object())) {
-                                SessionObject ssnObject = g_cache.getSession(session_id);
+                        String finalSession_id = session_id;
+                        J2Cache.getChannel().lock(token, 5, 10, new DefaultLockCallback<Boolean>(false, false) {
+                            @Override
+                            public Boolean handleObtainLock() {
+                                SessionObject ssnObject = g_cache.getSession(finalSession_id);
                                 if (ssnObject != null) {
                                     session = new J2CacheSession(servletContext, g_cache, ssnObject);
                                     session.setNew(false);
                                 } else if (create) {
-                                    session = new J2CacheSession(servletContext, session_id, g_cache);
+                                    session = new J2CacheSession(servletContext, finalSession_id, g_cache);
                                     try {
                                         String clientIp = com.eryansky.common.utils.net.IpUtils.getIpAddr(request);
                                         session.getSessionObject().setClientIP(clientIp);
@@ -234,12 +238,11 @@ public class J2CacheSessionFilter implements Filter {
                                         logger.warn("获取客户端IP失败:" + e.getMessage(), e);
                                     }
                                     g_cache.saveSession(session.getSessionObject());
-                                    setCookie(response,cookieName, session_id);
+                                    setCookie(response,cookieName, finalSession_id);
                                 }
+                                return true;
                             }
-                        } finally {
-                            SESSION_LOCKS.remove(session_id);
-                        }
+                        });
 
                     }
                 }
