@@ -48,7 +48,7 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         //已登录用户
-        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo(request,false);
+        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo(request, false);
         if (null != sessionInfo){
             return true;
         }
@@ -80,7 +80,7 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
             String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""),"Bearer","");
 
             if(StringUtils.isNotBlank(token)){
-                CacheUtils.getCacheChannel().lock(token, 20, 60, new DefaultLockCallback<>(false, false) {
+                CacheUtils.getCacheChannel().lock(token, 5, 10, new DefaultLockCallback<Boolean>(false, false) {
                             @Override
                             public Boolean handleObtainLock() {
                                 SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo(request, false);
