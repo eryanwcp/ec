@@ -7,6 +7,7 @@ package com.eryansky.core.security.interceptor;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.eryansky.common.utils.StringUtils;
+import com.eryansky.common.utils.encode.Encrypt;
 import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.core.security.SecurityUtils;
@@ -80,7 +81,8 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
             String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""),"Bearer","");
 
             if(StringUtils.isNotBlank(token)){
-                CacheUtils.getCacheChannel().lock(token, 5, 10, new DefaultLockCallback<Boolean>(false, false) {
+                String lockKey = "lock_oauth2_token:"+ Encrypt.md5(token);
+                CacheUtils.getCacheChannel().lock(lockKey, 5, 10, new DefaultLockCallback<Boolean>(false, false) {
                             @Override
                             public Boolean handleObtainLock() {
                                 SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo(request, false);
@@ -120,7 +122,7 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
                                 if (verify) {
                                     SecurityUtils.putUserToSession(request, user);
                                     UserUtils.recordLogin(user.getId());
-                                    logger.debug("自动登录成功：{},{},{}", loginName, IpUtils.getIpAddr0(request), requestUrl);
+                                    logger.debug("自动登录成功：{},{},{} {}", loginName, IpUtils.getIpAddr0(request), requestUrl,lockKey);
                                 }
                                 return true;
                             }
