@@ -83,6 +83,10 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
             if(StringUtils.isNotBlank(token)){
                 try {
                     synchronized (SESSION_LOCKS.computeIfAbsent(token, k -> new Object())) {
+                        sessionInfo = SecurityUtils.getCurrentSessionInfo();
+                        if (null != sessionInfo){
+                            return true;
+                        }
                         String requestUrl = request.getRequestURI();
                         String loginName = null;
                         if(StringUtils.isNotBlank(token)){
