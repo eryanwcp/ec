@@ -28,7 +28,6 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 实现基于 J2Cache 的分布式的 Session 管理
@@ -60,7 +59,6 @@ public class J2CacheSessionFilter implements Filter {
      * 黑名单
      */
     private String[] blackListURLs = null;
-    private static final ConcurrentHashMap<String, Object> SESSION_LOCKS = new ConcurrentHashMap<>();
 
     @Override
     public void init(FilterConfig config) {
