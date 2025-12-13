@@ -21,7 +21,7 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
+import org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -51,7 +51,7 @@ import com.eryansky.j2cache.cache.support.util.J2CacheSerializer;
  *
  */
 @Configuration
-@AutoConfigureAfter({ RedisAutoConfiguration.class })
+@AutoConfigureAfter({ DataRedisAutoConfiguration.class })
 @AutoConfigureBefore({ J2CacheAutoConfiguration.class })
 @ConditionalOnProperty(value = "j2cache.l2-cache-open", havingValue = "true", matchIfMissing = true)
 public class J2CacheSpringRedisAutoConfiguration {

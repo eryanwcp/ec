@@ -31,7 +31,7 @@ import org.apache.hc.core5.ssl.TrustStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -132,7 +132,7 @@ public class MvcConfigurer implements WebMvcConfigurer {
 
    @Override
    public void configurePathMatch(PathMatchConfigurer configurer) {
-      configurer.setUseTrailingSlashMatch(true);
+//      configurer.setUseTrailingSlashMatch(true);
    }
 
    /**
@@ -262,7 +262,6 @@ public class MvcConfigurer implements WebMvcConfigurer {
             HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
             requestFactory.setHttpClient(httpClient);
             requestFactory.setConnectionRequestTimeout(10*1000);
-            requestFactory.setConnectTimeout(20*1000);
             return requestFactory;
         } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
             throw new RuntimeException(e);

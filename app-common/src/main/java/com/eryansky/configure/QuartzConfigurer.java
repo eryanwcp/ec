@@ -3,7 +3,7 @@ package com.eryansky.configure;
 import com.eryansky.core.quartz.QuartJobSchedulingListener;
 import org.quartz.Scheduler;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration;
+import org.springframework.boot.quartz.autoconfigure.QuartzAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

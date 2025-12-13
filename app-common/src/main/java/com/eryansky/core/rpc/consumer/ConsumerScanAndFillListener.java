@@ -3,9 +3,9 @@ package com.eryansky.core.rpc.consumer;
 import com.eryansky.client.common.rpc.RPCConsumer;
 import com.eryansky.core.rpc.utils.FieldAnnotationUtils;
 import com.eryansky.core.rpc.utils.RPCUtils;
-import org.springframework.boot.web.context.WebServerApplicationContext;
-import org.springframework.boot.web.context.WebServerInitializedEvent;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.Field;
@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * 扫描到@RPCConsumer，并注入动态代理对象
  * 通过@EnableRPCClients 指定
  */
-public class ConsumerScanAndFillListener implements ApplicationListener<WebServerInitializedEvent> {
+public class ConsumerScanAndFillListener implements ApplicationListener<ApplicationReadyEvent> {
 
     /**
      * 标识事件监听器是否已经注册，避免重复注册
@@ -25,9 +25,9 @@ public class ConsumerScanAndFillListener implements ApplicationListener<WebServe
     private String serverUrl;
 
     @Override
-    public void onApplicationEvent(WebServerInitializedEvent event) {
+    public void onApplicationEvent(ApplicationReadyEvent event) {
         if (flag.compareAndSet(false, true)) {
-            WebServerApplicationContext applicationContext = event.getApplicationContext();
+            ConfigurableApplicationContext applicationContext = event.getApplicationContext();
             String[] beanDefinitionNames = applicationContext.getBeanDefinitionNames();
             for (String name : beanDefinitionNames) { // 遍历所有的bean
                 Object bean = applicationContext.getBean(name);
