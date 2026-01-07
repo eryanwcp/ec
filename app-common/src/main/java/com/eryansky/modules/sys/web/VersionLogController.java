@@ -252,6 +252,7 @@ public class VersionLogController extends SimpleController {
      * @return
      */
     @Logging(value = "版本管理-清空所有数据", logType = LogType.access)
+    @RequiresPermissions("sys:versionLog:edit")
     @PostMapping(value = {"removeAll"})
     @ResponseBody
     public Result removeAll() {
