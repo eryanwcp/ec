@@ -88,6 +88,17 @@ public class MessageUtils {
     /**
      * 发送系统消息给用户
      *
+     * @param receiveUserIds 接收用户IDS
+     * @param content        消息内容
+     * @param linkUrl        消息链接
+     */
+    public static CompletableFuture<Message> sendToUserMessage(Collection<String> receiveUserIds, String content,String linkUrl) {
+        return sendUserMessage(User.SUPERUSER_ID,content,linkUrl,receiveUserIds,null);
+    }
+
+    /**
+     * 发送系统消息给用户
+     *
      * @param receiveUserId 接收用户ID
      * @param content       消息内容
      * @param linkUrl       消息链接
