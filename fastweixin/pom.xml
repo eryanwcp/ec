@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.eryansky</groupId>
         <artifactId>ec-parent</artifactId>
-        <version>4.3.20251221.01</version>
+        <version>4.3.20251221.02</version>
     </parent>
 
     <artifactId>ec-fastweixin</artifactId>
