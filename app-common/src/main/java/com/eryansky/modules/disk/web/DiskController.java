@@ -551,6 +551,7 @@ public class DiskController extends SimpleController {
     @GetMapping(value = {"fileDownload/{fileId}"})
     public ModelAndView fileDownload(HttpServletResponse response,
                                      HttpServletRequest request, @PathVariable String fileId,String downloadType) throws Exception {
+        response.setHeader("Access-Control-Allow-Origin", "*");
         File file = fileService.get(StringUtils.substringBefore(fileId,"."));
         try {
             return downloadSingleFileUtil(response, request, file,downloadType);
