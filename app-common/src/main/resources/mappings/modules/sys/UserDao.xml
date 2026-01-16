@@ -76,6 +76,23 @@
         ORDER BY a.sort ASC
     </select>
 
+
+    <select id="findByMobiles" resultType="User">
+        SELECT
+        <include refid="userColumns"/>
+        FROM t_sys_user a
+        <where>
+            a.status = '0'
+            <if test="mobiles != null and mobiles.size() !=0">
+                AND a.mobile IN
+                <foreach collection="mobiles" open="(" separator="," close=")" item="item">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY a.sort ASC
+    </select>
+
     <select id="findByCodes" resultType="User">
         SELECT
         <include refid="userColumns"/>

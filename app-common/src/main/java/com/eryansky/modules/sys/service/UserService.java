@@ -2242,6 +2242,22 @@ public class UserService extends CrudService<UserDao, User> {
         return dao.findByLoginNames(parameter);
     }
 
+
+    /**
+     * 根据手机号查询
+     *
+     * @param mobiles
+     * @return
+     */
+    public List<User> findByMobiles(Collection<String> mobiles) {
+        if(Collections3.isEmpty(mobiles)){
+            return Collections.emptyList();
+        }
+        Parameter parameter = Parameter.newParameter();
+        parameter.put("mobiles", mobiles);
+        return dao.findByMobiles(parameter);
+    }
+
     /**
      * 根据员工编号查询
      *
