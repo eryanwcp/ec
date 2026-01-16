@@ -342,4 +342,12 @@
         <example>${fns:getYesOrNo()}</example>
     </function>
 
+    <function>
+        <description>文件路径Web</description>
+        <name>getFileUrl</name>
+        <function-class>com.eryansky.modules.disk.utils.DiskUtils</function-class>
+        <function-signature>java.lang.String getFileUrl(java.lang.String)</function-signature>
+        <example>${fns:getFileUrl()}</example>
+    </function>
+
 </taglib>
