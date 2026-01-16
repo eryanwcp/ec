@@ -514,12 +514,21 @@ public class UserUtils {
     }
 
     /**
-     * 根据loginNames查询
+     * 根据登录账号查询
      * @param loginNames 用户账号
      * @return
      */
     public static List<User> findUsersByLoginNames(Collection<String> loginNames){
         return Static.userService.findByLoginNames(loginNames);
+    }
+
+    /**
+     * 根据手机号查询
+     * @param mobiles 用户手机号
+     * @return
+     */
+    public static List<User> findByMobiles(Collection<String> mobiles){
+        return Static.userService.findByMobiles(mobiles);
     }
 
 
