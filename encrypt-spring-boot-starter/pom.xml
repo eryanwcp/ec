@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.eryansky</groupId>
         <artifactId>ec-parent</artifactId>
-        <version>4.3.20251221.03</version>
+        <version>4.3.20260121.01</version>
     </parent>
 
     <artifactId>ec-encrypt-spring-boot-starter</artifactId>
@@ -17,7 +17,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
-        <hutool.version>5.8.41</hutool.version>
+        <hutool.version>5.8.43</hutool.version>
     </properties>
 
     <dependencies>
