@@ -628,9 +628,10 @@ public class UserUtils {
      *
      * @param userIds  用户ID集合
      * @param password 密码(未加密)
+     * @param tipMessage 消息推送 由aop切面实现
      */
-    public static void updateUserPasswordReset(List<String> userIds, String password) {
-        Static.userService.updateUserPasswordReset(userIds, password);
+    public static void updateUserPasswordReset(List<String> userIds, String password,String tipMessage) {
+        Static.userService.updateUserPasswordReset(userIds, password,tipMessage);
     }
 
     /**

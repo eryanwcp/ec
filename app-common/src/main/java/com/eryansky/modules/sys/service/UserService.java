@@ -1137,6 +1137,17 @@ public class UserService extends CrudService<UserDao, User> {
      * @param password 密码(未加密)
      */
     public void updateUserPasswordReset(Collection<String> userIds, String password) throws ServiceException {
+        updateUserPasswordReset(userIds,password,null);
+    }
+
+    /**
+     * 重置用户密码（AOP切面） 批量
+     *
+     * @param userIds  用户ID集合
+     * @param password 密码(未加密)
+     * @param tipMessage 推送短信 用于AOP切面
+     */
+    public void updateUserPasswordReset(Collection<String> userIds, String password,String tipMessage) throws ServiceException {
         if (Collections3.isNotEmpty(userIds)) {
             for (String userId : userIds) {
                 User model = this.get(userId);

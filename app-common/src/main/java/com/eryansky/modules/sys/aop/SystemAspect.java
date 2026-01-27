@@ -10,6 +10,7 @@ import com.eryansky.common.orm.mybatis.interceptor.BaseInterceptor;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.modules.sys._enum.UserPasswordUpdateType;
+import com.eryansky.modules.sys._enum.YesOrNo;
 import com.eryansky.modules.sys.mapper.Organ;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.service.OrganService;
@@ -130,7 +131,11 @@ public class SystemAspect implements InitializingBean, DisposableBean {
             User user = UserUtils.getUser(userId);
             UserUtils.addUserPasswordUpdate(user, UserPasswordUpdateType.SystemReset.getValue());
         });
-
+        if(args.length >= 3){
+            String tipMessage = (String) args[2];
+            if(StringUtils.isEquals(tipMessage, YesOrNo.YES.getValue())){//消息推送 TODO具体由业务实现
+            }
+        }
 
     }
 
