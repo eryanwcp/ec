@@ -26,6 +26,7 @@ import com.eryansky.modules.disk.mapper.File;
 import com.eryansky.modules.sys.mapper.*;
 import com.eryansky.modules.sys.utils.DictionaryUtils;
 import com.eryansky.modules.sys.utils.PostUtils;
+import com.eryansky.modules.sys.utils.SecurePasswordUtils;
 import com.google.common.collect.Lists;
 import com.eryansky.core.excels.ExcelUtils;
 import com.eryansky.core.excels.JsGridReportBase;
@@ -236,7 +237,8 @@ public class UserController extends SimpleController {
      * 重置用户密码页面.
      */
     @GetMapping(value = {"password"})
-    public String password(@ModelAttribute("model") User model) {
+    public String password(@ModelAttribute("model") User model,Model uiModel) {
+        uiModel.addAttribute("generatePassword", SecurePasswordUtils.generatePassword(8));
         return "modules/sys/user-password";
 
     }
@@ -255,8 +257,9 @@ public class UserController extends SimpleController {
     @PostMapping(value = {"passwordReset"}, produces = {MediaType.TEXT_HTML_VALUE})
     @ResponseBody
     public Result passwordReset(@RequestParam(value = "userIds", required = true) List<String> userIds,
-                                     @RequestParam(value = "newPassword", required = true) String newPassword){
-        UserUtils.updateUserPasswordReset(userIds, newPassword);
+                                     @RequestParam(value = "newPassword", required = true) String newPassword,
+                                     @RequestParam(value = "tipMessage", defaultValue = "0") String tipMessage){
+        UserUtils.updateUserPasswordReset(userIds, newPassword,tipMessage);
         return Result.successResult();
     }
 
