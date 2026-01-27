@@ -628,6 +628,16 @@ public class UserUtils {
      *
      * @param userIds  用户ID集合
      * @param password 密码(未加密)
+     */
+    public static void updateUserPasswordReset(List<String> userIds, String password) {
+        updateUserPasswordReset(userIds, password,null);
+    }
+
+    /**
+     * 修改用户密码 批量
+     *
+     * @param userIds  用户ID集合
+     * @param password 密码(未加密)
      * @param tipMessage 消息推送 由aop切面实现
      */
     public static void updateUserPasswordReset(List<String> userIds, String password,String tipMessage) {
