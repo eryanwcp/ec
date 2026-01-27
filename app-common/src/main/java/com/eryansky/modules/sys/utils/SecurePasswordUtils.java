@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 public class SecurePasswordUtils {
 
     // 定义密码字符集（严格限定特殊符号范围）
-    private static final String DIGITS = "123456789"; // 数字 去除0
-    private static final String LOWER_CASE = "abcdefghjklmnpqrstuvwxyz"; // 小写字母
-    private static final String UPPER_CASE = "ABCDEFGHJKLMNPQRSTUVWXYZ"; // 大写字母 去除 O I
+    private static final String DIGITS = "23456789"; // 数字 去除0、1
+    private static final String LOWER_CASE = "abcdefghjklmnpqrstuvwxyz"; // 小写字母 去除o、i
+    private static final String UPPER_CASE = "ABCDEFGHJKLMNPQRSTUVWXYZ"; // 大写字母 去除O、I
     private static final String SPECIAL_CHARS = "!@#$%&"; // 指定特殊符号 去除部分特殊字符
     private static final String ALL_CHARS = DIGITS + LOWER_CASE + UPPER_CASE + SPECIAL_CHARS;
 
