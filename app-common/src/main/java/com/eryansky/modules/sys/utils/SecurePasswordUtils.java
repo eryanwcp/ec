@@ -18,7 +18,8 @@ public class SecurePasswordUtils {
     private static final String DIGITS = "0123456789"; // 数字
     private static final String LOWER_CASE = "abcdefghijklmnopqrstuvwxyz"; // 小写字母
     private static final String UPPER_CASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // 大写字母
-    private static final String SPECIAL_CHARS = "!@#$%&"; // 指定特殊符号
+//    private static final String SPECIAL_CHARS = "!@#$%^&*"; // 指定特殊符号
+    private static final String SPECIAL_CHARS = "!@#$%&"; // 指定特殊符号 去除部分特殊字符
     private static final String ALL_CHARS = DIGITS + LOWER_CASE + UPPER_CASE + SPECIAL_CHARS;
 
     // 使用安全随机数生成器（比Random更安全）
