@@ -462,10 +462,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
                     this.publish(new Command(Command.OPT_DELETE_SESSION, session.getId(), null));
                 }
             });
-
-
         }
-
     }
 
     public void setSessionAttribute(SessionObject session, String key) {
