@@ -456,14 +456,6 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             session.setLastAccess_at(System.currentTimeMillis());
             cache1.put(session.getId(), session);
             if(this.cache2 != null){
-                // 批量/延迟同步到Redis（避免实时写）
-                CompletableFuture.runAsync(() -> {
-                    cache2.updateKeyBytes(session.getId(), new HashMap<String,byte[]>() {{
-                        put(SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
-                        put(SessionObject.KEY_ACCESS_COUNT, String.valueOf(session.getAccessCount()).getBytes());
-                    }},cache1.getExpire());
-                });
-
                 executorService.execute(()->{
                     cache2.updateKeyBytes(session.getId(), new HashMap<String,byte[]>() {{
                         put(SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
