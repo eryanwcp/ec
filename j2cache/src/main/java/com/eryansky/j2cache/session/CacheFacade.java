@@ -74,7 +74,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
     // 优化：有界固定线程池（核心/最大线程数=CPU核心数*1，有界队列，自定义线程名）
     private ExecutorService executorService;
     // 线程池核心参数（可根据业务调整）
-    private static final int CORE_POOL_SIZE = Math.min(Runtime.getRuntime().availableProcessors(), 6);
+    private static final int CORE_POOL_SIZE = Math.min(Runtime.getRuntime().availableProcessors(), 4);
     private static final int MAX_POOL_SIZE = CORE_POOL_SIZE * 2;
     private static final int QUEUE_CAPACITY = CORE_POOL_SIZE * 1000; // 任务队列容量，避免无界堆积
     private static final long KEEP_ALIVE_TIME = 60L; // 空闲线程存活时间
@@ -456,6 +456,14 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             session.setLastAccess_at(System.currentTimeMillis());
             cache1.put(session.getId(), session);
             if(this.cache2 != null){
+                // 批量/延迟同步到Redis（避免实时写）
+                CompletableFuture.runAsync(() -> {
+                    cache2.updateKeyBytes(session.getId(), new HashMap<String,byte[]>() {{
+                        put(SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
+                        put(SessionObject.KEY_ACCESS_COUNT, String.valueOf(session.getAccessCount()).getBytes());
+                    }},cache1.getExpire());
+                });
+
                 executorService.execute(()->{
                     cache2.updateKeyBytes(session.getId(), new HashMap<String,byte[]>() {{
                         put(SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
