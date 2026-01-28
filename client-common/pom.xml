@@ -18,8 +18,8 @@
         <java.version>1.8</java.version>
         <commons-codec.version>1.20.0</commons-codec.version>
 
-        <ec-common.version>4.2.20241221.58</ec-common.version>
-        <ec-client-common.version>4.2.20241221.58</ec-client-common.version>
+        <ec-common.version>4.2.20241221.59</ec-common.version>
+        <ec-client-common.version>4.2.20241221.59</ec-client-common.version>
     </properties>
 
     <dependencies>

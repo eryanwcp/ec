@@ -74,7 +74,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
     // 优化：有界固定线程池（核心/最大线程数=CPU核心数*1，有界队列，自定义线程名）
     private ExecutorService executorService;
     // 线程池核心参数（可根据业务调整）
-    private static final int CORE_POOL_SIZE = Math.min(Runtime.getRuntime().availableProcessors(), 8);
+    private static final int CORE_POOL_SIZE = Math.min(Runtime.getRuntime().availableProcessors(), 4);
     private static final int MAX_POOL_SIZE = CORE_POOL_SIZE * 2;
     private static final int QUEUE_CAPACITY = CORE_POOL_SIZE * 1000; // 任务队列容量，避免无界堆积
     private static final long KEEP_ALIVE_TIME = 60L; // 空闲线程存活时间
@@ -188,9 +188,9 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         poolConfig.setMaxIdle(Integer.parseInt(redisConf.getProperty("maxIdle", "10")));
         poolConfig.setMinIdle(Integer.parseInt(redisConf.getProperty("minIdle", "10")));
 
-        poolConfig.setMaxWaitMillis(Integer.parseInt(redisConf.getProperty("maxWaitMillis", "100")));// 获取连接时的最大等待毫秒数
+        poolConfig.setMaxWaitMillis(Integer.parseInt(redisConf.getProperty("maxWaitMillis", "2000")));// 获取连接时的最大等待毫秒数
         poolConfig.setMinEvictableIdleTimeMillis(Integer.parseInt(redisConf.getProperty("minEvictableIdleTimeMillis", "864000000")));// 最小空闲检查时间间隔（毫秒）
-        poolConfig.setSoftMinEvictableIdleTimeMillis(Integer.parseInt(redisConf.getProperty("softMinEvictableIdleTimeMillis", "10")));
+        poolConfig.setSoftMinEvictableIdleTimeMillis(Integer.parseInt(redisConf.getProperty("softMinEvictableIdleTimeMillis", "300000")));
         poolConfig.setTimeBetweenEvictionRunsMillis(Integer.parseInt(redisConf.getProperty("timeBetweenEvictionRunsMillis", "300000")));
         poolConfig.setNumTestsPerEvictionRun(Integer.parseInt(redisConf.getProperty("numTestsPerEvictionRun", "10")));
         poolConfig.setLifo(Boolean.parseBoolean(redisConf.getProperty("lifo", "false")));// 设置是否使用 LIFO（后进先出）算法管理空闲对象队列，这对于长生命周期的连接很有用。
@@ -305,12 +305,10 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         if(this.cache2 == null){
             return;
         }
-        executorService.execute(()->{
-            try (StatefulRedisPubSubConnection<String, String> connection = this.pubsub()){
-                RedisPubSubCommands<String, String> sync = connection.sync();
-                sync.publish(this.pubsub_channel, cmd.toString());
-            }
-        });
+        try (StatefulRedisPubSubConnection<String, String> connection = this.pubsub()){
+            RedisPubSubCommands<String, String> sync = connection.sync();
+            sync.publish(this.pubsub_channel, cmd.toString());
+        }
 
 
 //        RedisPubSubCommands<String, String> sync = pubConnection.sync();
@@ -402,12 +400,10 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
                 if(this.cache2 == null){
                     return session;
                 }
-                List<String> keys = cache2.keys(session_id);
-                if(keys.size() == 0)
+                Map<String,byte[]> data = cache2.getBytes(session_id);
+                if(null == data || data.isEmpty())
                     return null;
-
-                List<byte[]> datas = cache2.getBytes(session_id, keys);
-                session = new SessionObject(session_id, keys, datas);
+                session = new SessionObject(session_id, data);
                 cache1.put(session_id, session);
             } catch (Exception e) {
                 logger.error("Failed to read session from j2cache", e);
@@ -451,22 +447,21 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
      * @param session 会话对象
      */
     public void updateSessionAccessTime(SessionObject session) {
-        try {
-            session.setAccessCount(session.getAccessCount() + 1);
-            session.setLastAccess_at(System.currentTimeMillis());
-            cache1.put(session.getId(), session);
-            if(this.cache2 != null){
-                executorService.execute(()->{
+        session.setAccessCount(session.getAccessCount() + 1);
+        session.setLastAccess_at(System.currentTimeMillis());
+        cache1.put(session.getId(), session);
+
+        if(this.cache2 != null){
+            executorService.execute(()->{
+                try {
                     cache2.updateKeyBytes(session.getId(), new HashMap<String,byte[]>() {{
                         put(SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
                         put(SessionObject.KEY_ACCESS_COUNT, String.valueOf(session.getAccessCount()).getBytes());
                     }},cache1.getExpire());
-                });
-            }
-        } finally {
-            if(this.cache2 != null){
-                this.publish(new Command(Command.OPT_DELETE_SESSION, session.getId(), null));
-            }
+                } finally {
+                    this.publish(new Command(Command.OPT_DELETE_SESSION, session.getId(), null));
+                }
+            });
         }
     }
 
