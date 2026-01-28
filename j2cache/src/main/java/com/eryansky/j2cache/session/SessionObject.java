@@ -15,12 +15,13 @@
  */
 package com.eryansky.j2cache.session;
 
+import com.eryansky.j2cache.CacheException;
 import com.eryansky.j2cache.util.SerializationUtils;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -55,27 +56,31 @@ public class SessionObject implements Serializable {
         this.accessCount = 1L;
     }
 
-    public SessionObject(String session_id, List<String> keys, List<byte[]> datas) throws IOException, ClassNotFoundException {
+    public SessionObject(String session_id, Map<String,byte[]> data) {
         this.id = session_id;
-        for (int i = 0; i < keys.size(); i++) {
-            String key = keys.get(i);
-            if(null == datas.get(i)){
-                continue;
-            }
-            if (KEY_CREATE_AT.equals(key))
-                this.created_at = Long.parseLong(new String(datas.get(i)));
-            else if (KEY_ACCESS_AT.equals(key))
-                this.access_at = Long.parseLong(new String(datas.get(i)));
-            else if (KEY_SERVICE_HOST.equals(key))
-                this.host = null != datas.get(i) ? new String(datas.get(i)) : null;
-            else if (KEY_CLIENT_IP.equals(key))
-                this.clientIP = null != datas.get(i) ? new String(datas.get(i)) : null;
-            else if (KEY_ACCESS_COUNT.equals(key))
-                this.accessCount = null != datas.get(i) ? Long.parseLong(new String(datas.get(i))):0L;
-            else {
-                attributes.put(key, SerializationUtils.deserialize(datas.get(i)));
-            }
-        }
+        data.entrySet().stream()
+                .filter(entry -> null != entry.getValue()) // 过滤条件
+                .forEach(entry -> {
+                    String key = entry.getKey();
+                    byte[] bytes = entry.getValue();
+                    if (KEY_CREATE_AT.equals(key))
+                        this.created_at = Long.parseLong(new String(bytes));
+                    else if (KEY_ACCESS_AT.equals(key))
+                        this.access_at = Long.parseLong(new String(bytes));
+                    else if (KEY_SERVICE_HOST.equals(key))
+                        this.host = new String(bytes);
+                    else if (KEY_CLIENT_IP.equals(key))
+                        this.clientIP = new String(bytes);
+                    else if (KEY_ACCESS_COUNT.equals(key))
+                        this.accessCount = Long.parseLong(new String(bytes));
+                    else {
+                        try {
+                            attributes.put(key, SerializationUtils.deserialize(bytes));
+                        } catch (IOException e) {
+                            throw new CacheException(e);
+                        }
+                    }
+                });
     }
 
     public Object get(String key) {

@@ -305,12 +305,10 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         if(this.cache2 == null){
             return;
         }
-        executorService.execute(()->{
-            try (StatefulRedisPubSubConnection<String, String> connection = this.pubsub()){
-                RedisPubSubCommands<String, String> sync = connection.sync();
-                sync.publish(this.pubsub_channel, cmd.toString());
-            }
-        });
+        try (StatefulRedisPubSubConnection<String, String> connection = this.pubsub()){
+            RedisPubSubCommands<String, String> sync = connection.sync();
+            sync.publish(this.pubsub_channel, cmd.toString());
+        }
 
 
 //        RedisPubSubCommands<String, String> sync = pubConnection.sync();
@@ -402,12 +400,10 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
                 if(this.cache2 == null){
                     return session;
                 }
-                List<String> keys = cache2.keys(session_id);
-                if(keys.size() == 0)
+                Map<String,byte[]> data = cache2.getBytes(session_id);
+                if(null == data || data.isEmpty())
                     return null;
-
-                List<byte[]> datas = cache2.getBytes(session_id, keys);
-                session = new SessionObject(session_id, keys, datas);
+                session = new SessionObject(session_id, data);
                 cache1.put(session_id, session);
             } catch (Exception e) {
                 logger.error("Failed to read session from j2cache", e);
@@ -451,23 +447,25 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
      * @param session 会话对象
      */
     public void updateSessionAccessTime(SessionObject session) {
-        try {
-            session.setAccessCount(session.getAccessCount() + 1);
-            session.setLastAccess_at(System.currentTimeMillis());
-            cache1.put(session.getId(), session);
-            if(this.cache2 != null){
-                executorService.execute(()->{
+        session.setAccessCount(session.getAccessCount() + 1);
+        session.setLastAccess_at(System.currentTimeMillis());
+        cache1.put(session.getId(), session);
+
+        if(this.cache2 != null){
+            executorService.execute(()->{
+                try {
                     cache2.updateKeyBytes(session.getId(), new HashMap<String,byte[]>() {{
                         put(SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
                         put(SessionObject.KEY_ACCESS_COUNT, String.valueOf(session.getAccessCount()).getBytes());
                     }},cache1.getExpire());
-                });
-            }
-        } finally {
-            if(this.cache2 != null){
-                this.publish(new Command(Command.OPT_DELETE_SESSION, session.getId(), null));
-            }
+                } finally {
+                    this.publish(new Command(Command.OPT_DELETE_SESSION, session.getId(), null));
+                }
+            });
+
+
         }
+
     }
 
     public void setSessionAttribute(SessionObject session, String key) {

@@ -94,6 +94,18 @@ public class LettuceCache {
         return session_id;
     }
 
+    /**
+     * 获取所有
+     * @param session_id
+     * @return
+     */
+    public Map<String,byte[]> getBytes(String session_id) {
+        try(StatefulConnection<String, byte[]> connection = connect()) {
+            RedisHashCommands<String, byte[]> cmd = (RedisHashCommands)sync(connection);
+            return cmd.hgetall(_key(session_id));
+        }
+    }
+
     public byte[] getBytes(String session_id, String key) {
         try(StatefulConnection<String, byte[]> connection = connect()) {
             RedisHashCommands<String, byte[]> cmd = (RedisHashCommands)sync(connection);
@@ -107,6 +119,7 @@ public class LettuceCache {
             return cmd.hmget(_key(session_id), keys.stream().toArray(String[]::new)).stream().map(kv -> kv.hasValue()?kv.getValue():null).collect(Collectors.toList());
         }
     }
+
 
     /**
      * 更新某个Key
