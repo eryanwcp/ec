@@ -179,7 +179,7 @@ public class OrganController extends SimpleController {
      * 保存.
      */
     @RequiresPermissions("sys:organ:edit")
-    @Logging(value = "机构管理-保存机构",data = "#JsonMapper.toJson(#organ)", logType = LogType.access)
+    @Logging(value = "机构管理-保存机构",data = "#JsonMapper.toJson(#organ)", logType = LogType.operate)
     @PostMapping(value = {"save"}, produces = {MediaType.TEXT_HTML_VALUE})
     @ResponseBody
     public Result save(@ModelAttribute("model") Organ organ, String _parentId) {
@@ -210,7 +210,7 @@ public class OrganController extends SimpleController {
      * @return
      */
     @RequiresPermissions("sys:organ:edit")
-    @Logging(value = "机构管理-删除机构",data = "#id", logType = LogType.access)
+    @Logging(value = "机构管理-删除机构",data = "#id", logType = LogType.operate)
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"delete/{id}"})
     @ResponseBody
     public Result delete(@PathVariable String id) {
@@ -243,7 +243,7 @@ public class OrganController extends SimpleController {
      * @return
      */
     @RequiresPermissions(logical = Logical.OR,value = {"sys:organ:edit","sys:organ:user:edit","sys:user:organ:edit"})
-    @Logging(value = "机构管理-机构用户", logType = LogType.access)
+    @Logging(value = "机构管理-机构用户", logType = LogType.operate)
     @PostMapping(value = {"updateOrganUser"}, produces = {MediaType.TEXT_HTML_VALUE})
     @ResponseBody
     public Result updateOrganUser(@ModelAttribute("model") Organ organ) {
@@ -469,7 +469,7 @@ public class OrganController extends SimpleController {
      * @return
      */
     @RequiresPermissions("sys:organ:sync")
-    @Logging(value = "机构管理-同步机构所有父级ID", logType = LogType.access)
+    @Logging(value = "机构管理-同步机构所有父级ID", logType = LogType.operate)
     @ResponseBody
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = "syncAllParentIds")
     public Result syncAllParentIds() {
@@ -483,7 +483,7 @@ public class OrganController extends SimpleController {
      * @return
      */
     @RequiresPermissions("sys:organ:sync")
-    @Logging(value = "机构管理-重新初始化机构系统编码", logType = LogType.access)
+    @Logging(value = "机构管理-重新初始化机构系统编码", logType = LogType.operate)
     @ResponseBody
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = "initSysCode")
     public Result initSysCode() {
@@ -515,7 +515,7 @@ public class OrganController extends SimpleController {
      * @return
      */
     @RequiresPermissions("sys:organ:sync")
-    @Logging(value = "机构管理-同步到扩展表", logType = LogType.access)
+    @Logging(value = "机构管理-同步到扩展表", logType = LogType.operate)
     @ResponseBody
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = "syncToExtend")
     public Result syncToExtend() {

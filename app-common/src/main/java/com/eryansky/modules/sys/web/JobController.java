@@ -4,12 +4,14 @@ import com.eryansky.common.model.Result;
 import com.eryansky.common.orm.Page;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.utils.WebUtils;
+import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.excels.ExcelUtils;
 import com.eryansky.core.excels.JsGridReportBase;
 import com.eryansky.core.excels.TableData;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.annotation.RequiresPermissions;
 import com.eryansky.modules.sys._enum.JobState;
+import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys.mapper.QuartzJobDetail;
 import com.eryansky.modules.sys.service.JobService;
 import com.google.common.collect.Maps;
@@ -48,6 +50,7 @@ public class JobController extends SimpleController {
 	 * @param response
 	 * @return
 	 */
+	@Logging(value = "定时任务", logType = LogType.access)
 	@RequiresPermissions("sys:job:view")
 	@RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value={"list",""})
 	public String getJobList(@RequestParam(value = "export",defaultValue = "false") Boolean export, QuartzJobDetail model,
@@ -87,6 +90,7 @@ public class JobController extends SimpleController {
 	 * @param jobGroupName
 	 * @return
 	 */
+	@Logging(value = "定时任务-立即执行", logType = LogType.operate)
 	@RequiresPermissions("sys:job:edit")
 	@PostMapping(value = "triggerJob")
 	@ResponseBody
@@ -111,6 +115,7 @@ public class JobController extends SimpleController {
 	 * @param jobGroupName
 	 * @return
 	 */
+	@Logging(value = "定时任务-暂停任务", logType = LogType.operate)
 	@RequiresPermissions("sys:job:edit")
 	@PostMapping(value = "pauseJob")
 	@ResponseBody
@@ -134,6 +139,7 @@ public class JobController extends SimpleController {
 	 * @param jobGroupName
 	 * @return
 	 */
+	@Logging(value = "定时任务-恢复任务", logType = LogType.operate)
 	@RequiresPermissions("sys:job:edit")
 	@PostMapping(value = "resumeJob")
 	@ResponseBody
@@ -157,6 +163,7 @@ public class JobController extends SimpleController {
 	 * @param cronExpression
 	 * @return
 	 */
+	@Logging(value = "定时任务-添加任务", logType = LogType.operate)
 	@RequiresPermissions("sys:job:edit")
 	@PostMapping(value = "addJob")
 	@ResponseBody
@@ -202,6 +209,7 @@ public class JobController extends SimpleController {
 	 * @param cronExpression
 	 * @return
 	 */
+	@Logging(value = "定时任务-调度任务", logType = LogType.operate)
 	@RequiresPermissions("sys:job:edit")
 	@PostMapping(value = "rescheduleJob")
 	@ResponseBody
@@ -236,6 +244,7 @@ public class JobController extends SimpleController {
 	 * @param jobGroupName
 	 * @return
 	 */
+	@Logging(value = "定时任务-删除任务", logType = LogType.operate)
 	@RequiresPermissions("sys:job:edit")
 	@PostMapping(value = "removeJob")
 	@ResponseBody

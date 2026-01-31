@@ -114,7 +114,7 @@ public class AreaController extends SimpleController {
         });
     }
 
-    @Logging(value = "区域管理-保存区域", logType = LogType.access)
+    @Logging(value = "区域管理-保存区域", logType = LogType.operate)
     @RequiresPermissions("sys:area:edit")
     @PostMapping(value = "save")
     public String save(@ModelAttribute("model") Area area, Model model, RedirectAttributes redirectAttributes) {
@@ -126,7 +126,7 @@ public class AreaController extends SimpleController {
         return "redirect:" + AppConstants.getAdminPath() + "/sys/area/";
     }
 
-    @Logging(value = "区域管理-删除区域", logType = LogType.access)
+    @Logging(value = "区域管理-删除区域", logType = LogType.operate)
     @RequiresPermissions("sys:area:edit")
     @GetMapping(value = "delete")
     public String delete(@ModelAttribute("model") Area model, RedirectAttributes redirectAttributes) {
@@ -138,7 +138,7 @@ public class AreaController extends SimpleController {
         return "redirect:" + AppConstants.getAdminPath() + "/sys/area/";
     }
 
-    @Logging(value = "区域管理-级联删除区域", logType = LogType.access)
+    @Logging(value = "区域管理-级联删除区域", logType = LogType.operate)
     @RequiresPermissions("sys:area:edit")
     @GetMapping(value = "deleteOwnerAndChilds")
     public String deleteOwnerAndChilds(@ModelAttribute("model") Area model, RedirectAttributes redirectAttributes) {

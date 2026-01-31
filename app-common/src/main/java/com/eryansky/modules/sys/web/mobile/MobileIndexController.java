@@ -245,7 +245,7 @@ public class MobileIndexController extends SimpleController {
      * @param fileId
      * @return
      */
-    @Logging(value = "删除文件", logType = LogType.access)
+    @Logging(value = "删除文件", logType = LogType.operate)
     @PostMapping(value = {"deleteFile"})
     @ResponseBody
     public Result deleteFile(@RequestParam(value = "fileId") String fileId) {
@@ -260,6 +260,7 @@ public class MobileIndexController extends SimpleController {
      * @param press 是否添加水印
      * @param pressText 水印文字
      */
+    @Logging(value = "图片文件上传",data = "#folderCode + #press + #pressText", logType = LogType.operate)
     @PostMapping(value = {"base64ImageUpLoad"})
     @ResponseBody
     public Result base64ImageUpLoad(@RequestParam(value = "base64Data", required = false) String base64Data,
@@ -353,6 +354,7 @@ public class MobileIndexController extends SimpleController {
      * @param press 是否添加水印
      * @param pressText 水印文字
      */
+    @Logging(value = "图片文件上传", logType = LogType.operate)
     @PostMapping(value = {"imageUpLoad"})
     @ResponseBody
     public Result imageUpLoad(@RequestHeader Map<String, String> headers,

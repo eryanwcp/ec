@@ -71,7 +71,7 @@ public class ConfigController extends SimpleController {
     }
 
     @RequiresPermissions("sys:config:edit")
-    @Logging(value = "属性配置-保存配置", logType = LogType.access)
+    @Logging(value = "属性配置-保存配置", logType = LogType.operate)
     @PostMapping(value = "save",produces = {MediaType.TEXT_HTML_VALUE})
     @ResponseBody
     public Result save(@ModelAttribute("model") Config model) {
@@ -96,7 +96,7 @@ public class ConfigController extends SimpleController {
      * @return
      */
     @RequiresPermissions("sys:config:edit")
-    @Logging(value = "属性配置-配置文件同步", logType = LogType.access)
+    @Logging(value = "属性配置-配置文件同步", logType = LogType.operate)
     @PostMapping(value = {"syncFromProperties"})
     @ResponseBody
     public Result syncFromProperties(Boolean overrideFromProperties) {
@@ -113,7 +113,7 @@ public class ConfigController extends SimpleController {
      * @return
      */
     @RequiresPermissions("sys:config:edit")
-    @Logging(value = "属性配置-删除配置", logType = LogType.access)
+    @Logging(value = "属性配置-删除配置", logType = LogType.operate)
     @PostMapping(value = {"remove"})
     @ResponseBody
     public Result remove(@RequestParam(value = "ids", required = false) List<String> ids) {
@@ -180,7 +180,7 @@ public class ConfigController extends SimpleController {
      * @param uiModel
      * @return
      */
-    @Logging(value = "参数配置-保存", logType = LogType.access)
+    @Logging(value = "参数配置-保存", logType = LogType.operate)
     @RequiresPermissions("sys:config:edit")
     @PostMapping(value = {"saveParam"})
     public String saveParam(HttpServletRequest request, RedirectAttributes redirectAttributes, Model uiModel) {
