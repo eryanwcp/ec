@@ -797,6 +797,7 @@ public class UserController extends SimpleController {
      *
      * @return
      */
+    @Logging(value = "用户管理-数据导出", logType = LogType.operate)
     @RequiresPermissions(logical = Logical.OR,value = {"sys:user:view","sys:user:edit"})
     @GetMapping(value = "export")
     public void export(HttpServletRequest request, HttpServletResponse response) throws Exception {
