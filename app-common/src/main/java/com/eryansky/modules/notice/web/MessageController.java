@@ -10,10 +10,12 @@ import com.eryansky.common.model.Result;
 import com.eryansky.common.orm.Page;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.web.springmvc.SimpleController;
+import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.modules.notice._enum.MessageType;
 import com.eryansky.modules.notice.mapper.Notice;
 import com.eryansky.modules.notice.task.MessageTask;
 import com.eryansky.modules.notice.utils.NoticeConstants;
+import com.eryansky.modules.sys._enum.LogType;
 import com.google.common.collect.Lists;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
@@ -70,7 +72,7 @@ public class MessageController extends SimpleController {
         }
     }
 
-
+    @Logging(logType = LogType.access, value = "消息中心")
     @RequiresPermissions("notice:message:view")
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"list", "", "audit"})
     public ModelAndView list(@ModelAttribute("model") Message model,String appId, HttpServletRequest request, HttpServletResponse response) {
@@ -116,6 +118,7 @@ public class MessageController extends SimpleController {
      * @param objectIds
      * @return
      */
+    @Logging(logType = LogType.operate, value = "消息中心-保存")
     @RequiresPermissions("notice:message:edit")
     @PostMapping(value = "save")
     public ModelAndView save(@ModelAttribute("model") Message model, Model uiModel, RedirectAttributes redirectAttributes,
@@ -146,6 +149,7 @@ public class MessageController extends SimpleController {
         return modelAndView;
     }
 
+    @Logging(logType = LogType.operate, value = "消息中心-删除")
     @RequiresPermissions("notice:message:edit")
     @GetMapping(value = "delete")
     public ModelAndView delete(@ModelAttribute("model") Message model, @RequestParam(required = false) Boolean isRe, RedirectAttributes redirectAttributes) {
@@ -161,6 +165,7 @@ public class MessageController extends SimpleController {
      * @param model
      * @return
      */
+    @Logging(logType = LogType.operate, value = "消息中心-推送")
     @RequiresPermissions("notice:message:edit")
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"push"})
     @ResponseBody
@@ -205,6 +210,7 @@ public class MessageController extends SimpleController {
      * @param receiveObjectIds  必选 接收对象ID集合 多个之间以”,“分割
      * @return
      */
+    @Logging(logType = LogType.operate, value = "消息中心-发送消息")
     @PostMapping(value = "sendMessage")
     @ResponseBody
     public Result sendMessage(@RequestParam(value = "content") String content,
@@ -226,6 +232,7 @@ public class MessageController extends SimpleController {
      * @param linkUrl 消息URL链接地址
      * @return
      */
+    @Logging(logType = LogType.operate, value = "消息中心-发送消息给管理员")
     @PostMapping(value = "sendToManager")
     @ResponseBody
     public Result sendToManager(@RequestParam(value = "content") String content,
@@ -270,6 +277,7 @@ public class MessageController extends SimpleController {
      * @return
      * @throws Exception
      */
+    @Logging(logType = LogType.operate, value = "消息中心-外部消息发送接口")
     @PostMapping(value = {"api/sendMessage"})
     @ResponseBody
     public WSResult sendMessage(String paramJson) {

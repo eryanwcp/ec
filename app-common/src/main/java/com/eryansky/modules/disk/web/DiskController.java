@@ -191,7 +191,7 @@ public class DiskController extends SimpleController {
      *
      * @return
      */
-    @Logging(logType = LogType.access, value = "我的云盘-文件夹保存")
+    @Logging(logType = LogType.operate, value = "我的云盘-文件夹保存")
     @PostMapping(value = {"saveFolder"})
     @ResponseBody
     public Result saveFolder(@ModelAttribute("model") Folder folder) {
@@ -212,7 +212,7 @@ public class DiskController extends SimpleController {
      * @param folderId 文件夹ID
      * @return
      */
-    @Logging(logType = LogType.access, value = "我的云盘-文件夹删除")
+    @Logging(logType = LogType.operate, value = "我的云盘-文件夹删除")
     @PostMapping(value = {"folderRemove/{folderId}"})
     @ResponseBody
     public Result folderRemove(@PathVariable String folderId) {
@@ -401,7 +401,7 @@ public class DiskController extends SimpleController {
      *
      * @return
      */
-    @Logging(logType = LogType.access, value = "我的云盘-文件修改")
+    @Logging(logType = LogType.operate, value = "我的云盘-文件修改")
     @PostMapping(value = {"fileSave"})
     @ResponseBody
     public Result fileSave(@ModelAttribute("model") File file) {
@@ -415,7 +415,7 @@ public class DiskController extends SimpleController {
      * @param fileIds 文件Id集合
      * @return
      */
-    @Logging(logType = LogType.access, value = "我的云盘-文件删除")
+    @Logging(logType = LogType.operate, value = "我的云盘-文件删除")
     @PostMapping(value = {"delFolderFile"})
     @ResponseBody
     public Result delFolderFile(@RequestParam(value = "fileIds", required = false) List<String> fileIds) {
@@ -429,7 +429,7 @@ public class DiskController extends SimpleController {
      * @param fileCodes 文件code集合
      * @throws Exception
      */
-    @Logging(logType = LogType.access, value = "我的云盘-文件级联删除")
+    @Logging(logType = LogType.operate, value = "我的云盘-文件级联删除")
     @PostMapping(value = {"cascadeDelFile"})
     @ResponseBody
     public Result cascadeDelFile(@RequestParam(value = "fileCodes", required = false) List<String> fileCodes) {
@@ -445,6 +445,7 @@ public class DiskController extends SimpleController {
      * @param multipartFile 上传文件
      * @return
      */
+    @Logging(logType = LogType.operate, value = "我的云盘-文件上传")
     @PostMapping(value = {"fileUpload"})
     @ResponseBody
     public Result fileUpload(
@@ -729,7 +730,7 @@ public class DiskController extends SimpleController {
      *
      * @return
      */
-    @Logging(logType = LogType.access, value = "我的云盘-清空缓存目录")
+    @Logging(logType = LogType.operate, value = "我的云盘-清空缓存目录")
     @PostMapping(value = {"clearTempDir"})
     @ResponseBody
     public Result clearTempDir() {

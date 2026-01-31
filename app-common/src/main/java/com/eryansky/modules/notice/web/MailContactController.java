@@ -14,8 +14,10 @@ import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
+import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
+import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys.mapper.Organ;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.service.OrganService;
@@ -94,6 +96,7 @@ public class MailContactController extends SimpleController {
      * @param model
      * @return
      */
+    @Logging(logType = LogType.operate, value = "邮件联系人-保存")
     @PostMapping(value = {"_save"})
     @ResponseBody
     public Result save(@ModelAttribute("model") MailContact model, String contactGroupId) {
@@ -125,6 +128,7 @@ public class MailContactController extends SimpleController {
      * @param email
      * @return
      */
+    @Logging(logType = LogType.operate, value = "邮件联系人-自动添加")
     @PostMapping(value = "autoAdd")
     @ResponseBody
     public Result autoAdd(String email) {

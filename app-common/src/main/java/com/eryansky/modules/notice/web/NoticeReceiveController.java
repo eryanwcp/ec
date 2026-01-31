@@ -221,6 +221,7 @@ public class NoticeReceiveController extends SimpleController {
      * @param fileIds 页面文件ID集合
      * @return
      */
+    @Logging(logType = LogType.operate, value = "消息中心-回复保存")
     @PostMapping(value = {"replySave"})
     @ResponseBody
     public Result replySave(@ModelAttribute("model") NoticeReceiveInfo model,
@@ -239,6 +240,7 @@ public class NoticeReceiveController extends SimpleController {
      * @param model
      * @return
      */
+    @Logging(logType = LogType.operate, value = "消息中心-设置已读")
     @PostMapping(value = "setRead")
     @ResponseBody
     public Result setRead(@ModelAttribute("model") NoticeReceiveInfo model) {
@@ -251,6 +253,7 @@ public class NoticeReceiveController extends SimpleController {
      *
      * @return
      */
+    @Logging(logType = LogType.operate, value = "消息中心-设置全部已读")
     @PostMapping(value = "setReadAll")
     @ResponseBody
     public Result setReadAll(String appId) {

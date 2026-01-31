@@ -16,10 +16,12 @@ import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.common.web.utils.WebUtils;
+import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.web.annotation.MobileValue;
 import com.eryansky.core.web.upload.FileUploadUtils;
 import com.eryansky.modules.disk.mapper.File;
 import com.eryansky.modules.notice.utils.NoticeConstants;
+import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys.service.UserService;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Lists;
@@ -94,6 +96,7 @@ public class NoticeController extends SimpleController {
      * @param noticeId 通知ID
      * @return
      */
+    @Logging(logType = LogType.access, value = "通知管理")
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {""})
     public ModelAndView list(String noticeId,
                              @RequestParam(value = "objectType", required = false) String objectType,
@@ -176,6 +179,7 @@ public class NoticeController extends SimpleController {
      * @return
      * @throws Exception
      */
+    @Logging(logType = LogType.access, value = "通知管理-查看通知")
     @GetMapping(value = {"readInfo/{id}"})
     public ModelAndView readInfo(@PathVariable String id) {
         ModelAndView modelAndView = new ModelAndView("modules/notice/notice-readInfo");
@@ -309,6 +313,7 @@ public class NoticeController extends SimpleController {
      * @param fileIds        页面文件ID集合
      * @return
      */
+    @Logging(logType = LogType.operate, value = "通知发布-保存")
     @RequiresPermissions("notice:publish")
     @PostMapping(value = {"save"})
     @ResponseBody
@@ -339,6 +344,7 @@ public class NoticeController extends SimpleController {
      * @param id
      * @return
      */
+    @Logging(logType = LogType.operate, value = "通知管理-推送")
     @RequiresPermissions("notice:publish")
     @PostMapping(value = {"push/{id}"})
     @ResponseBody
@@ -354,6 +360,7 @@ public class NoticeController extends SimpleController {
      * @param ids
      * @return
      */
+    @Logging(logType = LogType.operate, value = "通知管理-标记为已读")
     @PostMapping(value = {"markReaded"})
     @ResponseBody
     public Result markReaded(@RequestParam(value = "ids", required = false) List<String> ids) {
@@ -367,6 +374,7 @@ public class NoticeController extends SimpleController {
      *
      * @return
      */
+    @Logging(logType = LogType.operate, value = "通知管理-标记为已读(全部)")
     @PostMapping(value = {"markReadedAll"})
     @ResponseBody
     public Result markReadedAll() {
@@ -381,6 +389,7 @@ public class NoticeController extends SimpleController {
      * @param id 通知ID
      * @return
      */
+    @Logging(logType = LogType.operate, value = "通知管理-发布通知")
     @RequiresPermissions("notice:publish")
     @PostMapping(value = {"publish/{id}"})
     @ResponseBody
@@ -395,6 +404,7 @@ public class NoticeController extends SimpleController {
      * @param id 通知ID
      * @return
      */
+    @Logging(logType = LogType.operate, value = "通知管理-终止通知")
     @RequiresPermissions("notice:publish")
     @PostMapping(value = {"invalid/{id}"})
     @ResponseBody
@@ -410,6 +420,7 @@ public class NoticeController extends SimpleController {
      * @param ids
      * @return
      */
+    @Logging(logType = LogType.operate, value = "通知管理-删除通知")
     @RequiresPermissions("notice:publish")
     @PostMapping(value = {"remove"})
     @ResponseBody
@@ -468,6 +479,7 @@ public class NoticeController extends SimpleController {
      * @param fileId
      * @return
      */
+    @Logging(logType = LogType.operate, value = "通知管理-删除附件")
     @PostMapping(value = {"delUpload"})
     @ResponseBody
     public Result delUpload(@ModelAttribute("model") Notice model, @RequestParam String fileId) {
@@ -506,6 +518,7 @@ public class NoticeController extends SimpleController {
      *
      * @return
      */
+    @Logging(logType = LogType.operate, value = "我的通知")
     @GetMapping(value = {"read"})
     public ModelAndView readList() {
         ModelAndView modelAndView = new ModelAndView("modules/notice/notice-read");
