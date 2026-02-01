@@ -15,8 +15,10 @@ import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
+import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
+import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.utils.SelectType;
 import com.google.common.collect.Lists;
@@ -54,6 +56,7 @@ public class ContactGroupController extends SimpleController {
         }
     }
 
+    @Logging(logType = LogType.access, value = "联系人组管理")
     @GetMapping(value = {""})
     public String list() {
         return "modules/notice/contactGroup";
@@ -77,6 +80,7 @@ public class ContactGroupController extends SimpleController {
      * @param model
      * @return
      */
+    @Logging(logType = LogType.operate, value = "联系人组管理-保存")
     @PostMapping(value = {"save"})
     @ResponseBody
     public Result save(@ModelAttribute("model") ContactGroup model) {
@@ -137,6 +141,7 @@ public class ContactGroupController extends SimpleController {
      * @param ids
      * @return
      */
+    @Logging(logType = LogType.operate, value = "联系人组管理-删除")
     @PostMapping(value = {"remove"})
     @ResponseBody
     public Result remove(@RequestParam(value = "ids", required = false) List<String> ids) {
@@ -186,6 +191,7 @@ public class ContactGroupController extends SimpleController {
      * @param addObjectIds 新增联系人 ID集合
      * @return
      */
+    @Logging(logType = LogType.operate, value = "联系人组管理-添加联系人")
     @PostMapping(value = {"addContactGroupUser"})
     @ResponseBody
     public Result addContactGroupUser(@ModelAttribute("model") ContactGroup model,
@@ -200,6 +206,7 @@ public class ContactGroupController extends SimpleController {
      * @param removeObjectIds 需要移除的联系人 ID集合
      * @return
      */
+    @Logging(logType = LogType.operate, value = "联系人组管理-移除联系人")
     @PostMapping(value = {"removeContactGroupUser"})
     @ResponseBody
     public Result removeContactGroupUser(@ModelAttribute("model") ContactGroup model,

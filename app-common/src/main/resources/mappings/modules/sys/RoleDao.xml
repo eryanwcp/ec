@@ -274,6 +274,15 @@
         WHERE id = #{id}
     </delete>
 
+    <delete id="clear">
+        DELETE FROM t_sys_role
+        WHERE id = #{id}
+    </delete>
+
+    <delete id="clearAll">
+        DELETE FROM t_sys_role
+    </delete>
+
 
     <!--角色机构-->
     <delete id="deleteRoleOrgansByRoleId">

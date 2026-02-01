@@ -12,12 +12,14 @@ import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.utils.WebUtils;
+import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.excels.CsvUtils;
 import com.eryansky.core.excels.ExcelUtils;
 import com.eryansky.core.excels.JsGridReportBase;
 import com.eryansky.core.excels.TableData;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.annotation.RequiresPermissions;
+import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys._enum.ResetType;
 import com.eryansky.modules.sys.mapper.SystemSerialNumber;
 import com.eryansky.modules.sys.service.SystemSerialNumberService;
@@ -57,7 +59,7 @@ public class SystemSerialNumberController extends SimpleController {
         }
     }
 
-
+    @Logging(value = "序列号生成器",logType = LogType.access)
     @RequiresPermissions("sys:systemSerialNumber:view")
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"list", ""})
     public String list(SystemSerialNumber model,
@@ -124,6 +126,7 @@ public class SystemSerialNumberController extends SimpleController {
         });
     }
 
+    @Logging(value = "序列号生成器-保存",logType = LogType.operate)
     @RequiresPermissions("sys:systemSerialNumber:edit")
     @PostMapping(value = "save")
     public String save(@ModelAttribute("model") SystemSerialNumber model, Model uiModel, RedirectAttributes redirectAttributes) {
@@ -135,6 +138,7 @@ public class SystemSerialNumberController extends SimpleController {
         return "redirect:" + AppConstants.getAdminPath() + "/sys/systemSerialNumber";
     }
 
+    @Logging(value = "序列号生成器-删除",logType = LogType.operate)
     @RequiresPermissions("sys:systemSerialNumber:edit")
     @GetMapping(value = "delete")
     public String delete(@ModelAttribute("model") SystemSerialNumber model, RedirectAttributes redirectAttributes) {
@@ -150,6 +154,7 @@ public class SystemSerialNumberController extends SimpleController {
      * @return
      * @throws Exception
      */
+    @Logging(value = "序列号生成器-重置",logType = LogType.operate)
     @RequiresPermissions("sys:systemSerialNumber:edit")
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"resetSerialNumber"})
     @ResponseBody

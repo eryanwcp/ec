@@ -8,7 +8,7 @@ package com.eryansky.modules.sys.task;
 import com.eryansky.modules.sys.event.SysLogEvent;
 import com.eryansky.modules.sys.mapper.Log;
 import com.eryansky.modules.sys.service.LogService;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
 import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SysLogListener implements ApplicationListener<SysLogEvent> {
 
-    @Autowired
+    @Resource
     private LogService logService;
 
     @Async

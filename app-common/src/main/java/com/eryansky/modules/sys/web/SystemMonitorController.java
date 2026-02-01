@@ -188,7 +188,7 @@ public class SystemMonitorController extends SimpleController {
      * @param region 缓存名称
      * @return
      */
-    @Logging(value = "系统监控-清空缓存",data = "#region", logType = LogType.access)
+    @Logging(value = "系统监控-清空缓存",data = "#region", logType = LogType.operate)
     @RequiresPermissions("sys:systemMonitor:edit")
     @GetMapping(value = "clearCache")
     public String clearCache(String region, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
@@ -215,7 +215,7 @@ public class SystemMonitorController extends SimpleController {
      * @param region 缓存名称
      * @return
      */
-    @Logging(value = "系统监控-清空缓存",remark = "#region",data = "#key", logType = LogType.access)
+    @Logging(value = "系统监控-清空缓存",remark = "#region",data = "#key", logType = LogType.operate)
     @RequiresPermissions("sys:systemMonitor:edit")
     @GetMapping(value = "clearCacheKey")
     public String clearCacheKey(String region, String key, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
@@ -270,7 +270,7 @@ public class SystemMonitorController extends SimpleController {
      * @param id 缓存id/sessionid
      * @return
      */
-    @Logging(value = "系统监控-清空会话缓存key",data = "#id", logType = LogType.access)
+    @Logging(value = "系统监控-清空会话缓存key",data = "#id", logType = LogType.operate)
     @RequiresPermissions("sys:systemMonitor:edit")
     @GetMapping(value = "clearSessionCacheKey")
     public String clearSessionCacheKey(String id, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
@@ -285,7 +285,7 @@ public class SystemMonitorController extends SimpleController {
      *
      * @return
      */
-    @Logging(value = "系统监控-清空全部会话", logType = LogType.access)
+    @Logging(value = "系统监控-清空全部会话", logType = LogType.operate)
     @RequiresPermissions("sys:systemMonitor:edit")
     @GetMapping(value = "clearSession")
     public String clearSessionCacheKey(RedirectAttributes redirectAttributes) {
@@ -301,7 +301,7 @@ public class SystemMonitorController extends SimpleController {
      *
      * @return
      */
-    @Logging(value = "系统监控-删除过期会话", logType = LogType.access)
+    @Logging(value = "系统监控-删除过期会话", logType = LogType.operate)
     @RequiresPermissions("sys:systemMonitor:edit")
     @GetMapping(value = "clearExpireSession")
     public String clearExpireSession(RedirectAttributes redirectAttributes) {
@@ -351,7 +351,7 @@ public class SystemMonitorController extends SimpleController {
     }
 
     @RequiresPermissions("sys:systemMonitor:edit")
-    @Logging(value = "系统监控-队列管理:清空队列",data = "#region", logType = LogType.access, logging = "!#isAjax")
+    @Logging(value = "系统监控-队列管理:清空队列",data = "#region", logType = LogType.operate, logging = "!#isAjax")
     @GetMapping(value = "queueClear")
     public String queueClear(HttpServletRequest request, RedirectAttributes redirectAttributes, String region, HttpServletResponse response) {
         CacheUtils.getCacheChannel().queueClear(region);
@@ -360,7 +360,7 @@ public class SystemMonitorController extends SimpleController {
     }
 
     @RequiresPermissions("sys:systemMonitor:edit")
-    @Logging(value = "系统监控-队列管理:清空队列", logType = LogType.access, logging = "!#isAjax")
+    @Logging(value = "系统监控-队列管理:清空队列", logType = LogType.operate, logging = "!#isAjax")
     @GetMapping(value = "clearAllQueue")
     public String clearAllQueue(HttpServletRequest request, RedirectAttributes redirectAttributes, HttpServletResponse response) {
         Collection<CacheChannel.Region> regions = CacheUtils.getCacheChannel().queues();
@@ -447,7 +447,7 @@ public class SystemMonitorController extends SimpleController {
         return "modules/sys/systemMonitor-log";
     }
 
-    @Logging(value = "系统监控-系统日志文件下载", logType = LogType.access)
+    @Logging(value = "系统监控-系统日志文件下载", logType = LogType.operate)
     @RequiresPermissions("sys:systemMonitor:view")
     @GetMapping(value = "downloadLogFile")
     public String downloadLogFile(HttpServletRequest request, HttpServletResponse response, String fileName) {

@@ -151,7 +151,7 @@ public class LogController extends SimpleController {
      *
      * @return
      */
-    @Logging(value = "日志管理-删除日志", logType = LogType.access)
+    @Logging(value = "日志管理-删除日志", logType = LogType.operate)
     @RequiresRoles(value = AppConstants.ROLE_SYSTEM_MANAGER)
     @PostMapping(value = {"remove"})
     @ResponseBody
@@ -165,7 +165,7 @@ public class LogController extends SimpleController {
      *
      * @return
      */
-    @Logging(value = "日志管理-清除日志", logType = LogType.access)
+    @Logging(value = "日志管理-清除日志", logType = LogType.operate)
     @RequiresRoles(value = AppConstants.ROLE_SYSTEM_MANAGER)
     @PostMapping(value = {"removeAll"})
     @ResponseBody

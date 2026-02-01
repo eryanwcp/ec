@@ -403,7 +403,7 @@
         WHERE id = #{id}
     </delete>
 
-    <delete id="deleteCascadeByFolderId">
+    <update id="deleteCascadeByFolderId">
         UPDATE t_disk_file a
         LEFT JOIN t_disk_folder f  ON f.id = a.folder_id
          SET
@@ -418,7 +418,7 @@
             <when test="dbName == 'oracle'">'%,'||#{folderId}||',%'</when>
             <otherwise>'%,'+#{folderId}+',%'</otherwise>
         </choose>
-    </delete>
+    </update>
 
     <select id="findFilesByFolderId" resultType="File">
         SELECT
@@ -443,5 +443,14 @@
         </where>
         ORDER BY a.update_time DESC
     </select>
+
+    <delete id="clear">
+        DELETE FROM t_disk_file
+        WHERE id = #{id}
+    </delete>
+
+    <delete id="clearAll">
+        DELETE FROM t_disk_file
+    </delete>
 
 </mapper>

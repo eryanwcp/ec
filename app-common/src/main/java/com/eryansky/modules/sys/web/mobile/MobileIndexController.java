@@ -9,10 +9,7 @@ import com.drew.metadata.Tag;
 import com.eryansky.common.exception.ActionException;
 import com.eryansky.common.model.Result;
 import com.eryansky.common.orm._enum.StatusState;
-import com.eryansky.common.utils.Arith;
-import com.eryansky.common.utils.Identities;
-import com.eryansky.common.utils.StringUtils;
-import com.eryansky.common.utils.UserAgentUtils;
+import com.eryansky.common.utils.*;
 import com.eryansky.common.utils.encode.Cryptos;
 import com.eryansky.common.utils.encode.EncodeUtils;
 import com.eryansky.common.utils.encode.RSAUtils;
@@ -254,7 +251,7 @@ public class MobileIndexController extends SimpleController {
      * @param fileId
      * @return
      */
-    @Logging(value = "删除文件", logType = LogType.access)
+    @Logging(value = "删除文件", logType = LogType.operate)
     @PostMapping(value = {"deleteFile"})
     @ResponseBody
     public Result deleteFile(@RequestParam(value = "fileId") String fileId) {
@@ -269,6 +266,7 @@ public class MobileIndexController extends SimpleController {
      * @param press 是否添加水印
      * @param pressText 水印文字
      */
+    @Logging(value = "图片文件上传",data = "#folderCode + #press + #pressText", logType = LogType.operate)
     @PostMapping(value = {"base64ImageUpLoad"})
     @ResponseBody
     public Result base64ImageUpLoad(@RequestParam(value = "base64Data", required = false) String base64Data,
@@ -362,6 +360,7 @@ public class MobileIndexController extends SimpleController {
      * @param press 是否添加水印
      * @param pressText 水印文字
      */
+    @Logging(value = "图片文件上传", logType = LogType.operate)
     @PostMapping(value = {"imageUpLoad"})
     @ResponseBody
     public Result imageUpLoad(@RequestHeader Map<String, String> headers,
@@ -443,7 +442,7 @@ public class MobileIndexController extends SimpleController {
                 BufferedImage originalImage =  ImgUtil.read(multipartFile.getInputStream());
 
                 // 水印文字
-                String watermarkText = StringUtils.isNotBlank(pressText) ? pressText:sessionInfo.getLoginName();
+                String watermarkText = StringUtils.isNotBlank(pressText) ? pressText:sessionInfo.getLoginName()+" "+ DateUtils.getDateTime();
                 String watermarkTextGPS = null;
                 if (null != longitude && null != latitude) {
                     watermarkTextGPS = Arith.round(latitude,6) + "," + Arith.round(longitude,6);

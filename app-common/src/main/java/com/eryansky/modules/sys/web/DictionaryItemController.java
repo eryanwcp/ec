@@ -73,7 +73,7 @@ public class DictionaryItemController extends SimpleController {
      * @return
      */
     @RequiresPermissions("sys:dictionary:edit")
-    @Logging(value = "字典管理-保存字典项", logType = LogType.access)
+    @Logging(value = "字典管理-保存字典项", logType = LogType.operate)
     @PostMapping(value = {"save"}, produces = {MediaType.TEXT_HTML_VALUE})
     @ResponseBody
     public Result save(@ModelAttribute DictionaryItem dictionaryItem, String dictionaryId, String parentId) {
@@ -102,7 +102,7 @@ public class DictionaryItemController extends SimpleController {
     }
 
     @RequiresPermissions("sys:dictionary:edit")
-    @Logging(value = "字典管理-删除字典项", logType = LogType.access)
+    @Logging(value = "字典管理-删除字典项", logType = LogType.operate)
     @PostMapping(value = {"remove"})
     @ResponseBody
     public Result remove(@RequestParam(value = "ids", required = false) List<String> ids) {

@@ -103,7 +103,7 @@ public class ResourceController extends SimpleController {
      * 保存.
      */
     @RequiresPermissions("sys:resource:edit")
-    @Logging(value = "资源管理-保存资源",data = "#JsonMapper.toJson(#resource)", logType = LogType.access)
+    @Logging(value = "资源管理-保存资源",data = "#JsonMapper.toJson(#resource)", logType = LogType.operate)
     @PostMapping(value = {"save"}, produces = {MediaType.TEXT_HTML_VALUE})
     @ResponseBody
     public Result save(@ModelAttribute("model") Resource resource, String _parentId) {
@@ -137,7 +137,7 @@ public class ResourceController extends SimpleController {
      * 删除.
      */
     @RequiresPermissions("sys:resource:edit")
-    @Logging(value = "资源管理-删除资源",remark = "#id", logType = LogType.access)
+    @Logging(value = "资源管理-删除资源",remark = "#id", logType = LogType.operate)
     @PostMapping(value = {"delete/{id}"})
     @ResponseBody
     public Result delete(@PathVariable String id) {
@@ -317,7 +317,7 @@ public class ResourceController extends SimpleController {
      * @return
      * @throws Exception
      */
-    @Logging(value = "资源管理-移除关联角色",remark = "#resourceId",data = "#JsonMapper.toJson(#ids)", logType = LogType.access)
+    @Logging(value = "资源管理-移除关联角色",remark = "#resourceId",data = "#JsonMapper.toJson(#ids)", logType = LogType.operate)
     @RequiresPermissions(logical = Logical.OR,value = {"sys:resource:edit","sys:resource:role:edit","sys:role:resource:edit"})
     @PostMapping(value = {"deleteRoles/{resourceId}"})
     @ResponseBody
@@ -370,7 +370,7 @@ public class ResourceController extends SimpleController {
      * @return
      * @throws Exception
      */
-    @Logging(value = "资源管理-移除关联用户",remark = "#resourceId",data = "#JsonMapper.toJson(#ids)", logType = LogType.access)
+    @Logging(value = "资源管理-移除关联用户",remark = "#resourceId",data = "#JsonMapper.toJson(#ids)", logType = LogType.operate)
     @RequiresPermissions(logical = Logical.OR,value = {"sys:resource:edit","sys:resource:user:edit","sys:user:resource:edit"})
     @PostMapping(value = {"deleteUsers/{resourceId}"})
     @ResponseBody

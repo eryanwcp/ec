@@ -97,7 +97,7 @@ public class UserMobileController extends SimpleController {
      * @return
      */
     @RequiresUser(required = false)
-    @Logging(logType = LogType.access, value = "修改密码")
+    @Logging(logType = LogType.security, value = "修改密码")
     @PostMapping(value = "savePs")
     @ResponseBody
     public Result savePs(@RequestParam(name = "id", required = false) String id,
@@ -199,7 +199,7 @@ public class UserMobileController extends SimpleController {
      * @param model
      * @return
      */
-    @Logging(logType = LogType.access,value = "修改个人信息")
+    @Logging(logType = LogType.operate,value = "修改个人信息")
     @PostMapping(value = "saveUserInfo")
     @ResponseBody
     public Result saveUserInfo(@ModelAttribute("model")User model) {
