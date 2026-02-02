@@ -85,8 +85,7 @@ $(function () {
         }, {
             title: '设备类型',
             field: 'systemDeviceType',
-            width: 120,
-            hidden: true
+            width: 120
         }, {
             title: '设备编码',
             field: 'deviceCode',
