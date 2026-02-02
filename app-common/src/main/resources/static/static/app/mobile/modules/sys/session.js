@@ -85,18 +85,15 @@ $(function () {
         }, {
             title: '设备类型',
             field: 'systemDeviceType',
-            width: 120,
-            hidden: true
+            width: 120
         }, {
             title: '设备编码',
             field: 'deviceCode',
-            width: 200,
-            hidden: true
+            width: 200
         }, {
             title: 'APP客户端版本',
             field: 'appVersion',
-            width: 120,
-            hidden: true
+            width: 120
         }, {
             title: '登录时间',
             field: 'loginTime',
