@@ -81,7 +81,7 @@ public class ApplicationSessionContext {
 	public List<SessionInfo> findSessionInfoData(Collection<String> keys) {
 		// 空集合快速返回，避免无效流操作
 		if (Objects.isNull(keys) || keys.isEmpty()) {
-			return List.of();
+			return Collections.emptyList();
 		}
 
 		// 根据key数量决定是否使用并行流（建议阈值：key数量>1000时用并行流）
@@ -138,7 +138,7 @@ public class ApplicationSessionContext {
 	public Collection<String> findSessionInfoKeys() {
 		Collection<String> keys = cacheFacade.keys();
 		if (Objects.isNull(keys) || keys.isEmpty()) {
-			return List.of();
+			return Collections.emptyList();
 		}
 		return keys.parallelStream().filter(key -> {
 			SessionObject sessionObject = cacheFacade.getSession(key);
