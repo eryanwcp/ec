@@ -79,18 +79,67 @@ public class ApplicationSessionContext {
 	}
 
 	public List<SessionInfo> findSessionInfoData(Collection<String> keys) {
-		return keys.parallelStream().map(key -> {
-			SessionObject sessionObject = cacheFacade.getSession(key);
-            SessionInfo sessionInfo = null != sessionObject ? (SessionInfo) sessionObject.get(SessionObject.KEY_SESSION_DATA) : null;
-            if(null != sessionInfo){
-                sessionInfo.setUpdateTime(Instant.ofEpochMilli(sessionObject.getLastAccess_at()).toDate());
-            }
-            return sessionInfo;
-		}).filter(Objects::nonNull).collect(Collectors.toList());
+		// 空集合快速返回，避免无效流操作
+		if (Objects.isNull(keys) || keys.isEmpty()) {
+			return List.of();
+		}
+
+		// 根据key数量决定是否使用并行流（建议阈值：key数量>1000时用并行流）
+		return (keys.size() > 1000 ? keys.parallelStream() : keys.stream())
+				.map(cacheFacade::getSession)
+				.filter(Objects::nonNull)
+				.map(this::convertToSessionInfoWithUpdateTime)
+				.filter(Objects::nonNull)
+				.collect(Collectors.toList());
+	}
+
+	/**
+	 * 将SessionObject转换为SessionInfo，并设置更新时间
+	 * @param sessionObject 缓存中的会话对象
+	 * @return 填充了更新时间的SessionInfo（转换失败返回null）
+	 */
+	private SessionInfo convertToSessionInfoWithUpdateTime(SessionObject sessionObject) {
+		try {
+			// 提取会话数据并做类型校验，避免强制类型转换异常
+			Object sessionData = sessionObject.get(SessionObject.KEY_SESSION_DATA);
+			if (!(sessionData instanceof SessionInfo)) {
+				return null;
+			}
+			SessionInfo sessionInfo = (SessionInfo) sessionData;
+
+			// 转换最后访问时间为Date类型，填充到SessionInfo
+			long lastAccessTime = sessionObject.getLastAccess_at();
+			Date updateTime = Instant.ofEpochMilli(lastAccessTime).toDate();
+			sessionInfo.setUpdateTime(updateTime);
+
+			return sessionInfo;
+		} catch (Exception e) {
+			// 捕获时间转换/空值等异常，避免单个异常导致整个流终止
+			// 可根据需要添加日志：log.warn("转换SessionObject失败", e);
+			return null;
+		}
+	}
+
+	public SessionInfo getSessionInfoBySessionInfoId(String sessionInfoId) {
+		Collection<String> keys = cacheFacade.keys();
+		if (Objects.isNull(keys) || keys.isEmpty()) {
+			return null;
+		}
+		return keys.stream()
+				.map(key -> cacheFacade.getSession(key))
+				.filter(Objects::nonNull)
+				.map(sessionObject -> (SessionInfo) sessionObject.get(SessionObject.KEY_SESSION_DATA))
+				.filter(Objects::nonNull)
+				.filter(sessionInfo -> sessionInfoId.equals(sessionInfo.getId()))
+				.findFirst()
+				.orElse(null);
 	}
 
 	public Collection<String> findSessionInfoKeys() {
 		Collection<String> keys = cacheFacade.keys();
+		if (Objects.isNull(keys) || keys.isEmpty()) {
+			return List.of();
+		}
 		return keys.parallelStream().filter(key -> {
 			SessionObject sessionObject = cacheFacade.getSession(key);
 			return  null != sessionObject && null != sessionObject.get(SessionObject.KEY_SESSION_DATA);
