@@ -226,7 +226,7 @@ public class NoticeReceiveController extends SimpleController {
     @ResponseBody
     public Result replySave(@ModelAttribute("model") NoticeReceiveInfo model,
                             @RequestParam(value = "fileIds", required = false) List<String> fileIds) {
-        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
+//        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         model.setIsReply(YesOrNo.YES.getValue());
         model.setReplyTime(Calendar.getInstance().getTime());
         model.setReplyFileIds(Collections3.convertToString(fileIds, ","));
