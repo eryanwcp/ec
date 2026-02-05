@@ -60,6 +60,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 用户管理
@@ -230,24 +231,20 @@ public class UserMobileController extends SimpleController {
     @PostMapping(value = "contactData")
     public String contactData(String companyId,HttpServletRequest request, HttpServletResponse response) {
         List<User> personPlatformContacts = StringUtils.isBlank(companyId) ? userService.findAllNormal():userService.findUsersByCompanyId(companyId);
-        Map<String, List<User>> listMap = Maps.newConcurrentMap();
-        personPlatformContacts.parallelStream().forEach(v->{
-            List<User> list = listMap.get(v.getNamePinyinHeadChar());
-            if (Collections3.isEmpty(list)) {
-                list = Lists.newCopyOnWriteArrayList();
-                list.add(v);
-            } else {
-                list.add(v);
-            }
-            listMap.put(v.getNamePinyinHeadChar(), list);
-        });
-        Set<String> keySet = listMap.keySet();
-        Iterator<String> iterator = keySet.iterator();
-        while (iterator.hasNext()){
-            String key = iterator.next();
-            List<User> userList = listMap.get(key);
-            userList.sort(Comparator.comparing(User::getName));
-        }
+        Map<String, List<User>> listMap = personPlatformContacts.parallelStream()
+                // 按拼音首字母分组（key：namePinyinHeadChar，value：对应的User列表）
+                .collect(Collectors.groupingByConcurrent(
+                        User::getNamePinyinHeadChar, // 分组依据：拼音首字母
+                        // 收集每个分组的元素，并直接排序
+                        Collectors.collectingAndThen(
+                                Collectors.toList(), // 先收集为列表
+                                userList -> {
+                                    // 对每个分组的列表按姓名排序
+                                    userList.sort(Comparator.comparing(User::getName));
+                                    return userList;
+                                }
+                        )
+                ));
         Result result = Result.successResult().setObj(listMap);
         String json = JsonMapper.getInstance().toJson(result, User.class, new String[]{"id", "name","mobile"});
         return renderString(response,json, WebUtils.JSON_TYPE);
@@ -266,26 +263,42 @@ public class UserMobileController extends SimpleController {
                                  @RequestParam(value = "showPhoto",defaultValue = "false") Boolean showPhoto,
                                  HttpServletRequest request, HttpServletResponse response) {
         List<User> personPlatformContacts = StringUtils.isBlank(companyId) ? userService.findAllNormal():userService.findUsersByCompanyId(companyId);
-        List<Map<String,Object>> list = Lists.newArrayList();
-        personPlatformContacts.parallelStream().forEach(v->{
-            //排除管理员
-            if(UserType.Platform.getValue().equals(v.getUserType()) || UserType.User.getValue().equals(v.getUserType())){
-                Map<String,Object> map = Maps.newHashMap();
-                map.put("id",v.getId());
-                map.put("name",v.getName());
-                map.put("remark",v.getRemark());
-                map.put("phone",v.getMobile());
-                map.put("tel",v.getTel());
-                if(showPhoto){
-                    map.put("photoSrc",v.getPhotoSrc());
-                }
-                map.put("tagIndex",v.getNamePinyinHeadChar());
-                list.add(map);
-            }
+        List<Map<String,Object>> list = personPlatformContacts.parallelStream()
+                // 1. 过滤：排除非指定类型的用户（管理员）
+                .filter(v -> {
+                    String userType = v.getUserType();
+                    return UserType.Platform.getValue().equals(userType)
+                            || UserType.User.getValue().equals(userType);
+                })
+                // 2. 转换：将对象映射为目标 Map 结构
+                .map(v -> {
+                    Map<String, Object> map = Maps.newHashMap();
+                    map.put("id", v.getId());
+                    map.put("name", v.getName());
+                    map.put("remark", v.getRemark());
+                    map.put("phone", v.getMobile());
+                    map.put("tel", v.getTel());
+                    // 按需添加照片字段
+                    if (showPhoto) {
+                        map.put("photoSrc", v.getPhotoSrc());
+                    }
+                    map.put("tagIndex", v.getNamePinyinHeadChar());
+                    return map;
+                })
+                // 3. 收集结果并排序（流式收集后排序，避免并行流排序的线程安全问题）
+                .collect(Collectors.collectingAndThen(
+                        Collectors.toList(),
+                        collectedList -> {
+                            collectedList.sort(Comparator.nullsLast(
+                                    Comparator.comparing(
+                                            m -> (String) m.get("name"),
+                                            Comparator.nullsLast(Comparator.naturalOrder())
+                                    )
+                            ));
+                            return collectedList;
+                        }
+                ));
 
-        });
-        list.sort(Comparator.nullsLast(Comparator.comparing(m -> (String) m.get("name"),
-                Comparator.nullsLast(Comparator.naturalOrder()))));
         return renderString(response,Result.successResult().setObj(list));
     }
 
