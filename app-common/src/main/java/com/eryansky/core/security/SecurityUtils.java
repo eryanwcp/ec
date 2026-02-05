@@ -1191,7 +1191,7 @@ public class SecurityUtils {
      * @return
      */
     public static SessionInfo getSessionInfoById(String sessionInfoId) {
-        return findSessionInfoList().parallelStream().filter(sessionInfo -> sessionInfo.getId().equals(sessionInfoId)).findFirst().orElse(null);
+        return Static.applicationSessionContext.getSessionInfoBySessionInfoId(sessionInfoId);
     }
 
     public static boolean isMobileLogin() {
