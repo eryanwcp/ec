@@ -92,7 +92,7 @@ public class NoticeReceiveController extends SimpleController {
     public String list(NoticeReceiveInfo model, HttpServletRequest request, HttpServletResponse response, Model uiModel) {
         Page<NoticeReceiveInfo> page = new Page<>(request, response);
         if (WebUtils.isAjaxRequest(request)) {
-            SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
+//            SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
             return renderString(response, Result.successResult().setObj(page));
         }
 
