@@ -51,6 +51,8 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
@@ -238,21 +240,41 @@ public class SystemMonitorController extends SimpleController {
         String region = AppConstants.getConfigValue("j2cache.session.redis.cluster_name","j2cache-session");
         if (WebUtils.isAjaxRequest(request)) {
             Collection<String> keys = SecurityUtils.findSessionKeys();
-            List<SessionVo> list = keys.parallelStream().map(key->{
-                SessionObject sessionObject = SecurityUtils.getSessionObjectBySessionId(key);
-                SessionVo sessionVo = new SessionVo();
-                sessionVo.setId(key);
-                sessionVo.setTtl1(SecurityUtils.sessionTTL1(key));
-                sessionVo.setTtl2(SecurityUtils.sessionTTL2(key));
-                sessionVo.setLoginUser(null != sessionObject && null != sessionObject.getAttributes() ? (String) sessionObject.getAttributes().get("loginUser") : null);
-                sessionVo.setHost(Optional.ofNullable(sessionObject).map(SessionObject::getHost).orElse(null));
-                sessionVo.setClientIP(Optional.ofNullable(sessionObject).map(SessionObject::getClientIP).orElse(null));
-                sessionVo.setCreatedTime(Optional.ofNullable(sessionObject).map(v-> Instant.ofEpochMilli(sessionObject.getCreated_at()).toDate()).orElse(null));
-                sessionVo.setUpdateTime(Optional.ofNullable(sessionObject).map(v-> Instant.ofEpochMilli(sessionObject.getLastAccess_at()).toDate()).orElse(null));
-                sessionVo.setData(Optional.ofNullable(sessionObject).map(SessionObject::getAttributes).orElse(null));
-                sessionVo.setAccessCount(Optional.ofNullable(sessionObject).map(SessionObject::getAccessCount).orElse(null));
-                return sessionVo;
-            }).sorted(Comparator.comparing(SessionVo::getUpdateTime,Comparator.nullsLast(Comparator.naturalOrder())).reversed().thenComparing(Comparator.comparing(SessionVo::getCreatedTime,Comparator.nullsLast(Comparator.naturalOrder())).reversed())).collect(Collectors.toList());
+            // 替换后的代码片段
+            List<SessionVo> list;
+            final int threshold = 1000;
+            if (Objects.isNull(keys) || keys.isEmpty()) {
+                list = Collections.emptyList();
+            } else if (keys.size() <= threshold) {
+                list = new ArrayList<>();
+                toSessionVo(keys, list);
+            } else {
+                List<String> keyList = new ArrayList<>(keys);
+                int parallelism = Math.min(Runtime.getRuntime().availableProcessors(), keyList.size());
+                int batchSize = (keyList.size() + parallelism - 1) / parallelism;
+                List<java.util.concurrent.CompletableFuture<List<SessionVo>>> futures = new ArrayList<>(parallelism);
+                ExecutorService executor = Executors.newFixedThreadPool(Math.max(1, parallelism));
+                for (int i = 0; i < parallelism; i++) {
+                    int from = i * batchSize;
+                    if (from >= keyList.size()) break;
+                    int to = Math.min(from + batchSize, keyList.size());
+                    List<String> sliceKeys = keyList.subList(from, to);
+                    futures.add(java.util.concurrent.CompletableFuture.supplyAsync(() -> {
+                        List<SessionVo> sub = new ArrayList<>(sliceKeys.size());
+                        toSessionVo(sliceKeys, sub);
+                        return sub;
+                    }, executor));
+                }
+
+                list = futures.stream()
+                        .map(java.util.concurrent.CompletableFuture::join)
+                        .flatMap(List::stream)
+                        .collect(Collectors.toList());
+            }
+
+            // 排序并分页（保持原有排序逻辑）
+            list.sort(Comparator.comparing(SessionVo::getUpdateTime, Comparator.nullsLast(Comparator.naturalOrder())).reversed()
+                    .thenComparing(Comparator.comparing(SessionVo::getCreatedTime, Comparator.nullsLast(Comparator.naturalOrder())).reversed()));
             List<SessionVo> dataList = AppUtils.getPagedList(list, page.getPageNo(), page.getPageSize());
             page.autoTotalCount(keys.size());
             page.autoResult(dataList);
@@ -261,6 +283,24 @@ public class SystemMonitorController extends SimpleController {
         uiModel.addAttribute("region", region);
         uiModel.addAttribute("page", page);
         return "modules/sys/systemMonitor-sessionCache";
+    }
+
+    private void toSessionVo(Collection<String> keys, List<SessionVo> list) {
+        for (String key : keys) {
+            SessionObject sessionObject = SecurityUtils.getSessionObjectBySessionId(key);
+            SessionVo sessionVo = new SessionVo();
+            sessionVo.setId(key);
+            sessionVo.setTtl1(SecurityUtils.sessionTTL1(key));
+            sessionVo.setTtl2(SecurityUtils.sessionTTL2(key));
+            sessionVo.setLoginUser(null != sessionObject && null != sessionObject.getAttributes() ? (String) sessionObject.getAttributes().get("loginUser") : null);
+            sessionVo.setHost(Optional.ofNullable(sessionObject).map(SessionObject::getHost).orElse(null));
+            sessionVo.setClientIP(Optional.ofNullable(sessionObject).map(SessionObject::getClientIP).orElse(null));
+            sessionVo.setCreatedTime(Optional.ofNullable(sessionObject).map(v -> Instant.ofEpochMilli(sessionObject.getCreated_at()).toDate()).orElse(null));
+            sessionVo.setUpdateTime(Optional.ofNullable(sessionObject).map(v -> Instant.ofEpochMilli(sessionObject.getLastAccess_at()).toDate()).orElse(null));
+            sessionVo.setData(Optional.ofNullable(sessionObject).map(SessionObject::getAttributes).orElse(null));
+            sessionVo.setAccessCount(Optional.ofNullable(sessionObject).map(SessionObject::getAccessCount).orElse(null));
+            list.add(sessionVo);
+        }
     }
 
 
