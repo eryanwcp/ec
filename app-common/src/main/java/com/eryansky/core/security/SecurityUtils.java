@@ -179,7 +179,7 @@ public class SecurityUtils {
                 if (sessionInfo.isSuperUser()) {// 超级用户
                     return true;
                 }
-                return null != sessionInfo.getPermissons().parallelStream().filter(permisson -> resource.equals(permisson.getId()) || resource.equalsIgnoreCase(permisson.getCode())).findFirst().orElse(null);
+                return null != sessionInfo.getPermissons().stream().filter(permisson -> resource.equals(permisson.getId()) || resource.equalsIgnoreCase(permisson.getCode())).findFirst().orElse(null);
             } else {
                 return Static.resourceService.isPermittedResourceCodeWithPermission(userId, resource);
             }
@@ -289,10 +289,10 @@ public class SecurityUtils {
                 if (sessionInfo.isSuperUser()) {// 超级用户
                     return true;
                 }
-                return null != sessionInfo.getPermissonRoles().parallelStream().filter(permissonRole -> role.equals(permissonRole.getId()) || role.equalsIgnoreCase(permissonRole.getCode())).findFirst().orElse(null);
+                return null != sessionInfo.getPermissonRoles().stream().filter(permissonRole -> role.equals(permissonRole.getId()) || role.equalsIgnoreCase(permissonRole.getCode())).findFirst().orElse(null);
             } else {
                 List<Role> list = Static.roleService.findRolesByUserId(userId);
-                return null != list.parallelStream().filter(r -> role.equals(r.getId()) || role.equalsIgnoreCase(r.getCode())).findFirst().orElse(null);
+                return null != list.stream().filter(r -> role.equals(r.getId()) || role.equalsIgnoreCase(r.getCode())).findFirst().orElse(null);
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -464,11 +464,11 @@ public class SecurityUtils {
             }
 
             if (sessionInfo != null && userId.equals(sessionInfo.getUserId())) {
-                return null != sessionInfo.getPostCodes().parallelStream().filter(postCode::equals).findFirst().orElse(null);
+                return null != sessionInfo.getPostCodes().stream().filter(postCode::equals).findFirst().orElse(null);
             }
 
             List<Post> posts = Static.postService.findPostsByUserId(userId);
-            return null != posts.parallelStream().filter(post -> postCode.equals(post.getCode())).findFirst().orElse(null);
+            return null != posts.stream().filter(post -> postCode.equals(post.getCode())).findFirst().orElse(null);
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
@@ -1024,7 +1024,7 @@ public class SecurityUtils {
     public static Page<SessionInfo> findSessionInfoPage(Page<SessionInfo> page, String companyId, String query) {
         List<SessionInfo> list = StringUtils.isNotBlank(query) ? findSessionInfoByQuery(query) : findSessionInfoListWithOrder();
         if (null != companyId) {
-            list = list.parallelStream().filter(v -> companyId.equals(v.getLoginCompanyId()) || companyId.equals(v.getLoginHomeCompanyId())).collect(Collectors.toList());
+            list = list.stream().filter(v -> companyId.equals(v.getLoginCompanyId()) || companyId.equals(v.getLoginHomeCompanyId())).collect(Collectors.toList());
         }
         page.autoTotalCount(list.size());
         if (Page.PAGESIZE_ALL == page.getPageSize()) {
@@ -1088,7 +1088,7 @@ public class SecurityUtils {
      */
     public static SessionInfo getSessionInfoByToken(String token) {
         List<SessionInfo> list = findSessionInfoList();
-        return list.parallelStream().filter(sessionInfo -> token.equals(sessionInfo.getToken())).findFirst().orElse(null);
+        return list.stream().filter(sessionInfo -> token.equals(sessionInfo.getToken())).findFirst().orElse(null);
     }
 
     /**
@@ -1098,7 +1098,7 @@ public class SecurityUtils {
      */
     public static SessionInfo getSessionInfoByRefreshToken(String refreshToken) {
         List<SessionInfo> list = findSessionInfoList();
-        return list.parallelStream().filter(sessionInfo -> refreshToken.equals(sessionInfo.getRefreshToken())).findFirst().orElse(null);
+        return list.stream().filter(sessionInfo -> refreshToken.equals(sessionInfo.getRefreshToken())).findFirst().orElse(null);
     }
 
     /**
@@ -1108,7 +1108,7 @@ public class SecurityUtils {
      */
     public static SessionInfo getSessionInfoByTokenOrRefreshToken(String token) {
         List<SessionInfo> list = findSessionInfoList();
-        return list.parallelStream().filter(sessionInfo -> token.equals(sessionInfo.getToken()) || token.equals(sessionInfo.getRefreshToken())).findFirst().orElse(null);
+        return list.stream().filter(sessionInfo -> token.equals(sessionInfo.getToken()) || token.equals(sessionInfo.getRefreshToken())).findFirst().orElse(null);
     }
 
     /**
@@ -1128,7 +1128,7 @@ public class SecurityUtils {
      */
     public static List<SessionInfo> findSessionInfoByLoginName(String loginName) {
         List<SessionInfo> list = findSessionInfoList();
-        return list.parallelStream().filter(sessionInfo -> loginName.equalsIgnoreCase(sessionInfo.getLoginName())).collect(Collectors.toList());
+        return list.stream().filter(sessionInfo -> loginName.equalsIgnoreCase(sessionInfo.getLoginName())).collect(Collectors.toList());
     }
 
     /**
@@ -1138,7 +1138,7 @@ public class SecurityUtils {
      */
     public static List<SessionInfo> findSessionInfoByLoginNameOrMobile(String loginNameOrMobile) {
         List<SessionInfo> list = findSessionInfoList();
-        return list.parallelStream().filter(sessionInfo -> loginNameOrMobile.equalsIgnoreCase(sessionInfo.getLoginName()) || loginNameOrMobile.equalsIgnoreCase(sessionInfo.getMobile())).collect(Collectors.toList());
+        return list.stream().filter(sessionInfo -> loginNameOrMobile.equalsIgnoreCase(sessionInfo.getLoginName()) || loginNameOrMobile.equalsIgnoreCase(sessionInfo.getMobile())).collect(Collectors.toList());
     }
 
 
@@ -1149,7 +1149,7 @@ public class SecurityUtils {
      */
     public static List<SessionInfo> findSessionInfoByUserId(String userId) {
         List<SessionInfo> list = findSessionInfoList();
-        return list.parallelStream().filter(sessionInfo -> userId.equals(sessionInfo.getUserId())).collect(Collectors.toList());
+        return list.stream().filter(sessionInfo -> userId.equals(sessionInfo.getUserId())).collect(Collectors.toList());
     }
 
     /**
@@ -1163,7 +1163,7 @@ public class SecurityUtils {
             return Collections.emptyList();
         }
         List<SessionInfo> list = findSessionInfoList();
-        return list.parallelStream().filter(sessionInfo -> StringUtils.contains(sessionInfo.getLoginName(), query)
+        return list.stream().filter(sessionInfo -> StringUtils.contains(sessionInfo.getLoginName(), query)
                         || StringUtils.contains(sessionInfo.getMobile(), query)
                         || StringUtils.contains(sessionInfo.getName(), query)
                         || StringUtils.contains(sessionInfo.getIp(), query)

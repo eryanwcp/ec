@@ -299,7 +299,7 @@ public class UserController extends SimpleController {
         List<Combobox> defaultOrganCombobox = Lists.newArrayList();
         if (model.getId() != null) {
             List<Organ> organs = organService.findOrgansByUserId(model.getId());
-            defaultOrganCombobox = organs.parallelStream().map(organ -> new Combobox(organ.getId(), organ.getName())).collect(Collectors.toList());
+            defaultOrganCombobox = organs.stream().map(organ -> new Combobox(organ.getId(), organ.getName())).collect(Collectors.toList());
         }
         String defaultOrganComboboxData = JsonMapper.nonDefaultMapper().toJson(defaultOrganCombobox);
         logger.debug(defaultOrganComboboxData);
@@ -614,7 +614,7 @@ public class UserController extends SimpleController {
             if(null != post){
                 List<String> postOrganIds = organService.findAssociationOrganIdsByPostId(post.getId());
                 List<String> postUserIds = userService.findUserIdsByPostCode(postCode);
-                return treeNodes.parallelStream().filter(v->{
+                return treeNodes.stream().filter(v->{
                     String nType = v.getAttribute("nType");
                     if("o".equals(nType)){
                         return postOrganIds.contains(v.getId());
@@ -839,7 +839,7 @@ public class UserController extends SimpleController {
             List<Resource> list = resourceService.findResourcesWithPermissions(userId);
             //结构树展示优化
             list.forEach(v->{
-                if(null == list.parallelStream().filter(r->r.getId().equals(v.get_parentId())).findAny().orElse(null)){
+                if(null == list.stream().filter(r->r.getId().equals(v.get_parentId())).findAny().orElse(null)){
                     v.setParent(null);
                 }
             });

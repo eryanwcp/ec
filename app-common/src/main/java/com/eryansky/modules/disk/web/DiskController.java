@@ -281,7 +281,7 @@ public class DiskController extends SimpleController {
 
         List<Folder> userFolders = isAdmin ? folderService.findNormalTypeAndSystemFoldersByUserId(loginUserId) : folderService.findNormalTypeFoldersByUserId(loginUserId);
 
-        List<TreeNode> userFolderTreeNodes = userFolders.parallelStream().map(this::folderToTreeNode).collect(Collectors.toList());
+        List<TreeNode> userFolderTreeNodes = userFolders.stream().map(this::folderToTreeNode).collect(Collectors.toList());
         treeNodes.addAll(userFolderTreeNodes);
         return AppUtils.toTreeTreeNodes(treeNodes);
     }
@@ -320,7 +320,7 @@ public class DiskController extends SimpleController {
 
             Datagrid<File> dg = new Datagrid<>(page.getTotalCount(),
                     page.getResult());
-            long totalSize = page.getResult().parallelStream().mapToLong(File::getFileSize).sum();
+            long totalSize = page.getResult().stream().mapToLong(File::getFileSize).sum();
             Map<String, Object> map = Maps.newHashMap();
             map.put("name", "总大小");
             map.put("prettyFileSize", PrettyMemoryUtils.prettyByteSize(totalSize));

@@ -64,7 +64,7 @@ public class LogReportController extends SimpleController {
         page = logService.getLoginStatistics(page, query, startTime, endTime);
         Datagrid<Map<String, Object>> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
         List<Map<String, Object>> footer = Lists.newArrayList();
-        long totalSize = page.getResult().parallelStream().mapToLong(r -> (Long) r.get("count")).sum();
+        long totalSize = page.getResult().stream().mapToLong(r -> (Long) r.get("count")).sum();
         Map<String, Object> map = Maps.newHashMap();
         map.put("name", "总计");
         map.put("count", totalSize);

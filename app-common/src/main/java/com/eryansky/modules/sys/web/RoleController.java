@@ -388,7 +388,7 @@ public class RoleController extends SimpleController {
             List<Resource> list = resourceService.findResourcesByRoleId(roleId);
             //结构树展示优化
             list.forEach(v->{
-                if(null == list.parallelStream().filter(r->r.getId().equals(v.get_parentId())).findAny().orElse(null)){
+                if(null == list.stream().filter(r->r.getId().equals(v.get_parentId())).findAny().orElse(null)){
                     v.setParent(null);
                 }
             });
