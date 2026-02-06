@@ -8,6 +8,9 @@ import org.joda.time.Instant;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 /**
@@ -79,18 +82,48 @@ public class ApplicationSessionContext {
 	}
 
 	public List<SessionInfo> findSessionInfoData(Collection<String> keys) {
-		// 空集合快速返回，避免无效流操作
-		if (Objects.isNull(keys) || keys.isEmpty()) {
-			return Collections.emptyList();
-		}
+	    if (Objects.isNull(keys) || keys.isEmpty()) {
+	        return Collections.emptyList();
+	    }
 
-		// 根据key数量决定是否使用并行流（建议阈值：key数量>1000时用并行流）
-		return (keys.size() > 1000 ? keys.parallelStream() : keys.stream())
-				.map(cacheFacade::getSession)
-				.filter(Objects::nonNull)
-				.map(this::convertToSessionInfoWithUpdateTime)
-				.filter(Objects::nonNull)
-				.collect(Collectors.toList());
+	    final int threshold = 1000;
+	    if (keys.size() <= threshold) {
+	        return keys.stream()
+	                .map(cacheFacade::getSession)
+	                .filter(Objects::nonNull)
+	                .map(this::convertToSessionInfoWithUpdateTime)
+	                .filter(Objects::nonNull)
+	                .collect(Collectors.toList());
+	    }
+
+	    List<String> keyList = new ArrayList<>(keys);
+	    int parallelism = Math.min(Runtime.getRuntime().availableProcessors(), keyList.size());
+	    int batchSize = (keyList.size() + parallelism - 1) / parallelism;
+	    ExecutorService executor = Executors.newFixedThreadPool(Math.max(1, parallelism));
+	    try {
+	        List<CompletableFuture<List<SessionInfo>>> futures = new ArrayList<>(parallelism);
+	        for (int i = 0; i < parallelism; i++) {
+	            int from = i * batchSize;
+	            if (from >= keyList.size()) break;
+	            int to = Math.min(from + batchSize, keyList.size());
+	            List<String> slice = keyList.subList(from, to);
+	            futures.add(CompletableFuture.supplyAsync(() ->
+	                    slice.stream()
+	                            .map(cacheFacade::getSession)
+	                            .filter(Objects::nonNull)
+	                            .map(this::convertToSessionInfoWithUpdateTime)
+	                            .filter(Objects::nonNull)
+	                            .collect(Collectors.toList())
+	                    , executor));
+	        }
+
+	        return futures.stream()
+	                .map(CompletableFuture::join)
+	                .flatMap(List::stream)
+	                .collect(Collectors.toList());
+	    } finally {
+	        executor.shutdown();
+	    }
 	}
 
 	/**
@@ -136,14 +169,53 @@ public class ApplicationSessionContext {
 	}
 
 	public Collection<String> findSessionInfoKeys() {
-		Collection<String> keys = cacheFacade.keys();
-		if (Objects.isNull(keys) || keys.isEmpty()) {
-			return Collections.emptyList();
-		}
-		return keys.parallelStream().filter(key -> {
-			SessionObject sessionObject = cacheFacade.getSession(key);
-			return  null != sessionObject && null != sessionObject.get(SessionObject.KEY_SESSION_DATA);
-		}).collect(Collectors.toList());
+	    Collection<String> keys = cacheFacade.keys();
+	    if (Objects.isNull(keys) || keys.isEmpty()) {
+	        return Collections.emptyList();
+	    }
+
+	    final int threshold = 1000;
+	    if (keys.size() <= threshold) {
+	        List<String> result = new ArrayList<>();
+	        for (String key : keys) {
+	            SessionObject sessionObject = cacheFacade.getSession(key);
+	            if (sessionObject != null && sessionObject.get(SessionObject.KEY_SESSION_DATA) != null) {
+	                result.add(key);
+	            }
+	        }
+	        return result;
+	    }
+
+	    List<String> keyList = new ArrayList<>(keys);
+	    int parallelism = Math.min(Runtime.getRuntime().availableProcessors(), keyList.size());
+	    int batchSize = (keyList.size() + parallelism - 1) / parallelism;
+	    ExecutorService executor = Executors.newFixedThreadPool(Math.max(1, parallelism));
+	    try {
+	        List<CompletableFuture<List<String>>> futures = new ArrayList<>(parallelism);
+	        for (int i = 0; i < parallelism; i++) {
+	            int from = i * batchSize;
+	            if (from >= keyList.size()) break;
+	            int to = Math.min(from + batchSize, keyList.size());
+	            List<String> slice = keyList.subList(from, to);
+	            futures.add(CompletableFuture.supplyAsync(() -> {
+	                List<String> sub = new ArrayList<>();
+	                for (String key : slice) {
+	                    SessionObject sessionObject = cacheFacade.getSession(key);
+	                    if (sessionObject != null && sessionObject.get(SessionObject.KEY_SESSION_DATA) != null) {
+	                        sub.add(key);
+	                    }
+	                }
+	                return sub;
+	            }, executor));
+	        }
+
+	        return futures.stream()
+	                .map(CompletableFuture::join)
+	                .flatMap(List::stream)
+	                .collect(Collectors.toList());
+	    } finally {
+	        executor.shutdown();
+	    }
 	}
 
 	public int findSessionInfoKeySize() {
