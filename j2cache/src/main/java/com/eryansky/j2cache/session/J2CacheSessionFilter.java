@@ -28,6 +28,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * 实现基于 J2Cache 的分布式的 Session 管理
@@ -197,64 +198,71 @@ public class J2CacheSessionFilter implements Filter {
 
         @Override
         public HttpSession getSession(boolean create) {
-            if(session == null){
-                Cookie ssnCookie = getCookie(cookieName);
-                String session_id = null;
-                if (ssnCookie != null) {
-                    session_id = ssnCookie.getValue();
-                    SessionObject ssnObject = g_cache.getSession(session_id);
-                    if(ssnObject != null) {
-                        session = new J2CacheSession(servletContext, g_cache,ssnObject);
-                        session.setNew(false);
-                    }
+            if (session != null) return session;
+            Cookie ssnCookie = getCookie(cookieName);
+            String session_id = null;
+            if (ssnCookie != null) {
+                session_id = ssnCookie.getValue();
+                SessionObject ssnObject = g_cache.getSession(session_id);
+                if(ssnObject != null) {
+                    session = new J2CacheSession(servletContext, g_cache,ssnObject);
+                    session.setNew(false);
                 }
-                if (null == session) {
-                    String authorization = request.getParameter(ATTR_AUTHORIZATION);
-                    if (StringUtils.isBlank(authorization)) {
-                        authorization = request.getParameter(ATTR_TOKEN);
-                    }
-                    if (StringUtils.isBlank(authorization)) {
-                        authorization = request.getHeader(ATTR_AUTHORIZATION);
-                    }
-                    String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""), "Bearer", "");
-                    if (StringUtils.isNotBlank(token)) {
-                        session_id = Encrypt.md5(token);
-                        String finalSession_id = session_id;
-                        String lockKey = "lock_session_token:"+session_id;
-                        J2Cache.getChannel().lock(lockKey, 5, 10, new DefaultLockCallback<Boolean>(false, false) {
-                            @Override
-                            public Boolean handleObtainLock() {
-                                SessionObject ssnObject = g_cache.getSession(finalSession_id);
-                                if (ssnObject != null) {
-                                    session = new J2CacheSession(servletContext, g_cache, ssnObject);
-                                    session.setNew(false);
-                                } else if (create) {
-                                    session = new J2CacheSession(servletContext, finalSession_id, g_cache);
-                                    try {
-                                        String clientIp = com.eryansky.common.utils.net.IpUtils.getIpAddr(request);
-                                        session.getSessionObject().setClientIP(clientIp);
-                                    } catch (Exception e) {
-                                        logger.warn("获取客户端IP失败:" + e.getMessage(), e);
-                                    }
-                                    g_cache.saveSession(session.getSessionObject());
-                                    setCookie(response,cookieName, finalSession_id);
+            }
+            if (null == session) {
+                String authorization = Stream.of(
+                                request.getHeader(ATTR_AUTHORIZATION),
+                                request.getParameter(ATTR_TOKEN),
+                                request.getParameter(ATTR_AUTHORIZATION)
+                        ).filter(StringUtils::isNotBlank)
+                        .findFirst()
+                        .orElse(null);
+
+                String token = null;
+                if (StringUtils.isNotBlank(authorization)) {
+                    token = authorization.startsWith("Bearer ") ? authorization.substring(7) :
+                            authorization.startsWith("Bearer") ? authorization.substring(6) : authorization;
+                    token = token.trim();
+                }
+
+                if (StringUtils.isNotBlank(token)) {
+                    String clientIp = com.eryansky.common.utils.net.IpUtils.getIpAddr(request);
+                    session_id = Encrypt.md5(token);
+                    String finalSession_id = session_id;
+                    String lockKey = "lock_session_token:"+session_id;
+                    J2Cache.getChannel().lock(lockKey, 5, 10, new DefaultLockCallback<Boolean>(false, false) {
+                        @Override
+                        public Boolean handleObtainLock() {
+                            SessionObject ssnObject = g_cache.getSession(finalSession_id);
+                            if (ssnObject != null) {
+                                session = new J2CacheSession(servletContext, g_cache, ssnObject);
+                                session.setNew(false);
+                            } else if (create) {
+                                session = new J2CacheSession(servletContext, finalSession_id, g_cache);
+                                try {
+                                    session.getSessionObject().setClientIP(clientIp);
+                                } catch (Exception e) {
+                                    logger.warn("获取客户端IP失败:" + e.getMessage(), e);
                                 }
-                                return true;
+                                g_cache.saveSession(session.getSessionObject());
+                                setCookie(response,cookieName, finalSession_id);
                             }
-                        });
+                            return true;
+                        }
+                    });
 
-                    }
                 }
+            }
 
-                if(session == null && create) {
-                    if(null == session_id){
-                        session_id = UUID.randomUUID().toString().replaceAll("-", "");
-                    }
-                    session = new J2CacheSession(servletContext, session_id, g_cache);
-                    session.getSessionObject().setClientIP(com.eryansky.common.utils.net.IpUtils.getIpAddr(request));
-                    g_cache.saveSession(session.getSessionObject());
-                    setCookie(response,cookieName, session_id);
+            if(session == null && create) {
+                if(null == session_id){
+                    session_id = UUID.randomUUID().toString().replaceAll("-", "");
                 }
+                String clientIp = com.eryansky.common.utils.net.IpUtils.getIpAddr(request);
+                session = new J2CacheSession(servletContext, session_id, g_cache);
+                session.getSessionObject().setClientIP(clientIp);
+                g_cache.saveSession(session.getSessionObject());
+                setCookie(response,cookieName, session_id);
             }
             return session;
         }
