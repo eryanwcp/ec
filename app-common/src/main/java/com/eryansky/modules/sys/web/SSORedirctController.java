@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.stream.Stream;
 
 /**
  * 内部应用单点跳转
@@ -44,13 +45,13 @@ public class SSORedirctController extends SimpleController {
         if (StringUtils.isNotBlank(param)) {
             url += "?" + param;
         }
-        String authorization = request.getParameter(AuthorityInterceptor.ATTR_AUTHORIZATION);
-        if (StringUtils.isBlank(authorization)) {
-            authorization = request.getParameter(AuthorityInterceptor.ATTR_TOKEN);
-        }
-        if (StringUtils.isBlank(authorization)) {
-            authorization = request.getHeader(AuthorityInterceptor.ATTR_AUTHORIZATION);
-        }
+        String authorization = Stream.of(
+                        request.getHeader(AuthorityInterceptor.ATTR_AUTHORIZATION),
+                        request.getParameter(AuthorityInterceptor.ATTR_TOKEN),
+                        request.getParameter(AuthorityInterceptor.ATTR_AUTHORIZATION)
+                ).filter(StringUtils::isNotBlank)
+                .findFirst()
+                .orElse(null);
         String token = null;
         if (StringUtils.isNotBlank(authorization)) {
             token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""),"Bearer","");
