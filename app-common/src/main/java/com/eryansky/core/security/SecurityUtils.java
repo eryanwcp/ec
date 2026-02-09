@@ -45,6 +45,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 系统使用的特殊工具类 简化代码编写.
@@ -799,13 +800,13 @@ public class SecurityUtils {
             sessionInfo = getSessionInfo(sessionId);
             //Authorization 请求头或请求参数
             if (sessionInfo == null && autoAuthorizationSession) {
-                String authorization = request.getParameter(AuthorityInterceptor.ATTR_AUTHORIZATION);
-                if (StringUtils.isBlank(authorization)) {
-                    authorization = request.getParameter(AuthorityInterceptor.ATTR_TOKEN);
-                }
-                if (StringUtils.isBlank(authorization)) {
-                    authorization = request.getHeader(AuthorityInterceptor.ATTR_AUTHORIZATION);
-                }
+                String authorization = Stream.of(
+                                request.getHeader(AuthorityInterceptor.ATTR_AUTHORIZATION),
+                                request.getParameter(AuthorityInterceptor.ATTR_TOKEN),
+                                request.getParameter(AuthorityInterceptor.ATTR_AUTHORIZATION)
+                        ).filter(StringUtils::isNotBlank)
+                        .findFirst()
+                        .orElse(null);
                 if (StringUtils.isNotBlank(authorization)) {
                     String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""), "Bearer", "");
                     sessionInfo = StringUtils.isNotBlank(token) ? getSessionInfoByTokenOrRefreshTokenWithMd5(token) : null;
