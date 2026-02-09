@@ -28,6 +28,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.lang.annotation.Annotation;
 import java.util.List;
+import java.util.stream.Stream;
 
 
 /**
@@ -71,13 +72,13 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
                 return true;
             }
 
-            String authorization = request.getParameter(AuthorityInterceptor.ATTR_AUTHORIZATION);
-            if (StringUtils.isBlank(authorization)) {
-                authorization = request.getParameter(AuthorityInterceptor.ATTR_TOKEN);
-            }
-            if (StringUtils.isBlank(authorization)) {
-                authorization = request.getHeader(AuthorityInterceptor.ATTR_AUTHORIZATION);
-            }
+            String authorization = Stream.of(
+                            request.getHeader(AuthorityInterceptor.ATTR_AUTHORIZATION),
+                            request.getParameter(AuthorityInterceptor.ATTR_TOKEN),
+                            request.getParameter(AuthorityInterceptor.ATTR_AUTHORIZATION)
+                    ).filter(StringUtils::isNotBlank)
+                    .findFirst()
+                    .orElse(null);
             String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""),"Bearer","");
 
             if(StringUtils.isNotBlank(token)){
