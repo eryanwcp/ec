@@ -268,7 +268,7 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
 
             return true;
         }else{
-            logger.debug("[{},{}]未授权[{}] {}", SpringMVCHolder.getIp(),request.getSession().getId(),requestUrl, JsonMapper.toJsonString(request.getHeaderNames()));
+            logger.debug("[{},{}]未授权[{}] {}", SpringMVCHolder.getIp(),request.getSession().getId(),requestUrl, JsonMapper.toJsonString(WebUtils.getHeaders(request)));
             //返回校验不通过页面
             try {
                 if(!response.isCommitted()){
@@ -283,7 +283,7 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
                     if(WebUtils.isAjaxRequest(request) || StringUtils.startsWith(authorization,"Bearer ")){
                         response.setStatus(HttpStatus.UNAUTHORIZED.value());
                         R<Boolean> r = new R<>(false).setCode(R.NO_PERMISSION).setMsg("未授权或会话信息已失效！");
-                        logger.warn("用户[{},{}]访问URL:{}未授权或会话信息已失效！{} ", SpringMVCHolder.getIp(),request.getSession().getId(), requestUrl, JsonMapper.toJsonString(request.getHeaderNames()));
+                        logger.warn("用户[{},{}]访问URL:{}未授权或会话信息已失效！{} ", SpringMVCHolder.getIp(),request.getSession().getId(), requestUrl, JsonMapper.toJsonString(WebUtils.getHeaders(request)));
                         WebUtils.renderJson(response, r);
                     }else{
                         //返回校验不通过页面
