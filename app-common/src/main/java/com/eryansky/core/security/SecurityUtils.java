@@ -773,7 +773,7 @@ public class SecurityUtils {
      * @param request
      */
     public static SessionInfo getCurrentSessionInfo(HttpServletRequest request) {
-        return getCurrentSessionInfo(request,false);
+        return getCurrentSessionInfo(request,true);
     }
 
     /**
