@@ -198,7 +198,7 @@ public class J2CacheSessionFilter implements Filter {
 
         @Override
         public HttpSession getSession(boolean create) {
-            if (session != null) return session;
+            if (session != null && !session.isInvalid()) return session;
             Cookie ssnCookie = getCookie(cookieName);
             String session_id = null;
             if (ssnCookie != null) {
