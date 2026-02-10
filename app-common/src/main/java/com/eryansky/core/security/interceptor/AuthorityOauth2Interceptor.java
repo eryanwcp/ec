@@ -74,6 +74,7 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
 
             String authorization = Stream.of(
                             request.getHeader(AuthorityInterceptor.ATTR_AUTHORIZATION),
+                            request.getHeader(AuthorityInterceptor.ATTR_AUTHORIZATION.toLowerCase()),
                             request.getParameter(AuthorityInterceptor.ATTR_TOKEN),
                             request.getParameter(AuthorityInterceptor.ATTR_AUTHORIZATION)
                     ).filter(StringUtils::isNotBlank)
