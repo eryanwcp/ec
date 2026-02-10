@@ -141,7 +141,7 @@ public class SystemService extends BaseService {
 
     public void syncOrganToExtend() {
         List<Organ> list = organService.findAllWithDelete();
-        list.parallelStream().forEach(this::syncOrganToExtend);
+        list.stream().forEach(this::syncOrganToExtend);
     }
 
     public void syncOrganToExtend(Organ organ) {
