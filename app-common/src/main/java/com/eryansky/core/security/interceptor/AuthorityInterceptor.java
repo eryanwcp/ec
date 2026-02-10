@@ -268,12 +268,13 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
 
             return true;
         }else{
-            logger.debug("[{},{}]未授权[{}]",new Object[]{SpringMVCHolder.getIp(),request.getSession().getId(),requestUrl});
+            logger.debug("[{},{}]未授权[{}] {}", SpringMVCHolder.getIp(),request.getSession().getId(),requestUrl, JsonMapper.toJsonString(request.getHeaderNames()));
             //返回校验不通过页面
             try {
                 if(!response.isCommitted()){
                     String authorization = Stream.of(
                                     request.getHeader(ATTR_AUTHORIZATION),
+                                    request.getHeader(ATTR_AUTHORIZATION.toLowerCase()),
                                     request.getParameter(ATTR_TOKEN),
                                     request.getParameter(ATTR_AUTHORIZATION)
                             ).filter(StringUtils::isNotBlank)
