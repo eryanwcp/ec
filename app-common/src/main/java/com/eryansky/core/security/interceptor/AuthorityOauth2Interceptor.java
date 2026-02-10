@@ -72,15 +72,7 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
                 return true;
             }
 
-            String authorization = Stream.of(
-                            request.getHeader(AuthorityInterceptor.ATTR_AUTHORIZATION),
-                            request.getHeader(AuthorityInterceptor.ATTR_AUTHORIZATION.toLowerCase()),
-                            request.getParameter(AuthorityInterceptor.ATTR_TOKEN),
-                            request.getParameter(AuthorityInterceptor.ATTR_AUTHORIZATION)
-                    ).filter(StringUtils::isNotBlank)
-                    .findFirst()
-                    .orElse(null);
-            String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""),"Bearer","");
+            String token = extractToken(request);
 
             if(StringUtils.isNotBlank(token)){
                 String lockKey = "lock_oauth2_token:"+ Encrypt.md5(token);
@@ -130,6 +122,32 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
             }
         }
         return true;
+    }
+
+    // 独立Token提取方法
+    private String extractToken(HttpServletRequest request) {
+        // 优先从Header获取（大小写兼容）
+        String authorization = request.getHeader(AuthorityInterceptor.ATTR_AUTHORIZATION);
+        if (StringUtils.isBlank(authorization)) {
+            authorization = request.getHeader(AuthorityInterceptor.ATTR_AUTHORIZATION.toLowerCase());
+        }
+        // Header无则从参数获取
+        if (StringUtils.isBlank(authorization)) {
+            authorization = request.getParameter(AuthorityInterceptor.ATTR_TOKEN);
+        }
+        if (StringUtils.isBlank(authorization)) {
+            authorization = request.getParameter(AuthorityInterceptor.ATTR_AUTHORIZATION);
+        }
+        if (StringUtils.isBlank(authorization)) {
+            return null;
+        }
+        // 处理Bearer前缀
+        if (authorization.startsWith("Bearer ")) {
+            return authorization.substring(7).trim();
+        } else if (authorization.startsWith("Bearer")) {
+            return authorization.substring(6).trim();
+        }
+        return authorization.trim();
     }
 
 
