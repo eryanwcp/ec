@@ -210,19 +210,10 @@ public class J2CacheSessionFilter implements Filter {
                 }
             }
             if (null == session) {
-                String authorization = Stream.of(
-                                request.getHeader(ATTR_AUTHORIZATION),
-                                request.getHeader(ATTR_AUTHORIZATION.toLowerCase()),
-                                request.getParameter(ATTR_TOKEN),
-                                request.getParameter(ATTR_AUTHORIZATION)
-                        ).filter(StringUtils::isNotBlank)
-                        .findFirst()
-                        .orElse(null);
-
                 String token = extractToken(request);
                 if (StringUtils.isNotBlank(token)) {
                     String clientIp = com.eryansky.common.utils.net.IpUtils.getIpAddr(request);
-                    session_id = Encrypt.md5(token);
+                    session_id = Encrypt.sha(token);
                     String finalSession_id = session_id;
                     String lockKey = "lock_session_token:"+session_id;
                     J2Cache.getChannel().lock(lockKey, 5, 10, new DefaultLockCallback<Boolean>(false, false) {
