@@ -198,7 +198,7 @@ public class J2CacheSessionFilter implements Filter {
 
         @Override
         public HttpSession getSession(boolean create) {
-            if (session != null) return session;
+            if (session != null && !session.isInvalid()) return session;
             Cookie ssnCookie = getCookie(cookieName);
             String session_id = null;
             if (ssnCookie != null) {
@@ -210,22 +210,7 @@ public class J2CacheSessionFilter implements Filter {
                 }
             }
             if (null == session) {
-                String authorization = Stream.of(
-                                request.getHeader(ATTR_AUTHORIZATION),
-                                request.getHeader(ATTR_AUTHORIZATION.toLowerCase()),
-                                request.getParameter(ATTR_TOKEN),
-                                request.getParameter(ATTR_AUTHORIZATION)
-                        ).filter(StringUtils::isNotBlank)
-                        .findFirst()
-                        .orElse(null);
-
-                String token = null;
-                if (StringUtils.isNotBlank(authorization)) {
-                    token = authorization.startsWith("Bearer ") ? authorization.substring(7) :
-                            authorization.startsWith("Bearer") ? authorization.substring(6) : authorization;
-                    token = token.trim();
-                }
-
+                String token = extractToken(request);
                 if (StringUtils.isNotBlank(token)) {
                     String clientIp = com.eryansky.common.utils.net.IpUtils.getIpAddr(request);
                     session_id = Encrypt.md5(token);
@@ -284,7 +269,34 @@ public class J2CacheSessionFilter implements Filter {
                         return cookie;
             return null;
         }
+
+        // 独立Token提取方法
+        private String extractToken(HttpServletRequest request) {
+            // 优先从Header获取（大小写兼容）
+            String authorization = request.getHeader(ATTR_AUTHORIZATION);
+            if (StringUtils.isBlank(authorization)) {
+                authorization = request.getHeader(ATTR_AUTHORIZATION.toLowerCase());
+            }
+            // Header无则从参数获取
+            if (StringUtils.isBlank(authorization)) {
+                authorization = request.getParameter(ATTR_TOKEN);
+            }
+            if (StringUtils.isBlank(authorization)) {
+                authorization = request.getParameter(ATTR_AUTHORIZATION);
+            }
+            if (StringUtils.isBlank(authorization)) {
+                return null;
+            }
+            // 处理Bearer前缀
+            if (authorization.startsWith("Bearer ")) {
+                return authorization.substring(7).trim();
+            } else if (authorization.startsWith("Bearer")) {
+                return authorization.substring(6).trim();
+            }
+            return authorization.trim();
+        }
     }
+
 
     /**
      * @param name
