@@ -212,6 +212,7 @@ public class J2CacheSessionFilter implements Filter {
             if (null == session) {
                 String authorization = Stream.of(
                                 request.getHeader(ATTR_AUTHORIZATION),
+                                request.getHeader(ATTR_AUTHORIZATION.toLowerCase()),
                                 request.getParameter(ATTR_TOKEN),
                                 request.getParameter(ATTR_AUTHORIZATION)
                         ).filter(StringUtils::isNotBlank)

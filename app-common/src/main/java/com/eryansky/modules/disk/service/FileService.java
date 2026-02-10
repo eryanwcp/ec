@@ -219,6 +219,28 @@ public class FileService extends CrudService<FileDao, File> {
     }
 
     /**
+     *
+     * 文件删除（物理删除） 包括文件信息以及仓储文件
+     * @param fileId 文件ID
+     */
+    public void clearByFileId(String fileId) {
+        File file = dao.get(fileId);
+        try {
+            //检查文件是否被引用
+            List<File> files = this.findByCode(file.getCode(), fileId);
+            if (Collections3.isEmpty(files)) {
+                iFileManager.deleteFile(file.getFilePath());
+                logger.debug("删除文件：{}", new Object[]{file.getFilePath()});
+            }
+            dao.clear(file);
+        } catch (IOException e) {
+            logger.error("删除文件[{}]失败,{}", new Object[]{file.getFilePath(), e.getMessage()});
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    /**
      * 根据文件夹ID级联删除文件（包含下级文件夹）
      * @param fileId 文件ID
      * @return

@@ -281,13 +281,13 @@ public class OrganController extends SimpleController {
             if (sessionInfo.isSuperUser() || (StringUtils.isNotBlank(dataScope) && dataScope.equals(DataScope.ALL.getValue()))) {
 
             } else if(StringUtils.isNotBlank(dataScope) && dataScope.equals(DataScope.HOME_COMPANY_AND_CHILD.getValue())) {
-                organList = organList.parallelStream().filter(v-> Objects.equals(OrganUtils.getHomeCompanyIdByRecursive(v.getId()), sessionInfo.getLoginHomeCompanyId())).collect(Collectors.toList());
+                organList = organList.stream().filter(v-> Objects.equals(OrganUtils.getHomeCompanyIdByRecursive(v.getId()), sessionInfo.getLoginHomeCompanyId())).collect(Collectors.toList());
             } else if (StringUtils.isNotBlank(dataScope) && dataScope.equals(DataScope.COMPANY_AND_CHILD.getValue())) {
-                organList = organList.parallelStream().filter(v-> Objects.equals(OrganUtils.getCompanyIdByRecursive(v.getId()), sessionInfo.getLoginCompanyId())).collect(Collectors.toList());
+                organList = organList.stream().filter(v-> Objects.equals(OrganUtils.getCompanyIdByRecursive(v.getId()), sessionInfo.getLoginCompanyId())).collect(Collectors.toList());
             } else if (StringUtils.isNotBlank(dataScope) && dataScope.equals(DataScope.OFFICE_AND_CHILD.getValue())) {
-                organList = organList.parallelStream().filter(v->v.getId().equals(sessionInfo.getLoginOrganId())).collect(Collectors.toList());
+                organList = organList.stream().filter(v->v.getId().equals(sessionInfo.getLoginOrganId())).collect(Collectors.toList());
             }
-            treeNodes = AppUtils.toTreeTreeNodes(organList.parallelStream().map(v ->
+            treeNodes = AppUtils.toTreeTreeNodes(organList.stream().map(v ->
                     organService.organToTreeNode(v)
             ).collect(Collectors.toList()));
         }else{

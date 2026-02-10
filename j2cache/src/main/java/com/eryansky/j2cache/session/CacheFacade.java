@@ -389,19 +389,19 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
      * @return 返回会话对象
      */
     public SessionObject getSession(String session_id) {
-        SessionObject session = (SessionObject)cache1.get(session_id);
-        if(session != null)
+        SessionObject session = (SessionObject) cache1.get(session_id);
+        if (session != null)
             return session;
         synchronized (_g_keyLocks.computeIfAbsent(session_id, v -> new Object())) {
-            session = (SessionObject)cache1.get(session_id);
-            if(session != null)
+            session = (SessionObject) cache1.get(session_id);
+            if (session != null)
                 return session;
             try {
-                if(this.cache2 == null){
+                if (this.cache2 == null) {
                     return session;
                 }
-                Map<String,byte[]> data = cache2.getBytes(session_id);
-                if(null == data || data.isEmpty())
+                Map<String, byte[]> data = cache2.getBytes(session_id);
+                if (null == data || data.isEmpty())
                     return null;
                 session = new SessionObject(session_id, data);
                 cache1.put(session_id, session);

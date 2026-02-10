@@ -15,6 +15,7 @@
             fitColumns: false,//自适应列宽
             striped: true,//显示条纹
             pageSize: 20,//每页记录数
+            pageList: [10, 20, 50, 100, 1000, 99999],
             singleSelect: false,//单选模式
             remoteSort: false,//是否通过远程服务器对数据排序
             checkbox: true,

@@ -482,7 +482,7 @@ public class OrganService extends TreeService<OrganDao, Organ> {
             }
 
         }
-        return tempMap.entrySet().parallelStream().map(v-> {
+        return tempMap.entrySet().stream().map(v-> {
             if(cascade && Collections3.isEmpty(v.getValue().getChildren())){
                 v.getValue().setState(TreeNode.STATE_OPEN);
             }
@@ -588,7 +588,7 @@ public class OrganService extends TreeService<OrganDao, Organ> {
      * @return
      */
     public TreeNode getParentTreeNode(String parentId, Collection<TreeNode> treeNodes) {
-        return treeNodes.parallelStream().filter(treeNode-> parentId.equals(treeNode.getId())).findFirst().orElse(null);
+        return treeNodes.stream().filter(treeNode-> parentId.equals(treeNode.getId())).findFirst().orElse(null);
     }
 
     /**
@@ -599,7 +599,7 @@ public class OrganService extends TreeService<OrganDao, Organ> {
      * @return
      */
     public TreeNode getParentTreeNode(String parentId, String type, Collection<TreeNode> treeNodes) {
-        return treeNodes.parallelStream().filter(treeNode->{
+        return treeNodes.stream().filter(treeNode->{
             String _type = (String) treeNode.getAttributes().get("nType");
             return parentId.equals(treeNode.getId()) && _type != null && _type.equals(type);
         }).findFirst().orElse(null);

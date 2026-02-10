@@ -1,6 +1,5 @@
 package com.eryansky.common.orm.mybatis.type;
 
-import java.io.IOException;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,12 +23,8 @@ public class JsonTypeHandler<T> extends BaseTypeHandler<T> {
 
     private static  final Logger logger = LoggerFactory.getLogger(JsonTypeHandler.class);
 
-    private static final JsonMapper jsonMapper;
+    private final JsonMapper jsonMapper = JsonMapper.getInstance();
     private Class<T> type;
-
-    static {
-        jsonMapper = JsonMapper.getInstance();
-    }
 
     public JsonTypeHandler(Class<T> type) {
         if (logger.isTraceEnabled()) {
@@ -42,18 +37,13 @@ public class JsonTypeHandler<T> extends BaseTypeHandler<T> {
     }
 
     public JsonTypeHandler() {
-
     }
 
-    private T parse(String json) {
-        try {
-            if (json == null || json.length() == 0) {
-                return null;
-            }
-            return jsonMapper.readValue(json, type);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    private T toJavaObject(String json) {
+        if (json == null || json.length() == 0) {
+            return null;
         }
+        return jsonMapper.toJavaObject(json, type);
     }
 
     private String toJsonString(Object obj) {
@@ -66,23 +56,22 @@ public class JsonTypeHandler<T> extends BaseTypeHandler<T> {
 
     @Override
     public T getNullableResult(ResultSet rs, String columnName) throws SQLException {
-        return parse(rs.getString(columnName));
+        return toJavaObject(rs.getString(columnName));
     }
 
     @Override
     public T getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
-        return parse(rs.getString(columnIndex));
+        return toJavaObject(rs.getString(columnIndex));
     }
 
     @Override
     public T getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
-        return parse(cs.getString(columnIndex));
+        return toJavaObject(cs.getString(columnIndex));
     }
 
     @Override
     public void setNonNullParameter(PreparedStatement ps, int columnIndex, T parameter, JdbcType jdbcType) throws SQLException {
-        ps.setString(columnIndex, toJsonString(parameter));
-
+        ps.setObject(columnIndex, toJsonString(parameter));
     }
 
 }
