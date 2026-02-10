@@ -8,6 +8,7 @@ package com.eryansky.core.security.interceptor;
 import com.eryansky.common.model.R;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
+import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.security.annotation.RestApi;
@@ -32,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Stream;
 
 
 /**
@@ -266,20 +268,22 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
 
             return true;
         }else{
-            logger.debug("[{},{}]未授权[{}]",new Object[]{SpringMVCHolder.getIp(),request.getSession().getId(),requestUrl});
+            logger.debug("[{},{}]未授权[{}] {}", SpringMVCHolder.getIp(),request.getSession().getId(),requestUrl, JsonMapper.toJsonString(request.getHeaderNames()));
             //返回校验不通过页面
             try {
                 if(!response.isCommitted()){
-                    String authorization = request.getParameter(AuthorityInterceptor.ATTR_AUTHORIZATION);
-                    if (StringUtils.isBlank(authorization)) {
-                        authorization = request.getParameter(AuthorityInterceptor.ATTR_TOKEN);
-                    }
-                    if (StringUtils.isBlank(authorization)) {
-                        authorization = request.getHeader(AuthorityInterceptor.ATTR_AUTHORIZATION);
-                    }
+                    String authorization = Stream.of(
+                                    request.getHeader(ATTR_AUTHORIZATION),
+                                    request.getHeader(ATTR_AUTHORIZATION.toLowerCase()),
+                                    request.getParameter(ATTR_TOKEN),
+                                    request.getParameter(ATTR_AUTHORIZATION)
+                            ).filter(StringUtils::isNotBlank)
+                            .findFirst()
+                            .orElse(null);
                     if(WebUtils.isAjaxRequest(request) || StringUtils.startsWith(authorization,"Bearer ")){
                         response.setStatus(HttpStatus.UNAUTHORIZED.value());
                         R<Boolean> r = new R<>(false).setCode(R.NO_PERMISSION).setMsg("未授权或会话信息已失效！");
+                        logger.warn("用户[{},{}]访问URL:{}未授权或会话信息已失效！{} ", SpringMVCHolder.getIp(),request.getSession().getId(), requestUrl, JsonMapper.toJsonString(request.getHeaderNames()));
                         WebUtils.renderJson(response, r);
                     }else{
                         //返回校验不通过页面
