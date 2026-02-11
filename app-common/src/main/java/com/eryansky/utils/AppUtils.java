@@ -31,6 +31,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.eryansky.core.security.interceptor.AuthorityInterceptor.ATTR_AUTHORIZATION;
+import static com.eryansky.core.security.interceptor.AuthorityInterceptor.ATTR_TOKEN;
+
 /**
  * @author Eryan
  * @date 2015-10-19 
@@ -671,5 +674,35 @@ public class AppUtils {
         } else {
             return result;
         }
+    }
+
+    /**
+     * 独立Token提取方法
+     * @param request
+     * @return
+     */
+    public static String extractToken(HttpServletRequest request) {
+        // 优先从Header获取（大小写兼容）
+        String authorization = request.getHeader(ATTR_AUTHORIZATION);
+        if (StringUtils.isBlank(authorization)) {
+            authorization = request.getHeader(ATTR_AUTHORIZATION.toLowerCase());
+        }
+        // Header无则从参数获取
+        if (StringUtils.isBlank(authorization)) {
+            authorization = request.getParameter(ATTR_TOKEN);
+        }
+        if (StringUtils.isBlank(authorization)) {
+            authorization = request.getParameter(ATTR_AUTHORIZATION);
+        }
+        if (StringUtils.isBlank(authorization)) {
+            return null;
+        }
+        // 处理Bearer前缀
+        if (authorization.startsWith("Bearer ")) {
+            return authorization.substring(7).trim();
+        } else if (authorization.startsWith("Bearer")) {
+            return authorization.substring(6).trim();
+        }
+        return authorization.trim();
     }
 }
