@@ -33,7 +33,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Stream;
 
 
 /**
@@ -271,15 +270,8 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
             //返回校验不通过页面
             try {
                 if(!response.isCommitted()){
-                    String authorization = Stream.of(
-                                    request.getHeader(ATTR_AUTHORIZATION),
-                                    request.getHeader(ATTR_AUTHORIZATION.toLowerCase()),
-                                    request.getParameter(ATTR_TOKEN),
-                                    request.getParameter(ATTR_AUTHORIZATION)
-                            ).filter(StringUtils::isNotBlank)
-                            .findFirst()
-                            .orElse(null);
-                    if(WebUtils.isAjaxRequest(request) || StringUtils.startsWith(authorization,"Bearer ")){
+                    String token = AppUtils.extractToken(request);
+                    if(WebUtils.isAjaxRequest(request) || StringUtils.isNotBlank(token)){
                         response.setStatus(HttpStatus.UNAUTHORIZED.value());
                         R<Boolean> r = new R<>(false).setCode(R.NO_PERMISSION).setMsg("未授权或会话信息已失效！");
                         logger.debug("用户[{},{}]访问URL:{}未授权或会话信息已失效！{} ", SpringMVCHolder.getIp(),request.getSession().getId(), requestUrl, JsonMapper.toJsonString(WebUtils.getHeaders(request)));
