@@ -268,7 +268,6 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
 
             return true;
         }else{
-            logger.debug("[{},{}]未授权[{}] {}", SpringMVCHolder.getIp(),request.getSession().getId(),requestUrl, JsonMapper.toJsonString(WebUtils.getHeaders(request)));
             //返回校验不通过页面
             try {
                 if(!response.isCommitted()){
