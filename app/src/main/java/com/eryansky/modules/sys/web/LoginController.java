@@ -42,7 +42,6 @@ import com.eryansky.modules.sys.mapper.Resource;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Sets;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.Assert;
@@ -63,11 +62,11 @@ import java.util.*;
 @RequestMapping(value = {"${adminPath}/login","${mobilePath}/login"})
 public class LoginController extends SimpleController {
 
-    @Autowired
+    @jakarta.annotation.Resource
     private UserService userService;
-    @Autowired
+    @jakarta.annotation.Resource
     private UserPasswordService userPasswordService;
-    @Autowired
+    @jakarta.annotation.Resource
     private ResourceService resourceService;
     private static final int RESULT_CODE_APP_VERSION_ERROR = 5;//APP版本禁止登录
     private static final int RESULT_CODE_DEVICE_ERROR = 4;//移动设备校验错误码
@@ -309,6 +308,7 @@ public class LoginController extends SimpleController {
      * @param request
      * @return
      */
+    @RequiresUser(required = false)
     @PrepareOauth2(enable = false)
     @PostMapping(value = {"logout"})
     @ResponseBody
@@ -345,7 +345,7 @@ public class LoginController extends SimpleController {
     /**
      * 自动登录
      * @param loginName
-     * @param token
+     * @param refreshToken
      * @param request
      * @param uiModel
      * @return
@@ -355,7 +355,7 @@ public class LoginController extends SimpleController {
     @ResponseBody
     @PostMapping(value = {"autoLogin"})
     public Result autoLogin(@RequestParam(required = true) String loginName,
-                            @RequestParam(required = true) String token,
+                            @RequestParam(required = true) String refreshToken,
                             HttpServletRequest request, Model uiModel) {
         //登录限制
         checkLoginLimit();
@@ -370,10 +370,10 @@ public class LoginController extends SimpleController {
         }
 
         try {
-            verify = SecurityUtils.verifySessionInfoToken(token,loginName,user.getPassword());
+            verify = SecurityUtils.verifySessionInfoToken(refreshToken,loginName,user.getPassword());
         } catch (Exception e) {
             if(!(e instanceof TokenExpiredException)){
-                logger.error("Token校验失败：{}，{},{},{}",loginName, SpringMVCHolder.getIp(),  token, e.getMessage());
+                logger.error("Token校验失败：{}，{},{},{}",loginName, SpringMVCHolder.getIp(), refreshToken, e.getMessage());
             }
         }
         if(!verify){

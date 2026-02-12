@@ -39,9 +39,9 @@ import java.util.Map;
 @RequestMapping(value = "${adminPath}/sys/encrypt")
 public class SystemEncryptController extends SimpleController {
 
-    @Autowired
+    @jakarta.annotation.Resource
     private ConfigService configService;
-    @Autowired
+    @jakarta.annotation.Resource
     private LogService logService;
 
     /**
