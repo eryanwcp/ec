@@ -47,7 +47,7 @@ import java.util.List;
 @RequestMapping(value = "${adminPath}/sys/systemSerialNumber")
 public class SystemSerialNumberController extends SimpleController {
 
-    @Autowired
+    @jakarta.annotation.Resource
     private SystemSerialNumberService systemSerialNumberService;
 
     @ModelAttribute("model")

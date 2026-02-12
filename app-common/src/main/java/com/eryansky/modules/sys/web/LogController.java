@@ -30,7 +30,6 @@ import com.eryansky.modules.sys.service.LogService;
 import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.SelectType;
 import com.google.common.collect.Lists;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -51,7 +50,7 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "${adminPath}/sys/log")
 public class LogController extends SimpleController {
 
-    @Autowired
+    @jakarta.annotation.Resource
     private LogService logService;
 
     @ModelAttribute("model")

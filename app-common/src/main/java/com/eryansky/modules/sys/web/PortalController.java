@@ -45,13 +45,13 @@ import java.util.Map;
 @RequestMapping(value = "${adminPath}/portal")
 public class PortalController extends SimpleController {
 
-    @Autowired
+    @jakarta.annotation.Resource
     private UserService userService;
-    @Autowired
+    @jakarta.annotation.Resource
     private NoticeService noticeService;
-    @Autowired
+    @jakarta.annotation.Resource
     private NoticeReceiveInfoService noticeReceiveInfoService;
-    @Autowired
+    @jakarta.annotation.Resource
     private UserPasswordService userPasswordService;
 
 

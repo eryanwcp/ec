@@ -21,7 +21,6 @@ import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.utils.AppDateUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -41,7 +40,7 @@ import java.util.Map;
 @RequestMapping(value = "${adminPath}/sys/log/report")
 public class LogReportController extends SimpleController {
 
-    @Autowired
+    @jakarta.annotation.Resource
     private LogService logService;
 
     /**

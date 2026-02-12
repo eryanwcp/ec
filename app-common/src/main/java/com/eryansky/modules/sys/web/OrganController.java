@@ -335,10 +335,10 @@ public class OrganController extends SimpleController {
         if (enumParentType != null) {
             if (enumParentType.equals(OrganType.organ)) {
                 OrganType[] rss = OrganType.values();
-                for (int i = 0; i < rss.length; i++) {
+                for (OrganType organType : rss) {
                     Combobox combobox = new Combobox();
-                    combobox.setValue(rss[i].getValue());
-                    combobox.setText(rss[i].getDescription());
+                    combobox.setValue(organType.getValue());
+                    combobox.setText(organType.getDescription());
                     cList.add(combobox);
                 }
             } else if (enumParentType.equals(OrganType.department)) {
@@ -355,7 +355,7 @@ public class OrganController extends SimpleController {
             cList.add(groupCombobox);
         }
         List<DictionaryItem> dictionaryItems = DictionaryUtils.getDictList(Organ.DIC_ORGAN_TYPE);
-        dictionaryItems.stream().forEach(v->cList.add(new Combobox(v.getCode(), v.getName())));
+        dictionaryItems.forEach(v->cList.add(new Combobox(v.getCode(), v.getName())));
         return cList;
     }
 
@@ -454,9 +454,8 @@ public class OrganController extends SimpleController {
     public List<TreeNode> provinceCityAreaData(Boolean shortName,HttpServletResponse response) {
         List<TreeNode> treeNodes = Lists.newArrayList();
         List<Area> list = areaService.findAreaUp();
-        for (int i = 0; i < list.size(); i++) {
-            Area e = list.get(i);
-            TreeNode treeNode = new TreeNode(e.getId(), null != shortName && shortName ? e.getShortName():e.getName());
+        for (Area e : list) {
+            TreeNode treeNode = new TreeNode(e.getId(), null != shortName && shortName ? e.getShortName() : e.getName());
             treeNode.setpId(e.getParentId());
             treeNodes.add(treeNode);
         }

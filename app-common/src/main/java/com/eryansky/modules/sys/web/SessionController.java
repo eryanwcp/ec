@@ -57,7 +57,7 @@ public class SessionController extends SimpleController {
     public String onlineDatagrid(HttpServletRequest request, HttpServletResponse response, String query) {
         Page<SessionInfo> page = new Page<>(request);
         page = SecurityUtils.findSessionInfoPage(page,null,query);
-        Datagrid dg = new Datagrid<>(page.getTotalCount(), page.getResult());
+        Datagrid<SessionInfo> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
         String json = SecurityUtils.isCurrentUserAdmin() ? JsonMapper.getInstance().toJson(dg):JsonMapper.getInstance().toJsonWithExcludeProperties(dg, SessionInfo.class, new String[]{"token","refreshToken"});
         return renderString(response, json, WebUtils.JSON_TYPE);
     }
@@ -72,7 +72,7 @@ public class SessionController extends SimpleController {
         Page<SessionInfo> page = new Page<>(request);
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         page = SecurityUtils.findSessionInfoPage(page,(sessionInfo.isSuperUser() || SecurityUtils.isPermittedMaxRoleDataScope()) ? null:sessionInfo.getLoginCompanyId(),query);
-        Datagrid dg = new Datagrid<>(page.getTotalCount(), page.getResult());
+        Datagrid<SessionInfo> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
         String json = SecurityUtils.isCurrentUserAdmin() ? JsonMapper.getInstance().toJson(dg):JsonMapper.getInstance().toJsonWithExcludeProperties(dg, SessionInfo.class, new String[]{"token","refreshToken"});
         return renderString(response, json, WebUtils.JSON_TYPE);
     }

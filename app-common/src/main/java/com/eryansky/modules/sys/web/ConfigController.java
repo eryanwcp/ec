@@ -17,7 +17,6 @@ import com.eryansky.modules.sys.mapper.Config;
 import com.eryansky.modules.sys.service.ConfigService;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Maps;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -36,7 +35,7 @@ import java.util.Map;
 @Controller
 @RequestMapping(value = "${adminPath}/sys/config")
 public class ConfigController extends SimpleController {
-    @Autowired
+    @jakarta.annotation.Resource
     private ConfigService configService;
 
 
@@ -67,7 +66,7 @@ public class ConfigController extends SimpleController {
                                      String query) {
         Page<Config> page = new Page<>(request);
         page = configService.findPage(page, query);
-        return new Datagrid(page.getTotalCount(), page.getResult());
+        return new Datagrid<>(page.getTotalCount(), page.getResult());
     }
 
     @RequiresPermissions("sys:config:edit")

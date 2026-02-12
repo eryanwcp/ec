@@ -23,7 +23,7 @@ import com.eryansky.modules.sys.service.AreaService;
 import com.eryansky.modules.sys.utils.AreaUtils;
 import com.eryansky.modules.sys.utils.OrganUtils;
 import com.eryansky.utils.AppConstants;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
@@ -45,7 +45,7 @@ import java.util.List;
 @RequestMapping(value = "${adminPath}/sys/area")
 public class AreaController extends SimpleController {
 
-    @Autowired
+    @Resource
     private AreaService areaService;
 
     @ModelAttribute("model")

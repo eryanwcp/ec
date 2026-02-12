@@ -303,10 +303,10 @@ public class ResourceController extends SimpleController {
      */
     @PostMapping(value = {"resourceRoleDatagrid/{resourceId}"})
     @ResponseBody
-    public Datagrid resourceRoleDatagrid(@PathVariable String resourceId,HttpServletRequest request,HttpServletResponse response) {
+    public Datagrid<Role> resourceRoleDatagrid(@PathVariable String resourceId,HttpServletRequest request,HttpServletResponse response) {
         Page<Role> page = new Page<>(request);
         page = roleService.findRolesByReourceId(page,resourceId);
-        return new Datagrid(page.getTotalCount(),page.getResult());
+        return new Datagrid<>(page.getTotalCount(),page.getResult());
     }
 
 

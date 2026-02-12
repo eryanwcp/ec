@@ -63,7 +63,7 @@ import java.util.List;
 @RequestMapping(value = "${adminPath}/sys/versionLog")
 public class VersionLogController extends SimpleController {
 
-    @Autowired
+    @jakarta.annotation.Resource
     private VersionLogService versionLogService;
 
 

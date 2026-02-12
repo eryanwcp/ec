@@ -26,7 +26,6 @@ import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.modules.sys.vo.PasswordTip;
 import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.AppUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -43,9 +42,9 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping(value = "${adminPath}")
 public class IndexController extends SimpleController {
 
-    @Autowired
+    @jakarta.annotation.Resource
     private UserService userService;
-    @Autowired
+    @jakarta.annotation.Resource
     private UserPasswordService userPasswordService;
 
     @GetMapping(value = {"headers"})

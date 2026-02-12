@@ -16,7 +16,6 @@ import com.eryansky.modules.sys.mapper.QuartzJobDetail;
 import com.eryansky.modules.sys.service.JobService;
 import com.google.common.collect.Maps;
 import org.quartz.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -35,10 +34,9 @@ import java.util.Map;
 @Controller
 @RequestMapping(value = "${adminPath}/sys/job")
 public class JobController extends SimpleController {
-	@Autowired
+	@jakarta.annotation.Resource
 	private JobService jobService;
-
-	@Autowired
+	@jakarta.annotation.Resource
 	private Scheduler scheduler;
 
 	/**

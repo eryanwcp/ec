@@ -59,9 +59,9 @@ public class LogInterceptor implements HandlerInterceptor {
 	private static final ThreadLocal<Long> startTimeThreadLocal =
 			new NamedThreadLocal<>("ThreadLocal StartTime");
 
-	private RequestMappingHandlerAdapter adapter;
+	private final RequestMappingHandlerAdapter adapter;
 	private final Map<Class<?>, Set<Method>> initBinderCache = new ConcurrentHashMap<>(64);
-	private List<HandlerMethodArgumentResolver> argumentResolvers;
+	private final List<HandlerMethodArgumentResolver> argumentResolvers;
 	private final Map<MethodParameter, HandlerMethodArgumentResolver> argumentResolverCache =
 			new ConcurrentHashMap<>(256);
 

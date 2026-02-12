@@ -21,7 +21,7 @@ import com.eryansky.modules.sys.service.SystemService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,7 +39,7 @@ import java.util.*;
 @RequestMapping(value = "${adminPath}/common")
 public class CommonController extends SimpleController {
 
-    @Autowired
+    @Resource
     private SystemService systemService;
 
     /**
