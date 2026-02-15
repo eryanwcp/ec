@@ -4,9 +4,9 @@ import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.j2cache.session.CacheFacade;
 import com.eryansky.j2cache.session.J2CacheSessionFilter;
 import com.eryansky.j2cache.session.SessionObject;
-import org.joda.time.Instant;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -71,7 +71,7 @@ public class ApplicationSessionContext {
 		SessionObject sessionObject = getSessionObjectBySessionId(sessionId);
         SessionInfo sessionInfo = null != sessionObject ? (SessionInfo) sessionObject.get(SessionObject.KEY_SESSION_DATA) : null;
         if(null != sessionInfo){
-            sessionInfo.setUpdateTime(Instant.ofEpochMilli(sessionObject.getLastAccess_at()).toDate());
+            sessionInfo.setUpdateTime(Date.from(Instant.ofEpochMilli(sessionObject.getLastAccess_at())));
         }
         return sessionInfo;
 	}
@@ -142,7 +142,7 @@ public class ApplicationSessionContext {
 
 			// 转换最后访问时间为Date类型，填充到SessionInfo
 			long lastAccessTime = sessionObject.getLastAccess_at();
-			Date updateTime = Instant.ofEpochMilli(lastAccessTime).toDate();
+			Date updateTime = Date.from(Instant.ofEpochMilli(lastAccessTime));
 			sessionInfo.setUpdateTime(updateTime);
 
 			return sessionInfo;
