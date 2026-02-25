@@ -210,10 +210,10 @@ public class J2CacheSessionFilter implements Filter {
                     session.setNew(false);
                 }
             }
+            String clientIp = com.eryansky.common.utils.net.IpUtils.getIpAddr(request);
             if (null == session) {
                 String token = extractToken(request);
                 if (StringUtils.isNotBlank(token)) {
-                    String clientIp = com.eryansky.common.utils.net.IpUtils.getIpAddr(request);
                     session_id = Encrypt.md5(token);
                     String finalSession_id = session_id;
                     String lockKey = "lock_session_token:"+session_id;
@@ -259,7 +259,6 @@ public class J2CacheSessionFilter implements Filter {
                 if(null == session_id){
                     session_id = UUID.randomUUID().toString().replaceAll("-", "");
                 }
-                String clientIp = com.eryansky.common.utils.net.IpUtils.getIpAddr(request);
                 session = new J2CacheSession(servletContext, session_id, g_cache);
                 session.getSessionObject().setClientIP(clientIp);
                 g_cache.saveSession(session.getSessionObject());
