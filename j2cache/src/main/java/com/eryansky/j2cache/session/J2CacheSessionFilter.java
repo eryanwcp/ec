@@ -217,7 +217,7 @@ public class J2CacheSessionFilter implements Filter {
                     session_id = Encrypt.md5(token);
                     String finalSession_id = session_id;
                     String lockKey = "lock_session_token:"+session_id;
-                    J2Cache.getChannel().lock(lockKey, 5, 10, new DefaultLockCallback<Boolean>(false, false) {
+                    J2Cache.getChannel().lock(lockKey, 10, 60, new DefaultLockCallback<Boolean>(false, false) {
                         @Override
                         public Boolean handleObtainLock() {
                             SessionObject ssnObject = g_cache.getSession(finalSession_id);
