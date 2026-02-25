@@ -17,6 +17,7 @@ package com.eryansky.j2cache.session;
 
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.encode.Encrypt;
+import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.j2cache.J2Cache;
 import com.eryansky.j2cache.lock.DefaultLockCallback;
 import org.slf4j.Logger;
@@ -221,8 +222,10 @@ public class J2CacheSessionFilter implements Filter {
                         public Boolean handleObtainLock() {
                             SessionObject ssnObject = g_cache.getSession(finalSession_id);
                             //自定义session关联方案 兼容app与webview
+                            boolean updateCookie = false;
                             if (ssnObject == null) {
                                 ssnObject = g_cache.getSessionBySessionDataKey(finalSession_id);
+                                updateCookie = null != ssnObject;
                             }
                             if (ssnObject != null) {
                                 session = new J2CacheSession(servletContext, g_cache, ssnObject);
@@ -235,6 +238,13 @@ public class J2CacheSessionFilter implements Filter {
                                     logger.warn("获取客户端IP失败:" + e.getMessage(), e);
                                 }
                                 g_cache.saveSession(session.getSessionObject());
+                                updateCookie = true;
+                            }
+                            if(updateCookie){
+                                Cookie cookie = WebUtils.getCookie(request,cookieName);
+                                if(null != cookie){
+                                    WebUtils.deleteCookie(response,cookie,cookiePath);
+                                }
                                 setCookie(response,cookieName, finalSession_id);
                             }
                             return true;
