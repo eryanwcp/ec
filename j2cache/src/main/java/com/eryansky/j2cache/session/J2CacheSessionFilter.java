@@ -232,11 +232,7 @@ public class J2CacheSessionFilter implements Filter {
                                 session.setNew(false);
                             } else if (create) {
                                 session = new J2CacheSession(servletContext, finalSession_id, g_cache);
-                                try {
-                                    session.getSessionObject().setClientIP(clientIp);
-                                } catch (Exception e) {
-                                    logger.warn("获取客户端IP失败:" + e.getMessage(), e);
-                                }
+                                session.getSessionObject().setClientIP(clientIp);
                                 g_cache.saveSession(session.getSessionObject());
                                 updateCookie = true;
                             }
