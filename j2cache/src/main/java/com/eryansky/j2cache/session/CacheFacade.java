@@ -15,6 +15,7 @@
  */
 package com.eryansky.j2cache.session;
 
+import com.eryansky.common.utils.reflection.BeanUtils;
 import com.eryansky.j2cache.lettuce.LettuceByteCodec;
 import com.eryansky.j2cache.util.SerializationUtils;
 import io.lettuce.core.AbstractRedisClient;
@@ -412,6 +413,33 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             }
         }
         return session;
+    }
+
+    /**
+     * 读取 Session 对象信息 根据自定义key
+     * @param session_id  会话id
+     * @return 返回会话对象
+     */
+    public SessionObject getSessionBySessionDataKey(String session_id) {
+        return keys().stream()
+                .map(this::getSession)
+                .filter(Objects::nonNull)
+                .filter(sessionObject -> {
+                    try {
+                        Object sessionData = sessionObject.get(SessionObject.KEY_SESSION_DATA);
+                        if (sessionData == null) {
+                            return false;
+                        }
+                        String actualId = BeanUtils.getProperty(sessionData,"id");
+                        return session_id.equals(actualId);
+                    } catch (Exception e) {
+                        // 捕获所有可能的异常（JSON解析、类型转换等），避免流式处理中断
+                        logger.warn("解析SessionObject的id失败", e);
+                        return false;
+                    }
+                })
+                .findFirst()
+                .orElse(null);
     }
 
     /**

@@ -28,6 +28,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * 实现基于 J2Cache 的分布式的 Session 管理
@@ -219,12 +220,20 @@ public class J2CacheSessionFilter implements Filter {
                         @Override
                         public Boolean handleObtainLock() {
                             SessionObject ssnObject = g_cache.getSession(finalSession_id);
+                            //自定义session关联方案 兼容app与webview
+                            if (ssnObject == null) {
+                                ssnObject = g_cache.getSessionBySessionDataKey(finalSession_id);
+                            }
                             if (ssnObject != null) {
                                 session = new J2CacheSession(servletContext, g_cache, ssnObject);
                                 session.setNew(false);
                             } else if (create) {
                                 session = new J2CacheSession(servletContext, finalSession_id, g_cache);
-                                session.getSessionObject().setClientIP(clientIp);
+                                try {
+                                    session.getSessionObject().setClientIP(clientIp);
+                                } catch (Exception e) {
+                                    logger.warn("获取客户端IP失败:" + e.getMessage(), e);
+                                }
                                 g_cache.saveSession(session.getSessionObject());
                                 setCookie(response,cookieName, finalSession_id);
                             }
