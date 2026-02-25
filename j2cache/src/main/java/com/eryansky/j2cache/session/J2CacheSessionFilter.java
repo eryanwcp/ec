@@ -240,7 +240,7 @@ public class J2CacheSessionFilter implements Filter {
                                 Cookie cookie = WebUtils.getCookie(request,cookieName);
                                 if(null == cookie){
 //                                    setCookie(response,cookieName, finalSession_id);
-                                    setCookie(response,cookieName, ssnObject.getId());
+                                    setCookie(response,cookieName, session.getId());
                                 }
                             }
                             return true;
