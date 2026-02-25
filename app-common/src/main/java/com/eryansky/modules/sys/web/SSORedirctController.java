@@ -45,18 +45,7 @@ public class SSORedirctController extends SimpleController {
         if (StringUtils.isNotBlank(param)) {
             url += "?" + param;
         }
-        String authorization = Stream.of(
-                        request.getHeader(AuthorityInterceptor.ATTR_AUTHORIZATION),
-                        request.getHeader(AuthorityInterceptor.ATTR_AUTHORIZATION.toLowerCase()),
-                        request.getParameter(AuthorityInterceptor.ATTR_TOKEN),
-                        request.getParameter(AuthorityInterceptor.ATTR_AUTHORIZATION)
-                ).filter(StringUtils::isNotBlank)
-                .findFirst()
-                .orElse(null);
-        String token = null;
-        if (StringUtils.isNotBlank(authorization)) {
-            token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""),"Bearer","");
-        }
+        String token = AppUtils.extractToken(request);
         if (StringUtils.isBlank(token) && null != sessionInfo) {
             token =  sessionInfo.getToken();
         }
