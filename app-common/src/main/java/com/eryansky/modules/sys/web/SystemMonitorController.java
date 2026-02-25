@@ -35,9 +35,7 @@ import com.eryansky.utils.*;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.io.IOUtils;
-import org.joda.time.Instant;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Controller;
@@ -49,6 +47,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -66,7 +65,7 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "${adminPath}/sys/systemMonitor")
 public class SystemMonitorController extends SimpleController {
 
-    @Autowired
+    @javax.annotation.Resource
     @Qualifier("defaultAsyncExecutor")
     private Executor asyncExecutor;
 
@@ -295,8 +294,8 @@ public class SystemMonitorController extends SimpleController {
             sessionVo.setLoginUser(null != sessionObject && null != sessionObject.getAttributes() ? (String) sessionObject.getAttributes().get("loginUser") : null);
             sessionVo.setHost(Optional.ofNullable(sessionObject).map(SessionObject::getHost).orElse(null));
             sessionVo.setClientIP(Optional.ofNullable(sessionObject).map(SessionObject::getClientIP).orElse(null));
-            sessionVo.setCreatedTime(Optional.ofNullable(sessionObject).map(v -> Instant.ofEpochMilli(sessionObject.getCreated_at()).toDate()).orElse(null));
-            sessionVo.setUpdateTime(Optional.ofNullable(sessionObject).map(v -> Instant.ofEpochMilli(sessionObject.getLastAccess_at()).toDate()).orElse(null));
+            sessionVo.setCreatedTime(Optional.ofNullable(sessionObject).map(v -> Date.from(Instant.ofEpochMilli(sessionObject.getCreated_at()))).orElse(null));
+            sessionVo.setUpdateTime(Optional.ofNullable(sessionObject).map(v -> Date.from(Instant.ofEpochMilli(sessionObject.getLastAccess_at()))).orElse(null));
             sessionVo.setData(Optional.ofNullable(sessionObject).map(SessionObject::getAttributes).orElse(null));
             sessionVo.setAccessCount(Optional.ofNullable(sessionObject).map(SessionObject::getAccessCount).orElse(null));
             list.add(sessionVo);

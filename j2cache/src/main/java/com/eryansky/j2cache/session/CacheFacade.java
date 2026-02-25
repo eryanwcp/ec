@@ -15,7 +15,7 @@
  */
 package com.eryansky.j2cache.session;
 
-import com.eryansky.common.utils.mapper.JsonMapper;
+import com.eryansky.common.utils.reflection.BeanUtils;
 import com.eryansky.j2cache.lettuce.LettuceByteCodec;
 import com.eryansky.j2cache.util.SerializationUtils;
 import io.lettuce.core.AbstractRedisClient;
@@ -430,13 +430,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
                         if (sessionData == null) {
                             return false;
                         }
-
-                        HashMap<String, Object> sessionMap = JsonMapper.getInstance()
-                                .toJavaObject(sessionData, HashMap.class);
-                        String actualId = com.eryansky.common.utils.StringUtils.EMPTY;
-                        if(null != sessionMap && !sessionMap.isEmpty()){
-                            actualId = (String) sessionMap.get("id");
-                        }
+                        String actualId = BeanUtils.getProperty(sessionData,"id");
                         return session_id.equals(actualId);
                     } catch (Exception e) {
                         // 捕获所有可能的异常（JSON解析、类型转换等），避免流式处理中断
