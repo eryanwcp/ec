@@ -247,6 +247,7 @@ public class J2CacheSessionFilter implements Filter {
 
                         @Override
                         public Boolean handleNotObtainLock() {
+                            logger.warn("handleNotObtainLock -> handleObtainLock {}",lockKey);
                             return this.handleObtainLock();
                         }
                     });
