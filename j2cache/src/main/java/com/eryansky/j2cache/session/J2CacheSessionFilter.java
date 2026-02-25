@@ -236,7 +236,7 @@ public class J2CacheSessionFilter implements Filter {
                                 g_cache.saveSession(session.getSessionObject());
                                 updateCookie = true;
                             }
-                            if(updateCookie){
+                            if(updateCookie && create){
                                 Cookie cookie = WebUtils.getCookie(request,cookieName);
                                 if(null == cookie){
                                     setCookie(response,cookieName, finalSession_id);
