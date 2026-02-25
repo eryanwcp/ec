@@ -220,6 +220,7 @@ public class J2CacheSessionFilter implements Filter {
                         @Override
                         public Boolean handleObtainLock() {
                             SessionObject ssnObject = g_cache.getSession(finalSession_id);
+                            //自定义session关联方案 兼容app与webview
                             if (ssnObject == null) {
                                 ssnObject = g_cache.getSessionBySessionDataKey(finalSession_id);
                             }

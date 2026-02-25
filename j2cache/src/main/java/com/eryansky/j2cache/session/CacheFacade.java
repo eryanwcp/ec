@@ -422,25 +422,21 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
      */
     public SessionObject getSessionBySessionDataKey(String session_id) {
         return keys().stream()
-                // 1. 根据key获取SessionObject
                 .map(this::getSession)
-                // 2. 过滤null的SessionObject
                 .filter(Objects::nonNull)
-                // 3. 核心匹配逻辑（内联但结构化）
                 .filter(sessionObject -> {
                     try {
-                        // 获取原始session数据并判空
                         Object sessionData = sessionObject.get(SessionObject.KEY_SESSION_DATA);
                         if (sessionData == null) {
                             return false;
                         }
 
-                        // 解析为HashMap并获取id值
                         HashMap<String, Object> sessionMap = JsonMapper.getInstance()
                                 .toJavaObject(sessionData, HashMap.class);
-                        String actualId = String.valueOf(sessionMap.getOrDefault("id", ""));
-
-                        // 匹配目标session_id
+                        String actualId = com.eryansky.common.utils.StringUtils.EMPTY;
+                        if(null != sessionMap && !sessionMap.isEmpty()){
+                            actualId = (String) sessionMap.get("id");
+                        }
                         return session_id.equals(actualId);
                     } catch (Exception e) {
                         // 捕获所有可能的异常（JSON解析、类型转换等），避免流式处理中断
@@ -448,7 +444,6 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
                         return false;
                     }
                 })
-                // 4. 取第一个匹配的元素，无则返回null
                 .findFirst()
                 .orElse(null);
     }
