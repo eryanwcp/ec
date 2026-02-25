@@ -220,6 +220,9 @@ public class J2CacheSessionFilter implements Filter {
                         @Override
                         public Boolean handleObtainLock() {
                             SessionObject ssnObject = g_cache.getSession(finalSession_id);
+                            if (ssnObject == null) {
+                                ssnObject = g_cache.getSessionBySessionDataKey(finalSession_id);
+                            }
                             if (ssnObject != null) {
                                 session = new J2CacheSession(servletContext, g_cache, ssnObject);
                                 session.setNew(false);
