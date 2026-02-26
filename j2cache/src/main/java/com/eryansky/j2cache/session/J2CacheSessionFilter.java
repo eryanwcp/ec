@@ -17,6 +17,7 @@ package com.eryansky.j2cache.session;
 
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.encode.Encrypt;
+import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.j2cache.J2Cache;
 import com.eryansky.j2cache.lock.DefaultLockCallback;
@@ -238,9 +239,11 @@ public class J2CacheSessionFilter implements Filter {
                             }
                             if(updateCookie){
                                 Cookie cookie = WebUtils.getCookie(request,cookieName);
-                                if(null == cookie){
+                                if (null == cookie) {
 //                                    setCookie(response,cookieName, finalSession_id);
-                                    setCookie(response,cookieName, session.getId());
+                                    setCookie(response, cookieName, session.getId());
+                                } else {
+                                    logger.warn("已存在Cookies：{}", JsonMapper.toJsonString(request.getCookies()));
                                 }
                             }
                             return true;
