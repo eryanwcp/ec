@@ -686,8 +686,8 @@ public class SecurityUtils {
      * @return
      */
     public static void setOrRefreshSessionInfoToken(SessionInfo sessionInfo, String secret) {
-        sessionInfo.setToken(JWTUtils.sign(sessionInfo.getLoginName(), null == secret ? StringUtils.EMPTY : secret, 2 * 24 * 60 * 60 * 1000L));
-        sessionInfo.setRefreshToken(JWTUtils.sign(sessionInfo.getLoginName(), null == secret ? StringUtils.EMPTY : secret, 7 * 24 * 60 * 60 * 1000L));
+        sessionInfo.setToken(JWTUtils.sign(sessionInfo.getLoginName(), null == secret ? StringUtils.EMPTY : secret, 7 * 24 * 60 * 60 * 1000L));
+        sessionInfo.setRefreshToken(JWTUtils.sign(sessionInfo.getLoginName(), null == secret ? StringUtils.EMPTY : secret, 14 * 24 * 60 * 60 * 1000L));
     }
 
     /**
