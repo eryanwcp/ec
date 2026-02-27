@@ -673,6 +673,18 @@ public class SecurityUtils {
      * @param sessionInfo sessionInfo
      * @return
      */
+    public static void setOrRefreshSessionInfoToken(SessionInfo sessionInfo) {
+        User user = UserUtils.getUser(sessionInfo.getUserId());
+        setOrRefreshSessionInfoToken(sessionInfo, null != user ? user.getPassword() : StringUtils.EMPTY);
+    }
+
+
+    /**
+     * 设置或刷新用户Token信息
+     * @param sessionInfo sessionInfo
+     * @param secret 密钥
+     * @return
+     */
     public static void setOrRefreshSessionInfoToken(SessionInfo sessionInfo, String secret) {
         sessionInfo.setToken(JWTUtils.sign(sessionInfo.getLoginName(), null == secret ? StringUtils.EMPTY : secret, 2 * 24 * 60 * 60 * 1000L));
         sessionInfo.setRefreshToken(JWTUtils.sign(sessionInfo.getLoginName(), null == secret ? StringUtils.EMPTY : secret, 7 * 24 * 60 * 60 * 1000L));
