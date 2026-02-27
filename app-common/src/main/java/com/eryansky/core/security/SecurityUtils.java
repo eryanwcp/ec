@@ -63,15 +63,15 @@ public class SecurityUtils {
      * 静态内部类，延迟加载，懒汉式，线程安全的单例模式
      */
     public static final class Static {
-        private static ResourceService resourceService = SpringContextHolder.getBean(ResourceService.class);
-        private static UserService userService = SpringContextHolder.getBean(UserService.class);
-        private static OrganService organService = SpringContextHolder.getBean(OrganService.class);
-        private static RoleService roleService = SpringContextHolder.getBean(RoleService.class);
-        private static PostService postService = SpringContextHolder.getBean(PostService.class);
-        private static ApplicationSessionContext applicationSessionContext = ApplicationSessionContext.getInstance();
+        private static final ResourceService resourceService = SpringContextHolder.getBean(ResourceService.class);
+        private static final UserService userService = SpringContextHolder.getBean(UserService.class);
+        private static final OrganService organService = SpringContextHolder.getBean(OrganService.class);
+        private static final RoleService roleService = SpringContextHolder.getBean(RoleService.class);
+        private static final PostService postService = SpringContextHolder.getBean(PostService.class);
+        private static final ApplicationSessionContext applicationSessionContext = ApplicationSessionContext.getInstance();
     }
 
-    public static Boolean isPermitted(Class clazz,Method method){
+    public static Boolean isPermitted(Class<?> clazz,Method method){
         //需要登录
         RequiresUser methodRequiresUser = method.getAnnotation(RequiresUser.class);
         if (methodRequiresUser != null && !methodRequiresUser.required()) {
@@ -148,7 +148,7 @@ public class SecurityUtils {
      * 是否授权某个资源
      *
      * @param resource 资源ID或编码
-     * @return
+     * @return a boolean.
      */
     public static Boolean isPermitted(String resource) {
         return isPermitted(null, resource);
@@ -160,7 +160,7 @@ public class SecurityUtils {
      *
      * @param userId 用户ID
      * @param resource 资源ID或编码
-     * @return
+     * @return a boolean.
      */
     public static Boolean isPermitted(String userId, String resource) {
         try {
@@ -236,8 +236,8 @@ public class SecurityUtils {
                 for (Permisson permisson : sessionInfo.getPermissons()) {
                     if (!flag && StringUtils.isNotBlank(permisson.getMarkUrl())) {
                         String[] markUrls = permisson.getMarkUrl().split(";");
-                        for (int i = 0; i < markUrls.length; i++) {
-                            if (StringUtils.isNotBlank(markUrls[i]) && StringUtils.simpleWildcardMatch(markUrls[i], url)) {
+                        for (String markUrl : markUrls) {
+                            if (StringUtils.isNotBlank(markUrl) && StringUtils.simpleWildcardMatch(markUrl, url)) {
                                 flag = true;
                                 break;
                             }
@@ -344,14 +344,14 @@ public class SecurityUtils {
     public static String getUserMaxRoleDataScope(String userId) {
         User user = UserUtils.getUser(userId);
         // 获取到最大的数据权限范围
-        int dataScopeInteger = Integer.valueOf(DataScope.SELF.getValue());
+        int dataScopeInteger = Integer.parseInt(DataScope.SELF.getValue());
         List<Role> roles = Static.roleService.findRolesByUserId(user.getId());
         for (Role r : roles) {
             if (StringUtils.isBlank(r.getDataScope())) {
                 continue;
             }
-            int ds = Integer.valueOf(r.getDataScope());
-            if (ds == Integer.valueOf(DataScope.CUSTOM.getValue())) {
+            int ds = Integer.parseInt(r.getDataScope());
+            if (ds == Integer.parseInt(DataScope.CUSTOM.getValue())) {
                 dataScopeInteger = ds;
                 break;
             } else if (ds < dataScopeInteger) {
@@ -553,9 +553,9 @@ public class SecurityUtils {
         sessionInfo.setBrowserType(UserAgentUtils.getBrowser(request).getName());
         String longitude_s = WebUtils.getParameter(request, "longitude");
         String latitude_s = WebUtils.getParameter(request, "latitude");
-        String accuracy_s = WebUtils.getParameter(request, "accuracy");
-        sessionInfo.setLongitude(StringUtils.isBlank(longitude_s) ? null : BigDecimal.valueOf(Double.valueOf(longitude_s)));
-        sessionInfo.setLatitude(StringUtils.isBlank(latitude_s) ? null : BigDecimal.valueOf(Double.valueOf(latitude_s)));
+//        String accuracy_s = WebUtils.getParameter(request, "accuracy");
+        sessionInfo.setLongitude(StringUtils.isBlank(longitude_s) ? null : BigDecimal.valueOf(Double.parseDouble(longitude_s)));
+        sessionInfo.setLatitude(StringUtils.isBlank(latitude_s) ? null : BigDecimal.valueOf(Double.parseDouble(latitude_s)));
         String appVersion_s = WebUtils.getParameter(request, "appVersion");
         String deviceCode_s = WebUtils.getParameter(request, "deviceCode");
         String platform_s = WebUtils.getParameter(request, "platform");
@@ -577,6 +577,7 @@ public class SecurityUtils {
         try {
             sessionInfo.setHost(InetAddresses.toAddrString(InetAddress.getLocalHost()));
         } catch (UnknownHostException e) {
+            logger.error(e.getMessage());
         }
 
         String userAgent = UserAgentUtils.getHTTPUserAgent(request);
@@ -791,7 +792,7 @@ public class SecurityUtils {
     /**
      * 获取当前用户session信息.
      * @param request
-     * @param autoAuthorizationSession
+     * @param autoAuthorizationSession 自动根据token创建会话信息
      */
     public static SessionInfo getCurrentSessionInfo(HttpServletRequest request,boolean autoAuthorizationSession) {
         SessionInfo sessionInfo = null;
@@ -812,16 +813,8 @@ public class SecurityUtils {
             sessionInfo = getSessionInfo(sessionId);
             //Authorization 请求头或请求参数
             if (sessionInfo == null && autoAuthorizationSession) {
-                String authorization = Stream.of(
-                                request.getHeader(AuthorityInterceptor.ATTR_AUTHORIZATION),
-                                request.getHeader(AuthorityInterceptor.ATTR_AUTHORIZATION.toLowerCase()),
-                                request.getParameter(AuthorityInterceptor.ATTR_TOKEN),
-                                request.getParameter(AuthorityInterceptor.ATTR_AUTHORIZATION)
-                        ).filter(StringUtils::isNotBlank)
-                        .findFirst()
-                        .orElse(null);
-                if (StringUtils.isNotBlank(authorization)) {
-                    String token = StringUtils.replaceOnce(StringUtils.replaceOnce(authorization, "Bearer ", ""), "Bearer", "");
+                String token = AppUtils.extractToken(request);
+                if (StringUtils.isNotBlank(token)) {
                     sessionInfo = StringUtils.isNotBlank(token) ? getSessionInfoByTokenOrRefreshTokenWithMd5(token) : null;
                 }
             }
