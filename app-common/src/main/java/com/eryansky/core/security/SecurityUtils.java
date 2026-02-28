@@ -563,7 +563,6 @@ public class SecurityUtils {
         sessionInfo.setDeviceCode(deviceCode_s);
         sessionInfo.setDeviceType(StringUtils.isNotBlank(platform_s) ? platform_s:UserAgentUtils.getDeviceType(request).toString());
         setOrRefreshSessionInfoToken(sessionInfo,user.getPassword());
-        sessionInfo.setId(Encrypt.md5(sessionInfo.getToken()));
         sessionInfo.setSessionId(sessionId);
 //        sessionInfo.addIfNotExistLoginName(sessionInfo.getLoginName());
         //可选账号
@@ -680,7 +679,7 @@ public class SecurityUtils {
 
 
     /**
-     * 设置或刷新用户Token信息
+     * 设置或刷新用户Token信息 修改id token、refrestToken字段
      * @param sessionInfo sessionInfo
      * @param secret 密钥
      * @return
@@ -688,6 +687,7 @@ public class SecurityUtils {
     public static void setOrRefreshSessionInfoToken(SessionInfo sessionInfo, String secret) {
         sessionInfo.setToken(JWTUtils.sign(sessionInfo.getLoginName(), null == secret ? StringUtils.EMPTY : secret, 7 * 24 * 60 * 60 * 1000L));
         sessionInfo.setRefreshToken(JWTUtils.sign(sessionInfo.getLoginName(), null == secret ? StringUtils.EMPTY : secret, 14 * 24 * 60 * 60 * 1000L));
+        sessionInfo.setId(Encrypt.md5(sessionInfo.getToken()));
     }
 
     /**
