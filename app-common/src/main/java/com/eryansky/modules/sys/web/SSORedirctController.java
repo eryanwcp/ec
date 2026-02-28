@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.stream.Stream;
 
 /**
  * 内部应用单点跳转
