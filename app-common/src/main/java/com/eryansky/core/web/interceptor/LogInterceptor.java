@@ -59,9 +59,9 @@ public class LogInterceptor implements HandlerInterceptor {
 	private static final ThreadLocal<Long> startTimeThreadLocal =
 			new NamedThreadLocal<>("ThreadLocal StartTime");
 
-	private RequestMappingHandlerAdapter adapter;
+	private final RequestMappingHandlerAdapter adapter;
 	private final Map<Class<?>, Set<Method>> initBinderCache = new ConcurrentHashMap<>(64);
-	private List<HandlerMethodArgumentResolver> argumentResolvers;
+	private final List<HandlerMethodArgumentResolver> argumentResolvers;
 	private final Map<MethodParameter, HandlerMethodArgumentResolver> argumentResolverCache =
 			new ConcurrentHashMap<>(256);
 
@@ -161,11 +161,12 @@ public class LogInterceptor implements HandlerInterceptor {
 				if (StringUtils.isNotBlank(logging.remark())) {
 					remark = SpringUtils.parseSpel(logging.remark(), handlerMethod.getMethod(), parameterValues);
 				}
-				if (StringUtils.isNotBlank(logging.data())) {
+				//异常情况记录参数
+				if (StringUtils.isNotBlank(logging.data()) || LogType.exception.getValue().equals(logType)) {
 					requestData = SpringUtils.parseSpel(logging.data(), handlerMethod.getMethod(), parameterValues);
 				}
-
-				if (logging.requestHeaders()) {
+				//异常情况记录请求Headers
+				if (logging.requestHeaders() || LogType.exception.getValue().equals(logType)) {
 					requestHeaders= JsonMapper.toJsonString(WebUtils.getHeaders(request));
 				}
 			} else if (logging != null && !Boolean.parseBoolean(SpringUtils.parseSpel(logging.logging(), handlerMethod.getMethod(), parameterValues))) {
