@@ -548,7 +548,7 @@ public class DiskController extends SimpleController {
      * @param downloadType   attachment、inline
      */
     @RequiresUser(required = false)
-    @Logging(logType = LogType.access, value = "下载文件")
+    @Logging(logType = LogType.access, data = "#JsonMapper.toJson(#fileId)", value = "下载文件")
     @GetMapping(value = {"fileDownload/{fileId}"})
     public ModelAndView fileDownload(HttpServletResponse response,
                                      HttpServletRequest request, @PathVariable String fileId,String downloadType) throws Exception {
@@ -575,7 +575,7 @@ public class DiskController extends SimpleController {
      * @param downloadType   attachment、inline
      */
     @RestApi
-    @Logging(logType = LogType.access, value = "接口文件")
+    @Logging(logType = LogType.access, data = "#JsonMapper.toJson(#fileId)", value = "接口文件")
     @GetMapping(value = {"restFileDownload/{fileId}"})
     public ModelAndView restFileDownload(HttpServletResponse response,
                                      HttpServletRequest request, @PathVariable String fileId,String downloadType) throws Exception {
@@ -600,7 +600,7 @@ public class DiskController extends SimpleController {
      * @param request
      * @param fileId   文件ID
      */
-    @Logging(logType = LogType.access, value = "文件下载")
+    @Logging(logType = LogType.access, data = "#JsonMapper.toJson(#fileId)", value = "文件下载")
     @GetMapping(value = {"innerFileDownload/{fileId}"},produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
     public ModelAndView innerFileDownload(HttpServletResponse response,
                                      HttpServletRequest request, @PathVariable String fileId) throws Exception {
@@ -624,7 +624,7 @@ public class DiskController extends SimpleController {
      * @param request
      * @param fileId   文件ID
      */
-    @Logging(logType = LogType.access, value = "文件预览")
+    @Logging(logType = LogType.access, data = "#JsonMapper.toJson(#fileId)", value = "文件预览")
     @GetMapping(value = {"innerFilePreview/{fileId}"},produces = {MediaType.IMAGE_GIF_VALUE,MediaType.IMAGE_JPEG_VALUE,MediaType.IMAGE_PNG_VALUE})
     public ModelAndView innerFilePreview(HttpServletResponse response,
                                           HttpServletRequest request, @PathVariable String fileId) throws Exception {
@@ -670,7 +670,7 @@ public class DiskController extends SimpleController {
      * @param fileIds 入参Ids拼接字符串
      * @throws Exception
      */
-    @Logging(logType = LogType.access, value = "文件下载")
+    @Logging(logType = LogType.access, data = "#JsonMapper.toJson(#fileIds)", value = "文件下载")
     @GetMapping(value = {"downloadDiskFile"})
     public ModelAndView downloadDiskFile(
             HttpServletResponse response,
