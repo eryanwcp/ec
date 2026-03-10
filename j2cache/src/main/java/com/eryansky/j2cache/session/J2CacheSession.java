@@ -45,7 +45,6 @@ public class J2CacheSession implements HttpSession {
         this.session = new SessionObject();
         this.session.setId(id);
         this.session.setCreated_at(System.currentTimeMillis());
-        this.session.setLastAccess_at(this.session.getLastAccess_at());
         this.session.setMaxInactiveInterval(cache.getExpire());
         this.session.setHost(IpUtils.getActivityLocalIp());
     }
