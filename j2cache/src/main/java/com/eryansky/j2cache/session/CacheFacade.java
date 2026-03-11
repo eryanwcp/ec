@@ -452,22 +452,23 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         if(this.cache2 == null){
             return;
         }
-        //write to redis
-        cache2.setBytes(session.getId(), new HashMap<String,byte[]>() {{
-            put(SessionObject.KEY_CREATE_AT, String.valueOf(session.getCreated_at()).getBytes());
-            put(SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
-            put(SessionObject.KEY_SERVICE_HOST, session.getHost().getBytes());
-            put(SessionObject.KEY_CLIENT_IP, session.getClientIP().getBytes());
-            put(SessionObject.KEY_ACCESS_COUNT,String.valueOf(session.getAccessCount()).getBytes());
-            session.getAttributes().forEach((key, value) -> {
-                try {
-                    put(key, SerializationUtils.serialize(value));
-                } catch (RuntimeException | IOException excp) {
-                    if (!discardNonSerializable)
-                        throw ((excp instanceof RuntimeException) ? (RuntimeException) excp : new RuntimeException(excp));
+        Map<String, byte[]> sessionData = new HashMap<>();
+        sessionData.put(SessionObject.KEY_CREATE_AT, String.valueOf(session.getCreated_at()).getBytes());
+        sessionData.put(SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
+        sessionData.put(SessionObject.KEY_SERVICE_HOST, session.getHost().getBytes());
+        sessionData.put(SessionObject.KEY_CLIENT_IP, session.getClientIP().getBytes());
+        sessionData.put(SessionObject.KEY_ACCESS_COUNT, String.valueOf(session.getAccessCount()).getBytes());
+        session.getAttributes().forEach((key, value) -> {
+            try {
+                sessionData.put(key, SerializationUtils.serialize(value));
+            } catch (RuntimeException | IOException excp) {
+                if (!discardNonSerializable) {
+                    throw ((excp instanceof RuntimeException) ? (RuntimeException) excp : new RuntimeException(excp));
                 }
-            });
-        }}, cache1.getExpire());
+            }
+        });
+
+        cache2.setBytes(session.getId(), sessionData, cache1.getExpire());
     }
 
     /**
@@ -482,16 +483,18 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         if(this.cache2 != null){
             executorService.execute(()->{
                 try {
-                    cache2.updateKeyBytes(session.getId(), new HashMap<String,byte[]>() {{
-                        put(SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
-                        put(SessionObject.KEY_ACCESS_COUNT, String.valueOf(session.getAccessCount()).getBytes());
-                    }},cache1.getExpire());
-                } finally {
+                    Map<String, byte[]> accessData = new HashMap<>(2);
+                    accessData.put(SessionObject.KEY_ACCESS_AT, String.valueOf(session.getLastAccess_at()).getBytes());
+                    accessData.put(SessionObject.KEY_ACCESS_COUNT, String.valueOf(session.getAccessCount()).getBytes());
+                    cache2.updateKeyBytes(session.getId(), accessData, cache1.getExpire());
                     this.publish(new Command(Command.OPT_DELETE_SESSION, session.getId(), null));
+                } catch (Exception e) {
+                    logger.error("Failed to update session access data", e);
                 }
             });
         }
     }
+
 
     public void setSessionAttribute(SessionObject session, String key) {
         try {
