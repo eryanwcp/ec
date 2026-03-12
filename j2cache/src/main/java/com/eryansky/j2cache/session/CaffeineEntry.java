@@ -1,7 +1,6 @@
 package com.eryansky.j2cache.session;
 
 import java.io.Serializable;
-import java.util.concurrent.TimeUnit;
 
 public class CaffeineEntry<T> implements Serializable {
 

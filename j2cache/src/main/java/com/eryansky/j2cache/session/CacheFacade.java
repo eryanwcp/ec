@@ -496,6 +496,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         }
     }
 
+
     public void setSessionAttribute(SessionObject session, String key) {
         try {
             cache1.put(session.getId(), session);

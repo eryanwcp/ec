@@ -90,7 +90,7 @@ public class CaffeineCache {
         caffeineEntry.setExpire(null != expireTime ? expireTime:expire);
 
         cache.put(session_id, caffeineEntry);
-        if(null != expireTime){
+        if(null != expireTime && expireTime > 0){
             cache.policy().expireVariably().ifPresent(expiration -> {
                 expiration.setExpiresAfter(session_id, expireTime, TimeUnit.SECONDS);
             });
