@@ -42,19 +42,16 @@ public class CaffeineCache {
                 .expireAfter(new Expiry<String, CaffeineEntry<Object>>() {
                     @Override
                     public long expireAfterCreate(String key, CaffeineEntry<Object> value, long currentTime) {
-                        return value.getTimeUnit().toNanos(value.getExpire());
+                        return TimeUnit.SECONDS.toNanos(value.getExpire());
                     }
 
                     @Override
                     public long expireAfterUpdate(String key, CaffeineEntry<Object> value, long currentTime, long currentDuration) {
-                        return value.getTimeUnit().toNanos(value.getExpire());
+                        return TimeUnit.SECONDS.toNanos(value.getExpire());
                     }
 
                     @Override
                     public long expireAfterRead(String key, CaffeineEntry<Object> value, long currentTime, long currentDuration) {
-                        if (value.isAccessFresh()) {
-                            return value.getTimeUnit().toNanos(value.getExpire());
-                        }
                         return currentDuration;
                     }
                 })
@@ -91,9 +88,6 @@ public class CaffeineCache {
         caffeineEntry.setKey(session_id);
         caffeineEntry.setValue(value);
         caffeineEntry.setExpire(null != expireTime ? expireTime:expire);
-        caffeineEntry.setTimeUnit(TimeUnit.SECONDS);
-        //此处设置为false不更新 由更新访问时间时自动更新有效时间
-        caffeineEntry.setAccessFresh(false);
 
         cache.put(session_id, caffeineEntry);
         if(null != expireTime && expireTime > 0){

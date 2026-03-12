@@ -1,7 +1,6 @@
 package com.eryansky.j2cache.session;
 
 import java.io.Serializable;
-import java.util.concurrent.TimeUnit;
 
 public class CaffeineEntry<T> implements Serializable {
 
@@ -10,10 +9,6 @@ public class CaffeineEntry<T> implements Serializable {
     private T value;
 
     private long expire;
-
-    private TimeUnit timeUnit;
-
-    private boolean accessFresh;
 
     public CaffeineEntry() {
     }
@@ -42,19 +37,4 @@ public class CaffeineEntry<T> implements Serializable {
         this.expire = expire;
     }
 
-    public TimeUnit getTimeUnit() {
-        return timeUnit;
-    }
-
-    public void setTimeUnit(TimeUnit timeUnit) {
-        this.timeUnit = timeUnit;
-    }
-
-    public boolean isAccessFresh() {
-        return accessFresh;
-    }
-
-    public void setAccessFresh(boolean accessFresh) {
-        this.accessFresh = accessFresh;
-    }
 }
