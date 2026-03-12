@@ -112,6 +112,7 @@ public class CaffeineCache {
      * 优化：优雅关闭线程池（等待任务完成+超时强制关闭）
      */
     public void close() {
+        cache.cleanUp();
     }
 
 
