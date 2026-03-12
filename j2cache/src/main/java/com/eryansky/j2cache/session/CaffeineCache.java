@@ -124,7 +124,7 @@ public class CaffeineCache {
     }
 
     public Collection<String> keys() {
-        return cache.asMap().keySet();
+        return map().keySet();
     }
 
     public ConcurrentMap<String,CaffeineEntry<Object>> map() {
