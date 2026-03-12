@@ -15,10 +15,7 @@
  */
 package com.eryansky.j2cache.session;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.Policy;
-import com.github.benmanes.caffeine.cache.RemovalCause;
+import com.github.benmanes.caffeine.cache.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,15 +32,32 @@ public class CaffeineCache {
 
     private static final Logger logger = LoggerFactory.getLogger(CaffeineCache.class);
 
-    private final Cache<String, Object> cache;
+    private final Cache<String, CaffeineEntry<Object>> cache;
     private final int size ;
     private final int expire ;
 
     public CaffeineCache(int size, int expire, CacheExpiredListener listener) {
         cache = Caffeine.newBuilder()
                 .maximumSize(size)
-                .expireAfterAccess(expire + 1, TimeUnit.SECONDS)
-                .expireAfterWrite(expire, TimeUnit.SECONDS)
+                .expireAfter(new Expiry<String, CaffeineEntry<Object>>() {
+                    @Override
+                    public long expireAfterCreate(String key, CaffeineEntry<Object> value, long currentTime) {
+                        return value.getTimeUnit().toNanos(value.getExpire());
+                    }
+
+                    @Override
+                    public long expireAfterUpdate(String key, CaffeineEntry<Object> value, long currentTime, long currentDuration) {
+                        return value.getTimeUnit().toNanos(value.getExpire());
+                    }
+
+                    @Override
+                    public long expireAfterRead(String key, CaffeineEntry<Object> value, long currentTime, long currentDuration) {
+                        if (value.isAccessFresh()) {
+                            return value.getTimeUnit().toNanos(value.getExpire());
+                        }
+                        return currentDuration;
+                    }
+                })
                 .removalListener((k,v, cause) -> {
                     //程序删除的缓存不做通知处理，因为上层已经做了处理
                     if (!RemovalCause.EXPLICIT.equals(cause) && !RemovalCause.REPLACED.equals(cause) && !RemovalCause.SIZE.equals(cause)) {
@@ -64,11 +78,30 @@ public class CaffeineCache {
     }
 
     public Object get(String session_id) {
-        return cache.getIfPresent(session_id);
+        CaffeineEntry<Object> entry = cache.getIfPresent(session_id);
+        return null != entry ? entry.getValue() : null;
     }
 
     public void put(String session_id, Object value) {
-        cache.put(session_id, value);
+        put(session_id, value, null);
+    }
+
+    public void put(String session_id, Object value,Long expireTime) {
+        CaffeineEntry<Object> caffeineEntry = new CaffeineEntry<>();
+        caffeineEntry.setKey(session_id);
+        caffeineEntry.setValue(value);
+        caffeineEntry.setExpire(null != expireTime ? expireTime:expire);
+        caffeineEntry.setTimeUnit(TimeUnit.SECONDS);
+        //此处设置为false不更新 由更新访问时间时自动更新有效时间
+        caffeineEntry.setAccessFresh(false);
+
+        cache.put(session_id, caffeineEntry);
+        if(null != expireTime){
+            cache.policy().expireVariably().ifPresent(expiration -> {
+                expiration.setExpiresAfter(session_id, expireTime, TimeUnit.SECONDS);
+            });
+        }
+
     }
 
     public void evict(String session_id) {
@@ -91,18 +124,18 @@ public class CaffeineCache {
     }
 
     public Collection<String> keys() {
-        return cache.asMap().keySet();
+        return map().keySet();
     }
 
-    public ConcurrentMap<String,Object> map() {
+    public ConcurrentMap<String,CaffeineEntry<Object>> map() {
         return cache.asMap();
     }
 
-    public Long ttl(String key) {
-        Policy.Expiration<String,Object> p = cache.policy().expireAfterWrite().orElse(cache.policy().expireAfterAccess().orElse(null));
-        long  total = null == p ? 0:p.getExpiresAfter(TimeUnit.SECONDS);
-        Duration d = null == p ? null:p.ageOf(key).orElse(null);
-        return null == d ? null:total - d.getSeconds();
+    public Long ttl(String session_id) {
+        return cache.policy().expireVariably()
+                .flatMap(expiration -> expiration.getExpiresAfter(session_id))
+                .map(Duration::getSeconds)
+                .orElse(null);
     }
 
 }

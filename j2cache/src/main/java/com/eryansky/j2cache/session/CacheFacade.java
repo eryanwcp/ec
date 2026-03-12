@@ -405,7 +405,8 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
                 if (null == data || data.isEmpty())
                     return null;
                 session = new SessionObject(session_id, data);
-                cache1.put(session_id, session);
+                Long ttl2 = cache2.ttl(session_id);
+                cache1.put(session_id, session,ttl2);
             } catch (Exception e) {
                 logger.error("Failed to read session from j2cache", e);
             } finally {
