@@ -1172,6 +1172,8 @@ public class SecurityUtils {
         List<SessionInfo> list = findSessionInfoList();
         return list.stream().filter(sessionInfo -> StringUtils.contains(sessionInfo.getLoginName(), query)
                         || StringUtils.contains(sessionInfo.getMobile(), query)
+                        || StringUtils.isEquals(sessionInfo.getSessionId(), query)
+                        || StringUtils.isEquals(sessionInfo.getId(), query)
                         || StringUtils.contains(sessionInfo.getName(), query)
                         || StringUtils.contains(sessionInfo.getIp(), query)
                         || StringUtils.contains(sessionInfo.getHost(), query)
@@ -1179,7 +1181,6 @@ public class SecurityUtils {
                         || StringUtils.contains(sessionInfo.getAppVersion(), query)
                         || StringUtils.contains(sessionInfo.getUserAgent(), query)
                         || StringUtils.contains(sessionInfo.getUserType(), query)
-                        || StringUtils.contains(sessionInfo.getToken(), query)
                 ).sorted((o1, o2) -> o2.getUpdateTime().compareTo(o1.getUpdateTime())).collect(Collectors.toList());
     }
 
