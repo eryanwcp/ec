@@ -151,9 +151,9 @@ public class LogService extends CrudService<LogDao, Log> {
         Date now = new Date();
         GregorianCalendar gc = new GregorianCalendar();
         gc.setTime(now); // 得到gc格式的时间
-        gc.add(5, -day); // 2表示月的加减，年代表1依次类推(３周....5天。。)
+        gc.add(Calendar.DAY_OF_MONTH, -day); // 2表示月的加减，年代表1依次类推(３周....5天。。)
         // 把运算完的时间从新赋进对象
-        gc.set(gc.get(gc.YEAR), gc.get(gc.MONTH), gc.get(gc.DATE));
+        gc.set(gc.get(Calendar.YEAR), gc.get(Calendar.MONTH), gc.get(Calendar.DATE));
 
         Parameter parameter = new Parameter();
         parameter.put("operTime", DateUtils.format(gc.getTime(), DateUtils.DATE_FORMAT));
@@ -186,17 +186,17 @@ public class LogService extends CrudService<LogDao, Log> {
 
         logger.info("备份日志表开始：{}", DateUtils.format(gc.getTime(), DateUtils.DATE_FORMAT));
         int countInsert = dao.insertToHistory(parameter);//插入历史表
-        logger.info("备份日志表结束。{}", new Object[]{countInsert});
+        logger.info("备份日志表结束。{}", countInsert);
         logger.info("删除日志表开始：{}", DateUtils.format(gc.getTime(), DateUtils.DATE_FORMAT));
         int countDelete = dao.clearInvalidLog(parameter);//删除数据
-        logger.info("删除日志表结束。{}", new Object[]{countDelete});
+        logger.info("删除日志表结束。{}", countDelete);
 
         parameter = new Parameter();
         gc.add(Calendar.DAY_OF_MONTH, -day);
         parameter.put("createTime", DateUtils.format(gc.getTime(), DateUtils.DATE_FORMAT));
         logger.info("删除历史日志表开始：{}", DateUtils.format(gc.getTime(), DateUtils.DATE_FORMAT));
         int countClearHistory = dao.clearHistoryLog(parameter);//删除历史日志数据
-        logger.info("删除历史日志表结束。{}", new Object[]{countClearHistory});
+        logger.info("删除历史日志表结束。{}", countClearHistory);
     }
 
     /**
@@ -233,7 +233,7 @@ public class LogService extends CrudService<LogDao, Log> {
     /**
      * 用户登录统计
      */
-    public Page<Map<String, Object>> getLoginStatistics(Page pg, String query, String startTime, String endTime) {
+    public Page<Map<String, Object>> getLoginStatistics(Page<Map<String, Object>> pg, String query, String startTime, String endTime) {
         Parameter parameter = Parameter.newParameter();
         if (StringUtils.isNotBlank(startTime)) {
             parameter.put("startTime", startTime + " 00:00:00");
@@ -253,7 +253,7 @@ public class LogService extends CrudService<LogDao, Log> {
     /**
      * 模块访问统计
      */
-    public Page<Map<String, Object>> getModuleStatistics(Page pg, String objectIds, String organId, Boolean onlyCompany, String startTime, String endTime, String postCode) {
+    public Page<Map<String, Object>> getModuleStatistics(Page<Map<String, Object>> pg, String objectIds, String organId, Boolean onlyCompany, String startTime, String endTime, String postCode) {
         Parameter parameter = new Parameter();
         if (StringUtils.isNotBlank(startTime)) {
             parameter.put("startTime", startTime + " 00:00:00");
@@ -282,8 +282,8 @@ public class LogService extends CrudService<LogDao, Log> {
      */
     public List<Map<String, Object>> findDayLoginStatistics(Date startTime, Date endTime) {
         Parameter parameter = new Parameter();
-        parameter.put("startTime", null != startTime ? DateUtils.getDateStart(startTime):startTime);
-        parameter.put("endTime", null != endTime ? DateUtils.getDateEnd(endTime):endTime);
+        parameter.put("startTime", null != startTime ? DateUtils.getDateStart(startTime): null);
+        parameter.put("endTime", null != endTime ? DateUtils.getDateEnd(endTime): null);
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
         List<Map<String, Object>> list = dao.getDayLoginStatistics(parameter);
         return list;
