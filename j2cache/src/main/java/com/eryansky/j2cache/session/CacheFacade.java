@@ -62,8 +62,6 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
     private String pubsub_channel;
     private GenericObjectPool<StatefulConnection<String, byte[]>> pool;
     private StatefulRedisPubSubConnection<String, String> pubsub_subscriber;
-//    private RedisPubSubCommands<String, String> pubSubCommands;
-    private StatefulRedisPubSubConnection<String, String> pubConnection;
     private static final LettuceByteCodec codec = new LettuceByteCodec();
 
     private final boolean discardNonSerializable;
@@ -111,7 +109,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         String clusterName = redisConf.getProperty("cluster_name","j2cache-session");
         String sentinelMasterId = redisConf.getProperty("sentinelMasterId");
         String sentinelPassword = redisConf.getProperty("sentinelPassword");
-        long clusterTopologyRefreshMs = Long.valueOf(redisConf.getProperty("clusterTopologyRefresh", "3000"));
+        long clusterTopologyRefreshMs = Long.parseLong(redisConf.getProperty("clusterTopologyRefresh", "3000"));
         String protocolVersion = redisConf.getProperty("protocolVersion");
 
         if("redis-cluster".equalsIgnoreCase(scheme)) {
@@ -120,7 +118,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             String[] hostArray = hosts.split(",");
             for(String host : hostArray) {
                 String[] redisArray = host.split(":");
-                RedisURI uri = RedisURI.create(redisArray[0], Integer.valueOf(redisArray[1]));
+                RedisURI uri = RedisURI.create(redisArray[0], Integer.parseInt(redisArray[1]));
                 uri.setDatabase(database);
                 uri.setPassword(password);
                 uri.setSentinelMasterId(sentinelMasterId);
@@ -150,13 +148,13 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
                 if(isFirst) {
                     builder = RedisURI.Builder.sentinel(
                             redisArray[0],
-                            Integer.valueOf(redisArray[1]),
+                            Integer.parseInt(redisArray[1]),
                             sentinelMasterId,
                             sentinelPassword);
                     isFirst = false;
                 }
                 else {
-                    builder.withSentinel(redisArray[0], Integer.valueOf(redisArray[1]));
+                    builder.withSentinel(redisArray[0], Integer.parseInt(redisArray[1]));
                 }
             }
             assert builder != null;
@@ -166,7 +164,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             redisClient = RedisClient.create(uri);
         }else {
             String[] redisArray = hosts.split(":");
-            RedisURI uri = RedisURI.create(redisArray[0], Integer.valueOf(redisArray[1]));
+            RedisURI uri = RedisURI.create(redisArray[0], Integer.parseInt(redisArray[1]));
             uri.setDatabase(database);
             uri.setPassword(password);
             redisClient = RedisClient.create(uri);
@@ -366,9 +364,6 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
             }
         } finally {
             this.cache1.close();
-            if(null != this.pubConnection){
-                this.pubConnection.close();
-            }
             if(null != this.pubsub_subscriber){
                 this.pubsub_subscriber.close();
             }
