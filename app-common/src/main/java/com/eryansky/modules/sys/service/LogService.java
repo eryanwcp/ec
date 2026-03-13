@@ -224,7 +224,7 @@ public class LogService extends CrudService<LogDao, Log> {
         if (startTime != null) {
             parameter.put("startTime", DateUtils.format(startTime, DateUtils.DATE_TIME_FORMAT));
         }
-        if (startTime != null) {
+        if (endTime != null) {
             parameter.put("endTime", DateUtils.format(endTime, DateUtils.DATE_TIME_FORMAT));
         }
         return dao.getUserLoginCount(parameter);
@@ -304,6 +304,7 @@ public class LogService extends CrudService<LogDao, Log> {
      * 自定义SQL查询
      *
      * @param whereSQL
+     * <br><strong>警告: 此方法存在SQL注入风险,生产环境请谨慎使用.</strong>
      * @return
      */
     public List<Log> findByWhereSQL(String whereSQL,Parameter parameter) {
@@ -319,6 +320,7 @@ public class LogService extends CrudService<LogDao, Log> {
      * 自定义SQL查询
      *
      * @param sql
+     * <br><strong>警告: 此方法存在SQL注入风险,生产环境请谨慎使用.</strong>
      * @return
      */
     public List<Log> findBySql(String sql) {
@@ -329,6 +331,7 @@ public class LogService extends CrudService<LogDao, Log> {
      * 自定义SQL查询
      *
      * @param sql
+     * <br><strong>警告: 此方法存在SQL注入风险,生产环境请谨慎使用.</strong>
      * @return
      */
     public List<Log> findBySql(String sql,Parameter parameter) {
