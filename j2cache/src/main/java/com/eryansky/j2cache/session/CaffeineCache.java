@@ -59,7 +59,7 @@ public class CaffeineCache {
                     //程序删除的缓存不做通知处理，因为上层已经做了处理
                     if (!RemovalCause.EXPLICIT.equals(cause) && !RemovalCause.REPLACED.equals(cause) && !RemovalCause.SIZE.equals(cause)) {
                         try {
-                            listener.notifyElementExpired((String) k);
+                            listener.notifyElementExpired(k);
                         } catch (Exception e) {
                             // 优化：打印完整异常堆栈+上下文，便于定位问题
                             logger.error("J2Cache缓存过期通知执行失败，key: {}, value: {}, 移除原因: {}", k, v, cause, e);
