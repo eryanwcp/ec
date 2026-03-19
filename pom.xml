@@ -5,7 +5,7 @@
 
     <groupId>com.eryansky</groupId>
     <artifactId>ec-parent</artifactId>
-    <version>4.2.20241221.63</version>
+    <version>4.2.20241221.64</version>
     <modules>
         <module>common</module>
         <module>j2cache</module>
@@ -29,7 +29,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
 <!--        <maven.deploy.skip>true</maven.deploy.skip>-->
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -46,8 +46,8 @@
         <tomcat.version>9.0.115</tomcat.version>
 
         <mybatis-spring-boot.version>2.3.2</mybatis-spring-boot.version>
-        <commons-pool2.version>2.12.1</commons-pool2.version>
-        <druid-version>1.2.27</druid-version>
+        <commons-pool2.version>2.13.1</commons-pool2.version>
+        <druid-version>1.2.28</druid-version>
         <mariadb.driver.version>3.1.4</mariadb.driver.version>
         <mysql.driver.version>8.4.0</mysql.driver.version>
         <db2.driver.version>10.1</db2.driver.version>
@@ -57,13 +57,13 @@
         <commons-codec.version>1.20.0</commons-codec.version>
 
 
-        <ec-common.version>4.2.20241221.63</ec-common.version>
-        <ec-app-common.version>4.2.20241221.63</ec-app-common.version>
-        <ec-client-common.version>4.2.20241221.63</ec-client-common.version>
-        <ec-j2cache.version>4.2.20241221.63</ec-j2cache.version>
-        <ec-j2cache-spring-boot-starter.version>4.2.20241221.63</ec-j2cache-spring-boot-starter.version>
-        <ec-fastweixin.version>4.2.20241221.63</ec-fastweixin.version>
-        <ec-encrypt-spring-boot-starter.version>4.2.20241221.63</ec-encrypt-spring-boot-starter.version>
+        <ec-common.version>4.2.20241221.64</ec-common.version>
+        <ec-app-common.version>4.2.20241221.64</ec-app-common.version>
+        <ec-client-common.version>4.2.20241221.64</ec-client-common.version>
+        <ec-j2cache.version>4.2.20241221.64</ec-j2cache.version>
+        <ec-j2cache-spring-boot-starter.version>4.2.20241221.64</ec-j2cache-spring-boot-starter.version>
+        <ec-fastweixin.version>4.2.20241221.64</ec-fastweixin.version>
+        <ec-encrypt-spring-boot-starter.version>4.2.20241221.64</ec-encrypt-spring-boot-starter.version>
 
         <jackson.version>2.19.2</jackson.version>
     </properties>
@@ -474,7 +474,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.5.5</version>
                 <configuration>
                     <skip>true</skip>
                 </configuration>
