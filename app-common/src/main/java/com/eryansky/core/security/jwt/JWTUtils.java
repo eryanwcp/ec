@@ -71,7 +71,7 @@ public class JWTUtils {
         Date date = new Date(now.getTime() + expireTime);
         Algorithm algorithm = Algorithm.HMAC256(secret);
         JWTCreator.Builder builder = JWT.create()
-                .withSubject(username)
+                .withClaim("username",username)
                 .withIssuedAt(now)
                 .withExpiresAt(date);
         if (claims != null) {
@@ -91,7 +91,7 @@ public class JWTUtils {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             JWTVerifier verifier = JWT.require(algorithm)
-                    .withSubject(username)
+                    .withClaim("username",username)
                     .build();
             verifier.verify(token);
             return true;
@@ -108,7 +108,8 @@ public class JWTUtils {
      */
     public static String getUsername(String token) {
         DecodedJWT jwt = JWT.decode(token);
-        return jwt.getSubject();
+        return jwt.getClaims().get("username").asString();
     }
+
 
 }
