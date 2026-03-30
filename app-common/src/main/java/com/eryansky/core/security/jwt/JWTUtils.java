@@ -24,6 +24,8 @@ public class JWTUtils {
      */
     private static final String DEFAULT_SECRET = "ec_secret";
 
+    public static final String SUBJECT = "username";
+
     /**
      * 生成签名,30min后过期
      *
@@ -71,7 +73,7 @@ public class JWTUtils {
         Date date = new Date(now.getTime() + expireTime);
         Algorithm algorithm = Algorithm.HMAC256(secret);
         JWTCreator.Builder builder = JWT.create()
-                .withClaim("username",username)
+                .withClaim(SUBJECT,username)
                 .withIssuedAt(now)
                 .withExpiresAt(date);
         if (claims != null) {
@@ -91,7 +93,7 @@ public class JWTUtils {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             JWTVerifier verifier = JWT.require(algorithm)
-                    .withClaim("username",username)
+                    .withClaim(SUBJECT,username)
                     .build();
             verifier.verify(token);
             return true;
@@ -108,7 +110,7 @@ public class JWTUtils {
      */
     public static String getUsername(String token) {
         DecodedJWT jwt = JWT.decode(token);
-        return jwt.getClaims().get("username").asString();
+        return jwt.getClaims().get(SUBJECT).asString();
     }
 
 
