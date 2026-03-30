@@ -1,6 +1,7 @@
 package com.eryansky.core.security.jwt;
 
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
@@ -8,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
+import java.util.Map;
 
 public class JWTUtils {
 
@@ -52,13 +54,30 @@ public class JWTUtils {
      * @return 加密的token
      */
     public static String sign(String username, String secret,long expireTime) {
-        Date date = new Date(System.currentTimeMillis() + expireTime);
+        return sign(username, secret, expireTime,null);
+    }
+
+    /**
+     * 生成签名
+     *
+     * @param username 用户名
+     * @param secret   用户的密码
+     * @param expireTime   超时时间 毫秒
+     * @param claims 自定义参数
+     * @return 加密的token
+     */
+    public static String sign(String username, String secret, long expireTime, Map<String,String> claims) {
+        Date now = new Date(System.currentTimeMillis());
+        Date date = new Date(now.getTime() + expireTime);
         Algorithm algorithm = Algorithm.HMAC256(secret);
-        // 附带username信息
-        return JWT.create()
-                .withClaim("username", username)
-                .withExpiresAt(date)
-                .sign(algorithm);
+        JWTCreator.Builder builder = JWT.create()
+                .withSubject(username)
+                .withIssuedAt(now)
+                .withExpiresAt(date);
+        if (claims != null) {
+            claims.forEach(builder::withClaim);
+        }
+        return builder.sign(algorithm);
     }
 
     /**
@@ -69,12 +88,17 @@ public class JWTUtils {
      * @return 是否正确
      */
     public static boolean verify(String token, String username, String secret) {
-        Algorithm algorithm = Algorithm.HMAC256(secret);
-        JWTVerifier verifier = JWT.require(algorithm)
-                .withClaim("username", username)
-                .build();
-        DecodedJWT jwt = verifier.verify(token);
-        return true;
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(secret);
+            JWTVerifier verifier = JWT.require(algorithm)
+                    .withSubject(username)
+                    .build();
+            verifier.verify(token);
+            return true;
+        } catch (Exception e) {
+            log.warn("Token verification failed for username: {}", username, e);
+            return false;
+        }
     }
 
     /**
@@ -84,7 +108,7 @@ public class JWTUtils {
      */
     public static String getUsername(String token) {
         DecodedJWT jwt = JWT.decode(token);
-        return jwt.getClaim("username").asString();
+        return jwt.getSubject();
     }
 
 }
