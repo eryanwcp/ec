@@ -65,7 +65,7 @@
         <ec-fastweixin.version>4.3.20260321.02</ec-fastweixin.version>
         <ec-encrypt-spring-boot-starter.version>4.3.20260321.02</ec-encrypt-spring-boot-starter.version>
 
-        <jackson.version>2.21.1</jackson.version>
+        <jackson.version>2.21.2</jackson.version>
     </properties>
 
 
