@@ -1,5 +1,6 @@
 <%@ page language="java" pageEncoding="UTF-8" contentType="text/html; charset=UTF-8"%>
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="isCheckPasswordPolicy" value="<%=AppConstants.isCheckPasswordPolicy()%>"></c:set>
 <style type="text/css">
     .img_div{
         display : inline-block;
@@ -74,7 +75,14 @@
                 <label>密码：</label>
                 <input type="password" id="password"
                        name="password" class="easyui-validatebox textbox" maxLength="36" value=""
-                       data-options="required:true,missingMessage:'请输入密码.',validType:['minLength[1]']">
+                <c:choose>
+                <c:when test="${isCheckPasswordPolicy}">
+                       data-options="required:true,missingMessage:'请输入新密码.',validType:['safepass_yc','minLength[1]']"/>
+                </c:when>
+                <c:otherwise>
+                    data-options="required:true,missingMessage:'请输入新密码.',validType:['minLength[1]']"/>
+                </c:otherwise>
+                </c:choose>
             </div>
             <div>
                 <label>确认密码：</label>
