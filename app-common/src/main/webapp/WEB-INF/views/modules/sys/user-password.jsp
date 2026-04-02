@@ -12,10 +12,7 @@
 			<input id="newPassword" name="newPassword"
 				class="easyui-validatebox textbox" value="${generatePassword}"
 			<c:choose>
-				<c:when test="${isCurrentUserAdmin}">
-				   data-options="required:true,missingMessage:'请输入新密码.',validType:['minLength[1]']"/>
-				</c:when>
-				<c:when test="${isCheckPasswordPolicy || !isCurrentUserAdmin}">
+				<c:when test="${isCheckPasswordPolicy}">
 					data-options="required:true,missingMessage:'请输入新密码.',validType:['safepass_yc','minLength[1]']"/>
 				</c:when>
 				<c:otherwise>
