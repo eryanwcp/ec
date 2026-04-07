@@ -16,6 +16,7 @@
     <description>web</description>
 
     <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
         <velocity.version>2.4.1</velocity.version>
         <ckfinder.version>2.3</ckfinder.version>
         <sitemesh.version>2.5.0</sitemesh.version>
