@@ -66,8 +66,6 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
 
     private final boolean discardNonSerializable;
 
-    // 定时任务线程池：用于自动清理过期Session
-    private ScheduledExecutorService cleanExpireScheduledExecutorService;
     private int maxAge;
 
     // 优化：有界固定线程池（核心/最大线程数=CPU核心数*1，有界队列，自定义线程名）
@@ -226,16 +224,6 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         logger.info("Connected to redis session channel:{}, time {}ms.", this.pubsub_channel, System.currentTimeMillis()-ct);
 
         this.publish(Command.join());
-
-        this.cleanExpireScheduledExecutorService = Executors.newSingleThreadScheduledExecutor(runnable -> {
-            Thread thread = new Thread(runnable, "j2cache-l2-cleanup-thread");
-            thread.setDaemon(true); // 守护线程：JVM退出时自动结束
-            return thread;
-        });
-
-        // 启动定时清理任务：延迟1分钟执行，之后每隔？执行一次
-        cleanExpireScheduledExecutorService.scheduleAtFixedRate(this::cleanupExpiredL2Sessions,
-                60 * 1000, maxAge * 1000L, TimeUnit.MILLISECONDS);
     }
 
     public long cleanupExpiredL2Sessions() {
@@ -356,9 +344,6 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         try {
             this.publish(Command.quit());
             this.unsubscribed(this.pubsub_channel, 1);
-            if(null != cleanExpireScheduledExecutorService){
-                cleanExpireScheduledExecutorService.shutdown();
-            }
             if(null != executorService){
                 executorService.shutdown();
             }
