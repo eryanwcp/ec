@@ -30,6 +30,7 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 实现基于 J2Cache 的分布式的 Session 管理
@@ -302,7 +303,7 @@ public class J2CacheSessionFilter implements Filter {
         private List<Cookie> getCookies(String name) {
             Cookie[] cookies = ((HttpServletRequest) getRequest()).getCookies();
             if (cookies != null){
-                return Arrays.stream(cookies).filter(v->v.getName().equalsIgnoreCase(name)).toList();
+                return Arrays.stream(cookies).filter(v->v.getName().equalsIgnoreCase(name)).collect(Collectors.toList());
             }
             return Collections.emptyList();
         }
