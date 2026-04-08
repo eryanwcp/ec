@@ -250,7 +250,7 @@ public class J2CacheSessionFilter implements Filter {
                                     setCookie(response, cookieName, session.getId());
                                     if (null != cookie && !cookie.getValue().equals(session.getId())) {
 //                                        logger.info("更新已存在Cookie：{} {} -> {}", request.getRequestURL(),cookie.getValue(), session.getId());
-                                        logger.info("更新已存在Cookie：{} {} -> {} {}", request.getRequestURL(),cookie.getValue(), session.getId(),JsonMapper.toJsonString(WebUtils.getHeaders(request)));
+                                        logger.debug("更新已存在Cookie：{} {} -> {} {}", request.getRequestURL(),cookie.getValue(), session.getId(),JsonMapper.toJsonString(WebUtils.getHeaders(request)));
                                     }
                                 } else {
                                     logger.debug("已存在Cookies：{}", JsonMapper.toJsonString(request.getCookies()));
