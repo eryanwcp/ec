@@ -200,6 +200,14 @@ public class J2CacheSessionFilter implements Filter {
         @Override
         public HttpSession getSession(boolean create) {
             if (session != null && !session.isInvalid()) return session;
+            //Cookie重复
+//            List<Cookie> ssnCookies = getCookies(cookieName);
+//            SessionObject ssnObject = ssnCookies.stream().map(cookie -> g_cache.getSession(cookie.getValue())).filter(Objects::nonNull).findFirst().orElse(null);
+//            if(ssnObject != null) {
+//                session = new J2CacheSession(servletContext, g_cache,ssnObject);
+//                session.setNew(false);
+//            }
+            //Cookie取第一个
             Cookie ssnCookie = getCookie(cookieName);
             String session_id = null;
             if (ssnCookie != null) {
@@ -242,7 +250,7 @@ public class J2CacheSessionFilter implements Filter {
                                     setCookie(response, cookieName, session.getId());
                                     if (null != cookie && !cookie.getValue().equals(session.getId())) {
 //                                        logger.info("更新已存在Cookie：{} {} -> {}", request.getRequestURL(),cookie.getValue(), session.getId());
-                                        logger.info("更新已存在Cookie：{} {} -> {} {}", request.getRequestURL(),cookie.getValue(), session.getId(),JsonMapper.toJsonString(WebUtils.getHeaders(request)));
+                                        logger.debug("更新已存在Cookie：{} {} -> {} {}", request.getRequestURL(),cookie.getValue(), session.getId(),JsonMapper.toJsonString(WebUtils.getHeaders(request)));
                                     }
                                 } else {
                                     logger.debug("已存在Cookies：{}", JsonMapper.toJsonString(request.getCookies()));
@@ -288,6 +296,15 @@ public class J2CacheSessionFilter implements Filter {
                     if (cookie.getName().equalsIgnoreCase(name))
                         return cookie;
             return null;
+        }
+
+
+        private List<Cookie> getCookies(String name) {
+            Cookie[] cookies = ((HttpServletRequest) getRequest()).getCookies();
+            if (cookies != null){
+                return Arrays.stream(cookies).filter(v->v.getName().equalsIgnoreCase(name)).toList();
+            }
+            return Collections.emptyList();
         }
 
         // 独立Token提取方法
