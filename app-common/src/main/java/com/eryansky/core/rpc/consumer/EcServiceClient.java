@@ -77,7 +77,12 @@ public class EcServiceClient {
                     }
 
                 }
-                r = new R().setCode(R.SUCCESS).setData(rm.getMethod().invoke(rpcBean, params.toArray()));
+                Object obj = rm.getMethod().invoke(rpcBean, params.toArray());
+                if(obj instanceof R){
+                    return (R)obj;
+                }
+
+                r = new R().setCode(R.SUCCESS).setData(obj);
             } catch (Exception e) {
                 log.error(e.getMessage(),e);
                 String message = e.getMessage();
@@ -133,6 +138,9 @@ public class EcServiceClient {
             try {
                 // 由于当前接口在服务消费方并没有实现类，不能对实现类增强，可以增加一个统一的切入点执行逻辑
                 Object obj = ConsumerExecutor.execute(url.toString(), headers, params.toArray(), reference);
+                if(obj instanceof R){
+                    return (R)obj;
+                }
                 r = new R().setCode(R.SUCCESS).setData(obj);
             } catch (Exception e) {
                 log.error(e.getMessage(),e);
