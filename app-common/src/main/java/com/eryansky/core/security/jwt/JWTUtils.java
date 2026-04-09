@@ -4,6 +4,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,8 +99,10 @@ public class JWTUtils {
                     .build();
             verifier.verify(token);
             return true;
-        } catch (Exception e) {
-            log.warn("Token verification failed for username: {}", username, e);
+        } catch (JWTVerificationException e) {
+            if (!(e instanceof TokenExpiredException)) {
+                log.warn("Token verification failed for username: {}", username, e);
+            }
             return false;
         }
     }
