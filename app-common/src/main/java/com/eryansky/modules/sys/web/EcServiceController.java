@@ -9,12 +9,14 @@ import com.eryansky.common.model.R;
 import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SimpleController;
+import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.rpc.advice.EncryptRPCResponseBodyAdvice;
 import com.eryansky.core.rpc.consumer.EcHttpContext;
 import com.eryansky.core.rpc.consumer.EcServiceClient;
 import com.eryansky.core.security.annotation.RestApi;
 import com.eryansky.encrypt.anotation.DecryptRequestBody;
 import com.eryansky.encrypt.anotation.EncryptResponseBody;
+import com.eryansky.modules.sys._enum.LogType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.springframework.stereotype.Controller;
@@ -35,6 +37,7 @@ import java.util.*;
 @RequestMapping(value = "/rest")
 public class EcServiceController extends SimpleController {
 
+    @Logging(value = "RPC服务",logType = LogType.access,requestHeaders = true)
     @DecryptRequestBody()
     @EncryptResponseBody(defaultHandle = false,handle = EncryptRPCResponseBodyAdvice.HANDLE)
     @ResponseBody
