@@ -37,7 +37,7 @@ import java.util.*;
 @RequestMapping(value = "/rest")
 public class EcServiceController extends SimpleController {
 
-    @Logging(value = "RPC服务",logType = LogType.access,requestHeaders = true)
+    @Logging(value = "'RPC服务'+#requestData.get(\"serviceName\").asText()+'.'+#requestData.get(\"serviceMethod\").asText()",logType = LogType.access,requestHeaders = true)
     @DecryptRequestBody()
     @EncryptResponseBody(defaultHandle = false,handle = EncryptRPCResponseBodyAdvice.HANDLE)
     @ResponseBody
