@@ -12,6 +12,8 @@ import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
 import com.eryansky.core.security.interceptor.AuthorityInterceptor;
+import com.eryansky.modules.sys.mapper.User;
+import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.utils.AppUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.stream.Stream;
 
 /**
  * 内部应用单点跳转
@@ -47,7 +48,15 @@ public class SSORedirctController extends SimpleController {
         }
         String token = AppUtils.extractToken(request);
         if (StringUtils.isBlank(token) && null != sessionInfo) {
-            token =  sessionInfo.getToken();
+//            token = sessionInfo.getToken();
+            token = sessionInfo.getRefreshToken();
+            //校验token是否有效
+//            User user = UserUtils.getUser(sessionInfo.getUserId());
+//            boolean flag = SecurityUtils.verifyUserToken(token, sessionInfo.getLoginName(), null != user ? user.getPassword() : null);
+//            if(!flag){
+//                SecurityUtils.setOrRefreshSessionInfoToken(sessionInfo,null != user ? user.getPassword() : null);
+//                token = sessionInfo.getToken();
+//            }
         }
 
         if(!StringUtils.contains(url,AuthorityInterceptor.ATTR_TOKEN)){
