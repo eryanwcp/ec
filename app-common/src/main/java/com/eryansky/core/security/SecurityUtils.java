@@ -720,8 +720,19 @@ public class SecurityUtils {
      * @return
      */
     public static boolean verifyUserToken(String token,User user) {
-        String secret = user.getPassword();
-        return JWTUtils.verify(token, user.getLoginName(),  null == secret ? StringUtils.EMPTY : secret);
+        return verifyUserToken(token, user.getLoginName(), user.getPassword());
+    }
+
+
+    /**
+     * 用户Token信息 校验
+     * @param token
+     * @param username
+     * @param secret
+     * @return
+     */
+    public static boolean verifyUserToken(String token,String username,String secret) {
+        return JWTUtils.verify(token, username,  null == secret ? StringUtils.EMPTY : secret);
     }
 
     /**
