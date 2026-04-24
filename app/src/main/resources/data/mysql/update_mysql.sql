@@ -1,6 +1,6 @@
 -- V4.3.20260421.01
 alter table t_sys_log modify ID varchar(36) not null comment '主键ID UUID';
-alter table t_sys_log modify USER_ID varchar(36) DEFAULT NULL comment '登录名';
+alter table t_sys_log modify USER_ID varchar(36) DEFAULT NULL comment '登录标识';
 
 alter table t_notice_receive_info modify USER_ID varchar(36) DEFAULT NULL comment '用户ID';
 alter table t_notice_message_receive modify USER_ID varchar(36) DEFAULT NULL comment '用户ID';
