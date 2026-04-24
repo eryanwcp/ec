@@ -54,7 +54,7 @@ public abstract class BaseEntity<T> extends AbstractBaseEntity<T,String> {
     public void prePersist() {
         // 不限制ID为UUID，调用setIsNewRecord()使用自定义ID
         if (!this.isNewRecord){
-            setId(Identities.uuid2());
+            setId(Identities.uuidV7());
         }
     }
 

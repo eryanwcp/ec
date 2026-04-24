@@ -7,6 +7,7 @@ package com.eryansky.common.utils;
 
 import com.eryansky.common.utils.encode.EncodeUtils;
 import com.eryansky.common.utils.id.SnowFlake;
+import com.fasterxml.uuid.Generators;
 
 import java.math.BigDecimal;
 import java.security.SecureRandom;
@@ -54,6 +55,17 @@ public class Identities {
 	public static String uuid4() {
 		return String.valueOf(uuid3());
 	}
+
+
+	/**
+	 * UUID Version 7
+	 * @return
+	 */
+	public static String uuidV7() {
+		UUID uuid = Generators.timeBasedEpochRandomGenerator().generate();
+		return uuid.toString();
+	}
+
 
 	/**
 	 * 使用SecureRandom随机生成Long. 
