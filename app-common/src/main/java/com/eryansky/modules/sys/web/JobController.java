@@ -16,16 +16,15 @@ import com.eryansky.modules.sys.mapper.QuartzJobDetail;
 import com.eryansky.modules.sys.service.JobService;
 import com.google.common.collect.Maps;
 import org.quartz.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.InvocationTargetException;
 import java.rmi.ServerException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -34,10 +33,10 @@ import java.util.Map;
 @Controller
 @RequestMapping(value = "${adminPath}/sys/job")
 public class JobController extends SimpleController {
-	@Autowired
+	@Resource
 	private JobService jobService;
 
-	@Autowired
+	@Resource
 	private Scheduler scheduler;
 
 	/**
@@ -62,8 +61,8 @@ public class JobController extends SimpleController {
 			page = jobService.findJobList(page,model.getJobName(),model.getTriggerState());
 			if(export){
 				String title = "定时任务列表";
-				String[] hearders = new String[] {"任务名", "任务状态", "执行实例","时间表达式","上一次执行时间","下一次执行时间"};//表头数组
-				String[] fields = new String[] {"jobName", "triggerStateView", "instanceName", "cronExpression","prevFireTime","nextFireTime"};//对象属性数组
+				String[] hearders = new String[] {"任务名", "任务状态", "执行实例","时间表达式","上一次执行时间","下一次执行时间","下一次执行时间"};//表头数组
+				String[] fields = new String[] {"jobName", "triggerStateView", "instanceName", "cronExpression","prevFireTime","nextFireTime","remark"};//对象属性数组
 				TableData td = ExcelUtils.createTableData(page.getResult(), ExcelUtils.createTableHeader(hearders,0),fields);
 				try {
 					JsGridReportBase report = new JsGridReportBase(request, response);

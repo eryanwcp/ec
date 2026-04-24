@@ -5,7 +5,6 @@
  */
 package com.eryansky.modules.notice.quartz;
 
-import com.eryansky.common.utils.ThreadUtils;
 import com.eryansky.core.quartz.QuartzJob;
 import com.eryansky.modules.notice.service.NoticeService;
 import org.quartz.JobExecutionContext;
@@ -21,7 +20,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
  * @date 2015-2-4 上午09:08:18
  */
 //@QuartzJob(name = "NoticeJob", cronExp = "0 0/1 * * * ?",instanceId = "ERYAN")
-@QuartzJob(name = "NoticeJob", cronExp = "0 0/10 6-23 * * ?")
+@QuartzJob(name = "NoticeJob", cronExp = "0 0/10 6-23 * * ?",remark = "通知管理-定时发布、到时失效、取消置顶")
 public class NoticeJob extends QuartzJobBean {
 
     private static final Logger logger = LoggerFactory.getLogger(NoticeJob.class);

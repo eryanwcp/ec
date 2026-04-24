@@ -51,4 +51,10 @@ public @interface QuartzJob {
      * @return
      */
     String cronExp();
+
+    /**
+     * 任务描述
+     * @return
+     */
+    String remark() default "";
 }

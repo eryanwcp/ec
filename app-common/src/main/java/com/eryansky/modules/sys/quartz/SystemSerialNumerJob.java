@@ -18,7 +18,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
  * 序列号管理 重置最大值定时任务
  * 每天凌晨执行
  */
-@QuartzJob(name = "SystemSerialNumerJob", cronExp = "0 0 0 * * ?")
+@QuartzJob(name = "SystemSerialNumerJob", cronExp = "0 0 0 * * ?",remark = "序列号管理-重置最大值")
 public class SystemSerialNumerJob extends QuartzJobBean {
 
     protected Logger logger = LoggerFactory.getLogger(getClass());

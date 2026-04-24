@@ -127,6 +127,7 @@
                 <th>时间表达式</th>
                 <th>上一次执行时间</th>
                 <th>下一次执行时间</th>
+                <th>备注</th>
                 <th>操作</th>
             </tr>
             </thead>
@@ -142,6 +143,7 @@
                 <td>{{cronExpression}}</td>
                 <td>{{prevFireTime}}</td>
                 <td>{{nextFireTime}}</td>
+                <td>{{remark}}</td>
                 <td>
                     <e:hasPermission name="sys:job:edit">
                         {{#instanceId}}

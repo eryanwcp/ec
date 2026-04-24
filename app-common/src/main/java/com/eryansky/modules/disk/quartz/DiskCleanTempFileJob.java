@@ -20,7 +20,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
  * @author Eryan
  * @date 2024-01-18
  */
-@QuartzJob(enable = true,name = "DiskCleanTempFileJob", cronExp = "0 0 0 * * ?")
+@QuartzJob(enable = true,name = "DiskCleanTempFileJob", cronExp = "0 0 0 * * ?",remark = "定期清理缓存文件夹")
 public class DiskCleanTempFileJob extends QuartzJobBean {
 
     private static Logger logger = LoggerFactory.getLogger(DiskCleanTempFileJob.class);
