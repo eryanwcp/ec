@@ -69,6 +69,14 @@ public class Identities {
 
 
 	/**
+	 * UUID v7（RFC 9562 标准）中间无-分割 时间戳 + 强随机数
+	 * @return
+	 */
+	public static String uuid7() {
+		return uuidV7().replaceAll("-", "");
+	}
+
+	/**
 	 * 使用SecureRandom随机生成Long. 
 	 */
 	public static long randomLong() {
