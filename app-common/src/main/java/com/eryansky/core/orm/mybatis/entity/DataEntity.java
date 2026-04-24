@@ -78,7 +78,7 @@ public abstract class DataEntity<T> extends BaseEntity<T>  implements IDataEntit
 	public void prePersist(){
 		// 不限制ID为UUID，调用setIsNewRecord()使用自定义ID
 		if (!this.isNewRecord){
-			setId(Identities.uuid2());
+			setId(Identities.uuid7());
 		}
 		String user = SecurityUtils.getCurrentUserId();
 		this.createUser = null != this.createUser ? this.createUser:user;

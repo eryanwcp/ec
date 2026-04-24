@@ -53,7 +53,7 @@ public abstract class PBaseEntity<T, PK extends Serializable> extends AbstractBa
             if(Long.class == idType){
                 setId((PK) Identities.uuid3());
             }else if(String.class == idType){
-                setId((PK) Identities.uuid2());
+                setId((PK) Identities.uuid7());
             }
         }
     }

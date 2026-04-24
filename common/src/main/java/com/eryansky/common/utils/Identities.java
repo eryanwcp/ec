@@ -7,6 +7,8 @@ package com.eryansky.common.utils;
 
 import com.eryansky.common.utils.encode.EncodeUtils;
 import com.eryansky.common.utils.id.SnowFlake;
+import com.fasterxml.uuid.Generators;
+import com.fasterxml.uuid.impl.TimeBasedEpochRandomGenerator;
 
 import java.math.BigDecimal;
 import java.security.SecureRandom;
@@ -21,7 +23,8 @@ public class Identities {
 
 	private static final SecureRandom random = new SecureRandom();
 	private static final SnowFlake snowFlake = SnowFlake.getInstance();
-
+	// 全局单例（只初始化一次）
+	private static final TimeBasedEpochRandomGenerator UUID_V7_GENERATOR = Generators.timeBasedEpochRandomGenerator();
 	private Identities() {
 	}
 
@@ -53,6 +56,24 @@ public class Identities {
 	 */
 	public static String uuid4() {
 		return String.valueOf(uuid3());
+	}
+
+
+	/**
+	 * UUID v7（RFC 9562 标准） 时间戳 + 强随机数
+	 * @return
+	 */
+	public static String uuidV7() {
+		return UUID_V7_GENERATOR.generate().toString();
+	}
+
+
+	/**
+	 * UUID v7（RFC 9562 标准）中间无-分割 时间戳 + 强随机数
+	 * @return
+	 */
+	public static String uuid7() {
+		return uuidV7().replaceAll("-", "");
 	}
 
 	/**
