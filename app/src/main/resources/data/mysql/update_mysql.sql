@@ -1,3 +1,10 @@
+-- V4.3.20260421.01
+alter table t_sys_log modify ID varchar(36) not null comment '主键ID UUID';
+alter table t_sys_log modify USER_ID varchar(36) DEFAULT NULL comment '登录名';
+
+alter table t_notice_receive_info modify USER_ID varchar(36) DEFAULT NULL comment '用户ID';
+alter table t_notice_message_receive modify USER_ID varchar(36) DEFAULT NULL comment '用户ID';
+
 -- V4.2.20231124.11 用户、组织增加信息分类编码以及自定义扩展数据；日志增加自定义扩展数据。
 ALTER TABLE t_sys_user ADD COLUMN biz_code varchar(64) COMMENT '信息分类编码';
 ALTER TABLE t_sys_user ADD COLUMN extend_attr text COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}';
