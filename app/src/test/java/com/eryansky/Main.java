@@ -17,7 +17,7 @@ import com.eryansky.common.utils.encode.*;
  */
 public class Main {
     public static void main(String[] args) throws Exception {
-        System.out.println(Identities.uuid2());
+        System.out.println(Identities.uuid7());
         Encryption as = new Encryption();
         System.out.println(as.encrypt("1","key"));//7e0cd7be3e66d4a8
         System.out.println(as.decrypt(as.encrypt("1","key"),"key"));
