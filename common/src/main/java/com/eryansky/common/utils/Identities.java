@@ -39,7 +39,7 @@ public class Identities {
 	 * 封装JDK自带的UUID, 通过Random数字生成,中间无-分割
 	 */
 	public static String uuid2() {
-		return uuid().replaceAll("-", "");
+		return uuid().replace("-", "");
 	}
 
 	/**
@@ -73,7 +73,7 @@ public class Identities {
 	 * @return
 	 */
 	public static String uuid7() {
-		return uuidV7().replaceAll("-", "");
+		return uuidV7().replace("-", "");
 	}
 
 	/**
