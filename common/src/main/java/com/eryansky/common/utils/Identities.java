@@ -60,7 +60,7 @@ public class Identities {
 
 
 	/**
-	 * UUID Version 7 with per-call random values
+	 * UUID v7（RFC 9562 标准） 时间戳 + 强随机数
 	 * @return
 	 */
 	public static String uuidV7() {
