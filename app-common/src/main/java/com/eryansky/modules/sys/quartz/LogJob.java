@@ -21,7 +21,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
  * @author Eryan
  * @date: 13-12-28 下午6:06
  */
-@QuartzJob(name = "LogJob", cronExp = "0 0 0 * * ?")
+@QuartzJob(name = "LogJob", cronExp = "0 0 0 * * ?",remark = "日志管理-清理过期日志")
 public class LogJob extends QuartzJobBean {
 
     protected Logger logger = LoggerFactory.getLogger(getClass());

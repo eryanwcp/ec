@@ -25,7 +25,7 @@ public class QuartzJobDetail extends BaseEntity<QuartzJobDetail> {
 	private Date nextFireTime;
 	private Date prevFireTime;
 	private String triggerState;
-
+	private String remark;
 
 	public String getJobName() {
 		return jobName;
@@ -125,5 +125,13 @@ public class QuartzJobDetail extends BaseEntity<QuartzJobDetail> {
 
 	public String getTriggerStateView(){
 		return GenericEnumUtils.getDescriptionByValue(JobState.class,triggerState,triggerState);
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
 	}
 }

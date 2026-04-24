@@ -5,10 +5,8 @@
  */
 package com.eryansky.modules.sys.quartz;
 
-import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.core.quartz.QuartzJob;
 import com.eryansky.modules.sys.mapper.User;
-import com.eryansky.modules.sys.service.SystemService;
 import com.eryansky.modules.sys.service.UserService;
 import com.google.common.collect.Lists;
 import org.quartz.JobExecutionContext;
@@ -26,7 +24,7 @@ import java.util.List;
  * @author Eryan
  * @date 2023-03-09
  */
-@QuartzJob(enable = false,name = "FixedDataJob", cronExp = "0 0 5 * * ?")
+@QuartzJob(enable = false,name = "FixedDataJob", cronExp = "0 0 5 * * ?",remark = "用户管理-清理用户不在部门的岗位信息")
 public class FixedDataJob extends QuartzJobBean {
 
     protected Logger logger = LoggerFactory.getLogger(getClass());

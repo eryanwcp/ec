@@ -25,6 +25,7 @@ public class JobService extends BaseService {
         page.getResult().forEach(v->{
             QuartzJob quartzJob = getAnnotationByTriggerName(v.getTriggerName());
             v.setInstanceId(null != quartzJob ? quartzJob.instanceId():null);
+            v.setRemark(null != quartzJob ? quartzJob.remark():null);
         });
         return page;
     }
