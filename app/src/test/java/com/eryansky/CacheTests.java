@@ -36,7 +36,7 @@ public class CacheTests {
 		Long d1  = System.currentTimeMillis();
 		List<String> ids= Lists.newArrayList();
 		for(int i=0;i<10000;i++){
-			String uuid = Identities.uuid2();
+			String uuid = Identities.uuid7();
 			ids.add(uuid);
 			CacheUtils.put(uuid,uuid);
 		}
