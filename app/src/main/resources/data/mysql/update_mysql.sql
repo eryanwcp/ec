@@ -1,3 +1,10 @@
+-- V4.3.20260421.01
+alter table t_sys_log modify ID varchar(36) not null comment '主键ID UUID';
+alter table t_sys_log modify USER_ID varchar(36) DEFAULT NULL comment '登录标识';
+
+alter table t_notice_receive_info modify USER_ID varchar(36) DEFAULT NULL comment '用户ID';
+alter table t_notice_message_receive modify USER_ID varchar(36) DEFAULT NULL comment '用户ID';
+
 -- V4.2.20231124.11 用户、组织增加信息分类编码以及自定义扩展数据；日志增加自定义扩展数据。
 ALTER TABLE t_sys_user ADD COLUMN biz_code varchar(64) COMMENT '信息分类编码';
 ALTER TABLE t_sys_user ADD COLUMN extend_attr text COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}';
@@ -10,7 +17,7 @@ ALTER TABLE t_sys_log ADD COLUMN extend_attr text COMMENT '自定义扩展数据
 ALTER TABLE t_sys_log_history ADD COLUMN extend_attr text COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}';
 
 -- V4.2.20231124.02 消息管理增加消息类型
-ALTER TABLE t_notice_message ADD COLUMN msg_type varchar(32) COMMENT '消息类型 文本：text；文本卡片：textcard';
+ALTER TABLE t_notice_message ADD COLUMN msg_type varchar(36) COMMENT '消息类型 文本：text；文本卡片：textcard';
 
 -- V4.2.20230921.04 用户管理增加“职务”字段
 ALTER TABLE t_sys_user ADD COLUMN position varchar(128) COMMENT '职务';
