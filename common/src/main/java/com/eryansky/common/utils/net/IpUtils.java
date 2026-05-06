@@ -14,7 +14,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -31,6 +34,18 @@ public class IpUtils {
     private static final String IP_UNKNOW = "unknown";
 
     private IpUtils() {
+    }
+
+    /**
+     * 逗号分隔字符串去重
+     */
+    public static String removeDuplicate(String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
+        }
+        // 分割 → 去重 → 拼接
+        Set<String> set = new LinkedHashSet<>(Arrays.asList(str.split(",")));
+        return String.join(",", set).replace(" ", "");
     }
 
     /**
@@ -96,8 +111,9 @@ public class IpUtils {
         if (StringUtils.isBlank(ip)){
             ip = IP_UNKNOW;
         }
-        return ip;
+        return removeDuplicate(ip);
     }
+
 
     /**
      * 获取客户端IP （有多个时，仅取第一个）
