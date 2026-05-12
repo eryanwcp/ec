@@ -44,8 +44,8 @@ public class IpUtils {
             return str;
         }
         // 分割 → 去重 → 拼接
-        Set<String> set = new LinkedHashSet<>(Arrays.asList(str.split(",")));
-        return String.join(",", set).replace(" ", "");
+        Set<String> set = new LinkedHashSet<>(Arrays.asList(str.replace(" ", "").split(",")));
+        return String.join(",", set);
     }
 
     /**
