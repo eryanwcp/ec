@@ -261,7 +261,7 @@ public class MobileIndexController extends SimpleController {
      * @param pressText 水印文字
      */
     @Logging(value = "图片上传-base64",data = "#folderCode + #press + #pressText", logType = LogType.operate)
-    @PostMapping(value = {"base64ImageUpLoad"})
+    @PostMapping(value = {"base64ImageUpLoad","biu"})
     @ResponseBody
     public Result base64ImageUpLoad(@RequestParam(value = "base64Data", required = false) String base64Data,
                                     String folderCode,
