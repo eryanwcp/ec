@@ -355,7 +355,7 @@ public class MobileIndexController extends SimpleController {
      * @param pressText 水印文字
      */
     @Logging(value = "图片上传", logType = LogType.operate)
-    @PostMapping(value = {"imageUpLoad"})
+    @PostMapping(value = {"imageUpLoad","iu"})
     @ResponseBody
     public Result imageUpLoad(@RequestHeader Map<String, String> headers,
                               @RequestParam(value = "uploadFile", required = false) MultipartFile multipartFile,
