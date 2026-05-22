@@ -41,8 +41,6 @@ $(function () {
             {field: 'userAgent', title: '客户端', width: 300, hidden: true},
             {field: 'ip', title: 'IP地址', width: 100},
             {field: 'action', title: '操作', width: 80},
-            {field: 'longitude', title: '经度', width: 100, hidden: true},
-            {field: 'latitude', title: '纬度', width: 100, hidden: true},
             {field: 'remark', title: '备注', width: 260, hidden: true},
             {field: 'requestHeaders', title: '请求头', width: 260, hidden: true,formatter: function (value, rowData, rowIndex) {
                     return typeof rowData['extendAttr']['requestHeaders'] === "string" ? rowData['extendAttr']['requestHeaders']:JSON.stringify(rowData['extendAttr']['requestHeaders']);
