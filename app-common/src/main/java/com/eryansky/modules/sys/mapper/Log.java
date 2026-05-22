@@ -82,14 +82,6 @@ public class Log extends DataEntity<Log> {
      * 异常信息
      */
     private String exception;
-    /**
-     * 经度
-     */
-    private BigDecimal longitude;
-    /**
-     * 纬度
-     */
-    private BigDecimal latitude;
 
 
     /**
@@ -237,22 +229,6 @@ public class Log extends DataEntity<Log> {
 
     public void setException(String exception) {
         this.exception = exception;
-    }
-
-    public BigDecimal getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(BigDecimal longitude) {
-        this.longitude = longitude;
-    }
-
-    public BigDecimal getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(BigDecimal latitude) {
-        this.latitude = latitude;
     }
 
     /**

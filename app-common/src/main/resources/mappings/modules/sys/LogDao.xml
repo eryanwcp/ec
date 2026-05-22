@@ -23,8 +23,6 @@
 		a.action AS "action",
 		a.remark AS "remark",
 		a.exception AS "exception",
-		a.longitude AS "longitude",
-		a.latitude AS "latitude",
 		a.extend_attr AS "extendAttr",
 		TRIM('"' FROM JSON_EXTRACT(a.extend_attr,'$.userName')) AS "userName",
 		TRIM('"' FROM JSON_EXTRACT(a.extend_attr,'$.userLoginName')) AS "userLoginName",
@@ -468,8 +466,6 @@
 		action,
 		remark,
 		exception,
-		longitude,
-		latitude,
         extend_attr
 		) VALUES (
 		#{id},
@@ -492,8 +488,6 @@
 		#{action},
 		#{remark},
 		#{exception},
-		#{longitude},
-		#{latitude},
 		#{extendAttr}
 		)
 	</insert>
@@ -519,8 +513,6 @@
 		action,
 		remark,
 		exception,
-		longitude,
-		latitude,
         extend_attr
 		) VALUES <foreach collection="list" item="item" separator=",">(
 		#{item.id},
@@ -543,8 +535,6 @@
 		#{item.action},
 		#{item.remark},
 		#{item.exception},
-		#{item.longitude},
-		#{item.latitude},
 		#{item.extendAttr}
         )</foreach>
 	</insert>
@@ -566,8 +556,6 @@
 		action = #{action},
 		remark = #{remark},
 		exception = #{exception},
-		longitude = #{longitude},
-		latitude = #{latitude},
         extend_attr = #{extendAttr}
 		WHERE id = #{id}
 	</update>
@@ -628,8 +616,6 @@
 		action,
 		remark,
 		exception,
-		longitude,
-		latitude,
         extend_attr
 		) SELECT id,
 		status,
@@ -651,8 +637,6 @@
 		action,
 		remark,
 		exception,
-		longitude,
-		latitude,
         extend_attr
 		FROM t_sys_log
 		<where>
