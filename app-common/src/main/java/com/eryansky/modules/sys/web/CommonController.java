@@ -12,11 +12,13 @@ import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.utils.MediaTypes;
+import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.rpc.advice.EncryptRPCResponseBodyAdvice;
 import com.eryansky.core.rpc.consumer.EcHttpContext;
 import com.eryansky.core.rpc.consumer.EcServiceClient;
 import com.eryansky.encrypt.anotation.DecryptRequestBody;
 import com.eryansky.encrypt.anotation.EncryptResponseBody;
+import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys.service.SystemService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -59,6 +61,7 @@ public class CommonController extends SimpleController {
         return JsonMapper.getInstance().toJsonP(callbackName, map);
     }
 
+    @Logging(value = "'RPC服务'+#requestData.get(\"serviceName\").asText()+'.'+#requestData.get(\"serviceMethod\").asText()",logType = LogType.access,requestHeaders = true)
     @DecryptRequestBody()
     @EncryptResponseBody(defaultHandle = false,handle = EncryptRPCResponseBodyAdvice.HANDLE)
     @ResponseBody
