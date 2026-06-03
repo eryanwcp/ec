@@ -263,7 +263,7 @@ public class FileService extends CrudService<FileDao, File> {
 
     /**
      *
-     * 文件删除 不处理引用
+     * 文件删除（物理删除） 包括文件信息以及存储文件 不处理引用
      * @param fileId 文件ID
      */
     public void clearFileAndClearDisk(String fileId) {
@@ -281,7 +281,7 @@ public class FileService extends CrudService<FileDao, File> {
 
     /**
      *
-     * 文件删除 不处理引用
+     * 文件删除（物理删除） 包括文件信息以及存储文件 不处理引用
      * @param file 文件
      */
     public void clearFileAndClearDisk(File file) {
@@ -301,7 +301,7 @@ public class FileService extends CrudService<FileDao, File> {
 
     /**
      *
-     * 文件删除（物理删除） 包括文件信息以及仓储文件
+     * 文件删除（物理删除） 包括文件信息以及存储文件
      * @param fileId 文件ID
      */
     public void clearByFileId(String fileId) {
