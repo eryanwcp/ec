@@ -206,8 +206,8 @@ public class FileService extends CrudService<FileDao, File> {
         File file = dao.get(fileId);
         try {
             //检查文件是否被引用
-            List<File> files = this.findByCode(file.getCode(), fileId);
-            if (deleteDiskFile && Collections3.isEmpty(files)) {
+//            List<File> files = this.findByCode(file.getCode(), fileId);
+            if (deleteDiskFile && Collections3.isEmpty(this.findByCode(file.getCode(), fileId))) {
                 iFileManager.deleteFile(file.getFilePath());
                 logger.debug("删除文件：{}", new Object[]{file.getFilePath()});
             }
