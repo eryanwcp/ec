@@ -229,15 +229,16 @@ public class FileService extends CrudService<FileDao, File> {
     public void deleteFileAndClearDisk(String fileId) {
         File file = dao.get(fileId);
         try {
-            dao.delete(file);
             iFileManager.deleteFile(file.getFilePath());
             logger.debug("删除文件：{}", new Object[]{file.getFilePath()});
+            dao.delete(file);
         } catch (IOException e) {
             logger.error("删除文件[{}]失败,{}", new Object[]{file.getFilePath(), e.getMessage()});
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
     }
+
 
     /**
      *
@@ -249,9 +250,9 @@ public class FileService extends CrudService<FileDao, File> {
             return;
         }
         try {
-            dao.delete(file);
             iFileManager.deleteFile(file.getFilePath());
             logger.debug("删除文件：{}", new Object[]{file.getFilePath()});
+            dao.delete(file);
         } catch (IOException e) {
             logger.error("删除文件[{}]失败,{}", new Object[]{file.getFilePath(), e.getMessage()});
         } catch (Exception e) {
@@ -261,7 +262,45 @@ public class FileService extends CrudService<FileDao, File> {
 
     /**
      *
-     * 文件删除（物理删除） 包括文件信息以及仓储文件
+     * 文件删除（物理删除） 包括文件信息以及存储文件 不处理引用
+     * @param fileId 文件ID
+     */
+    public void clearFileAndClearDisk(String fileId) {
+        File file = dao.get(fileId);
+        try {
+            iFileManager.deleteFile(file.getFilePath());
+            logger.debug("删除文件：{}", new Object[]{file.getFilePath()});
+            dao.clear(file);
+        } catch (IOException e) {
+            logger.error("删除文件[{}]失败,{}", new Object[]{file.getFilePath(), e.getMessage()});
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    /**
+     *
+     * 文件删除（物理删除） 包括文件信息以及存储文件 不处理引用
+     * @param file 文件
+     */
+    public void clearFileAndClearDisk(File file) {
+        if(null == file){
+            return;
+        }
+        try {
+            iFileManager.deleteFile(file.getFilePath());
+            logger.debug("删除文件：{}", new Object[]{file.getFilePath()});
+            dao.clear(file);
+        } catch (IOException e) {
+            logger.error("删除文件[{}]失败,{}", new Object[]{file.getFilePath(), e.getMessage()});
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    /**
+     *
+     * 文件删除（物理删除） 包括文件信息以及存储文件
      * @param fileId 文件ID
      */
     public void clearByFileId(String fileId) {
