@@ -210,6 +210,8 @@ public class FileService extends CrudService<FileDao, File> {
             if (deleteDiskFile && Collections3.isEmpty(this.findByCode(file.getCode(), fileId))) {
                 iFileManager.deleteFile(file.getFilePath());
                 logger.debug("删除文件：{}", new Object[]{file.getFilePath()});
+            }else{
+                logger.warn("文件被应用：{}，{}，未执行物理删除", new Object[]{file.getId(), file.getFilePath()});
             }
             dao.delete(file);
         } catch (IOException e) {
@@ -232,6 +234,8 @@ public class FileService extends CrudService<FileDao, File> {
             if (Collections3.isEmpty(files)) {
                 iFileManager.deleteFile(file.getFilePath());
                 logger.debug("删除文件：{}", new Object[]{file.getFilePath()});
+            }else{
+                logger.warn("文件被应用：{}，{}，未执行物理删除", new Object[]{file.getId(), file.getFilePath()});
             }
             dao.clear(file);
         } catch (IOException e) {
