@@ -305,6 +305,7 @@
                     <exclude>config*.properties</exclude>
                     <exclude>j2cache*.properties</exclude>
                     <exclude>logback*.xml</exclude>
+                    <exclude>data/**</exclude>
                 </excludes>
             </resource>
             <resource>
