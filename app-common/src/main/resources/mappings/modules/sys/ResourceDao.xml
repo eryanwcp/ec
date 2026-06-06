@@ -554,7 +554,7 @@
             <when test="dbName == 'db2'">'%,'||#{id}||',%'</when>
             <when test="dbName == 'mysql'">CONCAT('%,', #{id}, ',%')</when>
             <when test="dbName == 'oracle'">'%,'||#{id}||',%'</when>
-            <otherwise>'%,${id},%'</otherwise>
+            <otherwise>'%,'+#{id}+',%'</otherwise>
         </choose>
     </delete>
 
