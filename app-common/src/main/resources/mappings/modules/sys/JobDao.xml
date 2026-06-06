@@ -14,7 +14,7 @@
 			c.cron_expression AS 'cronExpression',
 			c.time_zone_id AS 'timeZoneId',
 			FROM_UNIXTIME(b.next_fire_time/1000,'%Y-%m-%d %H:%i:%S') AS 'nextFireTime',
-			FROM_UNIXTIME(b.next_fire_time/1000,'%Y-%m-%d %H:%i:%S') AS 'prevFireTime'
+			FROM_UNIXTIME(b.prev_fire_time/1000,'%Y-%m-%d %H:%i:%S') AS 'prevFireTime'
 		FROM
 			qrtz_job_details a
 		INNER JOIN qrtz_triggers b ON a.job_name = b.job_name AND a.job_group = b.job_group
