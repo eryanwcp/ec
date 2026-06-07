@@ -17,7 +17,7 @@
     <properties>
         <maven.deploy.skip>false</maven.deploy.skip>
         <poi.version>5.5.1</poi.version>
-        <xwpf.version>2.1.0</xwpf.version>
+        <xwpf.version>2.2.0</xwpf.version>
         <bsh.version>2.0b6</bsh.version>
 
         <sitemesh.version>3.2.2</sitemesh.version>
@@ -70,7 +70,7 @@
         <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
-            <version>1.10.15</version>
+            <version>1.10.17</version>
         </dependency>
 
         <dependency>
@@ -133,7 +133,7 @@
         <dependency>
             <groupId>org.javadelight</groupId>
             <artifactId>delight-rhino-sandbox</artifactId>
-            <version>0.2.1</version>
+            <version>0.2.2</version>
         </dependency>
 
         <dependency>

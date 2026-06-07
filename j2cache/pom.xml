@@ -21,8 +21,6 @@
         <caffeine.version>3.2.4</caffeine.version>
         <lettuce.version>6.8.2.RELEASE</lettuce.version>
         <objenesis.version>3.4</objenesis.version>
-        <fst.version>3.0.4-jdk17</fst.version>
-        <snappy.version>1.1.10.8</snappy.version>
         <fory.version>1.1.0</fory.version>
         <guava.version>33.6.0-jre</guava.version>
     </properties>
@@ -60,37 +58,6 @@
                     <artifactId>reactor-core</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.objenesis</groupId>
-            <artifactId>objenesis</artifactId>
-            <version>${objenesis.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>de.ruedigermoeller</groupId>
-            <artifactId>fst</artifactId>
-            <version>${fst.version}</version>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-compress</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-lang3</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-io</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.xerial.snappy</groupId>
-            <artifactId>snappy-java</artifactId>
-            <version>${snappy.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.fory</groupId>
