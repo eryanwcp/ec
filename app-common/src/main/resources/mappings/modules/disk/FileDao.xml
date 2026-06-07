@@ -178,7 +178,7 @@
         <where>
             a.status = #{status}
             AND a.folder_id = #{folderId}
-            <if test="fileSuffixs != null and fileIds.size() !=0">
+            <if test="fileSuffixs != null and fileSuffixs.size() !=0">
                 AND a.file_suffix IN
                 <foreach collection="fileSuffixs" item="item" open="(" separator="," close=")">
                     #{item}
@@ -212,7 +212,7 @@
                 <otherwise>'%,'+#{folderId}+',%'</otherwise>
             </choose>
             )
-            <if test="fileSuffixs != null and fileIds.size() !=0">
+            <if test="fileSuffixs != null and fileSuffixs.size() !=0">
                 AND a.file_suffix IN
                 <foreach collection="fileSuffixs" item="item" open="(" separator="," close=")">
                     #{item}
@@ -238,7 +238,7 @@
                 <otherwise>'%,'+#{folderId}+',%'</otherwise>
             </choose>
             )
-            <if test="fileSuffixs != null and fileIds.size() !=0">
+            <if test="fileSuffixs != null and fileSuffixs.size() !=0">
                 AND a.file_suffix IN
                 <foreach collection="fileSuffixs" item="item" open="(" separator="," close=")">
                     #{item}
