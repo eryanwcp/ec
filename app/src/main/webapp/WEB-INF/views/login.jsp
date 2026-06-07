@@ -28,9 +28,9 @@
     <%-- jQuery方法扩展 --%>
     <script type="text/javascript" src="${ctxStatic}/js/jquery/jquery-extend${yuicompressor}.js" charset="utf-8"></script>
 
-    <link href="${ctxStatic}/js/jquery-validation-1.19.3/dist/extend/jquery-validate-extend.min.css" type="text/css" rel="stylesheet" />
-    <script src="${ctxStatic}/js/jquery-validation-1.19.3/dist/jquery.validate.min.js" type="text/javascript"  charset="utf-8"></script>
-    <script src="${ctxStatic}/js/jquery-validation-1.19.3/dist/extend/jquery-validate-extend-methods.min.js" type="text/javascript"  charset="utf-8"></script>
+    <link href="${ctxStatic}/js/jquery-validation/dist/extend/jquery-validate-extend.min.css" type="text/css" rel="stylesheet" />
+    <script src="${ctxStatic}/js/jquery-validation/dist/jquery.validate.min.js" type="text/javascript"  charset="utf-8"></script>
+    <script src="${ctxStatic}/js/jquery-validation/dist/extend/jquery-validate-extend-methods.min.js" type="text/javascript"  charset="utf-8"></script>
     <script src="${ctxStatic}/js/jquery/qrcode/jquery.qrcode.min.js" type="text/javascript"></script>
 
     <link rel="stylesheet" href="${ctxStatic}/js/common/typica-login.css?_=${sysInitTime}">
