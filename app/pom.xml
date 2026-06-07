@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.eryansky</groupId>
         <artifactId>ec-parent</artifactId>
-        <version>4.2.20241221.66</version>
+        <version>4.2.20241221.67</version>
     </parent>
 
     <artifactId>ec-app</artifactId>
@@ -226,7 +226,7 @@
         <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
-            <version>1.10.15</version>
+            <version>1.10.17</version>
         </dependency>
 
 

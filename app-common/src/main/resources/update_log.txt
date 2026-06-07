@@ -3,7 +3,7 @@ V4.3.20260221.04
 1、优化session一级缓存与二级缓存过期时间一致性。
 
 20240415
-V4.2.20241221.63
+V4.2.20240301.11
 1、区域扩展增加信息分类编码
 
 ALTER TABLE t_sys_area ADD COLUMN biz_code varchar(64) COMMENT '信息分类编码';

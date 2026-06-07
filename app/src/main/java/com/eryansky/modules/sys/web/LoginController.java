@@ -90,7 +90,7 @@ public class LoginController extends SimpleController {
         String randomSecurityToken = Identities.randomBase62(64);
         modelAndView.addObject("securityToken", randomSecurityToken);
         modelAndView.addObject("publicKey", RSAUtils.getDefaultBase64PublicKey());
-        CacheUtils.put("securityToken:"+request.getSession().getId(),randomSecurityToken);
+        WebUtils.setSessionAttribute(request, "securityToken", randomSecurityToken);
         return modelAndView;
     }
 
@@ -160,7 +160,7 @@ public class LoginController extends SimpleController {
         Map<String,Object> data = Maps.newHashMap();
         data.put("securityToken:",randomSecurityToken);
         data.put("publicKey",publicKey);
-        CacheUtils.put("securityToken:"+request.getSession().getId(),randomSecurityToken);
+        WebUtils.setSessionAttribute(request, "securityToken", randomSecurityToken);
         return Result.successResult().setObj(data);
     }
 
@@ -193,13 +193,17 @@ public class LoginController extends SimpleController {
     public Result login(@RequestParam(required = true) String loginName,
                         @RequestParam(required = true) String password,
                         @RequestParam(defaultValue = "true") String encrypt,
+                        @RequestParam(name = "_csrf_token",required = true) String csrfToken,
                         String validateCode,
                         String theme, HttpServletRequest request, Model uiModel) {
         //登录限制
         checkLoginLimit();
 
         loginName = StringUtils.trim(loginName);
-        String securityToken = CacheUtils.get("securityToken:"+request.getSession().getId());
+        String securityToken = (String) WebUtils.getSessionAttribute(request, "securityToken");
+        if(!StringUtils.equals(csrfToken,securityToken)){
+            return Result.errorResult().setMsg("非法请求！").setObj(false);
+        }
 
         Result result = null;
         String msg = null;

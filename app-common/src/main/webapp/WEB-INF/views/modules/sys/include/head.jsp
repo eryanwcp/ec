@@ -20,9 +20,9 @@
 <script src="${ctxStatic}/js/jquery/jquery-1.12.4.min.js" type="text/javascript"></script>
 <script src="${ctxStatic}/js/jquery/jquery-migrate-1.4.1.min.js" type="text/javascript"></script>
 <script src="${ctxStatic}/js/jquery/jquery-extend.min.js" type="text/javascript"></script>
-<link href="${ctxStatic}/js/jquery-validation-1.19.3/dist/extend/jquery-validate-extend.min.css" type="text/css" rel="stylesheet" />
-<script src="${ctxStatic}/js/jquery-validation-1.19.3/dist/jquery.validate.min.js" type="text/javascript"></script>
-<script src="${ctxStatic}/js/jquery-validation-1.19.3/dist/extend/jquery-validate-extend-methods.min.js" type="text/javascript"></script>
+<link href="${ctxStatic}/js/jquery-validation/dist/extend/jquery-validate-extend.min.css" type="text/css" rel="stylesheet" />
+<script src="${ctxStatic}/js/jquery-validation/dist/jquery.validate.min.js" type="text/javascript"></script>
+<script src="${ctxStatic}/js/jquery-validation/dist/extend/jquery-validate-extend-methods.min.js" type="text/javascript"></script>
 <link href="${ctxStatic}/js/bootstrap/2.3.2/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
 <link href="${ctxStatic}/js/bootstrap/2.3.2/css/bootstrap-responsive.css" type="text/css" rel="stylesheet" />
 <script src="${ctxStatic}/js/bootstrap/2.3.2/js/bootstrap.min.js" type="text/javascript"></script>
