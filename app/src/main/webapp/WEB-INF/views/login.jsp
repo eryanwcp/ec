@@ -90,6 +90,7 @@
     <div id="login-wraper">
         <form id="loginForm" action="${ctxAdmin}/login/login?theme=${cookie.themeType.value}" class="form login-form" method="post" >
             <legend><span style="color:#08c;">${fns:getAppFullName()}</span></legend>
+            <input type="hidden" name="_csrf_token" value="${securityToken}"/>
             <div class="body">
                 <div class="control-group">
                     <%--<label for="loginName" class="control-label">用户名</label>--%>

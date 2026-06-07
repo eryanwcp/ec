@@ -104,7 +104,7 @@ function login() {
     $.ajax({
         url: ctxAdmin + '/login/login',
         type: 'post',
-        data: {theme:'',encrypt:'RSA',loginName:$("#loginName").val(),password:_password,validateCode:$("#validateCode").val()},
+        data: {theme:'',encrypt:'RSA',loginName:$("#loginName").val(),password:_password,_csrf_token:securityToken,validateCode:$("#validateCode").val()},
         traditional: true,
         async:false,
         dataType: 'json',
