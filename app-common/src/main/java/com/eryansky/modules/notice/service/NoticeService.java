@@ -224,7 +224,8 @@ public class NoticeService extends CrudService<NoticeDao, Notice> {
                 if(YesOrNo.YES.getValue().equals(notice.getIsReply())){
                     receiveInfo.setIsReply(YesOrNo.NO.getValue());
                 }
-                checkReceiveInfoAdd(receiveInfos, receiveInfo);
+                receiveInfo.prePersist();
+                receiveInfos.add(receiveInfo);
             });
         }
         noticeReceiveInfoService.deleteByNoticeId(notice.getId());
