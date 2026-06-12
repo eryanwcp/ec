@@ -760,8 +760,11 @@ public class OrganService extends TreeService<OrganDao, Organ> {
      * @return
      */
     public List<Organ> findOrgansByIds(Collection<String> organIds) {
+        if (Collections3.isEmpty(organIds)) {
+            return Collections.emptyList();
+        }
         Parameter parameter = new Parameter();
-        parameter.put("organIds", organIds);
+        parameter.put("ids", organIds);
         return dao.findOrgansByIds(parameter);
     }
 

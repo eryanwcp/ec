@@ -146,7 +146,7 @@ public class AreaService extends TreeService<AreaDao, Area> {
         parameter.put("parentCode", parentCode);
         parameter.put("types", types);
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
-        return dao.findOwnAndChild(parameter);
+        return dao.findChild(parameter);
     }
 
     /**

@@ -511,7 +511,14 @@
         FROM t_sys_organ a
         <include refid="organJoins"/>
         <where>
-            a.id IN <foreach collection="ids" item="item" open="(" separator="," close=")">#{item}</foreach>
+            <choose>
+                <when test="ids != null and ids.size() != 0">
+                    a.id IN <foreach collection="ids" item="item" open="(" separator="," close=")">#{item}</foreach>
+                </when>
+                <otherwise>
+                    1 = 0
+                </otherwise>
+            </choose>
         </where>
         ORDER BY a.sort ASC
     </select>
