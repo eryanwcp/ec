@@ -132,7 +132,9 @@ public class ResourceService extends TreeService<ResourceDao, Resource> {
             CacheConstants.RESOURCE_USER_MENU_TREE_CACHE,
             CacheConstants.CACHE_ResourceDao}, allEntries = true)
     public void deleteOwnerAndChilds(String id) {
-        dao.deleteOwnerAndChilds(new Resource(id));
+        Resource resource = new Resource(id);
+        resource.preUpdate();
+        dao.deleteOwnerAndChilds(resource);
         logger.debug("清空缓存:{}", CacheConstants.RESOURCE_USER_RESOURCE_TREE_CACHE
                 + "," + CacheConstants.RESOURCE_USER_AUTHORITY_URLS_CACHE
                 + "," + CacheConstants.RESOURCE_USER_MENU_TREE_CACHE

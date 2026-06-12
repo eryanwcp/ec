@@ -226,7 +226,9 @@ public class UserService extends CrudService<UserDao, User> {
         if (isSuperUser(id)) {
             throw new SystemException("不允许删除超级用户!");
         }
-        dao.delete(new User(id));
+        User user = new User(id);
+        user.preUpdate();
+        dao.delete(user);
     }
 
     /**

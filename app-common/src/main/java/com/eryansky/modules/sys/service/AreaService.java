@@ -42,7 +42,9 @@ public class AreaService extends TreeService<AreaDao, Area> {
     }
 
     public void deleteOwnerAndChilds(String id) {
-        dao.deleteOwnerAndChilds(new Area(id));
+        Area area = new Area(id);
+        area.preUpdate();
+        dao.deleteOwnerAndChilds(area);
     }
 
     /**
