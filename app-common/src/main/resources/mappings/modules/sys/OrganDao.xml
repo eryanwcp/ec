@@ -520,7 +520,7 @@
         SELECT
         a.id
         FROM t_sys_user a
-        LEFT JOIN t_sys_user_organ ur ON ur.user_id = a.id
+        INNER JOIN t_sys_user_organ ur ON ur.user_id = a.id
         <where>
             a.status = '0'
             AND ur.organ_id = #{organId}
