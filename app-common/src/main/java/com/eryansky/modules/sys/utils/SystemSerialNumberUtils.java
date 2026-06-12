@@ -16,6 +16,7 @@ import com.eryansky.modules.sys.sn.MaxSerialItem;
 import com.eryansky.utils.CacheUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.eryansky.common.utils.collections.Collections3;
 
 import java.util.List;
 import java.util.Map;
@@ -133,7 +134,7 @@ public class SystemSerialNumberUtils {
     public static Long getMaxSerialByModuleCode(String app,String moduleCode,String customCategory) {
         SystemSerialNumber systemSerialNumber = getByModuleCode(app,moduleCode);
         String maxSerialKey = null == customCategory ? SystemSerialNumber.DEFAULT_KEY_MAX_SERIAL:SystemSerialNumber.DEFAULT_KEY_MAX_SERIAL+"_"+customCategory;
-        if (systemSerialNumber != null &&  null != systemSerialNumber.getMaxSerial()) {
+        if (systemSerialNumber != null && systemSerialNumber.getMaxSerial() != null && Collections3.isNotEmpty(systemSerialNumber.getMaxSerial().getItems())) {
             MaxSerialItem item = systemSerialNumber.getMaxSerial().getItems().stream().filter(v->v.getKey().equals(maxSerialKey)).findFirst().orElse(new MaxSerialItem());
             return item.getValue();
         }
@@ -213,6 +214,10 @@ public class SystemSerialNumberUtils {
                 }
             });
             if (!flag) {
+                value = Static.cacheChannel.queuePop(queueRegion);
+                if (value != null) {
+                    return value;
+                }
                 logger.error("生成序列号失败，{}", queueRegion);
                 return null;
             }
