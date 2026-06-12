@@ -204,7 +204,7 @@
         <where>
             a.status = #{status}
             AND ((a.user_id = #{userId} AND a.folder_authorize = '0')
-            OR a.folder_authorize = "1")
+            OR a.folder_authorize = '1')
             <if test="type != null and type !=''">
                 AND a.type = #{type}
             </if>
