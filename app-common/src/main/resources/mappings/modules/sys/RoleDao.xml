@@ -116,9 +116,10 @@
         SELECT
         <include refid="roleColumns"/>
         FROM t_sys_role a
+        INNER JOIN t_sys_role_resource rr ON rr.role_id = a.id
         <where>
             a.status = #{status}
-            AND  a.id IN ( SELECT role_id FROM t_sys_role_resource WHERE resource_id = #{resourceId})
+            AND rr.resource_id = #{resourceId}
         </where>
     </select>
 
@@ -127,11 +128,10 @@
         SELECT
         <include refid="roleColumns"/>
         FROM t_sys_role a
-        LEFT JOIN t_sys_user_role ur ON ur.role_id = a.id
-        LEFT JOIN t_sys_user u On u.id = ur.user_id
+        INNER JOIN t_sys_user_role ur ON ur.role_id = a.id
         <where>
             a.status = '0'
-            AND u.id = #{userId}
+            AND ur.user_id = #{userId}
         </where>
         ORDER BY a.data_scope ASC
     </select>
@@ -140,11 +140,10 @@
         SELECT
         a.id
         FROM t_sys_role a
-        LEFT JOIN t_sys_user_role ur ON ur.role_id = a.id
-        LEFT JOIN t_sys_user u On u.id = ur.user_id
+        INNER JOIN t_sys_user_role ur ON ur.role_id = a.id
         <where>
             a.status = '0'
-            AND u.id = #{userId}
+            AND ur.user_id = #{userId}
         </where>
     </select>
 
