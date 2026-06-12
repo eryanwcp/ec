@@ -130,7 +130,7 @@
                     <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
                     <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
                     <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
-                    <otherwise>'%,'+#{query}+',%'</otherwise>
+                    <otherwise>'%'+#{query}+'%'</otherwise>
                 </choose>
             </if>
         </where>
@@ -148,8 +148,8 @@
         SELECT
         <include refid="userColumns"/>
         FROM t_sys_user a
-        LEFT JOIN t_notice_contact_group_object cgo ON cgo.object_id = a.id
-        LEFT JOIN t_notice_contact_group cg ON cg.id = cgo.contact_group_id
+        JOIN t_notice_contact_group_object cgo ON cgo.object_id = a.id
+        JOIN t_notice_contact_group cg ON cg.id = cgo.contact_group_id
         <where>
             a.status = #{status}
             <if test="contactGroupId != null and contactGroupId !=''">
@@ -165,7 +165,7 @@
                     <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
                     <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
                     <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
-                    <otherwise>'%,'+#{query}+',%'</otherwise>
+                    <otherwise>'%'+#{query}+'%'</otherwise>
                 </choose>
                 OR
                 a.login_name LIKE
@@ -173,7 +173,7 @@
                     <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
                     <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
                     <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
-                    <otherwise>'%,'+#{query}+',%'</otherwise>
+                    <otherwise>'%'+#{query}+'%'</otherwise>
                 </choose>
                 )
             </if>
