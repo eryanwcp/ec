@@ -68,7 +68,7 @@ public class UserPasswordService extends CrudService<UserPasswordDao, UserPasswo
     }
 
     /**
-     * 查询某个用户ID秘密修改记录
+     * 查询某个用户ID密码修改记录
      * <br/>根据修改时间 降序排列
      *
      * @param userId  用户ID
@@ -80,7 +80,7 @@ public class UserPasswordService extends CrudService<UserPasswordDao, UserPasswo
     }
 
     /**
-     * 查询某个用户ID秘密修改记录
+     * 查询某个用户ID密码修改记录
      * <br/>根据修改时间 降序排列
      *
      * @param userId  用户ID
@@ -129,7 +129,7 @@ public class UserPasswordService extends CrudService<UserPasswordDao, UserPasswo
 
         PasswordTip tip = new PasswordTip();
         if (userPassword == null) {
-            tip.setMsg("您从未修改过登录秘密，请设置登录密码！");
+            tip.setMsg("您从未修改过登录密码，请设置登录密码！");
             tip.setCode(PasswordTip.CODE_YES);
         } else if (time.compareTo(userPassword.getModifyTime()) > 0) {
             tip.setMsg("您已超过" + userPasswordUpdateCycle + "天没有修改登录密码，请修改登录密码！");
