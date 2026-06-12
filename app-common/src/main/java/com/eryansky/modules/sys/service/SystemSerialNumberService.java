@@ -114,6 +114,9 @@ public class SystemSerialNumberService extends CrudService<SystemSerialNumberDao
         String _moduleCode = null == customCategory ? moduleCode : moduleCode + "_" + customCategory;
         String maxSerialKey = null == customCategory ? SystemSerialNumber.DEFAULT_KEY_MAX_SERIAL : SystemSerialNumber.DEFAULT_KEY_MAX_SERIAL + "_" + customCategory;
         SystemSerialNumber entity = getByCode(StringUtils.isNotBlank(app) ? app : VersionLog.DEFAULT_ID, moduleCode);
+        if (entity == null) {
+            throw new ServiceException("未找到模块[" + moduleCode + "]的序列号配置");
+        }
         //预生成数量
         int prepare = StringUtils.isNotBlank(entity.getPreMaxNum()) ? Integer.parseInt(entity.getPreMaxNum()) : 1;
         //数据库存储的当前最大序列号
@@ -180,23 +183,17 @@ public class SystemSerialNumberService extends CrudService<SystemSerialNumberDao
      */
     public void resetSerialNumber(String id) {
         SystemSerialNumber systemSerialNumber = this.get(id);
-        Date now = null;
-        try {
-            now = DateUtils.parseDate(DateUtils.getDate(), DateUtils.DATE_FORMAT);
-        } catch (ParseException e) {
-            logger.error(e.getMessage());
+        if (systemSerialNumber == null) {
+            return;
         }
         boolean flag = false;
+        Calendar calendar = Calendar.getInstance();
         if (ResetType.Day.getValue().equals(systemSerialNumber.getResetType())) {
             flag = true;
         } else if (ResetType.Month.getValue().equals(systemSerialNumber.getResetType())) {
-            flag = AppDateUtils.getCurrentMonthStartTime().equals(now);
-        }
-//            else if(ResetType.Quarter.getValue().equals(systemSerialNumber.getResetType())){
-//                flag = AppDateUtils.getCurrentQuarterStartTime().equals(now);
-//            }
-        else if (ResetType.Year.getValue().equals(systemSerialNumber.getResetType())) {
-            flag = AppDateUtils.getCurrentYearStartTime().equals(now);
+            flag = calendar.get(Calendar.DAY_OF_MONTH) == 1;
+        } else if (ResetType.Year.getValue().equals(systemSerialNumber.getResetType())) {
+            flag = calendar.get(Calendar.DAY_OF_YEAR) == 1;
         }
         if (flag) {
             MaxSerial maxSerial = systemSerialNumber.getMaxSerial();
