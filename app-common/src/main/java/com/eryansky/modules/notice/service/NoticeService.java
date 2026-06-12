@@ -326,8 +326,10 @@ public class NoticeService extends CrudService<NoticeDao, Notice> {
         if (Collections3.isNotEmpty(noticeIds)) {
             for (String id : noticeIds) {
                 NoticeReceiveInfo noticeReceiveInfo = noticeReceiveInfoService.getUserNotice(userId, id);
-                noticeReceiveInfo.setIsRead(NoticeReadMode.readed.getValue());
-                noticeReceiveInfoService.save(noticeReceiveInfo);
+                if (noticeReceiveInfo != null) {
+                    noticeReceiveInfo.setIsRead(NoticeReadMode.readed.getValue());
+                    noticeReceiveInfoService.save(noticeReceiveInfo);
+                }
             }
         } else {
             logger.warn("参数[entitys]为空.");
@@ -401,7 +403,6 @@ public class NoticeService extends CrudService<NoticeDao, Notice> {
         Date nowTime = Calendar.getInstance().getTime();
         Notice notice = new Notice();
         notice.setStatus(StatusState.NORMAL.getValue());
-        notice.setBizMode(NoticeMode.Invalidated.getValue());
         List<Notice> noticeList = dao.findList(notice);
         if (Collections3.isNotEmpty(noticeList)) {
             for (Notice n : noticeList) {
