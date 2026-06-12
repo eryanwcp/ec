@@ -338,7 +338,6 @@
         SELECT
         count(*)
         FROM t_sys_organ a
-        <include refid="organJoins"/>
         <where>
             a.status = #{status}
             AND a.parent_id = #{parentId}
@@ -355,7 +354,6 @@
         SELECT
         a.id
         FROM t_sys_organ a
-        <include refid="organJoins"/>
         <where>
             <if test="status != null and status.size() !=0">
                 AND a.status IN
@@ -523,10 +521,9 @@
         a.id
         FROM t_sys_user a
         LEFT JOIN t_sys_user_organ ur ON ur.user_id = a.id
-        LEFT JOin t_sys_organ o ON o.id = ur.organ_id
         <where>
             a.status = '0'
-            AND o.id = #{organId}
+            AND ur.organ_id = #{organId}
         </where>
         ORDER BY a.sort ASC
     </select>
@@ -537,26 +534,24 @@
         <include refid="organColumns"/>
         FROM t_sys_organ a
         <include refid="organJoins"/>
-        LEFT JOIN t_sys_user_organ uo ON uo.organ_id = a.id
-        LEFT JOIN t_sys_user u ON u.id = uo.user_id
+        INNER JOIN t_sys_user_organ uo ON uo.organ_id = a.id
         <where>
             a.status = '0'
-            AND u.id = #{userId}
+            AND uo.user_id = #{userId}
         </where>
-        ORDER BY u.default_organ_id,a.sort ASC
+        ORDER BY a.sort ASC
     </select>
 
     <select id="findOrganIdsByUserId" resultType="java.lang.String">
         SELECT
         a.id
         FROM t_sys_organ a
-        LEFT JOIN t_sys_user_organ uo ON uo.organ_id = a.id
-        LEFT JOIN t_sys_user u ON u.id = uo.user_id
+        INNER JOIN t_sys_user_organ uo ON uo.organ_id = a.id
         <where>
             a.status = '0'
-            AND u.id = #{userId}
+            AND uo.user_id = #{userId}
         </where>
-        ORDER BY u.default_organ_id,a.sort ASC
+        ORDER BY a.sort ASC
     </select>
 
     <select id="findAssociationOrgansByPostId" resultType="Organ">
@@ -564,11 +559,10 @@
         <include refid="organColumns"/>
         FROM t_sys_organ a
         <include refid="organJoins"/>
-        LEFT JOIN t_sys_post_organ po ON po.organ_id = a.id
-        LEFT JOIN t_sys_post post ON post.id = po.post_id
+        INNER JOIN t_sys_post_organ po ON po.organ_id = a.id
         <where>
             a.status = '0'
-            AND post.id = #{postId}
+            AND po.post_id = #{postId}
         </where>
         ORDER BY a.sort ASC
     </select>
@@ -578,11 +572,10 @@
         SELECT
         a.id
         FROM t_sys_organ a
-        LEFT JOIN t_sys_post_organ po ON po.organ_id = a.id
-        LEFT JOIN t_sys_post post ON post.id = po.post_id
+        INNER JOIN t_sys_post_organ po ON po.organ_id = a.id
         <where>
             a.status = '0'
-            AND post.id = #{postId}
+            AND po.post_id = #{postId}
         </where>
         ORDER BY a.sort ASC
     </select>
@@ -872,8 +865,7 @@
         p.name AS "parentName"
         FROM t_sys_organ_extend a
         <include refid="organExtendJoins"/>
-        LEFT JOIN t_sys_user u ON u.default_organ_id = a.id
-        WHERE u.id = #{userId}
+        WHERE a.id = (SELECT u.default_organ_id FROM t_sys_user u WHERE u.id = #{userId})
     </select>
 
     <select id="findOrganExtendByUserLoginName" resultType="OrganExtend">
@@ -884,31 +876,32 @@
         p.name AS "parentName"
         FROM t_sys_organ_extend a
         <include refid="organExtendJoins"/>
-        LEFT JOIN t_sys_user u ON u.default_organ_id = a.id
-        <where>
-            <if test="status != null and status !=''">
-                AND u.status = #{status}
-            </if>
-            AND u.login_name = #{loginName}
-        </where>
+        WHERE a.id IN (
+            SELECT u.default_organ_id
+            FROM t_sys_user u
+            <where>
+                <if test="status != null and status !=''">
+                    AND u.status = #{status}
+                </if>
+                AND u.login_name = #{loginName}
+            </where>
+        )
     </select>
 
     <select id="getCompanyByUserId" resultType="OrganExtend">
         SELECT
         <include refid="organExtendColumns"/>
-        FROM t_sys_organ_extend e
-        LEFT JOIN t_sys_user u ON u.default_organ_id = e.id
-        LEFT JOIN t_sys_organ_extend a ON a.id = e.company_id
-        WHERE u.id = #{userId}
+        FROM t_sys_organ_extend a
+        INNER JOIN t_sys_organ_extend e ON a.id = e.company_id
+        WHERE e.id = (SELECT u.default_organ_id FROM t_sys_user u WHERE u.id = #{userId})
     </select>
 
     <select id="getHomeCompanyByUserId" resultType="OrganExtend">
         SELECT
         <include refid="organExtendColumns"/>
-        FROM t_sys_organ_extend e
-        LEFT JOIN t_sys_user u ON u.default_organ_id = e.id
-        LEFT JOIN t_sys_organ_extend a ON a.id = e.home_company_id
-        WHERE u.id = #{userId}
+        FROM t_sys_organ_extend a
+        INNER JOIN t_sys_organ_extend e ON a.id = e.home_company_id
+        WHERE e.id = (SELECT u.default_organ_id FROM t_sys_user u WHERE u.id = #{userId})
     </select>
 
     <select id="findOrganExtends" resultType="OrganExtend">
