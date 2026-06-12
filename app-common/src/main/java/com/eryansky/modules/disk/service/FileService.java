@@ -216,7 +216,7 @@ public class FileService extends CrudService<FileDao, File> {
             }else{
                 logger.warn("文件被应用：{}，{}，未执行物理删除", new Object[]{file.getId(), file.getFilePath()});
             }
-            dao.delete(file);
+            delete(file);
         } catch (IOException e) {
             logger.error("删除文件[{}]失败,{}", new Object[]{file.getFilePath(), e.getMessage()});
         } catch (Exception e) {
@@ -238,7 +238,7 @@ public class FileService extends CrudService<FileDao, File> {
         try {
             iFileManager.deleteFile(file.getFilePath());
             logger.debug("删除文件：{}", new Object[]{file.getFilePath()});
-            dao.delete(file);
+            delete(file);
         } catch (IOException e) {
             logger.error("删除文件[{}]失败,{}", new Object[]{file.getFilePath(), e.getMessage()});
         } catch (Exception e) {
@@ -259,7 +259,7 @@ public class FileService extends CrudService<FileDao, File> {
         try {
             iFileManager.deleteFile(file.getFilePath());
             logger.debug("删除文件：{}", new Object[]{file.getFilePath()});
-            dao.delete(file);
+            delete(file);
         } catch (IOException e) {
             logger.error("删除文件[{}]失败,{}", new Object[]{file.getFilePath(), e.getMessage()});
         } catch (Exception e) {
