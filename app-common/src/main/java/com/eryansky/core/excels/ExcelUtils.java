@@ -92,12 +92,21 @@ public class ExcelUtils {
      * @param titls 表头名称数组
      * @return
      */
-    public static TableHeaderMetaData createTableHeader(String[] titls) {
+    public static TableHeaderMetaData createTableHeader(String[] titls){
+        return createTableHeader(titls, true);
+    }
+
+    /**
+     * 创建普通表头
+     * @param titls 表头名称数组
+     * @return
+     */
+    public static TableHeaderMetaData createTableHeader(String[] titls, boolean grouped){
         TableHeaderMetaData headMeta = new TableHeaderMetaData();
-        for (String title : titls) {
+        for(String title : titls){
             TableColumn tc = new TableColumn();
             tc.setDisplay(title);
-            tc.setGrouped(true);
+            tc.setGrouped(grouped);
             headMeta.addColumn(tc);
         }
         return headMeta;
