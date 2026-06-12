@@ -12,7 +12,7 @@
 	</sql>
 
 	<sql id="messageReceiveJoins">
-		LEFT JOIN t_notice_message m ON m.id = a.message_id
+		JOIN t_notice_message m ON m.id = a.message_id
 	</sql>
 
 	<select id="get" resultType="MessageReceive">
@@ -212,17 +212,14 @@
 	</update>
 
 	<update id="setUserMessageRead">
-		UPDATE t_notice_message_receive
-		<if test="appId != null and appId != ''">
-			LEFT JOIN t_notice_message ON t_notice_message.id = t_notice_message_receive.message_id
-		</if>
-		SET t_notice_message_receive.is_send = #{isSend},
-		t_notice_message_receive.is_read = #{isRead},
-		t_notice_message_receive.read_time = #{readTime}
+		UPDATE t_notice_message_receive SET
+		is_send = #{isSend},
+		is_read = #{isRead},
+		read_time = #{readTime}
 		<where>
 			user_id = #{userId}
 			<if test="appId != null and appId != ''">
-				AND t_notice_message.app_id = #{appId}
+				AND message_id IN (SELECT id FROM t_notice_message WHERE app_id = #{appId})
 			</if>
 		</where>
 	</update>
@@ -234,6 +231,6 @@
 
 	<delete id="deleteByMessageId">
 		DELETE FROM t_notice_message_receive
-		WHERE message_id = #{id}
+		WHERE message_id = #{messageId}
 	</delete>
 </mapper>

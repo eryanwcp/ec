@@ -33,7 +33,6 @@
 		SELECT 
 			<include refid="noticeMessageColumns"/>
 		FROM t_notice_message a
-		<include refid="noticeMessageJoins"/>
 		WHERE a.id = #{id}
 	</select>
 	
@@ -174,7 +173,6 @@
 		SELECT 
 			<include refid="noticeMessageColumns"/>
 		FROM t_notice_message a
-		<include refid="noticeMessageJoins"/>
 		<where>
 			a.status = #{STATUS_NORMAL}
 			<if test="organId != null and organId != ''">

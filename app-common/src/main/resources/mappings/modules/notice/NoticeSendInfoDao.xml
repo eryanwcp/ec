@@ -17,7 +17,6 @@
 		SELECT
 		<include refid="noticeSendInfoColumns"/>
 		FROM t_notice_send_info a
-		<include refid="noticeJoins"/>
 		WHERE a.id = #{id}
 	</select>
 
@@ -29,7 +28,7 @@
 		<where>
 			n.status = #{STATUS_NORMAL}
 			<if test="noticeId != null and noticeId != ''">
-				AND n.notice_id  = #{noticeId}
+				AND a.notice_id  = #{noticeId}
 			</if>
 			<if test="notice != null and notice.title != null and notice.title != ''">
 				AND n.title LIKE
@@ -50,7 +49,7 @@
 				</choose>
 			</if>
 			<if test="notice != null and notice.userId != null and notice.userId != ''">
-				AND n.userId = #{notice.userId}
+				AND n.user_id = #{notice.userId}
 			</if>
 		</where>
 		<choose>
@@ -94,7 +93,7 @@
 		FROM t_notice_send_info a
 		<include refid="noticeJoins"/>
 		<where>
-			a.status = #{STATUS_NORMAL}
+			n.status = #{STATUS_NORMAL}
 		</where>
 		<choose>
 			<when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">

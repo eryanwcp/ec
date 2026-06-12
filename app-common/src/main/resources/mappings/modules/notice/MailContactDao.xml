@@ -28,12 +28,13 @@
         SELECT
         <include refid="contactColumns"/>
         FROM t_notice_mail_contact a
-        LEFT JOIN t_notice_contact_group_object cgo ON cgo.object_id = a.id
-        LEFT JOIN t_notice_contact_group cg ON cg.id = a.contact_group_id
+        <if test="contactGroupId != null and contactGroupId !=''">
+            JOIN t_notice_contact_group_object cgo ON cgo.object_id = a.id
+        </if>
         <where>
             a.status = #{status}
             <if test="contactGroupId != null and contactGroupId !=''">
-                AND cg.id = #{contactGroupId}
+                AND cgo.contact_group_id = #{contactGroupId}
             </if>
             <if test="userId != null and userId !=''">
                 AND a.user_id = #{userId}
@@ -84,11 +85,10 @@
         SELECT
         <include refid="contactColumns"/>
         FROM t_notice_mail_contact a
-        LEFT JOIN t_notice_contact_group_object cgo ON cgo.object_id = a.id
-        LEFT JOIN t_notice_contact_group cg ON cg.id = cgo.contact_group_id
+        JOIN t_notice_contact_group_object cgo ON cgo.object_id = a.id
         <where>
             a.status = #{status}
-            AND cg.id = #{contactGroupId}
+            AND cgo.contact_group_id = #{contactGroupId}
         </where>
         <choose>
             <when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
@@ -118,14 +118,14 @@
                         <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
                         <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
                         <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
-                        <otherwise>'%,'+#{query}+',%'</otherwise>
+                        <otherwise>'%'+#{query}+'%'</otherwise>
                     </choose>
                     OR a.email LIKE
                     <choose>
                         <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
                         <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
                         <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
-                        <otherwise>'%,'+#{query}+',%'</otherwise>
+                        <otherwise>'%'+#{query}+'%'</otherwise>
                     </choose>
                     )
                 </when>
@@ -141,14 +141,14 @@
                         <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
                         <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
                         <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
-                        <otherwise>'%,'+#{query}+',%'</otherwise>
+                        <otherwise>'%'+#{query}+'%'</otherwise>
                     </choose>
                     OR a.email LIKE
                     <choose>
                         <when test="dbName == 'db2'">'%'||#{query}||'%'</when>
                         <when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
                         <when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
-                        <otherwise>'%,'+#{query}+',%'</otherwise>
+                        <otherwise>'%'+#{query}+'%'</otherwise>
                     </choose>
                     )
                 </when>
