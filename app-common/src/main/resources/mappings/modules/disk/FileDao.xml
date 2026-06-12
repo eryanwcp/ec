@@ -174,7 +174,6 @@
         SELECT
         <include refid="fileColumns"/>
         FROM t_disk_file a
-        <include refid="fileJoins"/>
         <where>
             a.status = #{status}
             AND a.folder_id = #{folderId}
@@ -404,20 +403,21 @@
     </delete>
 
     <update id="deleteCascadeByFolderId">
-        UPDATE t_disk_file a
-        LEFT JOIN t_disk_folder f  ON f.id = a.folder_id
-         SET
-        a.status = #{STATUS_DELETE},
-        a.version = a.version +1,
-        a.update_user = #{updateUser},
-        a.update_time = #{updateTime}
-        WHERE (f.id = #{folderId} OR f.parent_ids LIKE
-        <choose>
-            <when test="dbName == 'db2'">'%,'||#{folderId}||',%'</when>
-            <when test="dbName == 'mysql'">CONCAT('%,', #{folderId}, ',%')</when>
-            <when test="dbName == 'oracle'">'%,'||#{folderId}||',%'</when>
-            <otherwise>'%,'+#{folderId}+',%'</otherwise>
-        </choose>
+        UPDATE t_disk_file SET
+        status = #{STATUS_DELETE},
+        version = version + 1,
+        update_user = #{updateUser},
+        update_time = #{updateTime}
+        WHERE folder_id IN (
+            SELECT id FROM t_disk_folder
+            WHERE id = #{folderId} OR parent_ids LIKE
+            <choose>
+                <when test="dbName == 'db2'">'%,'||#{folderId}||',%'</when>
+                <when test="dbName == 'mysql'">CONCAT('%,', #{folderId}, ',%')</when>
+                <when test="dbName == 'oracle'">'%,'||#{folderId}||',%'</when>
+                <otherwise>'%,'+#{folderId}+',%'</otherwise>
+            </choose>
+        )
     </update>
 
     <select id="findFilesByFolderId" resultType="File">
