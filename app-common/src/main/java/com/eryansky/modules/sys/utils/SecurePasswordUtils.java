@@ -51,8 +51,8 @@ public class SecurePasswordUtils {
             passwordChars.add(ALL_CHARS.charAt(random.nextInt(ALL_CHARS.length())));
         }
 
-        // 4. 打乱字符顺序（避免前4位固定是数字、小写、大写、特殊符号）
-        Collections.shuffle(passwordChars);
+        // 4. 打乱字符顺序（避免前 4 位固定是数字、小写、大写、特殊符号）
+        Collections.shuffle(passwordChars, random);
 
         // 5. 将字符列表拼接为字符串
         StringBuilder password = new StringBuilder();
@@ -80,7 +80,7 @@ public class SecurePasswordUtils {
         List<Character> pwdChars = combinedChars.chars()
                 .mapToObj(c -> (char) c)
                 .collect(Collectors.toList());
-        Collections.shuffle(pwdChars);
+        Collections.shuffle(pwdChars, random);
         String password = pwdChars.stream()
                 .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
                 .toString();

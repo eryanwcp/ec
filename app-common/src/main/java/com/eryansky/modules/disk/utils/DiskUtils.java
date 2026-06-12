@@ -609,8 +609,9 @@ public class DiskUtils {
                                 + ")")).toString();
                     }
                 }
-                if (file.getDiskFile().isFile()) {
-                    try (InputStream inputStream = new FileInputStream(file.getDiskFile());
+                java.io.File diskFile = file.getDiskFile();
+                if (diskFile != null && diskFile.isFile()) {
+                    try (InputStream inputStream = new FileInputStream(diskFile);
                          BufferedInputStream bis = new BufferedInputStream(inputStream)) {
                         ZipEntry entry = new ZipEntry(newName);
                         zipOut.putNextEntry(entry);
@@ -634,7 +635,9 @@ public class DiskUtils {
     public static void clearTempDir() {
         String tempDir = AppConstants.getDiskTempDir();
         java.io.File file = new java.io.File(tempDir);
-        FileUtils.deleteFile(file.listFiles());
+        if (file.exists() && file.isDirectory()) {
+            FileUtils.deleteFile(file.listFiles());
+        }
     }
 
     /**
@@ -710,17 +713,12 @@ public class DiskUtils {
 //        String displayFilename = displayName.substring(displayName.lastIndexOf("_") + 1);
 //        displayFilename = displayFilename.replace(" ", "_");
         WebUtils.setDownloadableHeader(request, response, displayName);
-        BufferedInputStream is = null;
-        OutputStream os = null;
-        try {
-
-            os = response.getOutputStream();
-            is = new BufferedInputStream(inputStream);
-            IOUtils.copy(is, os);
+        try (BufferedInputStream bis = new BufferedInputStream(inputStream)) {
+            OutputStream os = response.getOutputStream();
+            IOUtils.copy(bis, os);
+            os.flush();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-        } finally {
-            IOUtils.closeQuietly(is);
         }
     }
 
