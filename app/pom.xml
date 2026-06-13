@@ -416,7 +416,7 @@
                             <jvmFlag>-Dspring.profiles.active=${profileActive}</jvmFlag>
 
                             <jvmFlag>-XX:+UnlockExperimentalVMOptions</jvmFlag>
-                            <jvmFlag>-XX:+UseCGroupSubsystemConstraints</jvmFlag>
+<!--                            <jvmFlag>-XX:+UseCGroupSubsystemConstraints</jvmFlag>-->
 
                             <jvmFlag>-XX:MaxRAMPercentage=75.0</jvmFlag>
                             <jvmFlag>-XX:InitialRAMPercentage=40.0</jvmFlag>
