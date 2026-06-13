@@ -413,11 +413,27 @@
                     <container>
                         <mainClass>com.eryansky.Application</mainClass>
                         <jvmFlags>
-                            <jvmFlag>-Dspring.profiles.active=${profileActive}${configSuffix}</jvmFlag>
-                            <jvmFlag>-Xms1g</jvmFlag>
-                            <jvmFlag>-Xmx2g</jvmFlag>
-                            <jvmFlag>-Djava.awt.headless=true</jvmFlag>
+                            <jvmFlag>-Dspring.profiles.active=${profileActive}</jvmFlag>
+
+                            <!-- 容器资源感知与内存动态配比，防止 K8s OOM Killed -->
+                            <jvmFlag>-XX:+UseContainerSupport</jvmFlag>
+                            <jvmFlag>-XX:MaxRAMPercentage=75.0</jvmFlag>
+                            <jvmFlag>-XX:InitialRAMPercentage=40.0</jvmFlag>
+
+                            <!-- 垃圾回收器：JDK 21 下 G1GC 经过深度演进，依旧是高并发低延迟的生产首选 -->
+                            <jvmFlag>-XX:+UseG1GC</jvmFlag>
+                            <!-- 开启 JDK 21 核心黑科技：字符串去重，最高可节省 10%~15% 的 Java 堆内存空间 -->
+                            <jvmFlag>-XX:+UseStringDeduplication</jvmFlag>
+
+                            <!-- Spring Boot 3.5 + JDK 21 启动性能优化 -->
+                            <!-- 允许 JVM 共享类数据归档，配合 CDS 挂载，直接跳过繁重的 classpath 扫描（后文详述） -->
+                            <jvmFlag>-Xshare:on</jvmFlag>
+                            <!-- 关闭背景早期初始化，避免多核受限的容器内抢夺启动阶段宝贵的 CPU 算力 -->
+                            <jvmFlag>-Dspring.backgroundpreinitializer.ignore=true</jvmFlag>
+
+                            <!-- 环境基础配置 -->
                             <jvmFlag>-Duser.timezone=GMT+08</jvmFlag>
+                            <jvmFlag>-Dfile.encoding=UTF-8</jvmFlag>
                         </jvmFlags>
                         <args>
                         </args>
@@ -428,10 +444,13 @@
                         <ports>
                             <port>8080</port>
                         </ports>
+
                         <!-- 设置时区  -->
                         <environment>
                             <TZ>Asia/Shanghai</TZ>
                         </environment>
+
+                        <!-- 保持镜像创建时间为当前时间，便于企业内部私有仓库（如 Harbor）按时间流正确排序 -->
                         <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
                     </container>
                 </configuration>
