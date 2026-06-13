@@ -343,7 +343,7 @@
                             <!-- 容器资源感知与内存动态配比，防止 K8s OOM Killed -->
                             <jvmFlag>-XX:+UseContainerSupport</jvmFlag>
                             <jvmFlag>-XX:MaxRAMPercentage=60.0</jvmFlag>
-                            <jvmFlag>-XX:InitialRAMPercentage=20.0</jvmFlag>
+                            <jvmFlag>-XX:InitialRAMPercentage=15.0</jvmFlag>
 
                             <!-- 垃圾回收器：JDK 21 下 G1GC 经过深度演进，依旧是高并发低延迟的生产首选 -->
                             <jvmFlag>-XX:+UseG1GC</jvmFlag>
