@@ -209,7 +209,10 @@ public class UserUtils {
     public static String getPhotoUrlByUserId(String userId) {
         User user = getUser(userId);
         if (null != user) {
-            return user.getPhotoUrl();
+            String photoUrl = user.getPhotoUrl();
+            if (StringUtils.isNotBlank(photoUrl)) {
+                return photoUrl;
+            }
         }
         String ctx = StringUtils.EMPTY;
         try {
@@ -641,6 +644,12 @@ public class UserUtils {
      * @param tipMessage 消息推送 由aop切面实现
      */
     public static void updateUserPasswordReset(List<String> userIds, String password,String tipMessage) {
+        if (Collections3.isEmpty(userIds)) {
+            return;
+        }
+        if (StringUtils.isBlank(password)) {
+            throw new ServiceException("重置密码不能为空！");
+        }
         Static.userService.updateUserPasswordReset(userIds, password,tipMessage);
     }
 
@@ -699,6 +708,9 @@ public class UserUtils {
      * @param roleCode 角色编码
      */
     public static void addUserRole(String userId, String roleCode) {
+        if (StringUtils.isBlank(userId)) {
+            throw new ServiceException("用户ID不能为空！");
+        }
         if(null == roleCode){
             throw new ServiceException("角色编码不能为空！");
         }
@@ -716,6 +728,9 @@ public class UserUtils {
      * @param roleCode 角色编码
      */
     public static void deleteUserRole(String userId,String roleCode) {
+        if (StringUtils.isBlank(userId)) {
+            throw new ServiceException("用户ID不能为空！");
+        }
         if(null == roleCode){
             throw new ServiceException("角色编码不能为空！");
         }
@@ -748,6 +763,12 @@ public class UserUtils {
      * @param postCode 岗位编码
      */
     public static void addUserOrganPost(String userId, String organId,String postCode) {
+        if (StringUtils.isBlank(userId)) {
+            throw new ServiceException("用户ID不能为空！");
+        }
+        if (StringUtils.isBlank(organId)) {
+            throw new ServiceException("机构ID不能为空！");
+        }
         if(null == postCode){
             throw new ServiceException("岗位编码不能为空！");
         }
@@ -756,7 +777,7 @@ public class UserUtils {
             throw new ServiceException("岗位【"+postCode+"】不存在！");
         }
         List<String> organIds = Static.organService.findAssociationOrganIdsByPostId(post.getId());
-        if(!organIds.contains(organId) && !organId.equals(post.getOrganId())){
+        if(!organIds.contains(organId) && !StringUtils.equals(organId, post.getOrganId())){
             throw new ServiceException("岗位【"+postCode+"】未关联机构【"+organId+"】！");
         }
         Static.postService.addPostOrganUsers(post.getId(),organId,Lists.newArrayList(userId));
@@ -783,11 +804,14 @@ public class UserUtils {
      * @param postCode 岗位编码
      */
     public static void deleteUserOrganPost(String userId,String organId,String postCode) {
+        if (StringUtils.isBlank(userId)) {
+            throw new ServiceException("用户ID不能为空！");
+        }
+        if (StringUtils.isBlank(organId)) {
+            throw new ServiceException("机构ID不能为空！");
+        }
         if(null == postCode){
             throw new ServiceException("岗位编码不能为空！");
-        }
-        if(null == organId){
-            throw new ServiceException("机构ID不能为空！");
         }
         Post post = Static.postService.getByCode(postCode);
         if(null == post){
@@ -805,7 +829,7 @@ public class UserUtils {
      * @param postCode 岗位编码
      */
     public static void deleteUserPost(String userId,String postCode) {
-        if(null == userId){
+        if(StringUtils.isBlank(userId)){
             throw new ServiceException("用户ID不能为空！");
         }
         if(null == postCode){
