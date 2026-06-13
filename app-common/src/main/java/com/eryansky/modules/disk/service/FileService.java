@@ -203,6 +203,9 @@ public class FileService extends CrudService<FileDao, File> {
      */
     public void deleteByFileId(String fileId, boolean deleteDiskFile) {
         File file = dao.get(fileId);
+        if (file == null) {
+            return;
+        }
         try {
             //检查文件是否被引用
 //            List<File> files = this.findByCode(file.getCode(), fileId);
@@ -212,7 +215,7 @@ public class FileService extends CrudService<FileDao, File> {
             }else{
                 logger.warn("文件被应用：{}，{}，未执行物理删除", new Object[]{file.getId(), file.getFilePath()});
             }
-            dao.delete(file);
+            delete(file);
         } catch (IOException e) {
             logger.error("删除文件[{}]失败,{}", new Object[]{file.getFilePath(), e.getMessage()});
         } catch (Exception e) {
@@ -228,10 +231,13 @@ public class FileService extends CrudService<FileDao, File> {
      */
     public void deleteFileAndClearDisk(String fileId) {
         File file = dao.get(fileId);
+        if (file == null) {
+            return;
+        }
         try {
             iFileManager.deleteFile(file.getFilePath());
             logger.debug("删除文件：{}", new Object[]{file.getFilePath()});
-            dao.delete(file);
+            delete(file);
         } catch (IOException e) {
             logger.error("删除文件[{}]失败,{}", new Object[]{file.getFilePath(), e.getMessage()});
         } catch (Exception e) {
@@ -252,7 +258,7 @@ public class FileService extends CrudService<FileDao, File> {
         try {
             iFileManager.deleteFile(file.getFilePath());
             logger.debug("删除文件：{}", new Object[]{file.getFilePath()});
-            dao.delete(file);
+            delete(file);
         } catch (IOException e) {
             logger.error("删除文件[{}]失败,{}", new Object[]{file.getFilePath(), e.getMessage()});
         } catch (Exception e) {
@@ -267,6 +273,9 @@ public class FileService extends CrudService<FileDao, File> {
      */
     public void clearFileAndClearDisk(String fileId) {
         File file = dao.get(fileId);
+        if (file == null) {
+            return;
+        }
         try {
             iFileManager.deleteFile(file.getFilePath());
             logger.debug("删除文件：{}", new Object[]{file.getFilePath()});
@@ -305,6 +314,9 @@ public class FileService extends CrudService<FileDao, File> {
      */
     public void clearByFileId(String fileId) {
         File file = dao.get(fileId);
+        if (file == null) {
+            return;
+        }
         try {
             //检查文件是否被引用
             List<File> files = this.findByCode(file.getCode(), fileId);
@@ -324,33 +336,38 @@ public class FileService extends CrudService<FileDao, File> {
 
     /**
      * 根据文件夹ID级联删除文件（包含下级文件夹）
-     * @param fileId 文件ID
+     * @param folderId 文件夹ID
      * @return
      */
-    public void deleteCascadeByFolderId(String fileId) {
-        deleteCascadeByFolderId(fileId, false);
+    public void deleteCascadeByFolderId(String folderId) {
+        deleteCascadeByFolderId(folderId, false);
     }
 
     /**
      * 根据文件夹ID级联删除文件（包含下级文件夹）
-     * @param fileId 文件ID
-     * @param deleteDiskFile 删除磁盘文件
+     * @param folderId 文件夹ID
+     * @param deleteDiskFile 是否删除磁盘文件
      * @return
      */
-    public void deleteCascadeByFolderId(String fileId, boolean deleteDiskFile) {
-        File file = dao.get(fileId);
+    public void deleteCascadeByFolderId(String folderId, boolean deleteDiskFile) {
         try {
-            //检查文件是否被引用
-            List<File> files = this.findByCode(file.getCode(), fileId);
-            if (deleteDiskFile && Collections3.isEmpty(files)) {
-                iFileManager.deleteFile(file.getFilePath());
-                logger.debug("删除文件：{}", new Object[]{file.getFilePath()});
+            if (deleteDiskFile) {
+                List<File> files = findOwnerAndChildsFolderFiles(folderId);
+                for (File file : files) {
+                    try {
+                        iFileManager.deleteFile(file.getFilePath());
+                        logger.debug("删除文件：{}", new Object[]{file.getFilePath()});
+                    } catch (IOException e) {
+                        logger.error("删除文件[{}]失败,{}", new Object[]{file.getFilePath(), e.getMessage()});
+                    }
+                }
             }
+            File file = new File();
+            file.setFolderId(folderId);
+            file.preUpdate();
             dao.deleteCascadeByFolderId(file);
-        } catch (IOException e) {
-            logger.error("删除文件[{}]失败,{}", new Object[]{file.getFilePath(), e.getMessage()});
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
         }
     }
 

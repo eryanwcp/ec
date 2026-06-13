@@ -77,11 +77,11 @@
 	</select>
 
 
-	<select id="selectMany" resultType="Post">
+	<select id="selectMany" resultType="Area">
 		${selectStatement}
 	</select>
 
-	<select id="selectOne" resultType="Post">
+	<select id="selectOne" resultType="Area">
 		${selectStatement}
 	</select>
 
@@ -129,7 +129,7 @@
 					AND a.parent_id = #{parentId}
 				</when>
 				<otherwise>
-					AND (a.parent_id IS  NULL OR a.parent_id == '')
+					AND (a.parent_id IS NULL OR a.parent_id = '')
 				</otherwise>
 			</choose>
 		</where>
@@ -162,7 +162,7 @@
 	<select id="findChild" resultType="Area">
 		SELECT
 		<include refid="areaColumns"/>
-		FROM t_sys_organ a
+		FROM t_sys_area a
 		<include refid="areaJoins"/>
 		<where>
 			<if test="types != null and types.size() !=0">

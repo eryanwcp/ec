@@ -121,9 +121,9 @@ public class LogService extends CrudService<LogDao, Log> {
      * @return
      */
     public int clear(String id) {
-        int resultCount = super.clear(id);
-        logger.debug("清除日志：{}", resultCount);
-        return resultCount;
+        int reslutCount = super.clear(id);
+        logger.debug("清除日志：{}", reslutCount);
+        return reslutCount;
     }
 
     /**
@@ -132,9 +132,9 @@ public class LogService extends CrudService<LogDao, Log> {
      * @return
      */
     public int clearAll() {
-        int resultCount = super.clearAll();
-        logger.debug("清空日志：{}", resultCount);
-        return resultCount;
+        int reslutCount = super.clearAll();
+        logger.debug("清空日志：{}", reslutCount);
+        return reslutCount;
     }
 
     /**

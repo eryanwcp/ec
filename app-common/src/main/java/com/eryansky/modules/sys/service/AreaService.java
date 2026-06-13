@@ -42,7 +42,9 @@ public class AreaService extends TreeService<AreaDao, Area> {
     }
 
     public void deleteOwnerAndChilds(String id) {
-        dao.deleteOwnerAndChilds(new Area(id));
+        Area area = new Area(id);
+        area.preUpdate();
+        dao.deleteOwnerAndChilds(area);
     }
 
     /**
@@ -144,7 +146,7 @@ public class AreaService extends TreeService<AreaDao, Area> {
         parameter.put("parentCode", parentCode);
         parameter.put("types", types);
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
-        return dao.findOwnAndChild(parameter);
+        return dao.findChild(parameter);
     }
 
     /**

@@ -32,7 +32,9 @@ public class VersionLogService extends CrudService<VersionLogDao, VersionLog> {
      * @param id
      */
     public void delete(String id) {
-        dao.delete(new VersionLog(id));
+        VersionLog versionLog = new VersionLog(id);
+        versionLog.preUpdate();
+        dao.delete(versionLog);
     }
 
     public Page<VersionLog> findPage(Page<VersionLog> page, Parameter parameter) {

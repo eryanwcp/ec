@@ -16,14 +16,13 @@
 	</sql>
 
 	<sql id="noticeJoins">
-		LEFT JOIN t_notice n ON n.id = a.notice_id
+		JOIN t_notice n ON n.id = a.notice_id
 	</sql>
 
 	<select id="get" resultType="NoticeReceiveInfo">
 		SELECT
 		<include refid="noticeReceiveInfoColumns"/>
 		FROM t_notice_receive_info a
-		<include refid="noticeJoins"/>
 		WHERE a.id = #{id}
 	</select>
 
@@ -31,7 +30,6 @@
 		SELECT
 		<include refid="noticeReceiveInfoColumns"/>
 		FROM t_notice_receive_info a
-		<include refid="noticeJoins"/>
 		<where>
 			<if test="userId != null and userId != ''">
 				AND a.user_id = #{userId}
@@ -87,7 +85,7 @@
 				AND a.is_reply = #{isReply}
 			</if>
 			<choose>
-				<when test="types != null and types.sze() !=0">
+				<when test="types != null and types.size() != 0">
 					AND n.type IN
 					<foreach collection="types" item="item" index="index" open="(" close=")" separator=",">
 					#{item,jdbcType=VARCHAR}
@@ -155,7 +153,6 @@
 		SELECT
 		<include refid="noticeReceiveInfoColumns"/>
 		FROM t_notice_receive_info a
-		<include refid="noticeJoins"/>
 		<where>
 			a.status = #{STATUS_NORMAL}
 		</where>

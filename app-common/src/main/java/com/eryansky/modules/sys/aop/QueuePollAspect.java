@@ -38,7 +38,7 @@ public class QueuePollAspect {
         // 线程 ID 是唯一的，并且在其生命周期内保持不变。 当一个线程终止时，这个线程 ID 可能会被重用。
         // String threadId = String.valueOf(currentThread.getId());
         // 在多实例多情况下线程ID可能会导致重复，所以使用UUID
-        String uuid = Identities.uuid2();
+        String uuid = Identities.uuid7();
         // 相同的租户放入同一个redis队列里，实现同租户串行不同的租户并行
         String region = queuePoll.region() + "_" + queuePoll.value();
         CacheChannel cacheChannel = CacheUtils.getCacheChannel();

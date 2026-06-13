@@ -105,7 +105,7 @@
 
 	<delete id="deleteByMessageId">
 		DELETE FROM t_notice_message_sender
-		WHERE message_id = #{id}
+		WHERE message_id = #{messageId}
 	</delete>
 
 </mapper>

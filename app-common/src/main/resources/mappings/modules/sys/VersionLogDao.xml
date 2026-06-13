@@ -27,7 +27,6 @@
 	</sql>
 
 	<sql id="sysVersionLogJoins">
-		LEFT JOIN t_sys_user u ON u.id = a.update_user
 	</sql>
 
 	<select id="get" resultType="VersionLog">
@@ -156,7 +155,7 @@
 					<when test="dbName == 'db2'">'%'||#{query}||'%'</when>
 					<when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
 					<when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
-					<otherwise>'%'+#{versionName}+'%'</otherwise>
+					<otherwise>'%'+#{query}+'%'</otherwise>
 				</choose>
 				OR a.version_code LIKE
 				<choose>

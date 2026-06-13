@@ -85,6 +85,10 @@ public class File extends DataEntity<File>{
         this.fileType = FileType.Other.getValue();
     }
 
+    public File(String id) {
+        super(id);
+    }
+
     @Override
     public void prePersist() {
         super.prePersist();

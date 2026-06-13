@@ -36,14 +36,11 @@
         <include refid="postColumns"/>
         FROM t_sys_post a
         LEFT JOIN t_sys_post_organ po ON po.post_id = a.id
-        LEFT JOIN t_sys_organ o ON o.id = a.organ_id
         <where>
             a.status = '0'
             AND a.code = #{code}
             <if test="organId != null and organId !=''">
-                AND (a.organ_id = #{organId}
-                OR o.id = #{organId}
-                )
+                AND (a.organ_id = #{organId} OR po.organ_id = #{organId})
             </if>
         </where>
     </select>
@@ -96,11 +93,10 @@
         <include refid="postColumns"/>
         FROM t_sys_post a
         LEFT JOIN t_sys_post_organ po ON po.post_id = a.id
-        LEFT JOIN t_sys_organ o ON po.organ_id = o.id
         <where>
             a.status = #{status}
             <if test="organId != null and organId !=''">
-                AND (a.organ_id = #{organId}  OR o.id = #{organId})
+                AND (a.organ_id = #{organId} OR po.organ_id = #{organId})
             </if>
             <if test="query != null and query !=''">
                 AND (a.name LIKE
@@ -137,10 +133,9 @@
         <include refid="postColumns"/>
         FROM t_sys_post a
         LEFT JOIN t_sys_post_organ po ON po.post_id = a.id
-        LEFT JOIN t_sys_organ o ON po.organ_id = o.id
         <where>
             a.status = '0'
-            AND (a.organ_id = #{organId} OR o.id = #{organId})
+            AND (a.organ_id = #{organId} OR po.organ_id = #{organId})
         </where>
     </select>
 
@@ -150,13 +145,11 @@
         <include refid="postColumns"/>
         FROM t_sys_post a
         LEFT JOIN t_sys_post_organ po ON po.post_id = a.id
-        LEFT JOIN t_sys_organ o ON po.organ_id = o.id
         <where>
             a.status = '0'
-            AND (a.organ_id IN  <foreach collection="organIds" open="(" separator="," close=")" item="item">#{item}</foreach>
-                 OR o.id IN <foreach collection="organIds" open="(" separator="," close=")" item="item">#{item} </foreach>
+            AND (a.organ_id IN <foreach collection="organIds" open="(" separator="," close=")" item="item">#{item}</foreach>
+                 OR po.organ_id IN <foreach collection="organIds" open="(" separator="," close=")" item="item">#{item}</foreach>
              )
-
         </where>
     </select>
 
@@ -164,11 +157,10 @@
         SELECT
         <include refid="postColumns"/>
         FROM t_sys_post a
-        LEFT JOIN t_sys_user_post up ON up.post_id = a.id
-        LEFT JOIN t_sys_user u ON u.id = up.user_id
+        INNER JOIN t_sys_user_post up ON up.post_id = a.id
         <where>
             a.status = #{status}
-            AND u.id = #{userId}
+            AND up.user_id = #{userId}
             <if test="organId != null and organId !=''">
                 AND up.organ_id = #{organId}
             </if>
@@ -179,11 +171,10 @@
         SELECT
         a.id
         FROM t_sys_post a
-        LEFT JOIN t_sys_user_post up ON up.post_id = a.id
-        LEFT JOIN t_sys_user u ON u.id = up.user_id
+        INNER JOIN t_sys_user_post up ON up.post_id = a.id
         <where>
             a.status = #{status}
-            AND u.id = #{userId}
+            AND up.user_id = #{userId}
             <if test="organId != null and organId !=''">
                 AND up.organ_id = #{organId}
             </if>

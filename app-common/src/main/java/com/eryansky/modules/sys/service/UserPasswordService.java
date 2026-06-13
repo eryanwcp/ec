@@ -12,11 +12,9 @@ import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
 import com.eryansky.modules.sys._enum.UserPasswordUpdateType;
 import com.eryansky.modules.sys.mapper.User;
-import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.modules.sys.vo.PasswordTip;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Lists;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.eryansky.modules.sys.mapper.UserPassword;
@@ -70,7 +68,7 @@ public class UserPasswordService extends CrudService<UserPasswordDao, UserPasswo
     }
 
     /**
-     * 查询某个用户ID秘密修改记录
+     * 查询某个用户ID密码修改记录
      * <br/>根据修改时间 降序排列
      *
      * @param userId  用户ID
@@ -82,7 +80,7 @@ public class UserPasswordService extends CrudService<UserPasswordDao, UserPasswo
     }
 
     /**
-     * 查询某个用户ID秘密修改记录
+     * 查询某个用户ID密码修改记录
      * <br/>根据修改时间 降序排列
      *
      * @param userId  用户ID
@@ -131,7 +129,7 @@ public class UserPasswordService extends CrudService<UserPasswordDao, UserPasswo
 
         PasswordTip tip = new PasswordTip();
         if (userPassword == null) {
-            tip.setMsg("您从未修改过登录秘密，请设置登录密码！");
+            tip.setMsg("您从未修改过登录密码，请设置登录密码！");
             tip.setCode(PasswordTip.CODE_YES);
         } else if (time.compareTo(userPassword.getModifyTime()) > 0) {
             tip.setMsg("您已超过" + userPasswordUpdateCycle + "天没有修改登录密码，请修改登录密码！");

@@ -26,11 +26,10 @@
 		a.extend_attr AS "extendAttr",
 		TRIM('"' FROM JSON_EXTRACT(a.extend_attr,'$.userName')) AS "userName",
 		TRIM('"' FROM JSON_EXTRACT(a.extend_attr,'$.userLoginName')) AS "userLoginName",
-		TRIM('"' FROM JSON_EXTRACT(a.extend_attr,'$.userMobie')) AS "userMobie"
+		TRIM('"' FROM JSON_EXTRACT(a.extend_attr,'$.userMobile')) AS "userMobile"
 	</sql>
 
     <sql id="sysLogJoins">
-		LEFT JOIN t_sys_user u ON u.id = a.user_id
 	</sql>
 
     <select id="get" resultType="Log">

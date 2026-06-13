@@ -38,7 +38,6 @@
 		SELECT
 		<include refid="noticeColumns"/>
 		FROM t_notice a
-		<include refid="noticeJoins"/>
 		WHERE a.id = #{id}
 	</select>
 
@@ -88,7 +87,6 @@
 		SELECT
 		<include refid="noticeColumns"/>
 		FROM t_notice a
-		<include refid="noticeJoins"/>
 		<where>
 			a.status = #{STATUS_NORMAL}
 		</where>

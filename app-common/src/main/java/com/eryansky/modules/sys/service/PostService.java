@@ -10,10 +10,9 @@ import com.eryansky.common.orm.model.Parameter;
 import com.eryansky.common.orm.mybatis.interceptor.BaseInterceptor;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
-import com.eryansky.modules.sys.mapper.User;
+import com.eryansky.modules.sys.mapper.Role;
 import com.eryansky.utils.AppConstants;
 import org.apache.commons.lang3.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.eryansky.modules.sys.mapper.Post;
@@ -21,9 +20,7 @@ import com.eryansky.modules.sys.dao.PostDao;
 import com.eryansky.core.orm.mybatis.service.CrudService;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 /**
  * 岗位表 service

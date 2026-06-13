@@ -391,7 +391,7 @@ public class User extends DataEntity<User> implements IUser {
     }
 
     public boolean isAdmin() {
-        return SecurityUtils.isUserAdmin(this.id);
+        return null != this.id && SecurityUtils.isUserAdmin(this.id);
     }
 
     /**

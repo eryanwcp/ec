@@ -206,11 +206,11 @@
                 AND a.status = #{status}
             </if>
             AND a.name = #{name}
-            <if test="compnayId != null and compnayId !=''">
-                AND o.compnay_id = #{compnayId}
+            <if test="companyId != null and companyId !=''">
+                AND o.company_id = #{companyId}
             </if>
-            <if test="homeCompnayId != null and homeCompnayId !=''">
-                AND o.home_compnay_id = #{homeCompnayId}
+            <if test="homeCompanyId != null and homeCompanyId !=''">
+                AND o.home_company_id = #{homeCompanyId}
             </if>
         </where>
     </select>
@@ -1052,7 +1052,7 @@
                 AND o.code = #{organCode}
             </if>
             <if test="companyId != null and companyId !=''">
-                AND o.conmpay_id = #{companyId}
+                AND o.company_id = #{companyId}
             </if>
             <if test="companyCode != null and companyCode !=''">
                 AND o.company_code = #{companyCode}
@@ -1099,7 +1099,7 @@
                 AND o.code = #{organCode}
             </if>
             <if test="companyId != null and companyId !=''">
-                AND o.conmpay_id = #{companyId}
+                AND o.company_id = #{companyId}
             </if>
             <if test="companyCode != null and companyCode !=''">
                 AND o.company_code = #{companyCode}

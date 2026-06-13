@@ -132,7 +132,9 @@ public class FolderService extends TreeService<FolderDao, Folder> {
      */
     public void deleteFolderAndFiles(String folderId) {
         Validate.notNull(folderId, "参数[folderId]不能为null.");
-        dao.deleteCascadeByFolderId(new Folder(folderId));
+        Folder folder = new Folder(folderId);
+        folder.preUpdate();
+        dao.deleteCascadeByFolderId(folder);
         fileService.deleteCascadeByFolderId(folderId);
     }
 

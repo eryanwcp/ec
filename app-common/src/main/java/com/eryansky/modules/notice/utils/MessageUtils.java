@@ -219,25 +219,29 @@ public class MessageUtils {
         Static.messageService.save(model);
 
         List<MessageSender> messageSenders = Lists.newArrayList();
-        List<MessageReceive> messageReceives = Lists.newArrayList();
-        receiveObjectIds.forEach(objectId->{
+        Set<String> targetUserIds = new LinkedHashSet<>();
+        receiveObjectIds.stream().filter(Objects::nonNull).distinct().forEach(objectId->{
             MessageSender messageSender = new MessageSender(model.getId());
             messageSender.setObjectType(messageReceiveObjectType.getValue());
             messageSender.setObjectId(objectId);
             messageSender.prePersist();
             messageSenders.add(messageSender);
 
-            List<String> targetIds = Lists.newArrayList();
             if (MessageReceiveObjectType.User.equals(messageReceiveObjectType)) {
-                targetIds.add(objectId);
+                targetUserIds.add(objectId);
             } else if (MessageReceiveObjectType.Organ.equals(messageReceiveObjectType)) {
-//                targetIds = userService.findUsersLoginNamesByOrganId(objectId);
-                targetIds = Static.userService.findUserIdsByOrganId(objectId);
+                List<String> organUserIds = Static.userService.findUserIdsByOrganId(objectId);
+                if (Collections3.isNotEmpty(organUserIds)) {
+                    targetUserIds.addAll(organUserIds);
+                }
             } else if (MessageReceiveObjectType.Member.equals(messageReceiveObjectType)) {
-                targetIds.add(objectId);
-
+                targetUserIds.add(objectId);
             }
-            for (String targetId : targetIds) {
+        });
+
+        List<MessageReceive> messageReceives = Lists.newArrayList();
+        for (String targetId : targetUserIds) {
+            if (StringUtils.isNotBlank(targetId)) {
                 MessageReceive messageReceive = new MessageReceive(model.getId());
                 messageReceive.setUserId(targetId);
                 messageReceive.setIsSend(YesOrNo.NO.getValue());
@@ -245,7 +249,7 @@ public class MessageUtils {
                 messageReceive.prePersist();
                 messageReceives.add(messageReceive);
             }
-        });
+        }
         Static.messageSenderService.insertAutoBatch(messageSenders);
         Static.messageReceiveService.insertAutoBatch(messageReceives);
         model.setBizMode(MessageMode.Published.getValue());

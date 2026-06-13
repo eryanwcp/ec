@@ -47,7 +47,13 @@ public class VersionLogUtils {
      * @return
      */
     public static VersionLog getLatestVersionLog(String app) {
-        String userAgent = UserAgentUtils.getHTTPUserAgent(SpringMVCHolder.getRequest());
+        HttpServletRequest request = null;
+        try {
+            request = SpringMVCHolder.getRequest();
+        } catch (Exception e) {
+            // ignore
+        }
+        String userAgent = request != null ? UserAgentUtils.getHTTPUserAgent(request) : null;
         if (AppUtils.likeAndroid(userAgent)) {
             return Static.versionLogService.getLatestVersionLog(app,VersionLogType.Android.getValue());
         } else if (likeIOS(userAgent)) {
