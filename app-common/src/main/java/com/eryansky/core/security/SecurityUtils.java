@@ -80,7 +80,7 @@ public class SecurityUtils {
         }
 
         if(methodRequiresUser == null){//类注解处理
-            RequiresUser classRequiresUser =  method.getAnnotation(RequiresUser.class);
+            RequiresUser classRequiresUser =  AppUtils.getAnnotation(clazz, RequiresUser.class);
             if (classRequiresUser != null && !classRequiresUser.required()) {
                 return true;
             }
@@ -181,7 +181,7 @@ public class SecurityUtils {
                 if (sessionInfo.isSuperUser()) {// 超级用户
                     return true;
                 }
-                return null != sessionInfo.getPermissons().stream().filter(permisson -> resource.equals(permisson.getId()) || resource.equalsIgnoreCase(permisson.getCode())).findFirst().orElse(null);
+                return sessionInfo.getPermissons().stream().anyMatch(permisson -> resource.equals(permisson.getId()) || resource.equalsIgnoreCase(permisson.getCode()));
             } else {
                 return Static.resourceService.isPermittedResourceCodeWithPermission(userId, resource);
             }
@@ -235,13 +235,16 @@ public class SecurityUtils {
                 }
 
                 for (Permisson permisson : sessionInfo.getPermissons()) {
-                    if (!flag && StringUtils.isNotBlank(permisson.getMarkUrl())) {
+                    if (StringUtils.isNotBlank(permisson.getMarkUrl())) {
                         String[] markUrls = permisson.getMarkUrl().split(";");
                         for (String markUrl : markUrls) {
                             if (StringUtils.isNotBlank(markUrl) && StringUtils.simpleWildcardMatch(markUrl, url)) {
                                 flag = true;
                                 break;
                             }
+                        }
+                        if (flag) {
+                            break;
                         }
                     }
                 }
@@ -291,10 +294,10 @@ public class SecurityUtils {
                 if (sessionInfo.isSuperUser()) {// 超级用户
                     return true;
                 }
-                return null != sessionInfo.getPermissonRoles().stream().filter(permissonRole -> role.equals(permissonRole.getId()) || role.equalsIgnoreCase(permissonRole.getCode())).findFirst().orElse(null);
+                return sessionInfo.getPermissonRoles().stream().anyMatch(permissonRole -> role.equals(permissonRole.getId()) || role.equalsIgnoreCase(permissonRole.getCode()));
             } else {
                 List<Role> list = Static.roleService.findRolesByUserId(userId);
-                return null != list.stream().filter(r -> role.equals(r.getId()) || role.equalsIgnoreCase(r.getCode())).findFirst().orElse(null);
+                return list.stream().anyMatch(r -> role.equals(r.getId()) || role.equalsIgnoreCase(r.getCode()));
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -466,11 +469,11 @@ public class SecurityUtils {
             }
 
             if (sessionInfo != null && userId.equals(sessionInfo.getUserId())) {
-                return null != sessionInfo.getPostCodes().stream().filter(postCode::equals).findFirst().orElse(null);
+                return sessionInfo.getPostCodes().contains(postCode);
             }
 
             List<Post> posts = Static.postService.findPostsByUserId(userId);
-            return null != posts.stream().filter(post -> postCode.equals(post.getCode())).findFirst().orElse(null);
+            return posts.stream().anyMatch(post -> postCode.equals(post.getCode()));
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
@@ -530,8 +533,10 @@ public class SecurityUtils {
         List<Role> roles = Static.roleService.findRolesByUserId(sessionInfo.getUserId());
         roles.forEach(role -> sessionInfo.addPermissonRoles(new PermissonRole(role.getId(), role.getCode())));
         List<Post> posts = Static.postService.findPostsByUserId(sessionInfo.getUserId());
-        posts.forEach(post -> sessionInfo.getPermissonPosts().add(new PermissonPost(post.getId(),post.getCode(),post.getName(),sessionInfo.getLoginOrganId())));
-        posts.forEach(post -> sessionInfo.getPostCodes().add(StringUtils.isNotBlank(post.getCode()) ? post.getCode() : post.getId()));
+        posts.forEach(post -> {
+            sessionInfo.getPermissonPosts().add(new PermissonPost(post.getId(), post.getCode(), post.getName(), sessionInfo.getLoginOrganId()));
+            sessionInfo.getPostCodes().add(StringUtils.isNotBlank(post.getCode()) ? post.getCode() : post.getId());
+        });
     }
 
 
@@ -555,8 +560,20 @@ public class SecurityUtils {
         String longitude_s = WebUtils.getParameter(request, "longitude");
         String latitude_s = WebUtils.getParameter(request, "latitude");
 //        String accuracy_s = WebUtils.getParameter(request, "accuracy");
-        sessionInfo.setLongitude(StringUtils.isBlank(longitude_s) ? null : BigDecimal.valueOf(Double.parseDouble(longitude_s)));
-        sessionInfo.setLatitude(StringUtils.isBlank(latitude_s) ? null : BigDecimal.valueOf(Double.parseDouble(latitude_s)));
+        if (StringUtils.isNotBlank(longitude_s)) {
+            try {
+                sessionInfo.setLongitude(new BigDecimal(longitude_s));
+            } catch (NumberFormatException e) {
+                logger.warn("Invalid longitude: {}", longitude_s);
+            }
+        }
+        if (StringUtils.isNotBlank(latitude_s)) {
+            try {
+                sessionInfo.setLatitude(new BigDecimal(latitude_s));
+            } catch (NumberFormatException e) {
+                logger.warn("Invalid latitude: {}", latitude_s);
+            }
+        }
         String appVersion_s = WebUtils.getParameter(request, "appVersion");
         String deviceCode_s = WebUtils.getParameter(request, "deviceCode");
         String platform_s = WebUtils.getParameter(request, "platform");
