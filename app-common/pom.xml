@@ -20,7 +20,7 @@
         <xwpf.version>2.2.0</xwpf.version>
         <bsh.version>2.0b6</bsh.version>
 
-        <sitemesh.version>3.2.2</sitemesh.version>
+        <sitemesh.version>3.2.3</sitemesh.version>
         <commons-csv.version>1.14.1</commons-csv.version>
         <commons-cli.version>1.11.0</commons-cli.version>
         <commons-compress.version>1.28.0</commons-compress.version>
@@ -42,7 +42,7 @@
         </dependency>
         <dependency>
             <groupId>org.sitemesh</groupId>
-            <artifactId>sitemesh</artifactId>
+            <artifactId>spring-boot-starter-sitemesh</artifactId>
             <version>${sitemesh.version}</version>
         </dependency>
 

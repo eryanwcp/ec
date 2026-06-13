@@ -177,13 +177,6 @@
     </profiles>
 
     <dependencies>
-        <!-- ... other dependencies -->
-        <dependency>
-            <groupId>org.sitemesh</groupId>
-            <artifactId>spring-boot-starter-sitemesh</artifactId>
-            <version>3.2.3</version>
-        </dependency>
-
         <dependency>
             <groupId>com.eryansky</groupId>
             <artifactId>ec-common</artifactId>

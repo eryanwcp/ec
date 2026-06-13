@@ -40,11 +40,12 @@ import javax.sql.DataSource;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
+// import java.util.Properties;
 
 /**
- * @author Eryan
- * @date 2019-01-23
+ * DB configuration for data source, MyBatis and transaction management.
+ *
+ * Author: Eryan
  */
 @Configuration(proxyBeanMethods = false)
 public class DBConfigurer {
@@ -52,6 +53,10 @@ public class DBConfigurer {
     private static final Logger logger = LoggerFactory.getLogger(DBConfigurer.class);
 
     public static final String TX_MANAGER_NAME = "transactionManager";
+
+    // 默认包配置
+    private static final String DEFAULT_TYPE_ALIASES = "com.eryansky.modules.sys.mapper,com.eryansky.modules.disk.mapper,com.eryansky.modules.notice.mapper";
+    private static final String DEFAULT_BASE_PACKAGE = "com.eryansky.modules.sys.dao,com.eryansky.modules.disk.dao,com.eryansky.modules.notice.dao";
 
     // 数据源
     @Bean(name = "dataSource")
@@ -61,26 +66,14 @@ public class DBConfigurer {
         return DruidDataSourceBuilder.create().build();
     }
 
-    /**
-     * 自定义mybatis参数转换
-     * @param mybatisProperties
-     * @return
-     */
-    private Properties mybatisProperties(Map<String, String> mybatisProperties) {
-        if(null == mybatisProperties){
-            return new Properties();
-        }
-        Properties properties = new Properties();
-        properties.putAll(mybatisProperties);
-        return properties;
-    }
+    // mybatis properties helper removed (unused) - using AppUtils.mapToProperties directly
 
     /**
-     * mybatis sqlSessionFactory
-     * @param dataSource 数据源
-     * @param environment spring上下文参数
-     * @return
-     * @throws Exception
+     * Create and configure MyBatis SqlSessionFactory.
+     * @param dataSource the configured DataSource
+     * @param environment spring Environment to read properties
+     * @return configured SqlSessionFactory
+     * @throws Exception if factory creation fails
      */
     @Bean(name = "sqlSessionFactory")
     public SqlSessionFactory sqlSessionFactoryBean(@Qualifier("dataSource") DataSource dataSource,
@@ -91,29 +84,34 @@ public class DBConfigurer {
         sqlSessionFactoryBean.setConfigLocation(new ClassPathResource("mybatis-config.xml"));
         sqlSessionFactoryBean.setVfs(SpringBootVFS.class);
 
-        StringBuilder sb = new StringBuilder();
         String typeAliasesPackage = environment.getProperty("spring.dataSource.mybatis.typeAliasesPackage");
-        sb.append("com.eryansky.modules.sys.mapper,com.eryansky.modules.disk.mapper,com.eryansky.modules.notice.mapper");
-        if(StringUtils.isNotBlank(typeAliasesPackage)){
-            sb.append(StringUtils.startsWith(typeAliasesPackage,",") ? typeAliasesPackage :","+ typeAliasesPackage);
+        StringBuilder typeAliases = new StringBuilder(DEFAULT_TYPE_ALIASES);
+        if (StringUtils.isNotBlank(typeAliasesPackage)) {
+            typeAliases.append(typeAliasesPackage.startsWith(",") ? typeAliasesPackage : "," + typeAliasesPackage);
         }
-        sqlSessionFactoryBean.setTypeAliasesPackage(sb.toString());
+        sqlSessionFactoryBean.setTypeAliasesPackage(typeAliases.toString());
 
         Resource[] defaultResource = resolver.getResources("classpath*:mappings/modules/**/*Dao.xml");
-        Resource[] allResources = defaultResource;
         String mapperLocations = environment.getProperty("spring.dataSource.mybatis.mapperLocations");
-        if(StringUtils.isNotBlank(mapperLocations)){
-            for(String path:StringUtils.split(mapperLocations,",")){
-                Resource[] resources = resolver.getResources(path);
-                if(resources.length > 0){
-                    allResources = ArrayUtils.concatAll(defaultResource, resources);
+        if (StringUtils.isBlank(mapperLocations)) {
+            sqlSessionFactoryBean.setMapperLocations(defaultResource);
+        } else {
+            // collect resources from configured locations and merge with defaults
+            Resource[] merged = defaultResource;
+            String[] paths = StringUtils.split(mapperLocations, ",");
+            if (paths != null) {
+                for (String path : paths) {
+                    Resource[] resources = resolver.getResources(path);
+                    if (resources.length > 0) {
+                        merged = ArrayUtils.concatAll(merged, resources);
+                    }
                 }
             }
+            sqlSessionFactoryBean.setMapperLocations(merged);
         }
-        sqlSessionFactoryBean.setMapperLocations(allResources);
 
         String mybatisProperties = environment.getProperty("spring.dataSource.mybatis.properties");
-        Map<String,Object> map =  JsonMapper.getInstance().toMap(mybatisProperties);
+        Map<String, Object> map = JsonMapper.getInstance().toMap(mybatisProperties);
         sqlSessionFactoryBean.setConfigurationProperties(AppUtils.mapToProperties(map));
         return sqlSessionFactoryBean.getObject();
     }
@@ -122,12 +120,11 @@ public class DBConfigurer {
     public MapperScannerConfigurer mapperScannerConfigurer(Environment environment) {
         MapperScannerConfigurer cfg = new MapperScannerConfigurer();
         String basePackage = environment.getProperty("spring.dataSource.mybatis.basePackage");
-        StringBuilder sb = new StringBuilder();
-        sb.append("com.eryansky.modules.sys.dao,com.eryansky.modules.disk.dao,com.eryansky.modules.notice.dao");
-        if(StringUtils.isNotBlank(basePackage)){
-            sb.append(StringUtils.startsWith(basePackage,",") ? basePackage :","+ basePackage);
+        StringBuilder base = new StringBuilder(DEFAULT_BASE_PACKAGE);
+        if (StringUtils.isNotBlank(basePackage)) {
+            base.append(basePackage.startsWith(",") ? basePackage : "," + basePackage);
         }
-        cfg.setBasePackage(sb.toString());
+        cfg.setBasePackage(base.toString());
         cfg.setSqlSessionFactoryBeanName("sqlSessionFactory");
         cfg.setAnnotationClass(MyBatisDao.class);
         return cfg;
@@ -150,11 +147,12 @@ public class DBConfigurer {
         RuleBasedTransactionAttribute readOnlyTx = new RuleBasedTransactionAttribute();
         readOnlyTx.setReadOnly(true);
         readOnlyTx.setPropagationBehavior(TransactionDefinition.PROPAGATION_NOT_SUPPORTED);
+
         RuleBasedTransactionAttribute requiredTx = new RuleBasedTransactionAttribute();
         requiredTx.setRollbackRules(Collections.singletonList(new RollbackRuleAttribute(Exception.class)));
         requiredTx.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
         requiredTx.setTimeout(TX_METHOD_TIMEOUT);
-        Map<String, TransactionAttribute> txMap = new HashMap<>();
+        Map<String, TransactionAttribute> txMap = new HashMap<>(16);
         txMap.put("get*", readOnlyTx);
         txMap.put("find*", readOnlyTx);
         txMap.put("query*", readOnlyTx);
@@ -164,26 +162,25 @@ public class DBConfigurer {
         txMap.put("count*", readOnlyTx);
         txMap.put("*", requiredTx);
         source.setNameMap(txMap);
-        TransactionInterceptor txAdvice = new TransactionInterceptor(m, source);
-        return txAdvice;
+        return new TransactionInterceptor(m, source);
     }
 
     // 切面的定义,pointcut及advice
     @Bean
     @Order(1)
     public Advisor txAdviceAdvisor(@Qualifier("txAdvice") TransactionInterceptor txAdvice,
-                                   @Value("${spring.dataSource.aopPointcutExpression}")String aopPointcutExpression) {
+                                   @Value("${spring.dataSource.aopPointcutExpression}") String aopPointcutExpression) {
         AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
         StringBuilder sb = new StringBuilder();
         sb.append("(");
         sb.append(AOP_POINTCUT_EXPRESSION);
         if(StringUtils.isNotBlank(aopPointcutExpression)){
-            sb.append(StringUtils.startsWith(aopPointcutExpression,"||") ? aopPointcutExpression :" || "+ aopPointcutExpression);
+            sb.append(aopPointcutExpression.startsWith("||") ? aopPointcutExpression : " || " + aopPointcutExpression);
         }
         sb.append(" && !@annotation(org.springframework.transaction.annotation.Transactional)");
         sb.append(")");
         pointcut.setExpression(sb.toString());
-        logger.debug("aop expression:{}",sb);
+        logger.debug("aop expression:{}", sb);
         return new DefaultPointcutAdvisor(pointcut, txAdvice);
     }
 }
