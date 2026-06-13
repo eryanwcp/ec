@@ -5,7 +5,7 @@
 
     <groupId>com.eryansky</groupId>
     <artifactId>ec-parent</artifactId>
-    <version>4.3.20260421.04</version>
+    <version>4.3.20260612.04</version>
     <modules>
         <module>common</module>
         <module>j2cache</module>
@@ -37,8 +37,8 @@
         <java.version>17</java.version>
         <tomcat-plugin.version>2.2</tomcat-plugin.version>
 
-        <spring-boot.version>3.5.14</spring-boot.version>
-        <spring-integration-redis.version>6.5.8</spring-integration-redis.version>
+        <spring-boot.version>3.5.15</spring-boot.version>
+        <spring-integration-redis.version>6.5.9</spring-integration-redis.version>
         <logstash-logback-encoder.version>8.1</logstash-logback-encoder.version>
         <logback-classic.version>1.5.34</logback-classic.version>
         <byte-buddy.version>1.17.8</byte-buddy.version>
@@ -58,13 +58,13 @@
         <commons-codec.version>1.22.0</commons-codec.version>
 
 
-        <ec-common.version>4.3.20260421.04</ec-common.version>
-        <ec-app-common.version>4.3.20260421.04</ec-app-common.version>
-        <ec-client-common.version>4.3.20260421.04</ec-client-common.version>
-        <ec-j2cache.version>4.3.20260421.04</ec-j2cache.version>
-        <ec-j2cache-spring-boot-starter.version>4.3.20260421.04</ec-j2cache-spring-boot-starter.version>
-        <ec-fastweixin.version>4.3.20260421.04</ec-fastweixin.version>
-        <ec-encrypt-spring-boot-starter.version>4.3.20260421.04</ec-encrypt-spring-boot-starter.version>
+        <ec-common.version>4.3.20260612.04</ec-common.version>
+        <ec-app-common.version>4.3.20260612.04</ec-app-common.version>
+        <ec-client-common.version>4.3.20260612.04</ec-client-common.version>
+        <ec-j2cache.version>4.3.20260612.04</ec-j2cache.version>
+        <ec-j2cache-spring-boot-starter.version>4.3.20260612.04</ec-j2cache-spring-boot-starter.version>
+        <ec-fastweixin.version>4.3.20260612.04</ec-fastweixin.version>
+        <ec-encrypt-spring-boot-starter.version>4.3.20260612.04</ec-encrypt-spring-boot-starter.version>
 
         <jackson.version>2.22.0</jackson.version>
     </properties>
