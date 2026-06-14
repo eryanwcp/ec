@@ -157,8 +157,8 @@ public class ApplicationSessionContext {
 			// 提取会话数据并做类型校验，避免强制类型转换异常
 			Object sessionData = sessionObject.get(SessionObject.KEY_SESSION_DATA);
 			if (!(sessionData instanceof SessionInfo)) {
-				logger.warn("SessionObject with id {} contains non-SessionInfo data for KEY_SESSION_DATA. Actual type: {}",
-						sessionObject.getId(), sessionData != null ? sessionData.getClass().getName() : "null");
+//				logger.warn("SessionObject with id {} contains non-SessionInfo data for KEY_SESSION_DATA. Actual type: {}",
+//						sessionObject.getId(), sessionData != null ? sessionData.getClass().getName() : "null");
 				return null;
 			}
 			SessionInfo sessionInfo = (SessionInfo) sessionData;
