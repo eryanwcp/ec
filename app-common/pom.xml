@@ -194,7 +194,6 @@
                     <exclude>static/static/js/easyui/**/*.json</exclude>
                     <exclude>static/static/js/easyui/**/*.txt</exclude>
                     <exclude>static/static/js/jquery-ztree/3.5.12/api/**</exclude>
-                    <exclude>static/static/js/jquery-ztree/3.5.12/demo/**</exclude>
                     <exclude>static/static/js/My97DatePicker/docs/**</exclude>
                     <exclude>static/static/js/jquery-validation/dist/localization/**</exclude>
                     <exclude>static/static/js/jquery-validation/*.json</exclude>
