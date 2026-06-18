@@ -29,7 +29,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @EnableAsync
 public class DefaultAsyncConfigurer implements AsyncConfigurer {
 
-    private static Logger log = LoggerFactory.getLogger(DefaultAsyncConfigurer.class);
+    private static final Logger log = LoggerFactory.getLogger(DefaultAsyncConfigurer.class);
     private static final String CACHE_KEY = "system_ops_warn_defaultAsyncExecutor";
 
 //    @Value("${thread.pool.corePoolSize:10}")
