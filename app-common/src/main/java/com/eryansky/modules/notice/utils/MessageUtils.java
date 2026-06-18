@@ -50,11 +50,11 @@ public class MessageUtils {
      * 静态内部类，延迟加载，懒汉式，线程安全的单例模式
      */
     public static final class Static {
-        private static MessageService messageService = SpringContextHolder.getBean(MessageService.class);
-        private static MessageSenderService messageSenderService = SpringContextHolder.getBean(MessageSenderService.class);
-        private static MessageReceiveService messageReceiveService = SpringContextHolder.getBean(MessageReceiveService.class);
-        private static MessageTask messageTask = SpringContextHolder.getBean(MessageTask.class);
-        private static UserService userService = SpringContextHolder.getBean(UserService.class);
+        private static final MessageService messageService = SpringContextHolder.getBean(MessageService.class);
+        private static final MessageSenderService messageSenderService = SpringContextHolder.getBean(MessageSenderService.class);
+        private static final MessageReceiveService messageReceiveService = SpringContextHolder.getBean(MessageReceiveService.class);
+        private static final MessageTask messageTask = SpringContextHolder.getBean(MessageTask.class);
+        private static final UserService userService = SpringContextHolder.getBean(UserService.class);
     }
 
     private MessageUtils() {

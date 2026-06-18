@@ -38,7 +38,7 @@ import com.eryansky.server.result.WSResult;
 @WebService(serviceName = "ApiWebService", portName = "ApiWebServicePort", endpointInterface = "com.eryansky.server.IApiWebService")
 public class ApiWebServiceImpl implements IApiWebService {
 
-    private static Logger logger = LoggerFactory.getLogger(ApiWebServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(ApiWebServiceImpl.class);
 
 
     /**

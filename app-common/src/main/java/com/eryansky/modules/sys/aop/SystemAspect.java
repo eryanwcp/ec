@@ -42,7 +42,7 @@ import java.util.List;
 @Aspect
 public class SystemAspect implements InitializingBean, DisposableBean {
 
-    private static Logger logger = LoggerFactory.getLogger(SystemAspect.class);
+    private static final Logger logger = LoggerFactory.getLogger(SystemAspect.class);
 
     @Autowired
     private SystemService systemService;

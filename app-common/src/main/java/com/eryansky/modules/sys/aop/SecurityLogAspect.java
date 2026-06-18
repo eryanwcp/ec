@@ -41,7 +41,7 @@ import java.util.Date;
 @Aspect
 public class SecurityLogAspect {
 
-    private static Logger logger = LoggerFactory.getLogger(SecurityLogAspect.class);
+    private static final Logger logger = LoggerFactory.getLogger(SecurityLogAspect.class);
 
     /**
      * 登录增强

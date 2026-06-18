@@ -48,9 +48,9 @@ import java.util.Map;
 @Aspect
 public class SysLogAspect {
 
-    private static Logger logger = LoggerFactory.getLogger(SysLogAspect.class);
+    private static final Logger logger = LoggerFactory.getLogger(SysLogAspect.class);
 
-    private ThreadLocal<Log> sysLogThreadLocal = new ThreadLocal<>();
+    private final ThreadLocal<Log> sysLogThreadLocal = new ThreadLocal<>();
 
     /***
      * 定义controller切入点拦截规则，拦截SysLog注解的方法
