@@ -351,10 +351,11 @@ public class DiskUtils {
         if (Collections3.isEmpty(sourceFiles)) {
             return Collections.emptyList();
         }
-        List<File> newFiles = new ArrayList<File>(sourceFiles.size());
+        List<File> newFiles = new ArrayList<>(sourceFiles.size());
+        Folder folder = DiskUtils.checkAndSaveSystemFolderByCode(folderCode, userId);
         for (File sourceFile : sourceFiles) {
             File file = sourceFile.copy();
-            file.setFolderId(DiskUtils.checkAndSaveSystemFolderByCode(folderCode, userId).getId());
+            file.setFolderId(folder.getId());
             file.setUserId(userId);
             DiskUtils.saveFile(file);
             newFiles.add(file);
