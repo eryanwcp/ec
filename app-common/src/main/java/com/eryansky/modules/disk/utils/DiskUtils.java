@@ -59,9 +59,9 @@ public class DiskUtils {
      * 静态内部类，延迟加载，懒汉式，线程安全的单例模式
      */
     public static final class Static {
-        private static FolderService folderService = SpringContextHolder.getBean(FolderService.class);
-        private static FileService fileService = SpringContextHolder.getBean(FileService.class);
-        private static IFileManager iFileManager = SpringContextHolder.getBean(IFileManager.class);
+        private static final FolderService folderService = SpringContextHolder.getBean(FolderService.class);
+        private static final FileService fileService = SpringContextHolder.getBean(FileService.class);
+        private static final IFileManager iFileManager = SpringContextHolder.getBean(IFileManager.class);
 
     }
 
@@ -351,10 +351,11 @@ public class DiskUtils {
         if (Collections3.isEmpty(sourceFiles)) {
             return Collections.emptyList();
         }
-        List<File> newFiles = new ArrayList<File>(sourceFiles.size());
+        List<File> newFiles = new ArrayList<>(sourceFiles.size());
+        Folder folder = DiskUtils.checkAndSaveSystemFolderByCode(folderCode, userId);
         for (File sourceFile : sourceFiles) {
             File file = sourceFile.copy();
-            file.setFolderId(DiskUtils.checkAndSaveSystemFolderByCode(folderCode, userId).getId());
+            file.setFolderId(folder.getId());
             file.setUserId(userId);
             DiskUtils.saveFile(file);
             newFiles.add(file);
