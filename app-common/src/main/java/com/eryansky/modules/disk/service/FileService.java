@@ -145,41 +145,28 @@ public class FileService extends CrudService<FileDao, File> {
     public File fileUpload(SessionInfo sessionInfo, Folder folder,
                            MultipartFile uploadFile) {
         File file = null;
-        /*		Exception exception = null;
-         */
-        java.io.File tempFile = null;
-        String fullName = DiskUtils.getMultipartOriginalFilename(uploadFile);
-        String code = FileUploadUtils.encodingFilenamePrefix(sessionInfo.getUserId(), fullName);
-        String storePath = iFileManager.getStorePath(folder, sessionInfo.getUserId(), fullName);
+        String fileName = StringUtils.right(StringUtils.replace(DiskUtils.getMultipartOriginalFilename(uploadFile),"-",""),36);
+        String code = FileUploadUtils.encodingFilenamePrefix(fileName);
+        String storePath = iFileManager.getStorePath(folder, sessionInfo.getUserId(), fileName);
+        try {
+            IFileManager.UploadStatus uploadStatus = iFileManager.saveFile(storePath, uploadFile.getInputStream(), true);
+            if(null == uploadStatus || IFileManager.UploadStatus.Upload_New_File_Failed.equals(uploadStatus)){
+                logger.error("文件上传失败:"+fileName);
+                throw new ServiceException("文件上传失败："+fileName);
+            }
 
-        String fileTemp = AppConstants.getDiskTempDir() + java.io.File.separator + code;
-        tempFile = new java.io.File(fileTemp);
-        try (FileOutputStream fos = FileUtils.openOutputStream(tempFile)){
-            IOUtils.copy(uploadFile.getInputStream(), fos);
-            iFileManager.saveFile(storePath, fileTemp, false);
             file = new File();
             file.setFolderId(folder.getId());
             file.setCode(code);
             file.setUserId(sessionInfo.getUserId());
-            file.setName(fullName);
+            file.setName(fileName);
             file.setFilePath(storePath);
             file.setFileSize(uploadFile.getSize());
-            file.setFileSuffix(FilenameUtils.getExtension(fullName));
+            file.setFileSuffix(FilenameUtils.getExtension(fileName));
             save(file);
         } catch (Exception e) {
             // exception = e;
             throw new ServiceException(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage(), e);
-        } finally {
-//			if (exception != null && file != null) {
-//				DiskUtils.deleteByFileId(null, file.getId());
-//			}
-            if (tempFile != null && tempFile.exists()) {
-                boolean deleteFlag = tempFile.delete();
-                if(!deleteFlag){
-                    logger.warn("temp file delete {}:{}",tempFile.getName(),deleteFlag);
-                }
-            }
-
         }
         return file;
 

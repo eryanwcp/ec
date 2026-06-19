@@ -10,6 +10,7 @@ import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.io.FileUtils;
+import com.eryansky.common.utils.io.IoUtils;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.security.SecurityUtils;
@@ -123,7 +124,9 @@ public class DiskUtils {
      */
     public static String getDISKStoreDir(Folder folder, String userId) {
         String path = getRelativePath(folder, userId);
-        FileUtils.checkSaveDir(path);
+        if (StringUtils.isNotBlank(path)) {
+            FileUtils.checkSaveDir(path);
+        }
         return path;
     }
 
@@ -184,7 +187,7 @@ public class DiskUtils {
      * 根据编码获取 获取系统文件夹 <br/>
      * 如果不存在则自动创建
      *
-     * @param code   系统文件夹编码
+     * @param code 系统文件夹编码
      * @param userId 用户ID
      * @return
      */
@@ -215,8 +218,6 @@ public class DiskUtils {
      * @param multipartFile 上传文件对象 SpringMVC
      * @return
      * @throws InvalidExtensionException
-     * @throws FileUploadBase.FileSizeLimitExceededException
-     * @throws FileNameLengthLimitExceededException
      * @throws IOException
      */
     public static File saveSystemFile(String folderCode, String userId,
@@ -253,13 +254,15 @@ public class DiskUtils {
         file.setUserId(_userId);
         file.setName(fileName);
         file.setFilePath(storeFilePath);
-        file.setFileSize(Long.valueOf(inputStream.available()));
         file.setFileSuffix(FilenameUtils.getExtension(fileName));
         IFileManager.UploadStatus uploadStatus = Static.iFileManager.saveFile(file.getFilePath(), inputStream, true);
         if(null == uploadStatus || IFileManager.UploadStatus.Upload_New_File_Failed.equals(uploadStatus)){
             logger.error("文件上传失败:"+fileName);
             throw new ServiceException("文件上传失败："+fileName);
         }
+        file.setFileSize(IoUtils.countStreamSizeWithMarkReset(inputStream));
+        //JDK 9+
+//        file.setFileSize(IoUtils.countStreamSize(inputStream));
         Static.fileService.save(file);
         return file;
     }
@@ -709,7 +712,7 @@ public class DiskUtils {
 
 
         response.setContentType(contentType);
-        response.setContentLength((int) inputStream.available());
+//        response.setContentLength((int) inputStream.available());
 
 //        String displayFilename = displayName.substring(displayName.lastIndexOf("_") + 1);
 //        displayFilename = displayFilename.replace(" ", "_");

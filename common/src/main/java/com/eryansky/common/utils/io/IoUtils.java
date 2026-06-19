@@ -161,4 +161,47 @@ public class IoUtils extends IOUtils {
         }
 
     }
+
+    /**
+     * 计算流大小 JDK 9+
+     * @param is
+     * @return
+     * @throws IOException
+     */
+//    public static long countStreamSize(InputStream is) throws IOException {
+//        // 建立一个只计数、不保存任何数据的“虚无”输出流
+//        class NullOutputStream extends OutputStream {
+//            private long bytesRead = 0;
+//            @Override
+//            public void write(int b) { bytesRead++; }
+//            @Override
+//            public void write(byte[] b, int off, int len) { bytesRead += len; }
+//            public long getBytesRead() { return bytesRead; }
+//        }
+//
+//        NullOutputStream nos = new NullOutputStream();
+//        is.transferTo(nos); // JDK 9+ 自带的流传输方法，性能极高
+//        return nos.getBytesRead();
+//    }
+
+    public static long countStreamSizeWithMarkReset(InputStream is) throws IOException {
+        if (is instanceof FileInputStream) {
+            return ((FileInputStream) is).getChannel().size();
+        }
+        // 判断是否支持标记
+        if (!is.markSupported()) {
+            throw new IOException("当前流不支持mark，无法回退");
+        }
+        // 标记起始位置，缓冲区设足够大
+        is.mark(Integer.MAX_VALUE);
+        long total = 0;
+        byte[] buf = new byte[8192];
+        int len;
+        while ((len = is.read(buf)) != -1) {
+            total += len;
+        }
+        // 指针回到开头，后续可正常读取
+        is.reset();
+        return total;
+    }
 }
