@@ -145,19 +145,12 @@ public class FileService extends CrudService<FileDao, File> {
     public File fileUpload(SessionInfo sessionInfo, Folder folder,
                            MultipartFile uploadFile) {
         File file = null;
-        /*		Exception exception = null;
-         */
-        java.io.File tempFile = null;
         String fileName = DiskUtils.getMultipartOriginalFilename(uploadFile);
         fileName = StringUtils.right(StringUtils.replace(fileName,"-",""),36);
         String code = FileUploadUtils.encodingFilenamePrefix(fileName);
         String storePath = iFileManager.getStorePath(folder, sessionInfo.getUserId(), fileName);
-
-        String fileTemp = AppConstants.getDiskTempDir() + java.io.File.separator + code + "_" + fileName;
-        tempFile = new java.io.File(fileTemp);
-        try (FileOutputStream fos = FileUtils.openOutputStream(tempFile)){
-            IOUtils.copy(uploadFile.getInputStream(), fos);
-            iFileManager.saveFile(storePath, fileTemp, false);
+        try {
+            iFileManager.saveFile(storePath, uploadFile.getInputStream(), false);
             file = new File();
             file.setFolderId(folder.getId());
             file.setCode(code);
@@ -170,17 +163,6 @@ public class FileService extends CrudService<FileDao, File> {
         } catch (Exception e) {
             // exception = e;
             throw new ServiceException(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage(), e);
-        } finally {
-//			if (exception != null && file != null) {
-//				DiskUtils.deleteByFileId(null, file.getId());
-//			}
-            if (tempFile != null && tempFile.exists()) {
-                boolean deleteFlag = tempFile.delete();
-                if(!deleteFlag){
-                    logger.warn("temp file delete {}:{}",tempFile.getName(),deleteFlag);
-                }
-            }
-
         }
         return file;
 
