@@ -145,12 +145,16 @@ public class FileService extends CrudService<FileDao, File> {
     public File fileUpload(SessionInfo sessionInfo, Folder folder,
                            MultipartFile uploadFile) {
         File file = null;
-        String fileName = DiskUtils.getMultipartOriginalFilename(uploadFile);
-        fileName = StringUtils.right(StringUtils.replace(fileName,"-",""),36);
+        String fileName = StringUtils.right(StringUtils.replace(DiskUtils.getMultipartOriginalFilename(uploadFile),"-",""),36);
         String code = FileUploadUtils.encodingFilenamePrefix(fileName);
         String storePath = iFileManager.getStorePath(folder, sessionInfo.getUserId(), fileName);
         try {
-            iFileManager.saveFile(storePath, uploadFile.getInputStream(), false);
+            IFileManager.UploadStatus uploadStatus = iFileManager.saveFile(storePath, uploadFile.getInputStream(), true);
+            if(null == uploadStatus || IFileManager.UploadStatus.Upload_New_File_Failed.equals(uploadStatus)){
+                logger.error("文件上传失败:"+fileName);
+                throw new ServiceException("文件上传失败："+fileName);
+            }
+
             file = new File();
             file.setFolderId(folder.getId());
             file.setCode(code);
