@@ -146,7 +146,7 @@ public class FileService extends CrudService<FileDao, File> {
                            MultipartFile uploadFile) {
         File file = null;
         String fileName = StringUtils.right(StringUtils.replace(DiskUtils.getMultipartOriginalFilename(uploadFile),"-",""),36);
-        String code = FileUploadUtils.encodingFilenamePrefix(fileName);
+        String code = FileUploadUtils.encodingFilenamePrefix(sessionInfo.getUserId(),fileName);
         String storePath = iFileManager.getStorePath(folder, sessionInfo.getUserId(), fileName);
         try {
             IFileManager.UploadStatus uploadStatus = iFileManager.saveFile(storePath, uploadFile.getInputStream(), true);
