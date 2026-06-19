@@ -709,7 +709,7 @@ public class DiskUtils {
 
 
         response.setContentType(contentType);
-        response.setContentLength((int) inputStream.available());
+//        response.setContentLength((int) inputStream.available());
 
 //        String displayFilename = displayName.substring(displayName.lastIndexOf("_") + 1);
 //        displayFilename = displayFilename.replace(" ", "_");

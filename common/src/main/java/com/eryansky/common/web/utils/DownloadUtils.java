@@ -87,7 +87,7 @@ public class DownloadUtils {
         response.reset();
         WebUtils.setNoCacheHeader(response);
         response.setContentType("application/x-download");
-        response.setContentLength(inputStream.available());
+//        response.setContentLength(inputStream.available());
 //        String displayFilename = displayName.substring(displayName.lastIndexOf("_") + 1);
 //        displayFilename = displayFilename.replace(" ", "_");
         WebUtils.setDownloadableHeader(request, response, displayName);
