@@ -40,6 +40,8 @@ import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.net.InetAddress;
@@ -72,74 +74,78 @@ public class SecurityUtils {
         private static final ApplicationSessionContext applicationSessionContext = ApplicationSessionContext.getInstance();
     }
 
-    public static Boolean isPermitted(Class<?> clazz,Method method){
+    /**
+     * 从方法或类中获取注解（优先级：方法注解 > 类注解）
+     */
+    @SuppressWarnings("unchecked")
+    private static <T extends Annotation> T getAnnotationFromMethodOrClass(Method method, Class<?> clazz, Class<T> annotationType) {
+        T annotation = method.getAnnotation(annotationType);
+        if (annotation == null) {
+            annotation = AppUtils.getAnnotation(clazz, annotationType);
+        }
+        return annotation;
+    }
+
+    /**
+     * 检查权限数组（支持AND/OR逻辑）
+     */
+    private static <T> boolean checkLogicalPermissions(String[] items, Logical logical, 
+                                                        java.util.function.Predicate<String> checker) {
+        if (items == null || items.length == 0) {
+            return true;
+        }
+        
+        boolean permitted = false;
+        for (String item : items) {
+            permitted = checker.test(item);
+            if (Logical.AND.equals(logical)) {
+                if (!permitted) {
+                    return false;
+                }
+            } else if (permitted) {
+                return true;
+            }
+        }
+        return permitted;
+    }
+
+    /**
+     * 安全获取或返回默认用户ID
+     */
+    private static String getOrDefaultUserId(String userId) {
+        if (userId != null) {
+            return userId;
+        }
+        SessionInfo sessionInfo = getCurrentSessionInfo();
+        return sessionInfo != null ? sessionInfo.getUserId() : null;
+    }
+
+    public static Boolean isPermitted(Class<?> clazz, Method method) {
         //需要登录
-        RequiresUser methodRequiresUser = method.getAnnotation(RequiresUser.class);
+        RequiresUser methodRequiresUser = getAnnotationFromMethodOrClass(method, clazz, RequiresUser.class);
         if (methodRequiresUser != null && !methodRequiresUser.required()) {
             return true;
         }
 
-        if(methodRequiresUser == null){//类注解处理
-            RequiresUser classRequiresUser =  AppUtils.getAnnotation(clazz, RequiresUser.class);
-            if (classRequiresUser != null && !classRequiresUser.required()) {
-                return true;
-            }
-        }
-
-        RestApi restApi = method.getAnnotation(RestApi.class);
-        if (restApi == null) {
-            restApi = AppUtils.getAnnotation(clazz, RestApi.class);
-        }
-        if(null != restApi && !restApi.checkDefaultPermission()){
+        RestApi restApi = getAnnotationFromMethodOrClass(method, clazz, RestApi.class);
+        if (null != restApi && !restApi.checkDefaultPermission()) {
             return true;
         }
 
         //角色注解
-        RequiresRoles requiresRoles = method.getAnnotation(RequiresRoles.class);
-        if(requiresRoles == null){
-            requiresRoles = AppUtils.getAnnotation(clazz,RequiresRoles.class);
-        }
-        if (requiresRoles != null) {//方法注解处理
-            String[] roles = requiresRoles.value();
-            boolean permittedRole = false;
-            for (String role : roles) {
-                permittedRole = SecurityUtils.isPermittedRole(role);
-                if (Logical.AND.equals(requiresRoles.logical())) {
-                    if (!permittedRole) {
-                        return false;
-                    }
-                } else {
-                    if (permittedRole) {
-                        break;
-                    }
-                }
-            }
-            if(!permittedRole){
+        RequiresRoles requiresRoles = getAnnotationFromMethodOrClass(method, clazz, RequiresRoles.class);
+        if (requiresRoles != null) {
+            if (!checkLogicalPermissions(requiresRoles.value(), requiresRoles.logical(),
+                    SecurityUtils::isPermittedRole)) {
                 return false;
             }
         }
 
         //资源/权限注解
-        RequiresPermissions requiresPermissions = method.getAnnotation(RequiresPermissions.class);
-        if(requiresPermissions == null){
-            requiresPermissions = AppUtils.getAnnotation(clazz,RequiresPermissions.class);
-        }
-        if (requiresPermissions != null) {//方法注解处理
-            String[] permissions = requiresPermissions.value();
-            boolean permittedResource = false;
-            for (String permission : permissions) {
-                permittedResource = SecurityUtils.isPermitted(permission);
-                if (Logical.AND.equals(requiresPermissions.logical())) {
-                    if (!permittedResource) {
-                        return false;
-                    }
-                } else {
-                    if (permittedResource) {
-                        break;
-                    }
-                }
-            }
-            if(!permittedResource){
+        RequiresPermissions requiresPermissions = getAnnotationFromMethodOrClass(method, clazz, RequiresPermissions.class);
+        if (requiresPermissions != null) {
+            if (!checkLogicalPermissions(requiresPermissions.value(), requiresPermissions.logical(),
+                    SecurityUtils::isPermitted)) {
                 return false;
             }
         }
@@ -165,23 +171,20 @@ public class SecurityUtils {
      */
     public static Boolean isPermitted(String userId, String resource) {
         try {
-            SessionInfo sessionInfo = getCurrentSessionInfo();
-            if (userId == null) {
-                if (sessionInfo != null) {
-                    userId = sessionInfo.getUserId();
-                }
-            }
+            userId = getOrDefaultUserId(userId);
             if (userId == null) {
                 logger.debug("用户不存在.");
                 return false;
             }
 
-//            flag = resourceService.isUserPermittedResourceCode(sessionInfo.getUserId(), resourceCode);
+            SessionInfo sessionInfo = getCurrentSessionInfo();
             if (sessionInfo != null && userId.equals(sessionInfo.getUserId())) {
-                if (sessionInfo.isSuperUser()) {// 超级用户
+                if (sessionInfo.isSuperUser()) {
                     return true;
                 }
-                return sessionInfo.getPermissons().stream().anyMatch(permisson -> resource.equals(permisson.getId()) || resource.equalsIgnoreCase(permisson.getCode()));
+                return sessionInfo.getPermissons().stream()
+                        .anyMatch(permisson -> resource.equals(permisson.getId()) || 
+                                              resource.equalsIgnoreCase(permisson.getCode()));
             } else {
                 return Static.resourceService.isPermittedResourceCodeWithPermission(userId, resource);
             }
@@ -209,53 +212,44 @@ public class SecurityUtils {
      * @param url 资源编码
      * @return
      */
-    public static Boolean isPermittedUrl(String userId, String url) {
-        boolean flag = false;
-        try {
-            SessionInfo sessionInfo = getCurrentSessionInfo();
-            if (userId == null) {
-                if (sessionInfo != null) {
-                    userId = sessionInfo.getUserId();
-                }
+    /**
+     * 检查权限中的URL标记是否匹配
+     */
+    private static boolean matchesPermissionUrl(Permisson permisson, String url) {
+        if (StringUtils.isBlank(permisson.getMarkUrl())) {
+            return false;
+        }
+        String[] markUrls = permisson.getMarkUrl().split(";");
+        for (String markUrl : markUrls) {
+            if (StringUtils.isNotBlank(markUrl) && StringUtils.simpleWildcardMatch(markUrl, url)) {
+                return true;
             }
+        }
+        return false;
+    }
+
+    public static Boolean isPermittedUrl(String userId, String url) {
+        try {
+            userId = getOrDefaultUserId(userId);
             if (userId == null) {
                 logger.debug("用户不存在.");
                 return false;
             }
 
-            //是否需要拦截
-//            boolean needInterceptor = resourceService.isInterceptorUrl(url);
-//            if(!needInterceptor){
-//                return true;
-//            }
-
+            SessionInfo sessionInfo = getCurrentSessionInfo();
             if (sessionInfo != null && userId.equals(sessionInfo.getUserId())) {
-                if (sessionInfo.isSuperUser()) {// 超级用户
+                if (sessionInfo.isSuperUser()) {
                     return true;
                 }
-
-                for (Permisson permisson : sessionInfo.getPermissons()) {
-                    if (StringUtils.isNotBlank(permisson.getMarkUrl())) {
-                        String[] markUrls = permisson.getMarkUrl().split(";");
-                        for (String markUrl : markUrls) {
-                            if (StringUtils.isNotBlank(markUrl) && StringUtils.simpleWildcardMatch(markUrl, url)) {
-                                flag = true;
-                                break;
-                            }
-                        }
-                        if (flag) {
-                            break;
-                        }
-                    }
-                }
-                return flag;
+                return sessionInfo.getPermissons().stream()
+                        .anyMatch(permission -> matchesPermissionUrl(permission, url));
             } else {
                 return Static.resourceService.isPermittedResourceMarkUrlWithPermissions(userId, url);
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
-        return flag;
+        return false;
     }
 
 
@@ -279,25 +273,23 @@ public class SecurityUtils {
      */
     public static Boolean isPermittedRole(String userId, String role) {
         try {
-            SessionInfo sessionInfo = getCurrentSessionInfo();
+            userId = getOrDefaultUserId(userId);
             if (userId == null) {
-                if (sessionInfo != null) {
-                    userId = sessionInfo.getUserId();
-                }
-            }
-            if (userId == null) {
-                return  false;
-//                throw new SystemException("用户[" + userId + "]不存在.");
+                return false;
             }
 
+            SessionInfo sessionInfo = getCurrentSessionInfo();
             if (sessionInfo != null && userId.equals(sessionInfo.getUserId())) {
-                if (sessionInfo.isSuperUser()) {// 超级用户
+                if (sessionInfo.isSuperUser()) {
                     return true;
                 }
-                return sessionInfo.getPermissonRoles().stream().anyMatch(permissonRole -> role.equals(permissonRole.getId()) || role.equalsIgnoreCase(permissonRole.getCode()));
+                return sessionInfo.getPermissonRoles().stream()
+                        .anyMatch(permissonRole -> role.equals(permissonRole.getId()) || 
+                                                   role.equalsIgnoreCase(permissonRole.getCode()));
             } else {
                 List<Role> list = Static.roleService.findRolesByUserId(userId);
-                return list.stream().anyMatch(r -> role.equals(r.getId()) || role.equalsIgnoreCase(r.getCode()));
+                return list.stream()
+                        .anyMatch(r -> role.equals(r.getId()) || role.equalsIgnoreCase(r.getCode()));
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -858,7 +850,7 @@ public class SecurityUtils {
      */
     public static User getCurrentUser() {
         SessionInfo sessionInfo = getCurrentSessionInfo();
-        return null == sessionInfo ? null : Static.userService.get(sessionInfo.getUserId());
+        return sessionInfo != null ? Static.userService.get(sessionInfo.getUserId()) : null;
     }
 
     /**
@@ -866,7 +858,7 @@ public class SecurityUtils {
      */
     public static String getCurrentUserId() {
         SessionInfo sessionInfo = getCurrentSessionInfo();
-        return null == sessionInfo ? null : sessionInfo.getUserId();
+        return sessionInfo != null ? sessionInfo.getUserId() : null;
     }
 
     /**
@@ -874,7 +866,7 @@ public class SecurityUtils {
      */
     public static String getCurrentUserLoginName() {
         SessionInfo sessionInfo = getCurrentSessionInfo();
-        return null == sessionInfo ? null : sessionInfo.getLoginName();
+        return sessionInfo != null ? sessionInfo.getLoginName() : null;
     }
 
     /**
@@ -882,7 +874,7 @@ public class SecurityUtils {
      */
     public static String getCurrentUserName() {
         SessionInfo sessionInfo = getCurrentSessionInfo();
-        return null == sessionInfo ? null : sessionInfo.getName();
+        return sessionInfo != null ? sessionInfo.getName() : null;
     }
 
     /**
@@ -890,7 +882,7 @@ public class SecurityUtils {
      */
     public static String getCurrentUserToken() {
         SessionInfo sessionInfo = getCurrentSessionInfo();
-        return null == sessionInfo ? null : sessionInfo.getToken();
+        return sessionInfo != null ? sessionInfo.getToken() : null;
     }
 
     /**
@@ -898,7 +890,7 @@ public class SecurityUtils {
      */
     public static String getCurrentUserRefreshToken() {
         SessionInfo sessionInfo = getCurrentSessionInfo();
-        return null == sessionInfo ? null : sessionInfo.getRefreshToken();
+        return sessionInfo != null ? sessionInfo.getRefreshToken() : null;
     }
 
     /**
@@ -907,7 +899,7 @@ public class SecurityUtils {
      */
     public static boolean isCurrentUserAdmin() {
         SessionInfo sessionInfo = getCurrentSessionInfo();
-        return null != sessionInfo && isUserAdmin(sessionInfo.getUserId());
+        return sessionInfo != null && isUserAdmin(sessionInfo.getUserId());
     }
 
 
