@@ -171,8 +171,7 @@ public class ResourceController extends SimpleController {
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"resourceData"})
     @ResponseBody
     public List<TreeNode> resourceData(){
-        List<TreeNode>  treeNodes = resourceService.findTreeNodeResources();
-        return treeNodes;
+        return resourceService.findTreeNodeResources();
     }
 
     /**
@@ -182,8 +181,7 @@ public class ResourceController extends SimpleController {
     @ResponseBody
     public List<TreeNode> resourceDataWithPermission(){
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
-        List<TreeNode>  treeNodes = resourceService.resourcesToTreeNode(resourceService.findResourcesWithPermissions(sessionInfo.getUserId()));
-        return treeNodes;
+        return resourceService.resourcesToTreeNode(resourceService.findResourcesWithPermissions(sessionInfo.getUserId()));
     }
 
 
@@ -202,37 +200,25 @@ public class ResourceController extends SimpleController {
         String parentType = null;
         if (StringUtils.isNotBlank(parentId)) {
             Resource resource = resourceService.get(parentId);
-            parentType = resource.getType();
+            parentType = resource == null ? null : resource.getType();
         }
 
         ResourceType parentResourceType = ResourceType.getByValue(parentType);
-        if (parentResourceType != null) {
-            if (parentResourceType.equals(ResourceType.app)) {
-                Combobox combobox = new Combobox(ResourceType.app.getValue(), ResourceType.app.getDescription());
-                cList.add(combobox);
-                combobox = new Combobox(ResourceType.menu.getValue(), ResourceType.menu.getDescription());
-                cList.add(combobox);
-                combobox = new Combobox(ResourceType.function.getValue(), ResourceType.function.getDescription());
-                cList.add(combobox);
-            } else if (parentResourceType.equals(ResourceType.menu)) {
-                Combobox combobox = new Combobox(ResourceType.menu.getValue(), ResourceType.menu.getDescription());
-                cList.add(combobox);
-                combobox = new Combobox(ResourceType.function.getValue(), ResourceType.function.getDescription());
-                cList.add(combobox);
-            } else if (parentResourceType.equals(ResourceType.function)) {
-                Combobox combobox = new Combobox(ResourceType.function.getValue(), ResourceType.function.getDescription());
-                cList.add(combobox);
-            }
-        } else {
-            Combobox combobox = new Combobox(ResourceType.app.getValue(), ResourceType.app.getDescription());
-            cList.add(combobox);
-            combobox = new Combobox(ResourceType.menu.getValue(), ResourceType.menu.getDescription());
-            cList.add(combobox);
-            combobox = new Combobox(ResourceType.function.getValue(), ResourceType.function.getDescription());
-            cList.add(combobox);
+        if (parentResourceType == null || parentResourceType.equals(ResourceType.app)) {
+            addComboboxes(cList, ResourceType.app, ResourceType.menu, ResourceType.function);
+        } else if (parentResourceType.equals(ResourceType.menu)) {
+            addComboboxes(cList, ResourceType.menu, ResourceType.function);
+        } else if (parentResourceType.equals(ResourceType.function)) {
+            addComboboxes(cList, ResourceType.function);
         }
 
         return cList;
+    }
+
+    private void addComboboxes(List<Combobox> cList, ResourceType... types) {
+        for (ResourceType t : types) {
+            cList.add(new Combobox(t.getValue(), t.getDescription()));
+        }
     }
 
     /**
@@ -258,11 +244,8 @@ public class ResourceController extends SimpleController {
     @PostMapping(value = {"maxSort"})
     @ResponseBody
     public Result maxSort() throws Exception {
-        Result result;
         Integer maxSort = resourceService.getMaxSort();
-        result = new Result(Result.SUCCESS, null, maxSort);
-        logger.debug(result.toString());
-        return result;
+        return new Result(Result.SUCCESS, null, maxSort);
     }
 
     /**
@@ -303,10 +286,9 @@ public class ResourceController extends SimpleController {
      */
     @PostMapping(value = {"resourceRoleDatagrid/{resourceId}"})
     @ResponseBody
-    public Datagrid resourceRoleDatagrid(@PathVariable String resourceId,HttpServletRequest request,HttpServletResponse response) {
-        Page<Role> page = new Page<>(request);
-        page = roleService.findRolesByReourceId(page,resourceId);
-        return new Datagrid(page.getTotalCount(),page.getResult());
+    public Datagrid<Role> resourceRoleDatagrid(@PathVariable String resourceId,HttpServletRequest request,HttpServletResponse response) {
+        Page<Role> page = roleService.findRolesByReourceId(new Page<>(request), resourceId);
+        return new Datagrid<>(page.getTotalCount(), page.getResult());
     }
 
 
@@ -326,9 +308,7 @@ public class ResourceController extends SimpleController {
             logger.warn("参数[ids]为空.");
             return Result.warnResult().setMsg("操作失败，参数为空！");
         }
-        for (String id : ids) {
-            roleService.deleteRoleResourceByResourceIdAndRoleId(id,resourceId);
-        }
+        ids.forEach(id -> roleService.deleteRoleResourceByResourceIdAndRoleId(id, resourceId));
         return Result.successResult();
     }
 
@@ -357,9 +337,8 @@ public class ResourceController extends SimpleController {
     @PostMapping(value = {"resourceUserDatagrid/{resourceId}"})
     @ResponseBody
     public Datagrid resourceUserDatagrid(@PathVariable String resourceId,HttpServletRequest request,HttpServletResponse response) {
-        Page<User> page = new Page<>(request);
-        page = userService.findUsersByResourceId(page,resourceId);
-        return new Datagrid(page.getTotalCount(),page.getResult());
+        Page<User> page = userService.findUsersByResourceId(new Page<>(request), resourceId);
+        return new Datagrid(page.getTotalCount(), page.getResult());
     }
 
 
@@ -379,9 +358,7 @@ public class ResourceController extends SimpleController {
             logger.warn("参数[ids]为空.");
             return Result.warnResult().setMsg("操作失败，参数为空！");
         }
-        for (String id : ids) {
-            userService.deleteUserResourceByResourceIdAndUserId(id,resourceId);
-        }
+        ids.forEach(id -> userService.deleteUserResourceByResourceIdAndUserId(id, resourceId));
         return Result.successResult();
     }
 
