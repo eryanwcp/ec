@@ -220,13 +220,14 @@ public class RoleController extends SimpleController {
     @ResponseBody
     public Result copyFromRoles(@ModelAttribute("model") Role role,
                                      @RequestParam(value = "roleIds", required = false) Collection<String> roleIds) {
-        //源有
-        List<Resource> resources = resourceService.findResourcesByRoleId(role.getId());
-        //新增
-        for(String rId:roleIds){
-            resources.addAll(resourceService.findResourcesByRoleId(rId));
+        // 合并源角色与目标角色的资源（含去重）
+        List<String> allRoleIds = Lists.newArrayList(role.getId());
+        if (roleIds != null) {
+            allRoleIds.addAll(roleIds);
         }
-        //合并
+        List<Resource> resources = allRoleIds.stream()
+                .flatMap(rid -> resourceService.findResourcesByRoleId(rid).stream())
+                .collect(Collectors.toList());
         Set<String> rIds = resources.stream().map(BaseEntity::getId).collect(Collectors.toSet());
         roleService.saveRoleResources(role.getId(), rIds);
         return Result.successResult();
@@ -383,11 +384,12 @@ public class RoleController extends SimpleController {
                                     HttpServletRequest request,
                                     HttpServletResponse response) {
         Role model = RoleUtils.getRole(roleId);
-        if(WebUtils.isAjaxRequest(request)){
+        if (WebUtils.isAjaxRequest(request)) {
             List<Resource> list = resourceService.findResourcesByRoleId(roleId);
-            //结构树展示优化
-            list.forEach(v->{
-                if(null == list.stream().filter(r->r.getId().equals(v.get_parentId())).findAny().orElse(null)){
+            // 结构树展示优化：预计算 id 集合，避免在循环内流遍历
+            Set<String> ids = list.stream().map(BaseEntity::getId).collect(Collectors.toSet());
+            list.forEach(v -> {
+                if (!ids.contains(v.get_parentId())) {
                     v.setParent(null);
                 }
             });
@@ -395,6 +397,13 @@ public class RoleController extends SimpleController {
         }
         uiModel.addAttribute("model", model);
         return "modules/sys/role-resource-view";
+    }
+
+    private void addTitleCombobox(List<Combobox> cList, String selectType) {
+        Combobox titleCombobox = SelectType.combobox(selectType);
+        if (titleCombobox != null) {
+            cList.add(titleCombobox);
+        }
     }
 
     /**
@@ -406,16 +415,10 @@ public class RoleController extends SimpleController {
     @PostMapping(value = {"dataScope"})
     @ResponseBody
     public List<Combobox> dataScope(String selectType) {
-        DataScope[] list = DataScope.values();
         List<Combobox> cList = Lists.newArrayList();
-
-        Combobox titleCombobox = SelectType.combobox(selectType);
-        if (titleCombobox != null) {
-            cList.add(titleCombobox);
-        }
-        for (DataScope r : list) {
-            Combobox combobox = new Combobox(r.getValue() + "", r.getDescription());
-            cList.add(combobox);
+        addTitleCombobox(cList, selectType);
+        for (DataScope r : DataScope.values()) {
+            cList.add(new Combobox(r.getValue() + "", r.getDescription()));
         }
         return cList;
     }
@@ -430,18 +433,12 @@ public class RoleController extends SimpleController {
     @PostMapping(value = {"dataScopeWithPermission"})
     @ResponseBody
     public List<Combobox> dataScopeWithPermission(String selectType) {
-        DataScope[] list = DataScope.values();
         List<Combobox> cList = Lists.newArrayList();
-
-        Combobox titleCombobox = SelectType.combobox(selectType);
-        if (titleCombobox != null) {
-            cList.add(titleCombobox);
-        }
-        String maxRoleDataScope = SecurityUtils.getUserMaxRoleDataScope();
-        for (DataScope r : list) {
-            if(Integer.parseInt(r.getValue()) >= Integer.parseInt(maxRoleDataScope) ){
-                Combobox combobox = new Combobox(r.getValue() + "", r.getDescription());
-                cList.add(combobox);
+        addTitleCombobox(cList, selectType);
+        int max = Integer.parseInt(SecurityUtils.getUserMaxRoleDataScope());
+        for (DataScope r : DataScope.values()) {
+            if (Integer.parseInt(r.getValue()) >= max) {
+                cList.add(new Combobox(r.getValue() + "", r.getDescription()));
             }
         }
         return cList;
@@ -455,14 +452,8 @@ public class RoleController extends SimpleController {
     public List<Combobox> combobox(String selectType) {
         List<Role> list = roleService.findAll();
         List<Combobox> cList = Lists.newArrayList();
-        Combobox titleCombobox = SelectType.combobox(selectType);
-        if (titleCombobox != null) {
-            cList.add(titleCombobox);
-        }
-        for (Role r : list) {
-            Combobox combobox = new Combobox(r.getId(), r.getName());
-            cList.add(combobox);
-        }
+        addTitleCombobox(cList, selectType);
+        list.forEach(r -> cList.add(new Combobox(r.getId(), r.getName())));
         return cList;
     }
 
@@ -479,14 +470,8 @@ public class RoleController extends SimpleController {
         List<Role> list = SecurityUtils.isCurrentUserAdmin() ? roleService.findAll() : roleService.findOrganRolesAndSystemNormalRoles(organId);
 
         List<Combobox> cList = Lists.newArrayList();
-        Combobox titleCombobox = SelectType.combobox(selectType);
-        if (titleCombobox != null) {
-            cList.add(titleCombobox);
-        }
-        for (Role r : list) {
-            Combobox combobox = new Combobox(r.getId(), r.getName());
-            cList.add(combobox);
-        }
+        addTitleCombobox(cList, selectType);
+        list.forEach(r -> cList.add(new Combobox(r.getId(), r.getName())));
         return cList;
     }
 
