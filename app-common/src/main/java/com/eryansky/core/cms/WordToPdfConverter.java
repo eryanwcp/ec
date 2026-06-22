@@ -17,7 +17,7 @@ import java.io.*;
  */
 public class WordToPdfConverter {
 
-    private static Logger log = LoggerFactory.getLogger(WordToPdfConverter.class);
+    private static final Logger log = LoggerFactory.getLogger(WordToPdfConverter.class);
 
     /**
      * word转PDF文件
