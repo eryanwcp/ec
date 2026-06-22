@@ -37,7 +37,7 @@ import java.nio.file.Paths;
  */
 public class WordToHtmlConverter {
 
-    private static Logger log = LoggerFactory.getLogger(WordToHtmlConverter.class);
+    private static final Logger log = LoggerFactory.getLogger(WordToHtmlConverter.class);
 
     /**
      * doc/docx转换成html 
