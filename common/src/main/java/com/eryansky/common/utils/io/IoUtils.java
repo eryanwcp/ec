@@ -184,25 +184,4 @@ public class IoUtils extends IOUtils {
         is.transferTo(nos); // JDK 9+ 自带的流传输方法，性能极高
         return nos.getBytesRead();
     }
-
-    public static long countStreamSizeWithMarkReset(InputStream is) throws IOException {
-        if (is instanceof FileInputStream) {
-            return ((FileInputStream) is).getChannel().size();
-        }
-        // 判断是否支持标记
-        if (!is.markSupported()) {
-            throw new IOException("当前流不支持mark，无法回退");
-        }
-        // 标记起始位置，缓冲区设足够大
-        is.mark(Integer.MAX_VALUE);
-        long total = 0;
-        byte[] buf = new byte[8192];
-        int len;
-        while ((len = is.read(buf)) != -1) {
-            total += len;
-        }
-        // 指针回到开头，后续可正常读取
-        is.reset();
-        return total;
-    }
 }
