@@ -162,26 +162,4 @@ public class IoUtils extends IOUtils {
 
     }
 
-    /**
-     * 计算流大小 JDK 9+
-     * @param is
-     * @return
-     * @throws IOException
-     */
-//    public static long countStreamSize(InputStream is) throws IOException {
-//        // 建立一个只计数、不保存任何数据的“虚无”输出流
-//        class NullOutputStream extends OutputStream {
-//            private long bytesRead = 0;
-//            @Override
-//            public void write(int b) { bytesRead++; }
-//            @Override
-//            public void write(byte[] b, int off, int len) { bytesRead += len; }
-//            public long getBytesRead() { return bytesRead; }
-//        }
-//
-//        NullOutputStream nos = new NullOutputStream();
-//        is.transferTo(nos); // JDK 9+ 自带的流传输方法，性能极高
-//        return nos.getBytesRead();
-//    }
-
 }
