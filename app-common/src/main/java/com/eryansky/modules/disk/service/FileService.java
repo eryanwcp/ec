@@ -196,7 +196,7 @@ public class FileService extends CrudService<FileDao, File> {
                 iFileManager.deleteFile(file.getFilePath());
                 logger.debug("删除文件：{}", new Object[]{file.getFilePath()});
             }else{
-                logger.warn("文件被应用：{}，{}，未执行物理删除", new Object[]{file.getId(), file.getFilePath()});
+                logger.warn("文件被引用：{}，{}，未执行物理删除", new Object[]{file.getId(), file.getFilePath()});
             }
             delete(file);
         } catch (IOException e) {
