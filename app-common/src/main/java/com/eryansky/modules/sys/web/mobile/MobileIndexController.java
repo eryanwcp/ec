@@ -324,7 +324,7 @@ public class MobileIndexController extends SimpleController {
                 logger.error("图片上传失败,"+e.getMessage(),e);
                 return Result.errorResult().setMsg("图片上传失败,解析异常！");
             }
-            file = DiskUtils.saveSystemFile(_folderName, FolderType.NORMAL.getValue(), sessionInfo.getUserId(), new CustomMultipartFile(tempFileName,bs), tempFileName);
+            file = DiskUtils.saveSystemFile(_folderName, FolderType.NORMAL.getValue(), sessionInfo.getUserId(), new CustomMultipartFile(tempFileName,bs));
             result = Result.successResult().setObj(file).setMsg("文件上传成功！");
         } catch (InvalidExtensionException e) {
             exception = e;
@@ -500,7 +500,7 @@ public class MobileIndexController extends SimpleController {
             }
 
 
-            file = DiskUtils.saveSystemFile(_folderName, FolderType.NORMAL.getValue(), sessionInfo.getUserId(), new CustomMultipartFile(tempFileName, FileCopyUtils.copyToByteArray(inputStream)), tempFileName);
+            file = DiskUtils.saveSystemFile(_folderName, FolderType.NORMAL.getValue(), sessionInfo.getUserId(), new CustomMultipartFile(tempFileName, FileCopyUtils.copyToByteArray(inputStream)));
             Map<String, Object> _data = Maps.newHashMap();
             String base64Data = "data:image/jpeg;base64," + Base64Utils.encodeToString(FileCopyUtils.copyToByteArray(Files.newInputStream(file.getDiskFile().toPath())));
             _data.put("file", file);

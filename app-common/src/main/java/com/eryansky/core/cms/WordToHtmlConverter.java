@@ -151,7 +151,7 @@ public class WordToHtmlConverter {
         wordToHtmlConverter.setPicturesManager((content, pictureType, suggestedName, widthInches, heightInches) -> {
             com.eryansky.modules.disk.mapper.File pictureFile = null;
             try {
-                pictureFile = DiskUtils.saveSystemFile("WORD_IMAGES", FolderType.HIDE.getValue(),null != sessionInfo ? sessionInfo.getUserId():null,new CustomMultipartFile(suggestedName,content),suggestedName);
+                pictureFile = DiskUtils.saveSystemFile("WORD_IMAGES", FolderType.HIDE.getValue(),null != sessionInfo ? sessionInfo.getUserId():null,new CustomMultipartFile(suggestedName,content));
             } catch (Exception e) {
                 log.error(e.getMessage(),e);
             }

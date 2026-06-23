@@ -29,7 +29,7 @@ public class ImageManagerExtend extends ImageManager {
     public void extract(String imagePath, byte[] imageData) throws IOException {
         try {
             String fileName = FileNameUtil.getName(imagePath);
-            imageFile = DiskUtils.saveSystemFile("WORD_IMAGES", FolderType.HIDE.getValue(),null,new CustomMultipartFile(fileName,imageData),imagePath);
+            imageFile = DiskUtils.saveSystemFile("WORD_IMAGES", FolderType.HIDE.getValue(),null,new CustomMultipartFile(fileName,imageData));
         } catch (InvalidExtensionException e) {
             throw new RuntimeException(e);
         } catch (FileUploadBase.FileSizeLimitExceededException e) {
