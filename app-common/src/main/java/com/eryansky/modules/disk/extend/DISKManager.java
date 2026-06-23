@@ -1,3 +1,8 @@
+/**
+ * Copyright (c) 2012-2024 https://www.eryansky.com
+ * <p/>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ */
 package com.eryansky.modules.disk.extend;
 
 import com.eryansky.common.utils.io.FileUtils;
@@ -15,7 +20,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * 优化后的磁盘文件管理器
+ * 磁盘文件管理器
  *
  * @author Eryan
  * @date 2015-06-24

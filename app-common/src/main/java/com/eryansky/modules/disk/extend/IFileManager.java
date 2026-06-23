@@ -1,3 +1,8 @@
+/**
+ * Copyright (c) 2012-2024 https://www.eryansky.com
+ * <p/>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ */
 package com.eryansky.modules.disk.extend;
 
 import com.eryansky.modules.disk.mapper.Folder;
@@ -6,9 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Copyright (c) 2012-2024 https://www.eryansky.com
- * <p/>
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * 文件操作统一接口
  */
 public interface IFileManager {
 
