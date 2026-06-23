@@ -20,7 +20,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * 的磁盘文件管理器
+ * 磁盘文件管理器
  *
  * @author Eryan
  * @date 2015-06-24
