@@ -255,14 +255,14 @@ public class DiskUtils {
         file.setName(fileName);
         file.setFilePath(storeFilePath);
         file.setFileSuffix(FilenameUtils.getExtension(fileName));
+        //JDK 9+
+//        file.setFileSize(IoUtils.countStreamSize(multipartFile.getInputStream()));
         file.setFileSize(multipartFile.getSize());
         IFileManager.UploadStatus uploadStatus = Static.iFileManager.saveFile(file.getFilePath(), multipartFile.getInputStream(), true);
         if(null == uploadStatus || IFileManager.UploadStatus.Upload_New_File_Failed.equals(uploadStatus)){
             logger.error("文件上传失败:"+fileName);
             throw new ServiceException("文件上传失败："+fileName);
         }
-        //JDK 9+
-//        file.setFileSize(IoUtils.countStreamSize(inputStream));
         Static.fileService.save(file);
         return file;
     }

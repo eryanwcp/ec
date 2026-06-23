@@ -1,3 +1,8 @@
+/**
+ * Copyright (c) 2012-2024 https://www.eryansky.com
+ * <p/>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ */
 package com.eryansky.modules.disk.extend;
 
 import com.eryansky.modules.disk.mapper.Folder;
@@ -6,9 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Copyright (c) 2012-2024 https://www.eryansky.com
- * <p/>
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * 文件操作统一接口
  */
 public interface IFileManager {
 
@@ -22,6 +25,7 @@ public interface IFileManager {
         Remote_Bigger_Local,        //远程文件大于本地文件
         Upload_From_Break_Success,  //断点续传成功
         Upload_From_Break_Failed,   //断点续传失败
+        Delete_Remote_Success,       //删除远程文件成功
         Delete_Remote_Faild;        //删除远程文件失败
     }
 
