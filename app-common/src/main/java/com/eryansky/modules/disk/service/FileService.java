@@ -12,7 +12,6 @@ import com.eryansky.common.orm.mybatis.interceptor.BaseInterceptor;
 import com.eryansky.common.utils.DateUtils;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
-import com.eryansky.common.utils.io.FileUtils;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
 import com.eryansky.core.security.SessionInfo;
 import com.eryansky.core.web.upload.FileUploadUtils;
@@ -22,7 +21,6 @@ import com.eryansky.modules.disk.mapper.Folder;
 import com.eryansky.modules.disk.utils.DiskUtils;
 import com.eryansky.utils.AppConstants;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -33,7 +31,6 @@ import com.eryansky.modules.disk.dao.FileDao;
 import com.eryansky.core.orm.mybatis.service.CrudService;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
@@ -64,7 +61,6 @@ public class FileService extends CrudService<FileDao, File> {
             return Collections.emptyList();
         }
         Parameter parameter = Parameter.newParameter();
-        parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put("fileIds", fileIds);
         return dao.findFilesByIds(parameter);
     }
@@ -200,7 +196,7 @@ public class FileService extends CrudService<FileDao, File> {
                 iFileManager.deleteFile(file.getFilePath());
                 logger.debug("删除文件：{}", new Object[]{file.getFilePath()});
             }else{
-                logger.warn("文件被应用：{}，{}，未执行物理删除", new Object[]{file.getId(), file.getFilePath()});
+                logger.warn("文件被引用：{}，{}，未执行物理删除", new Object[]{file.getId(), file.getFilePath()});
             }
             delete(file);
         } catch (IOException e) {
@@ -311,7 +307,7 @@ public class FileService extends CrudService<FileDao, File> {
                 iFileManager.deleteFile(file.getFilePath());
                 logger.debug("删除文件：{}", new Object[]{file.getFilePath()});
             }else{
-                logger.warn("文件被应用：{}，{}，未执行物理删除", new Object[]{file.getId(), file.getFilePath()});
+                logger.warn("文件被引用：{}，{}，未执行物理删除", new Object[]{file.getId(), file.getFilePath()});
             }
             dao.clear(file);
         } catch (IOException e) {
@@ -485,6 +481,7 @@ public class FileService extends CrudService<FileDao, File> {
      */
     public List<File> findFilesByFolderId(String folderId,Date startTime, Date endTime) {
         Parameter parameter = Parameter.newParameter();
+        //排除已被删除的文件
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_DELETE);
         parameter.put("folderId", folderId);
         parameter.put("startTime", startTime == null ? null : DateUtils.formatDateTime(startTime));
