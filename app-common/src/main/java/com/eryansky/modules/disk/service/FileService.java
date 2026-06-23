@@ -61,7 +61,6 @@ public class FileService extends CrudService<FileDao, File> {
             return Collections.emptyList();
         }
         Parameter parameter = Parameter.newParameter();
-        parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put("fileIds", fileIds);
         return dao.findFilesByIds(parameter);
     }
