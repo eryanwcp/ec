@@ -45,6 +45,7 @@ import org.apache.commons.fileupload2.core.FileUploadSizeException;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
@@ -57,6 +58,8 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 
 /**
@@ -318,7 +321,7 @@ public class MobileIndexController extends SimpleController {
                 logger.error("图片上传失败,"+e.getMessage(),e);
                 return Result.errorResult().setMsg("图片上传失败,解析异常！");
             }
-            file = DiskUtils.saveSystemFile(_folderName, FolderType.NORMAL.getValue(), sessionInfo.getUserId(), new ByteArrayInputStream(bs), tempFileName);
+            file = DiskUtils.saveSystemFile(_folderName, FolderType.NORMAL.getValue(), sessionInfo.getUserId(), new CustomMultipartFile(tempFileName,bs));
             result = Result.successResult().setData(file).setMsg("文件上传成功！");
         } catch (InvalidExtensionException e) {
             exception = e;
@@ -490,11 +493,11 @@ public class MobileIndexController extends SimpleController {
                 }
                 tempFile = new java.io.File(tempFileName);
                 ImgUtil.write(watermarkImage, tempFile);
-                inputStream = new FileInputStream(tempFileName);
+                inputStream = Files.newInputStream(Paths.get(tempFileName));
             }
 
 
-            file = DiskUtils.saveSystemFile(_folderName, FolderType.NORMAL.getValue(), sessionInfo.getUserId(), inputStream, tempFileName);
+            file = DiskUtils.saveSystemFile(_folderName, FolderType.NORMAL.getValue(), sessionInfo.getUserId(), new CustomMultipartFile(tempFileName, FileCopyUtils.copyToByteArray(inputStream)));
             result = Result.successResult().setData(file).setMsg("文件上传成功！");
         } catch (InvalidExtensionException e) {
             exception = e;

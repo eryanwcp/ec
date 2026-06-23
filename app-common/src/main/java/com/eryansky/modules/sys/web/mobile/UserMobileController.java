@@ -477,7 +477,7 @@ public class UserMobileController extends SimpleController {
             }
 
 
-            file = DiskUtils.saveSystemFile(_folderName, FolderType.NORMAL.getValue(), sessionInfo.getUserId(), inputStream, tempFileName);
+            file = DiskUtils.saveSystemFile(_folderName, FolderType.NORMAL.getValue(), sessionInfo.getUserId(), new CustomMultipartFile(tempFileName, FileCopyUtils.copyToByteArray(inputStream)));
             result = Result.successResult().setData(file).setMsg("文件上传成功！");
         } catch (InvalidExtensionException e) {
             exception = e;

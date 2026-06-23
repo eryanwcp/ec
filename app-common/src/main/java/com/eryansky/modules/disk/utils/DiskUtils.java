@@ -224,7 +224,7 @@ public class DiskUtils {
                                       MultipartFile multipartFile) throws InvalidExtensionException,
             FileUploadSizeException,
             FileNameLengthLimitExceededException, IOException {
-        return saveSystemFile(folderCode, FolderType.HIDE.getValue(), userId, multipartFile.getInputStream(), DiskUtils.getMultipartOriginalFilename(multipartFile));
+        return saveSystemFile(folderCode, FolderType.HIDE.getValue(), userId,multipartFile);
     }
 
     /**
@@ -232,17 +232,16 @@ public class DiskUtils {
      *
      * @param folderCode  系统文件夹编码
      * @param userId      用户ID 允允许为null
-     * @param inputStream 文件输入流
-     * @param fileName    文件名称
+     * @param multipartFile 文件输入流
      * @return
      * @throws InvalidExtensionException
      * @throws FileNameLengthLimitExceededException
      * @throws IOException
      */
-    public static File saveSystemFile(String folderCode, String folderType, String userId,
-                                      InputStream inputStream, String fileName) throws InvalidExtensionException,
+    public static File saveSystemFile(String folderCode, String folderType, String userId,MultipartFile multipartFile) throws InvalidExtensionException,
             FileUploadSizeException,
             FileNameLengthLimitExceededException, IOException {
+        String fileName = getMultipartOriginalFilename(multipartFile);
         fileName = StringUtils.right(StringUtils.replace(fileName,"-",""),36);
         String _userId = StringUtils.isBlank(userId) ? User.SUPERUSER_ID : userId;
         String code = FileUploadUtils.encodingFilenamePrefix(fileName);
@@ -255,14 +254,14 @@ public class DiskUtils {
         file.setName(fileName);
         file.setFilePath(storeFilePath);
         file.setFileSuffix(FilenameUtils.getExtension(fileName));
-        IFileManager.UploadStatus uploadStatus = Static.iFileManager.saveFile(file.getFilePath(), inputStream, true);
+        //JDK 9+
+//        file.setFileSize(IoUtils.countStreamSize(multipartFile.getInputStream()));
+        file.setFileSize(multipartFile.getSize());
+        IFileManager.UploadStatus uploadStatus = Static.iFileManager.saveFile(file.getFilePath(), multipartFile.getInputStream(), true);
         if(null == uploadStatus || IFileManager.UploadStatus.Upload_New_File_Failed.equals(uploadStatus)){
             logger.error("文件上传失败:"+fileName);
             throw new ServiceException("文件上传失败："+fileName);
         }
-//        file.setFileSize(IoUtils.countStreamSizeWithMarkReset(inputStream));
-        //JDK 9+
-        file.setFileSize(IoUtils.countStreamSize(inputStream));
         Static.fileService.save(file);
         return file;
     }
