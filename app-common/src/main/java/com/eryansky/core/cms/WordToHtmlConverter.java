@@ -5,6 +5,7 @@ import com.eryansky.common.utils.StringUtils;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
 import com.eryansky.modules.disk._enum.FolderType;
+import com.eryansky.modules.disk.extend.CustomMultipartFile;
 import com.eryansky.modules.disk.utils.DiskUtils;
 import fr.opensagres.poi.xwpf.converter.xhtml.XHTMLConverter;
 import fr.opensagres.poi.xwpf.converter.xhtml.XHTMLOptions;
@@ -150,7 +151,7 @@ public class WordToHtmlConverter {
         wordToHtmlConverter.setPicturesManager((content, pictureType, suggestedName, widthInches, heightInches) -> {
             com.eryansky.modules.disk.mapper.File pictureFile = null;
             try {
-                pictureFile = DiskUtils.saveSystemFile("WORD_IMAGES", FolderType.HIDE.getValue(),null != sessionInfo ? sessionInfo.getUserId():null,new ByteArrayInputStream(content),suggestedName);
+                pictureFile = DiskUtils.saveSystemFile("WORD_IMAGES", FolderType.HIDE.getValue(),null != sessionInfo ? sessionInfo.getUserId():null,new CustomMultipartFile(suggestedName,content),suggestedName);
             } catch (Exception e) {
                 log.error(e.getMessage(),e);
             }

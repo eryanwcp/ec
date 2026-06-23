@@ -1,8 +1,10 @@
 package com.eryansky.core.cms;
 
+import cn.hutool.core.io.file.FileNameUtil;
 import com.eryansky.core.web.upload.exception.FileNameLengthLimitExceededException;
 import com.eryansky.core.web.upload.exception.InvalidExtensionException;
 import com.eryansky.modules.disk._enum.FolderType;
+import com.eryansky.modules.disk.extend.CustomMultipartFile;
 import com.eryansky.modules.disk.utils.DiskUtils;
 import fr.opensagres.poi.xwpf.converter.core.ImageManager;
 import org.apache.commons.fileupload.FileUploadBase;
@@ -26,7 +28,8 @@ public class ImageManagerExtend extends ImageManager {
     @Override
     public void extract(String imagePath, byte[] imageData) throws IOException {
         try {
-            imageFile = DiskUtils.saveSystemFile("WORD_IMAGES", FolderType.HIDE.getValue(),null,new ByteArrayInputStream(imageData),imagePath);
+            String fileName = FileNameUtil.getName(imagePath);
+            imageFile = DiskUtils.saveSystemFile("WORD_IMAGES", FolderType.HIDE.getValue(),null,new CustomMultipartFile(fileName,imageData),imagePath);
         } catch (InvalidExtensionException e) {
             throw new RuntimeException(e);
         } catch (FileUploadBase.FileSizeLimitExceededException e) {

@@ -224,7 +224,7 @@ public class DiskUtils {
                                       MultipartFile multipartFile) throws InvalidExtensionException,
             FileUploadBase.FileSizeLimitExceededException,
             FileNameLengthLimitExceededException, IOException {
-        return saveSystemFile(folderCode, FolderType.HIDE.getValue(), userId, multipartFile.getInputStream(), DiskUtils.getMultipartOriginalFilename(multipartFile));
+        return saveSystemFile(folderCode, FolderType.HIDE.getValue(), userId, multipartFile, DiskUtils.getMultipartOriginalFilename(multipartFile));
     }
 
     /**
@@ -241,7 +241,7 @@ public class DiskUtils {
      * @throws IOException
      */
     public static File saveSystemFile(String folderCode, String folderType, String userId,
-                                      InputStream inputStream, String fileName) throws InvalidExtensionException,
+                                      MultipartFile inputStream, String fileName) throws InvalidExtensionException,
             FileUploadBase.FileSizeLimitExceededException,
             FileNameLengthLimitExceededException, IOException {
         String _userId = StringUtils.isBlank(userId) ? User.SUPERUSER_ID : userId;
@@ -255,12 +255,12 @@ public class DiskUtils {
         file.setName(fileName);
         file.setFilePath(storeFilePath);
         file.setFileSuffix(FilenameUtils.getExtension(fileName));
-        IFileManager.UploadStatus uploadStatus = Static.iFileManager.saveFile(file.getFilePath(), inputStream, true);
+        file.setFileSize(inputStream.getSize());
+        IFileManager.UploadStatus uploadStatus = Static.iFileManager.saveFile(file.getFilePath(), inputStream.getInputStream(), true);
         if(null == uploadStatus || IFileManager.UploadStatus.Upload_New_File_Failed.equals(uploadStatus)){
             logger.error("文件上传失败:"+fileName);
             throw new ServiceException("文件上传失败："+fileName);
         }
-        file.setFileSize(IoUtils.countStreamSizeWithMarkReset(inputStream));
         //JDK 9+
 //        file.setFileSize(IoUtils.countStreamSize(inputStream));
         Static.fileService.save(file);

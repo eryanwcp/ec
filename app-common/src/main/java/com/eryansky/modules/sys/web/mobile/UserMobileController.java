@@ -479,7 +479,7 @@ public class UserMobileController extends SimpleController {
             }
 
 
-            file = DiskUtils.saveSystemFile(_folderName, FolderType.NORMAL.getValue(), sessionInfo.getUserId(), inputStream, tempFileName);
+            file = DiskUtils.saveSystemFile(_folderName, FolderType.NORMAL.getValue(), sessionInfo.getUserId(), new CustomMultipartFile(tempFileName, FileCopyUtils.copyToByteArray(inputStream)), tempFileName);
             Map<String, Object> _data = Maps.newHashMap();
             String base64Data = "data:image/jpeg;base64," + Base64Utils.encodeToString(FileCopyUtils.copyToByteArray(Files.newInputStream(file.getDiskFile().toPath())));
             _data.put("file", file);
