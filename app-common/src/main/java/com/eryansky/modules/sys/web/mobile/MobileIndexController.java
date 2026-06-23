@@ -14,6 +14,7 @@ import com.eryansky.common.utils.encode.Cryptos;
 import com.eryansky.common.utils.encode.EncodeUtils;
 import com.eryansky.common.utils.encode.RSAUtils;
 import com.eryansky.common.utils.encode.Sm4Utils;
+import com.eryansky.common.utils.io.IoUtils;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.core.aop.annotation.Logging;
@@ -497,7 +498,7 @@ public class MobileIndexController extends SimpleController {
             }
 
 
-            file = DiskUtils.saveSystemFile(_folderName, FolderType.NORMAL.getValue(), sessionInfo.getUserId(), new CustomMultipartFile(tempFileName, FileCopyUtils.copyToByteArray(inputStream)));
+            file = DiskUtils.saveSystemFile(_folderName, FolderType.NORMAL.getValue(), sessionInfo.getUserId(), new CustomMultipartFile(tempFileName, IoUtils.toByteArray(inputStream)));
             result = Result.successResult().setData(file).setMsg("文件上传成功！");
         } catch (InvalidExtensionException e) {
             exception = e;
