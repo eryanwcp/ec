@@ -323,7 +323,7 @@ public class FTPManager implements IFileManager {
         }
 
 
-        return UploadStatus.Delete_Remote_Faild;
+        return UploadStatus.Delete_Remote_Success;
     }
 
     /** */
