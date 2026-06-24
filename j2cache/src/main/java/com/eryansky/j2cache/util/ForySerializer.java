@@ -45,17 +45,11 @@ public class ForySerializer implements Serializer {
 
     @Override
     public byte[] serialize(Object obj) throws IOException {
-        if (fory == null) {
-            throw new IOException("Fory serializer not initialized");
-        }
         return fory.serialize(obj);
     }
 
     @Override
     public Object deserialize(byte[] bytes) throws IOException {
-        if (fory == null) {
-            throw new IOException("Fory serializer not initialized");
-        }
         return fory.deserialize(bytes);
     }
 
