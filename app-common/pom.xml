@@ -119,6 +119,12 @@
             <groupId>fr.opensagres.xdocreport</groupId>
             <artifactId>fr.opensagres.poi.xwpf.converter.pdf</artifactId>
             <version>${xwpf.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>fr.opensagres.xdocreport</groupId>
+                    <artifactId>fr.opensagres.xdocreport.itext.extension</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>fr.opensagres.xdocreport</groupId>
