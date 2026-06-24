@@ -4,7 +4,7 @@ import org.apache.fory.Fory;
 import org.apache.fory.ThreadSafeFory;
 import org.apache.fory.config.Language;
 import org.apache.fory.logging.LoggerFactory;
-import org.apache.fory.resolver.TypeChecker;
+import org.apache.fory.resolver.AllowListChecker;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -17,54 +17,22 @@ public class ForySerializer implements Serializer {
 
     private final static Logger log = org.slf4j.LoggerFactory.getLogger(ForySerializer.class);
 
-    public static final String TYPE_CHECKER_CLASS = "j2cache.fory.typeCheckerClass";
     private static volatile ThreadSafeFory fory = null;
-    private static volatile TypeChecker typeChecker;
+    private static final AllowListChecker typeChecker;
 
     static {
         LoggerFactory.useSlf4jLogging(true);
-        // Try to load an external TypeChecker implementation from system property
-        String typeCheckerClass = System.getProperty(TYPE_CHECKER_CLASS);
-        if (typeCheckerClass != null && !typeCheckerClass.trim().isEmpty()) {
-            try {
-                Class<?> cls = Class.forName(typeCheckerClass.trim());
-                Object inst = cls.getDeclaredConstructor().newInstance();
-                if (inst instanceof TypeChecker) {
-                    typeChecker = (TypeChecker) inst;
-                    log.info("Loaded external TypeChecker implementation: {}", typeCheckerClass);
-                } else {
-                    throw new IllegalArgumentException(typeCheckerClass + " does not implement TypeChecker");
-                }
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to instantiate TypeChecker: " + typeCheckerClass, e);
-            }
-        }
-
-
-        buildFory();
-    }
-
-    private static synchronized void buildFory() {
+        typeChecker = new AllowListChecker(AllowListChecker.CheckLevel.STRICT);
+        log.info("Using default TypeChecker: {} {}", typeChecker.getClass().getName(), typeChecker.getCheckLevel().name());
         fory = Fory.builder().withLanguage(Language.JAVA)
                 // Allow to deserialize objects unknown types, more flexible
                 // but may be insecure if the classes contains malicious code.
                 .withRefTracking(true)
-                .requireClassRegistration(null != typeChecker)
+                .requireClassRegistration(false)
                 .withTypeChecker(typeChecker)
                 .buildThreadSafeFory();
     }
 
-    /**
-     * Replace the TypeChecker at runtime and rebuild the underlying Fory instance.
-     * Provide a non-null TypeChecker implementation.
-     */
-    public static synchronized void setTypeChecker(TypeChecker checker) {
-        if (checker == null) {
-            throw new IllegalArgumentException("TypeChecker must not be null");
-        }
-        typeChecker = checker;
-        buildFory();
-    }
 
     public ForySerializer(){
 
@@ -77,12 +45,25 @@ public class ForySerializer implements Serializer {
 
     @Override
     public byte[] serialize(Object obj) throws IOException {
+        if (fory == null) {
+            throw new IOException("Fory serializer not initialized");
+        }
         return fory.serialize(obj);
     }
 
     @Override
     public Object deserialize(byte[] bytes) throws IOException {
+        if (fory == null) {
+            throw new IOException("Fory serializer not initialized");
+        }
         return fory.deserialize(bytes);
     }
 
+    public static ThreadSafeFory getFory() {
+        return fory;
+    }
+
+    public static AllowListChecker getTypeChecker() {
+        return typeChecker;
+    }
 }
