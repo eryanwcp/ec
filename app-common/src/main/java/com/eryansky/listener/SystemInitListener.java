@@ -9,6 +9,7 @@ import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.web.listener.DefaultSystemInitListener;
 import com.eryansky.core.security.SecurityType;
 import com.eryansky.core.security.SecurityUtils;
+import com.eryansky.j2cache.util.ForySerializer;
 import com.eryansky.modules.disk.utils.DiskUtils;
 import com.eryansky.server.IApiWebService;
 import com.eryansky.server.impl.ApiWebServiceImpl;
@@ -49,6 +50,7 @@ public class SystemInitListener extends DefaultSystemInitListener{
 		int initProcessors = processors < 4 ? processors - 1 : processors - 2;
 		Integer configParallelism = AppConstants.getPoolParallelism();
 		System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", String.valueOf(null != configParallelism ? configParallelism : initProcessors));
+//		System.setProperty(ForySerializer.TYPE_CHECKER_CLASS, DefaultForyTypeChecker.class.getName());
 		super.contextInitialized(sce);
 		AppUtils.init(sce.getServletContext());
 		logger.info("当前启动系统：{}-V{}",AppConstants.getAppFullName(),AppConstants.getAppVersion());
