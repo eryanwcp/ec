@@ -243,6 +243,24 @@
         </div>
     </fieldset>
 
+    <fieldset>
+        <legend>序列化注册</legend>
+        <div class="control-group">
+            <label class="control-label">黑名单：</label>
+            <div class="controls">
+                <textarea name="system.security.SerializerTypeCheck.disallowClasses" class="input-xxlarge"></textarea>
+                <span class="help-inline">类名 每行一个或多个之间以";"分割，支持"*"通配符结尾</span>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">白名单：</label>
+            <div class="controls">
+                <textarea name="system.security.SerializerTypeCheck.allowClasses" class="input-xxlarge"></textarea>
+                <span class="help-inline">类名 每行一个或多个之间以";"分割，支持"*"通配符结尾</span>
+            </div>
+        </div>
+    </fieldset>
+
 
     <fieldset>
         <legend>REST服务</legend>
@@ -279,14 +297,14 @@
     </fieldset>
 
 
-<%--    <div class="control-group">--%>
-<%--        <label class="control-label">URL黑名单限制：</label>--%>
-<%--        <div class="controls">--%>
-<%--            <label><input name="system.rest.limit.url.enable" type="radio" value="true"/>启用</label>--%>
-<%--            <label><input name="system.rest.limit.url.enable" type="radio" value="false"/>禁用</label>--%>
-<%--            <span class="help-inline">需重启服务</span>--%>
-<%--        </div>--%>
-<%--    </div>--%>
+    <%--    <div class="control-group">--%>
+    <%--        <label class="control-label">URL黑名单限制：</label>--%>
+    <%--        <div class="controls">--%>
+    <%--            <label><input name="system.rest.limit.url.enable" type="radio" value="true"/>启用</label>--%>
+    <%--            <label><input name="system.rest.limit.url.enable" type="radio" value="false"/>禁用</label>--%>
+    <%--            <span class="help-inline">需重启服务</span>--%>
+    <%--        </div>--%>
+    <%--    </div>--%>
 
     <div class="form-actions">
         <e:hasPermission name="sys:config:edit">
