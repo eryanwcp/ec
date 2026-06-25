@@ -8,6 +8,7 @@ package com.eryansky.configure;
 import com.eryansky.common.utils.ObjectUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.io.PropertiesLoader;
+import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.j2cache.util.ForySerializer;
 import com.eryansky.modules.sys.mapper.Config;
 import com.eryansky.modules.sys.service.ConfigService;
@@ -57,14 +58,16 @@ public class DefaultConfigurer {
 
     @Bean
     public String checkSerializerTypeCheck() {
-        List<String> disAllowClasses = AppConstants.getSerializerTypeCheckDisallowClassList();
+        List<String> disallowClasses = AppConstants.getSerializerTypeCheckDisallowClassList();
         AllowListChecker allowListChecker = ForySerializer.getTypeChecker();
-        if (Collections3.isNotEmpty(disAllowClasses)) {
-            allowListChecker.disallowClasses(disAllowClasses);
+        if (Collections3.isNotEmpty(disallowClasses)) {
+            logger.info("SerializerTypeCheck disallowClasses : {}", JsonMapper.toJsonString(disallowClasses));
+            allowListChecker.disallowClasses(disallowClasses);
         }
 
         List<String> allowClassList = AppConstants.getSerializerTypeCheckAllowClassList();
         if (Collections3.isNotEmpty(allowClassList)) {
+            logger.info("SerializerTypeCheck allowClasses : {}", JsonMapper.toJsonString(allowClassList));
             allowListChecker.allowClasses(allowClassList);
         }
         return null;
