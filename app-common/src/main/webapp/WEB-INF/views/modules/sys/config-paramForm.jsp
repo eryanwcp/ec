@@ -243,6 +243,24 @@
         </div>
     </fieldset>
 
+    <fieldset>
+        <legend>序列化注册</legend>
+        <div class="control-group">
+            <label class="control-label">黑名单：</label>
+            <div class="controls">
+                <textarea name="system.security.SerializerTypeCheck.disallowClasses" class="input-xxlarge"></textarea>
+                <span class="help-inline">类名 每行一个或多个之间以";"分割，支持"*"通配符结尾</span>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">白名单：</label>
+            <div class="controls">
+                <textarea name="system.security.SerializerTypeCheck.allowClasses" class="input-xxlarge"></textarea>
+                <span class="help-inline">类名 每行一个或多个之间以";"分割，支持"*"通配符结尾</span>
+            </div>
+        </div>
+    </fieldset>
+
 
     <fieldset>
         <legend>REST服务</legend>

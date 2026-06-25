@@ -145,6 +145,8 @@ public class ConfigController extends SimpleController {
             "system.security.limit.ip.blacklist",
             "system.security.proxy.enable",
             "system.security.proxy.whitelist",
+            "system.security.SerializerTypeCheck.disallowClasses",
+            "system.security.SerializerTypeCheck.allowClasses",
             "system.rest.enable",
             "system.rest.defaultApiKey",
             "system.rest.limit.ip.enable",
