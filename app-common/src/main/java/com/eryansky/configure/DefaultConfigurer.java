@@ -57,10 +57,10 @@ public class DefaultConfigurer {
 
     @Bean
     public String checkSerializerTypeCheck() {
-        List<String> disAllowClasses = AppConstants.getSerializerTypeCheckDisAllowClassList();
+        List<String> disallowClasses = AppConstants.getSerializerTypeCheckDisallowClassList();
         AllowListChecker allowListChecker = ForySerializer.getTypeChecker();
-        if (Collections3.isNotEmpty(disAllowClasses)) {
-            allowListChecker.disallowClasses(disAllowClasses);
+        if (Collections3.isNotEmpty(disallowClasses)) {
+            allowListChecker.disallowClasses(disallowClasses);
         }
 
         List<String> allowClassList = AppConstants.getSerializerTypeCheckAllowClassList();
