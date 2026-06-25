@@ -842,4 +842,42 @@ public class AppConstants extends SysConstants {
         return null != value  && !value.isEmpty() ? Integer.valueOf(value):null;
     }
 
+
+    /**
+     * 序列化注册 示例：com.erynasky.* 白名单 多个之间检以";"分割
+     * @return
+     */
+    public static String getSerializerTypeCheckAllowClasses() {
+        String code = "system.security.SerializerTypeCheck.allowClasses";
+        return getConfigValue(code,"com.eryansky.*");
+    }
+
+
+    public static List<String> getSerializerTypeCheckAllowClassList() {
+        String value = getSerializerTypeCheckAllowClasses();
+        if(StringUtils.isNotBlank(value)){
+            return Arrays.asList(StringUtils.split(StringUtils.trim(value).replaceAll("\r\n", ",").replaceAll("，", ",").replaceAll("；", ",").replaceAll(";", ","), ","));
+        }
+        return Collections.emptyList();
+    }
+
+
+    /**
+     * 序列化注册  黑名单(权限等级高于白名单) 多个之间检以";"分割
+     * @return
+     */
+    public static String getSerializerTypeCheckDisAllowClasses() {
+        String code = "system.security.SerializerTypeCheck.disAllowClasses";
+        return getConfigValue(code);
+    }
+
+
+    public static List<String> getSerializerTypeCheckDisAllowClassList() {
+        String value = getSerializerTypeCheckDisAllowClasses();
+        if(StringUtils.isNotBlank(value)){
+            return Arrays.asList(StringUtils.split(StringUtils.trim(value).replaceAll("\r\n", ",").replaceAll("，", ",").replaceAll("；", ",").replaceAll(";", ","), ","));
+        }
+        return Collections.emptyList();
+    }
+
 }

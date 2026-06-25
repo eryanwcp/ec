@@ -20,10 +20,8 @@
 
         <caffeine.version>2.9.3</caffeine.version>
         <lettuce.version>6.2.7.RELEASE</lettuce.version>
-        <objenesis.version>3.3</objenesis.version>
-        <fst.version>2.57</fst.version>
-        <snappy.version>1.1.10.8</snappy.version>
         <fory.version>1.2.0</fory.version>
+        <spotbugs-annotations.version>4.10.2</spotbugs-annotations.version>
         <guava.version>33.6.0-jre</guava.version>
     </properties>
 
@@ -62,32 +60,14 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.objenesis</groupId>
-            <artifactId>objenesis</artifactId>
-            <version>${objenesis.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>de.ruedigermoeller</groupId>
-            <artifactId>fst</artifactId>
-            <version>${fst.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.xerial.snappy</groupId>
-            <artifactId>snappy-java</artifactId>
-            <version>${snappy.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.apache.fory</groupId>
             <artifactId>fory-core</artifactId>
             <version>${fory.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.fory</groupId>
             <artifactId>fory-extensions</artifactId>
             <version>${fory.version}</version>
-            <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.fory</groupId>
@@ -95,12 +75,15 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+            <version>${spotbugs-annotations.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 
