@@ -262,7 +262,6 @@ public class MvcConfigurer implements WebMvcConfigurer {
             HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
             requestFactory.setHttpClient(httpClient);
             requestFactory.setConnectionRequestTimeout(10*1000);
-            requestFactory.setConnectTimeout(20*1000);
             return requestFactory;
         } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
             throw new RuntimeException(e);
