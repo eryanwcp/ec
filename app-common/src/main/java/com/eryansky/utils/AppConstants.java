@@ -866,14 +866,14 @@ public class AppConstants extends SysConstants {
      * 序列化注册  黑名单(权限等级高于白名单) 多个之间检以";"分割
      * @return
      */
-    public static String getSerializerTypeCheckDisAllowClasses() {
-        String code = "system.security.SerializerTypeCheck.disAllowClasses";
+    public static String getSerializerTypeCheckDisallowClasses() {
+        String code = "system.security.SerializerTypeCheck.disallowClasses";
         return getConfigValue(code);
     }
 
 
-    public static List<String> getSerializerTypeCheckDisAllowClassList() {
-        String value = getSerializerTypeCheckDisAllowClasses();
+    public static List<String> getSerializerTypeCheckDisallowClassList() {
+        String value = getSerializerTypeCheckDisallowClasses();
         if(StringUtils.isNotBlank(value)){
             return Arrays.asList(StringUtils.split(StringUtils.trim(value).replaceAll("\r\n", ",").replaceAll("，", ",").replaceAll("；", ",").replaceAll(";", ","), ","));
         }
