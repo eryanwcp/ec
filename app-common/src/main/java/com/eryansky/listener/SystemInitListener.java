@@ -9,7 +9,6 @@ import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.web.listener.DefaultSystemInitListener;
 import com.eryansky.core.security.SecurityType;
 import com.eryansky.core.security.SecurityUtils;
-import com.eryansky.j2cache.util.ForySerializer;
 import com.eryansky.modules.disk.utils.DiskUtils;
 import com.eryansky.server.IApiWebService;
 import com.eryansky.server.impl.ApiWebServiceImpl;
@@ -51,10 +50,6 @@ public class SystemInitListener extends DefaultSystemInitListener{
 		Integer configParallelism = AppConstants.getPoolParallelism();
 		System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", String.valueOf(null != configParallelism ? configParallelism : initProcessors));
 		super.contextInitialized(sce);
-
-		//Fory白名单配置
-		ForySerializer.getTypeChecker().allowClass("com.eryansky.*");
-
 		AppUtils.init(sce.getServletContext());
 		logger.info("当前启动系统：{}-V{}",AppConstants.getAppFullName(),AppConstants.getAppVersion());
 		logger.info("文件存储方式：{}",AppConstants.getSystemDiskType());

@@ -8,9 +8,11 @@ package com.eryansky.configure;
 import com.eryansky.common.utils.ObjectUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.io.PropertiesLoader;
+import com.eryansky.j2cache.util.ForySerializer;
 import com.eryansky.modules.sys.mapper.Config;
 import com.eryansky.modules.sys.service.ConfigService;
 import com.eryansky.utils.AppConstants;
+import org.apache.fory.resolver.AllowListChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +50,21 @@ public class DefaultConfigurer {
                     logger.warn("数据库与配置文件读取的系统参数配置不一致！{}：{} {}", v.getCode(), v.getValue(), r.getValue());
                 }
             });
+        }
+        return null;
+    }
+
+
+    @Bean
+    public String checkSerializerTypeCheck() {
+        List<String> disAllowClasses = AppConstants.getSerializerTypeCheckDisAllowClassList();
+        List<String> allowClassList = AppConstants.getSerializerTypeCheckAllowClassList();
+        AllowListChecker allowListChecker = ForySerializer.getTypeChecker();
+        if (Collections3.isNotEmpty(disAllowClasses)) {
+            allowListChecker.disallowClasses(disAllowClasses);
+        }
+        if (Collections3.isNotEmpty(allowClassList)) {
+            allowListChecker.allowClasses(allowClassList);
         }
         return null;
     }
