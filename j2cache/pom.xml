@@ -20,7 +20,6 @@
 
         <caffeine.version>3.2.4</caffeine.version>
         <lettuce.version>6.8.2.RELEASE</lettuce.version>
-        <objenesis.version>3.4</objenesis.version>
         <fory.version>1.2.0</fory.version>
         <spotbugs-annotations.version>4.10.2</spotbugs-annotations.version>
         <guava.version>33.6.0-jre</guava.version>
