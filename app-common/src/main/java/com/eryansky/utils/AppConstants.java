@@ -867,7 +867,7 @@ public class AppConstants extends SysConstants {
      * @return
      */
     public static String getSerializerTypeCheckDisAllowClasses() {
-        String code = "system.security.SerializerTypeCheck.DisAllowClasses";
+        String code = "system.security.SerializerTypeCheck.disAllowClasses";
         return getConfigValue(code);
     }
 
