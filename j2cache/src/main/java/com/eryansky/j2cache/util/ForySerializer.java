@@ -290,8 +290,8 @@ public class ForySerializer implements Serializer {
 
     static {
         LoggerFactory.useSlf4jLogging(true);
-//        AllowListChecker checker = new AllowListChecker(AllowListChecker.CheckLevel.STRICT);
-        AllowListChecker checker = new AllowListChecker(AllowListChecker.CheckLevel.WARN);
+        AllowListChecker checker = new AllowListChecker(AllowListChecker.CheckLevel.STRICT);
+//        AllowListChecker checker = new AllowListChecker(AllowListChecker.CheckLevel.WARN);
         checker.disallowClasses(DEFAULT_DISALLOWED_LIST_SET);
 
         log.info("Using default TypeChecker: {} {}", checker.getClass().getName(), checker.getCheckLevel().name());
