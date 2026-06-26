@@ -92,9 +92,4 @@ public class DefaultConfigurer {
         logger.info("默认访问地址：{}",AppConstants.getAppURL());
     }
 
-    @EventListener(ContextRefreshedEvent.class)
-    public void onContextRefresh(ContextRefreshedEvent event) {
-
-    }
-
 }
