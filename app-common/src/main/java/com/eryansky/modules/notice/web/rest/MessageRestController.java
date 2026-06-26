@@ -5,7 +5,7 @@ import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.security.annotation.RestApi;
 import com.eryansky.modules.sys._enum.LogType;
-import com.eryansky.modules.notice.service.IApiWebService;
+import com.eryansky.modules.notice.service.MessageAPI;
 import com.eryansky.modules.notice.vo.WSResult;
 import javax.annotation.Resource;
 import org.springframework.stereotype.Controller;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class MessageRestController extends SimpleController {
 
     @Resource
-    private IApiWebService apiWebService;
+    private MessageAPI apiWebService;
 
     @Override
     protected void initBinder(WebDataBinder binder) {
