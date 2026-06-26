@@ -89,10 +89,8 @@ public class DefaultConfigurer {
     public void onReady() {
         logger.info("当前启动系统：{}-V{}",AppConstants.getAppFullName(),AppConstants.getAppVersion());
         logger.info("文件存储方式：{}",AppConstants.getSystemDiskType());
-
-        clearTempDir();
-
         checkSysConfig();
+        clearTempDir();
 
         logger.info("默认访问地址：{}",AppConstants.getAppURL());
     }
