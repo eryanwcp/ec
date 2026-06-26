@@ -32,9 +32,9 @@ import org.springframework.stereotype.Component;
  * 外部API接口实现类
  */
 @Component
-public class MessageWebProviderService implements MessageWebAPI {
+public class SystemMessageProvider implements SystemMessageAPI {
 
-    private static final Logger logger = LoggerFactory.getLogger(MessageWebProviderService.class);
+    private static final Logger logger = LoggerFactory.getLogger(SystemMessageProvider.class);
 
 
     /**
