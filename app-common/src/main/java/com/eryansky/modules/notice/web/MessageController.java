@@ -12,7 +12,7 @@ import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.modules.notice._enum.MessageType;
-import com.eryansky.modules.notice.service.MessageAPI;
+import com.eryansky.modules.notice.service.MessageWebAPI;
 import com.eryansky.modules.notice.task.MessageTask;
 import com.eryansky.modules.notice.utils.NoticeConstants;
 import com.eryansky.modules.sys._enum.LogType;
@@ -55,7 +55,7 @@ import java.util.List;
 public class MessageController extends SimpleController {
 
     @Resource
-    private MessageAPI apiWebService;
+    private MessageWebAPI apiWebService;
     @Resource
     private MessageService messageService;
     @Resource
