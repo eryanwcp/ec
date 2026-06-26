@@ -5,7 +5,7 @@ import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.security.annotation.RestApi;
 import com.eryansky.modules.sys._enum.LogType;
-import com.eryansky.modules.notice.service.MessageWebAPI;
+import com.eryansky.modules.notice.service.SystemMessageAPI;
 import com.eryansky.modules.notice.vo.WSResult;
 import javax.annotation.Resource;
 import org.springframework.stereotype.Controller;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class MessageRestController extends SimpleController {
 
     @Resource
-    private MessageWebAPI messageWebAPI;
+    private SystemMessageAPI systemMessageAPI;
 
     @Override
     protected void initBinder(WebDataBinder binder) {
@@ -69,7 +69,7 @@ public class MessageRestController extends SimpleController {
     @PostMapping(value = { "sendMessage"})
     @ResponseBody
     public Result sendMessage(String data) {
-        WSResult wsResult = messageWebAPI.sendMessage(data);
+        WSResult wsResult = systemMessageAPI.sendMessage(data);
         return WSResult.SUCCESS.equals(wsResult.getCode()) ? Result.successResult().setMsg(wsResult.getMessage()).setData(wsResult.getData()): Result.errorResult().setMsg(wsResult.getMessage());
 
     }
@@ -98,7 +98,7 @@ public class MessageRestController extends SimpleController {
     @PostMapping(value = { "pushMessage"})
     @ResponseBody
     public Result pushMessage(String data) {
-        WSResult wsResult = messageWebAPI.pushMessage(data);
+        WSResult wsResult = systemMessageAPI.pushMessage(data);
         return WSResult.SUCCESS.equals(wsResult.getCode()) ? Result.successResult().setMsg(wsResult.getMessage()).setData(wsResult.getData()): Result.errorResult().setMsg(wsResult.getMessage());
 
     }
@@ -127,7 +127,7 @@ public class MessageRestController extends SimpleController {
     @PostMapping(value = { "getMessage"})
     @ResponseBody
     public Result getMessage(String data) {
-        WSResult wsResult = messageWebAPI.getMessage(data);
+        WSResult wsResult = systemMessageAPI.getMessage(data);
         return WSResult.SUCCESS.equals(wsResult.getCode()) ? Result.successResult().setMsg(wsResult.getMessage()).setData(wsResult.getData()): Result.errorResult().setMsg(wsResult.getMessage());
 
     }
@@ -164,7 +164,7 @@ public class MessageRestController extends SimpleController {
     @PostMapping(value = { "sendNotice"})
     @ResponseBody
     public Result sendNotice(String data) {
-        WSResult wsResult = messageWebAPI.sendNotice(data);
+        WSResult wsResult = systemMessageAPI.sendNotice(data);
         return WSResult.SUCCESS.equals(wsResult.getCode()) ? Result.successResult().setMsg(wsResult.getMessage()).setData(wsResult.getData()): Result.errorResult().setMsg(wsResult.getMessage());
 
     }
