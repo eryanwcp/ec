@@ -12,16 +12,14 @@ import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.modules.notice._enum.MessageType;
-import com.eryansky.modules.notice.mapper.Notice;
 import com.eryansky.modules.notice.task.MessageTask;
 import com.eryansky.modules.notice.utils.NoticeConstants;
 import com.eryansky.modules.sys._enum.LogType;
+import com.eryansky.modules.notice.service.IApiWebService;
 import com.google.common.collect.Lists;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
 import com.eryansky.core.security.annotation.RequiresPermissions;
-import com.eryansky.core.security.annotation.RequiresUser;
-import com.eryansky.listener.SystemInitListener;
 import com.eryansky.modules.notice._enum.MessageReceiveObjectType;
 import com.eryansky.modules.notice._enum.MessageChannel;
 import com.eryansky.modules.notice.mapper.Message;
@@ -33,8 +31,8 @@ import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.SelectType;
-import com.eryansky.server.result.WSResult;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.eryansky.modules.notice.vo.WSResult;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -56,11 +54,13 @@ import java.util.List;
 @RequestMapping(value = "${adminPath}/notice/message")
 public class MessageController extends SimpleController {
 
-    @Autowired
+    @Resource
+    private IApiWebService apiWebService;
+    @Resource
     private MessageService messageService;
-    @Autowired
+    @Resource
     private MessageReceiveService messageReceiveService;
-    @Autowired
+    @Resource
     private MessageTask messageTask;
 
     @ModelAttribute("model")
@@ -281,10 +281,7 @@ public class MessageController extends SimpleController {
     @PostMapping(value = {"api/sendMessage"})
     @ResponseBody
     public WSResult sendMessage(String paramJson) {
-        if (SystemInitListener.Static.apiWebService != null) {
-            return SystemInitListener.Static.apiWebService.sendMessage(paramJson);
-        }
-        return WSResult.buildDefaultErrorResult(WSResult.class);
+        return apiWebService.sendMessage(paramJson);
     }
 
     /**

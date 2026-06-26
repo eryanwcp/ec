@@ -4,9 +4,10 @@ import com.eryansky.common.model.Result;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.security.annotation.RestApi;
-import com.eryansky.listener.SystemInitListener;
 import com.eryansky.modules.sys._enum.LogType;
-import com.eryansky.server.result.WSResult;
+import com.eryansky.modules.notice.service.IApiWebService;
+import com.eryansky.modules.notice.vo.WSResult;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +22,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping(value = {"rest/message","rest/notice/message"})
 public class MessageRestController extends SimpleController {
 
+    @Resource
+    private IApiWebService apiWebService;
 
     @Override
     protected void initBinder(WebDataBinder binder) {
@@ -66,11 +69,9 @@ public class MessageRestController extends SimpleController {
     @PostMapping(value = { "sendMessage"})
     @ResponseBody
     public Result sendMessage(String data) {
-        if(SystemInitListener.Static.apiWebService != null){
-            WSResult wsResult = SystemInitListener.Static.apiWebService.sendMessage(data);
-            return WSResult.SUCCESS.equals(wsResult.getCode()) ? Result.successResult().setMsg(wsResult.getMessage()).setData(wsResult.getData()): Result.errorResult().setMsg(wsResult.getMessage());
-        }
-        return Result.errorResult();
+        WSResult wsResult = apiWebService.sendMessage(data);
+        return WSResult.SUCCESS.equals(wsResult.getCode()) ? Result.successResult().setMsg(wsResult.getMessage()).setData(wsResult.getData()): Result.errorResult().setMsg(wsResult.getMessage());
+
     }
 
 
@@ -97,11 +98,9 @@ public class MessageRestController extends SimpleController {
     @PostMapping(value = { "pushMessage"})
     @ResponseBody
     public Result pushMessage(String data) {
-        if(SystemInitListener.Static.apiWebService != null){
-            WSResult wsResult = SystemInitListener.Static.apiWebService.pushMessage(data);
-            return WSResult.SUCCESS.equals(wsResult.getCode()) ? Result.successResult().setMsg(wsResult.getMessage()).setData(wsResult.getData()): Result.errorResult().setMsg(wsResult.getMessage());
-        }
-        return Result.errorResult();
+        WSResult wsResult = apiWebService.pushMessage(data);
+        return WSResult.SUCCESS.equals(wsResult.getCode()) ? Result.successResult().setMsg(wsResult.getMessage()).setData(wsResult.getData()): Result.errorResult().setMsg(wsResult.getMessage());
+
     }
 
 
@@ -128,11 +127,9 @@ public class MessageRestController extends SimpleController {
     @PostMapping(value = { "getMessage"})
     @ResponseBody
     public Result getMessage(String data) {
-        if(SystemInitListener.Static.apiWebService != null){
-            WSResult wsResult = SystemInitListener.Static.apiWebService.getMessage(data);
-            return WSResult.SUCCESS.equals(wsResult.getCode()) ? Result.successResult().setMsg(wsResult.getMessage()).setData(wsResult.getData()): Result.errorResult().setMsg(wsResult.getMessage());
-        }
-        return Result.errorResult();
+        WSResult wsResult = apiWebService.getMessage(data);
+        return WSResult.SUCCESS.equals(wsResult.getCode()) ? Result.successResult().setMsg(wsResult.getMessage()).setData(wsResult.getData()): Result.errorResult().setMsg(wsResult.getMessage());
+
     }
 
     /**
@@ -167,10 +164,8 @@ public class MessageRestController extends SimpleController {
     @PostMapping(value = { "sendNotice"})
     @ResponseBody
     public Result sendNotice(String data) {
-        if(SystemInitListener.Static.apiWebService != null){
-            WSResult wsResult = SystemInitListener.Static.apiWebService.sendNotice(data);
-            return WSResult.SUCCESS.equals(wsResult.getCode()) ? Result.successResult().setMsg(wsResult.getMessage()).setData(wsResult.getData()): Result.errorResult().setMsg(wsResult.getMessage());
-        }
-        return Result.errorResult();
+        WSResult wsResult = apiWebService.sendNotice(data);
+        return WSResult.SUCCESS.equals(wsResult.getCode()) ? Result.successResult().setMsg(wsResult.getMessage()).setData(wsResult.getData()): Result.errorResult().setMsg(wsResult.getMessage());
+
     }
 }

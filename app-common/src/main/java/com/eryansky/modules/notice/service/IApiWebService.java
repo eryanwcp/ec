@@ -1,20 +1,16 @@
-package com.eryansky.server;
+package com.eryansky.modules.notice.service;
 
-import jakarta.jws.WebMethod;
-import jakarta.jws.WebParam;
-import jakarta.jws.WebService;
+import com.eryansky.modules.notice.utils.IFunction;
 
-import com.eryansky.server.result.WSResult;
+import com.eryansky.modules.notice.vo.WSResult;
 
 
 /**
  * 接口类
  */
-@WebService(name = "IApiWebService")
 public interface IApiWebService {
 	
-	@WebMethod
-	WSResult sendMessage(@WebParam(name = "data") String data);
+	WSResult sendMessage(String data);
 
 	/**
 	 * 发送消息
@@ -51,8 +47,7 @@ public interface IApiWebService {
 	 * @return
 	 *
 	 */
-	@WebMethod
-	WSResult sendMessage(@WebParam(name = "data") String data,IFunction function);
+	WSResult sendMessage(String data,IFunction function);
 
 	/**
 	 * 推送消息
@@ -68,7 +63,7 @@ public interface IApiWebService {
 	 * @return
 	 *
 	 */
-	WSResult pushMessage(@WebParam(name = "data") String data);
+	WSResult pushMessage(String data);
 
 
 	/**
@@ -85,7 +80,7 @@ public interface IApiWebService {
 	 * @return
 	 *
 	 */
-	WSResult getMessage(@WebParam(name = "data") String data);
+	WSResult getMessage(String data);
 
 	/**
 	 * 发送通知
@@ -116,7 +111,6 @@ public interface IApiWebService {
 	 * @return
 	 *
 	 */
-	@WebMethod
-	WSResult sendNotice(@WebParam(name = "data") String data);
-	WSResult sendNotice(@WebParam(name = "data") String data,IFunction function);
+	WSResult sendNotice(String data);
+	WSResult sendNotice(String data,IFunction function);
 }

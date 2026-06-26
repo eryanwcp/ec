@@ -5,13 +5,9 @@
  */
 package com.eryansky.listener;
 
-import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.web.listener.DefaultSystemInitListener;
 import com.eryansky.core.security.SecurityType;
 import com.eryansky.core.security.SecurityUtils;
-import com.eryansky.modules.disk.utils.DiskUtils;
-import com.eryansky.server.IApiWebService;
-import com.eryansky.server.impl.ApiWebServiceImpl;
 import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.AppUtils;
 import org.slf4j.Logger;
@@ -19,7 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.http.HttpSessionEvent;
-import jakarta.xml.ws.Endpoint;
 
 /**
  * 系统初始化监听 继承默认系统启动监听器.
@@ -31,13 +26,6 @@ public class SystemInitListener extends DefaultSystemInitListener{
 
 	private static final Logger logger = LoggerFactory.getLogger(SystemInitListener.class);
 
-	private static Endpoint endpoint;
-	/**
-	 * 静态内部类，延迟加载，懒汉式，线程安全的单例模式
-	 */
-	public static final class Static {
-		public static final IApiWebService apiWebService = new ApiWebServiceImpl();
-	}
 
 	public SystemInitListener() {
 	}
@@ -51,23 +39,8 @@ public class SystemInitListener extends DefaultSystemInitListener{
 		System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", String.valueOf(null != configParallelism ? configParallelism : initProcessors));
 		super.contextInitialized(sce);
 		AppUtils.init(sce.getServletContext());
-		logger.info("当前启动系统：{}-V{}",AppConstants.getAppFullName(),AppConstants.getAppVersion());
-		logger.info("文件存储方式：{}",AppConstants.getSystemDiskType());
-		clearTempDir();
 
-		//WebService发布
-		String webServiceUrl = AppConstants.getWebServiceUrl();
-		if(StringUtils.isNotBlank(webServiceUrl)){
-			logger.info("WebService发布...");
-			try {
-				endpoint = Endpoint.publish(webServiceUrl, Static.apiWebService);
-			} catch (Exception e) {
-				logger.error("WebService发布失败，"+e.getMessage(),e);
-			}
-			logger.info("WebService发布成功，发布地址：{}",webServiceUrl);
-		}
 
-		logger.info("默认访问地址：{}",AppConstants.getAppURL());
 	}
 
 	/**
@@ -80,22 +53,4 @@ public class SystemInitListener extends DefaultSystemInitListener{
 	}
 
 
-	@Override
-	public void contextDestroyed(ServletContextEvent sce) {
-		if(null != endpoint) {
-			try {
-				endpoint.stop();
-				logger.error("WebService 已停止服务！");
-			} catch (Exception e) {
-				logger.error("WebService 停止服务失败，" + e.getMessage(), e);
-			}
-		}
-		super.contextDestroyed(sce);
-	}
-
-	private void clearTempDir(){
-		logger.info("清空本地缓存目录：{}", AppConstants.getDiskTempDir());
-		DiskUtils.clearTempDir();
-		logger.info("清空本地缓存目录结束。");
-	}
 }
