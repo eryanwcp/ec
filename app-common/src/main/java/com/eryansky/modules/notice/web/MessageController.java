@@ -12,10 +12,10 @@ import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.modules.notice._enum.MessageType;
+import com.eryansky.modules.notice.service.SystemMessageAPI;
 import com.eryansky.modules.notice.task.MessageTask;
 import com.eryansky.modules.notice.utils.NoticeConstants;
 import com.eryansky.modules.sys._enum.LogType;
-import com.eryansky.modules.notice.service.IApiWebService;
 import com.google.common.collect.Lists;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
@@ -55,7 +55,7 @@ import java.util.List;
 public class MessageController extends SimpleController {
 
     @Resource
-    private IApiWebService apiWebService;
+    private SystemMessageAPI systemMessageAPI;
     @Resource
     private MessageService messageService;
     @Resource
@@ -281,7 +281,7 @@ public class MessageController extends SimpleController {
     @PostMapping(value = {"api/sendMessage"})
     @ResponseBody
     public WSResult sendMessage(String paramJson) {
-        return apiWebService.sendMessage(paramJson);
+        return systemMessageAPI.sendMessage(paramJson);
     }
 
     /**
