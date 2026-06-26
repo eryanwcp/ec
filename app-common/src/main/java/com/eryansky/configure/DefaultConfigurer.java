@@ -18,14 +18,10 @@ import javax.annotation.Resource;
 import org.apache.fory.resolver.AllowListChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.*;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 
 import java.util.List;
 import java.util.Map;
@@ -60,8 +56,6 @@ public class DefaultConfigurer {
         }
     }
 
-
-
     private void checkSerializerTypeCheck() {
         List<String> disallowClasses = AppConstants.getSerializerTypeCheckDisallowClassList();
         AllowListChecker allowListChecker = ForySerializer.getTypeChecker();
@@ -87,19 +81,15 @@ public class DefaultConfigurer {
 
     @EventListener(ApplicationReadyEvent.class)
     public void onReady() {
-        logger.info("当前启动系统：{}-V{}",AppConstants.getAppFullName(),AppConstants.getAppVersion());
-        logger.info("文件存储方式：{}",AppConstants.getSystemDiskType());
+        //动态配置序列化安全策略
+        checkSerializerTypeCheck();
 
+        logger.info("当前启动系统：{}-V{}",AppConstants.getAppFullName(),AppConstants.getAppVersion());
+        checkSysConfig();
+        logger.info("文件存储方式：{}",AppConstants.getSystemDiskType());
         clearTempDir();
 
-        checkSysConfig();
-
         logger.info("默认访问地址：{}",AppConstants.getAppURL());
-    }
-
-    @EventListener(ContextRefreshedEvent.class)
-    public void onContextRefresh(ContextRefreshedEvent event) {
-        checkSerializerTypeCheck();
     }
 
 }
