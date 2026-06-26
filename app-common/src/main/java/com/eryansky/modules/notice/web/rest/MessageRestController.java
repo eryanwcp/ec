@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class MessageRestController extends SimpleController {
 
     @Resource
-    private MessageAPI apiWebService;
+    private MessageAPI messageAPI;
 
     @Override
     protected void initBinder(WebDataBinder binder) {
@@ -69,7 +69,7 @@ public class MessageRestController extends SimpleController {
     @PostMapping(value = { "sendMessage"})
     @ResponseBody
     public Result sendMessage(String data) {
-        WSResult wsResult = apiWebService.sendMessage(data);
+        WSResult wsResult = messageAPI.sendMessage(data);
         return WSResult.SUCCESS.equals(wsResult.getCode()) ? Result.successResult().setMsg(wsResult.getMessage()).setData(wsResult.getData()): Result.errorResult().setMsg(wsResult.getMessage());
 
     }
@@ -98,7 +98,7 @@ public class MessageRestController extends SimpleController {
     @PostMapping(value = { "pushMessage"})
     @ResponseBody
     public Result pushMessage(String data) {
-        WSResult wsResult = apiWebService.pushMessage(data);
+        WSResult wsResult = messageAPI.pushMessage(data);
         return WSResult.SUCCESS.equals(wsResult.getCode()) ? Result.successResult().setMsg(wsResult.getMessage()).setData(wsResult.getData()): Result.errorResult().setMsg(wsResult.getMessage());
 
     }
@@ -127,7 +127,7 @@ public class MessageRestController extends SimpleController {
     @PostMapping(value = { "getMessage"})
     @ResponseBody
     public Result getMessage(String data) {
-        WSResult wsResult = apiWebService.getMessage(data);
+        WSResult wsResult = messageAPI.getMessage(data);
         return WSResult.SUCCESS.equals(wsResult.getCode()) ? Result.successResult().setMsg(wsResult.getMessage()).setData(wsResult.getData()): Result.errorResult().setMsg(wsResult.getMessage());
 
     }
@@ -164,7 +164,7 @@ public class MessageRestController extends SimpleController {
     @PostMapping(value = { "sendNotice"})
     @ResponseBody
     public Result sendNotice(String data) {
-        WSResult wsResult = apiWebService.sendNotice(data);
+        WSResult wsResult = messageAPI.sendNotice(data);
         return WSResult.SUCCESS.equals(wsResult.getCode()) ? Result.successResult().setMsg(wsResult.getMessage()).setData(wsResult.getData()): Result.errorResult().setMsg(wsResult.getMessage());
 
     }
