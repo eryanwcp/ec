@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 //@Aspect
 public class MessageAspect implements InitializingBean, DisposableBean {
 
-    private static Logger logger = LoggerFactory.getLogger(MessageAspect.class);
+    private static final Logger logger = LoggerFactory.getLogger(MessageAspect.class);
 
     @Autowired
     private MessageReceiveService messageReceiveService;

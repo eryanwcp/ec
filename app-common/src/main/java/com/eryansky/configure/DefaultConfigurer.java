@@ -10,15 +10,22 @@ import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.io.PropertiesLoader;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.j2cache.util.ForySerializer;
+import com.eryansky.modules.disk.utils.DiskUtils;
 import com.eryansky.modules.sys.mapper.Config;
 import com.eryansky.modules.sys.service.ConfigService;
 import com.eryansky.utils.AppConstants;
+import javax.annotation.Resource;
 import org.apache.fory.resolver.AllowListChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
 import java.util.List;
 import java.util.Map;
@@ -34,11 +41,10 @@ public class DefaultConfigurer {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultConfigurer.class);
 
-    @Autowired
+    @Resource
     private ConfigService configService;
 
-    @Bean
-    public String checkSysConfig() {
+    private void checkSysConfig() {
         List<Config> dbConfigs = configService.findList(new Config());
         PropertiesLoader propertiesLoader = AppConstants.getConfig();
         String[] resourcesPaths = propertiesLoader.getResourcesPaths();
@@ -52,12 +58,11 @@ public class DefaultConfigurer {
                 }
             });
         }
-        return null;
     }
 
 
-    @Bean
-    public String checkSerializerTypeCheck() {
+
+    private void checkSerializerTypeCheck() {
         List<String> disallowClasses = AppConstants.getSerializerTypeCheckDisallowClassList();
         AllowListChecker allowListChecker = ForySerializer.getTypeChecker();
         if (Collections3.isNotEmpty(disallowClasses)) {
@@ -70,7 +75,31 @@ public class DefaultConfigurer {
             logger.info("SerializerTypeCheck allowClasses : {}", JsonMapper.toJsonString(allowClassList));
             allowListChecker.allowClasses(allowClassList);
         }
-        return null;
+        allowListChecker.setCheckLevel(AllowListChecker.CheckLevel.STRICT);
+        logger.info("SerializerTypeCheck: {} checkLevel: {}",allowListChecker.getClass().getName(),allowListChecker.getCheckLevel().name());
+    }
+
+    private void clearTempDir(){
+        logger.info("清空本地缓存目录：{}", AppConstants.getDiskTempDir());
+        DiskUtils.clearTempDir();
+        logger.info("清空本地缓存目录结束。");
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void onReady() {
+        logger.info("当前启动系统：{}-V{}",AppConstants.getAppFullName(),AppConstants.getAppVersion());
+        logger.info("文件存储方式：{}",AppConstants.getSystemDiskType());
+
+        clearTempDir();
+
+        checkSysConfig();
+
+        logger.info("默认访问地址：{}",AppConstants.getAppURL());
+    }
+
+    @EventListener(ContextRefreshedEvent.class)
+    public void onContextRefresh(ContextRefreshedEvent event) {
+        checkSerializerTypeCheck();
     }
 
 }

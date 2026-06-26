@@ -32,9 +32,9 @@ public class NoticeUtils {
      * 静态内部类，延迟加载，懒汉式，线程安全的单例模式
      */
     public static final class Static {
-        private static UserService userService = SpringContextHolder.getBean(UserService.class);
-        private static NoticeService noticeService = SpringContextHolder.getBean(NoticeService.class);
-        private static NoticeSendInfoService noticeSendInfoService = SpringContextHolder.getBean(NoticeSendInfoService.class);
+        private static final UserService userService = SpringContextHolder.getBean(UserService.class);
+        private static final NoticeService noticeService = SpringContextHolder.getBean(NoticeService.class);
+        private static final NoticeSendInfoService noticeSendInfoService = SpringContextHolder.getBean(NoticeSendInfoService.class);
     }
 
     private NoticeUtils() {

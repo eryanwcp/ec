@@ -30,7 +30,7 @@ import java.util.concurrent.CompletableFuture;
 @Component
 public class MessageTask {
 
-    private static Logger logger = LoggerFactory.getLogger(MessageTask.class);
+    private static final Logger logger = LoggerFactory.getLogger(MessageTask.class);
 
     @Autowired
     private MessageService messageService;

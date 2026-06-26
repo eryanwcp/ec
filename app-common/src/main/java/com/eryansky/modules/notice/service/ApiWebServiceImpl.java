@@ -1,8 +1,7 @@
-package com.eryansky.server.impl;
+package com.eryansky.modules.notice.service;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import javax.jws.WebService;
 
 import com.eryansky.common.utils.DateUtils;
 import com.eryansky.common.utils.StringUtils;
@@ -13,12 +12,9 @@ import com.eryansky.modules.notice._enum.MessageChannel;
 import com.eryansky.modules.notice._enum.MessageReceiveObjectType;
 import com.eryansky.modules.notice._enum.ReceiveObjectType;
 import com.eryansky.modules.notice.mapper.Message;
-import com.eryansky.modules.notice.service.MessageReceiveService;
-import com.eryansky.modules.notice.service.NoticeService;
 import com.eryansky.modules.sys.mapper.Organ;
 import com.eryansky.modules.sys.service.OrganService;
-import com.eryansky.server.IApiWebService;
-import com.eryansky.server.IFunction;
+import com.eryansky.modules.notice.utils.IFunction;
 import com.google.common.collect.Lists;
 import org.apache.commons.compress.utils.Sets;
 import org.slf4j.Logger;
@@ -28,17 +24,17 @@ import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.modules.notice.utils.MessageUtils;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.service.UserService;
-import com.eryansky.server.result.WSResult;
+import com.eryansky.modules.notice.vo.WSResult;
+import org.springframework.stereotype.Component;
 
 
 /**
  * 外部API接口实现类
  */
-//serviceName与portName属性指明WSDL中的名称, endpointInterface属性指向Interface定义类.
-@WebService(serviceName = "ApiWebService", portName = "ApiWebServicePort", endpointInterface = "com.eryansky.server.IApiWebService")
+@Component
 public class ApiWebServiceImpl implements IApiWebService {
 
-    private static Logger logger = LoggerFactory.getLogger(ApiWebServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(ApiWebServiceImpl.class);
 
 
     /**

@@ -3,13 +3,9 @@
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  */
-package com.eryansky.server.result;
+package com.eryansky.modules.notice.vo;
 
 import com.eryansky.common.utils.reflection.ReflectionUtils;
-import com.eryansky.server.WsConstants;
-
-import javax.xml.bind.annotation.XmlType;
-
 
 /**
  * WebService返回结果基类,定义所有返回码.
@@ -17,7 +13,6 @@ import javax.xml.bind.annotation.XmlType;
  * @date 2013-3-11 下午9:25:48 
  *
  */
-@XmlType(name = "WSResult", namespace = WsConstants.NS)
 public class WSResult {
 	//-- 返回代码定义 --//
 	// 按项目的规则进行定义，比如1xx代表客户端参数错误，2xx代表业务错误等.
@@ -38,7 +33,7 @@ public class WSResult {
 	 */
 	public static <T extends WSResult> T buildResult(Class<T> resultClass, String resultCode, String resultMessage) {
 		try {
-			T result = resultClass.newInstance();
+			T result = resultClass.getDeclaredConstructor().newInstance();
 			result.setResult(resultCode, resultMessage);
 			return result;
 		} catch (Exception ex) {
