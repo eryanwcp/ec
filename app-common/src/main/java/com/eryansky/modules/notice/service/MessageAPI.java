@@ -8,7 +8,7 @@ import com.eryansky.modules.notice.vo.WSResult;
 /**
  * 接口类
  */
-public interface IApiWebService {
+public interface MessageAPI {
 	
 	WSResult sendMessage(String data);
 
