@@ -3,18 +3,18 @@ package com.eryansky.fastweixin.company.api;
 import com.eryansky.fastweixin.api.enums.MediaType;
 import com.eryansky.fastweixin.api.response.BaseResponse;
 import com.eryansky.fastweixin.company.api.config.QYAPIConfig;
+import com.eryansky.fastweixin.company.api.response.DownloadMediaResponse;
 import com.eryansky.fastweixin.company.api.response.UploadMediaResponse;
 import com.eryansky.fastweixin.util.JSONUtil;
-import com.eryansky.fastweixin.company.api.response.DownloadMediaResponse;
 import com.eryansky.fastweixin.util.NetWorkCenter;
 import com.eryansky.fastweixin.util.StreamUtil;
-import org.apache.http.Header;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import com.eryansky.fastweixin.util.StrUtil;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 /**
  *
@@ -61,27 +62,47 @@ public class QYMediaAPI extends QYBaseAPI {
     }
 
     /**
-     * 下载媒体文件
+     * 下载媒体文件（HttpClient5 重构版）
      * @param mediaId 媒体ID
      * @return 下载结果
      */
     public DownloadMediaResponse download(String mediaId){
         DownloadMediaResponse response = new DownloadMediaResponse();
         String url = BASE_API_URL + "cgi-bin/media/get?access_token=" + config.getAccessToken() + "&media_id=" + mediaId;
-        RequestConfig config = RequestConfig.custom().setConnectionRequestTimeout(NetWorkCenter.CONNECT_TIMEOUT).setConnectTimeout(NetWorkCenter.CONNECT_TIMEOUT).setSocketTimeout(NetWorkCenter.CONNECT_TIMEOUT).build();
-        CloseableHttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
-        HttpGet get = new HttpGet(url);
-        try{
-            CloseableHttpResponse r = client.execute(get);
-            if(HttpStatus.SC_OK == r.getStatusLine().getStatusCode()){
+
+        // HttpClient5 超时配置
+        RequestConfig config = RequestConfig.custom()
+                .setConnectionRequestTimeout(Timeout.ofMilliseconds(NetWorkCenter.CONNECT_TIMEOUT))
+                .setConnectTimeout(Timeout.ofMilliseconds(NetWorkCenter.CONNECT_TIMEOUT))
+                .setResponseTimeout(Timeout.ofMilliseconds(NetWorkCenter.CONNECT_TIMEOUT))
+                .build();
+
+        // try-with-resources 自动关闭客户端和响应，无需手动 close()
+        try (CloseableHttpClient client = HttpClients.custom()
+                .setDefaultRequestConfig(config)
+                .build();
+             org.apache.hc.client5.http.impl.classic.CloseableHttpResponse r = client.execute(new HttpGet(url))) {
+
+            if (HttpStatus.SC_OK == r.getCode()) {
                 InputStream inputStream = r.getEntity().getContent();
-                Header[] headers = r.getHeaders("Content-disposition");
-                if (null != headers && 0 != headers.length) {
-                    Header length = r.getHeaders("Content-Length")[0];
-                    response.setContent(inputStream, Integer.valueOf(length.getValue()));
-                    response.setFileName(headers[0].getElements()[0].getParameterByName("filename").getValue());
+                org.apache.hc.core5.http.Header[] headers = r.getHeaders("Content-disposition");
+
+                if (null != headers && headers.length > 0) {
+                    // 安全获取文件长度
+                    int contentLength = 0;
+                    org.apache.hc.core5.http.Header lengthHeader = r.getFirstHeader("Content-Length");
+                    if (lengthHeader != null) {
+                        contentLength = Integer.parseInt(lengthHeader.getValue());
+                    }
+                    response.setContent(inputStream, contentLength);
+
+                    DownloadMediaResponse finalResponse = response;
+                    Arrays.stream(headers).filter(v->v.getName().equalsIgnoreCase("filename")).findAny().ifPresent(v->{
+                        finalResponse.setFileName(v.getValue());
+                    });
                 } else {
-                    try(ByteArrayOutputStream out = new ByteArrayOutputStream()){
+                    // 返回JSON错误信息
+                    try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
                         StreamUtil.copy(inputStream, out);
                         String json = out.toString();
                         response = JSONUtil.toBean(json, DownloadMediaResponse.class);
@@ -89,14 +110,9 @@ public class QYMediaAPI extends QYBaseAPI {
                 }
             }
         } catch (Exception e) {
-            LOG.error("异常", e);
-        }finally {
-            try{
-                client.close();
-            }catch (IOException e){
-                LOG.error("异常", e);
-            }
+            LOG.error("下载媒体文件异常", e);
         }
+
         return response;
     }
 

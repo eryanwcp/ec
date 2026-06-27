@@ -10,13 +10,13 @@ import com.eryansky.fastweixin.api.response.UploadMediaResponse;
 import com.eryansky.fastweixin.util.JSONUtil;
 import com.eryansky.fastweixin.util.NetWorkCenter;
 import com.eryansky.fastweixin.util.StreamUtil;
-import org.apache.http.Header;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import com.eryansky.fastweixin.util.StrUtil;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +67,7 @@ public class MediaAPI extends BaseAPI {
     public UploadMediaResponse uploadNews(List<Article> articles){
         UploadMediaResponse response;
         String url = BASE_API_URL + "cgi-bin/media/uploadnews?access_token=#";
-        final Map<String, Object> params = new HashMap<String, Object>();
+        final Map<String, Object> params = new HashMap<>();
         params.put("articles", articles);
         BaseResponse r = executePost(url, JSONUtil.toJson(params));
         response = JSONUtil.toBean(r.getErrmsg(), UploadMediaResponse.class);
@@ -85,7 +86,7 @@ public class MediaAPI extends BaseAPI {
     }
 
     /**
-     * 下载资源，实现的很不好，反正能用了。搞的晕了，之后会优化
+     * 下载资源，HttpClient5 重构版
      *
      * @param mediaId 微信提供的资源唯一标识
      * @return 响应对象
@@ -93,24 +94,46 @@ public class MediaAPI extends BaseAPI {
     public DownloadMediaResponse downloadMedia(String mediaId) {
         DownloadMediaResponse response = new DownloadMediaResponse();
         String url = "http://file.api.weixin.qq.com/cgi-bin/media/get?access_token=" + this.config.getAccessToken() + "&media_id=" + mediaId;
-        RequestConfig config = RequestConfig.custom().setConnectionRequestTimeout(NetWorkCenter.CONNECT_TIMEOUT).setConnectTimeout(NetWorkCenter.CONNECT_TIMEOUT).setSocketTimeout(NetWorkCenter.CONNECT_TIMEOUT).build();
+
+        // HttpClient5 超时配置
+        RequestConfig config = RequestConfig.custom()
+                .setConnectionRequestTimeout(Timeout.ofMilliseconds(NetWorkCenter.CONNECT_TIMEOUT))
+                .setConnectTimeout(Timeout.ofMilliseconds(NetWorkCenter.CONNECT_TIMEOUT))
+                .setResponseTimeout(Timeout.ofMilliseconds(NetWorkCenter.CONNECT_TIMEOUT))
+                .build();
+
         HttpGet get = new HttpGet(url);
-        try (CloseableHttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
-             CloseableHttpResponse r = client.execute(get)){
-            if (HttpStatus.SC_OK == r.getStatusLine().getStatusCode()) {
+
+        // HttpClient5 自动关闭资源
+        try (CloseableHttpClient client = HttpClients.custom()
+                .setDefaultRequestConfig(config)
+                .build();
+             org.apache.hc.client5.http.impl.classic.CloseableHttpResponse r = client.execute(get)){
+
+            if (HttpStatus.SC_OK == r.getCode()) {
                 InputStream inputStream = r.getEntity().getContent();
-                Header[] headers = r.getHeaders("Content-disposition");
-                if (null != headers && 0 != headers.length) {
-                    Header length = r.getHeaders("Content-Length")[0];
-                    response.setContent(inputStream, Integer.valueOf(length.getValue()));
-                    response.setFileName(headers[0].getElements()[0].getParameterByName("filename").getValue());
+                org.apache.hc.core5.http.Header[] headers = r.getHeaders("Content-disposition");
+
+                if (null != headers && headers.length > 0) {
+                    // 安全获取文件长度
+                    int contentLength = 0;
+                    org.apache.hc.core5.http.Header lengthHeader = r.getFirstHeader("Content-Length");
+                    if (lengthHeader != null) {
+                        contentLength = Integer.parseInt(lengthHeader.getValue());
+                    }
+                    response.setContent(inputStream, contentLength);
+
+                    DownloadMediaResponse finalResponse = response;
+                    Arrays.stream(headers).filter(v->v.getName().equalsIgnoreCase("filename")).findAny().ifPresent(v->{
+                        finalResponse.setFileName(v.getValue());
+                    });
                 } else {
-                    try(ByteArrayOutputStream out = new ByteArrayOutputStream()){
+                    // 返回JSON错误信息
+                    try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
                         StreamUtil.copy(inputStream, out);
                         String json = out.toString();
                         response = JSONUtil.toBean(json, DownloadMediaResponse.class);
                     }
-
                 }
             }
         } catch (IOException e) {

@@ -8,26 +8,24 @@ import com.eryansky.fastweixin.api.response.*;
 import com.eryansky.fastweixin.util.JSONUtil;
 import com.eryansky.fastweixin.util.StrUtil;
 import com.eryansky.fastweixin.util.NetWorkCenter;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +66,7 @@ public class MaterialAPI extends BaseAPI {
         if(StrUtil.isBlank(title)) {
             r = executePost(url, null, file);
         }else{
-            final Map<String, String> param = new HashMap<String, String>();
+            final Map<String, String> param = new HashMap<>();
             param.put("title", title);
             param.put("introduction", introduction);
             r = executePost(url, JSONUtil.toJson(param), file);
@@ -86,7 +84,7 @@ public class MaterialAPI extends BaseAPI {
     public UploadMaterialResponse uploadMaterialNews(List<Article> articles){
         UploadMaterialResponse response;
         String url = BASE_API_URL + "cgi-bin/material/add_news?access_token=#";
-        final Map<String, Object> params = new HashMap<String, Object>();
+        final Map<String, Object> params = new HashMap<>();
         params.put("articles", articles);
         BaseResponse r = executePost(url, JSONUtil.toJson(params));
         String resultJson = isSuccess(r.getErrcode()) ? r.getErrmsg() : r.toJsonString();
@@ -103,19 +101,31 @@ public class MaterialAPI extends BaseAPI {
     public DownloadMaterialResponse downloadMaterial(String mediaId, MaterialType type){
         DownloadMaterialResponse response = new DownloadMaterialResponse();
         String url = BASE_API_URL + "cgi-bin/material/get_material?access_token=" + config.getAccessToken();
-        RequestConfig config = RequestConfig.custom().setConnectionRequestTimeout(NetWorkCenter.CONNECT_TIMEOUT).setConnectTimeout(NetWorkCenter.CONNECT_TIMEOUT).setSocketTimeout(NetWorkCenter.CONNECT_TIMEOUT).build();
+
+        // HttpClient5 超时配置
+        RequestConfig config = RequestConfig.custom()
+                .setConnectionRequestTimeout(Timeout.ofMilliseconds(NetWorkCenter.CONNECT_TIMEOUT))
+                .setConnectTimeout(Timeout.ofMilliseconds(NetWorkCenter.CONNECT_TIMEOUT))
+                .setResponseTimeout(Timeout.ofMilliseconds(NetWorkCenter.CONNECT_TIMEOUT))
+                .build();
+
         HttpPost request = new HttpPost(url);
         StringEntity mediaEntity = new StringEntity("{\"media_id\":\"" + mediaId + "\"}", ContentType.APPLICATION_JSON);
         request.setEntity(mediaEntity);
-        try(CloseableHttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
-            CloseableHttpResponse httpResponse = client.execute(request)){
-            if(HttpStatus.SC_OK == httpResponse.getStatusLine().getStatusCode()){
+
+        // HttpClient5 创建与资源自动关闭
+        try(CloseableHttpClient client = HttpClients.custom()
+                .setDefaultRequestConfig(config)
+                .build();
+            org.apache.hc.client5.http.impl.classic.CloseableHttpResponse httpResponse = client.execute(request)){
+
+            if(HttpStatus.SC_OK == httpResponse.getCode()){
                 HttpEntity entity;
                 String resultJson;
                 switch (type){
                     case NEWS:
                         entity = httpResponse.getEntity();
-                        resultJson = EntityUtils.toString(entity, StandardCharsets.UTF_8);
+                        resultJson = entity != null ? org.apache.hc.core5.http.io.entity.EntityUtils.toString(entity, StandardCharsets.UTF_8) : "";
                         response = JSONUtil.toBean(resultJson, DownloadMaterialResponse.class);
                         LOG.debug("-----------------请求成功-----------------");
                         LOG.debug("响应结果:");
@@ -127,7 +137,7 @@ public class MaterialAPI extends BaseAPI {
                         break;
                     case VIDEO:
                         entity = httpResponse.getEntity();
-                        resultJson = EntityUtils.toString(entity, StandardCharsets.UTF_8);
+                        resultJson = entity != null ? org.apache.hc.core5.http.io.entity.EntityUtils.toString(entity, StandardCharsets.UTF_8) : "";
                         LOG.debug("-----------------请求成功-----------------");
                         LOG.debug("响应结果:");
                         LOG.debug(resultJson);
@@ -140,13 +150,14 @@ public class MaterialAPI extends BaseAPI {
                         }
                         break;
                     default:
-                        Header length = httpResponse.getHeaders("Content-Length")[0];
+                        // 获取头信息 HttpClient5 API
+                        long contentLength = httpResponse.getEntity().getContentLength();
                         InputStream inputStream = httpResponse.getEntity().getContent();
-                        response.setContent(inputStream, Integer.valueOf(length.getValue()));
+                        response.setContent(inputStream, (int) contentLength);
                         break;
                 }
             }else{
-                response.setErrcode(String.valueOf(httpResponse.getStatusLine().getStatusCode()));
+                response.setErrcode(String.valueOf(httpResponse.getCode()));
                 response.setErrmsg("请求失败");
             }
         } catch (IOException e) {
@@ -185,7 +196,7 @@ public class MaterialAPI extends BaseAPI {
 
         GetMaterialListResponse response = null;
         String url = BASE_API_URL + "cgi-bin/material/batchget_material?access_token=#";
-        final Map<String, Object> params = new HashMap<String, Object>(4, 1);
+        final Map<String, Object> params = new HashMap<>(4, 1);
         params.put("type", type.toString());
         params.put("offset", offset);
         params.put("count", count);
@@ -203,26 +214,44 @@ public class MaterialAPI extends BaseAPI {
      */
     public ResultType deleteMaterial(String mediaId) {
         String url = BASE_API_URL + "cgi-bin/material/del_material?access_token=#";
-        final Map<String, String> param = new HashMap<String, String>();
+        final Map<String, String> param = new HashMap<>();
         param.put("media_id", mediaId);
         BaseResponse response = executePost(url, JSONUtil.toJson(param));
         return ResultType.get(response.getErrcode());
     }
 
+    /**
+     * 下载视频（HttpClient5 重构）
+     */
     private void downloadVideo(DownloadMaterialResponse response){
         String url = response.getDownUrl();
         LOG.debug("Download url: " + url);
-        RequestConfig config = RequestConfig.custom().setConnectionRequestTimeout(NetWorkCenter.CONNECT_TIMEOUT).setConnectTimeout(NetWorkCenter.CONNECT_TIMEOUT).setSocketTimeout(NetWorkCenter.CONNECT_TIMEOUT).build();
-        CloseableHttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
-        HttpGet get = new HttpGet(url);
-        try {
-            CloseableHttpResponse r = client.execute(get);
-            if (HttpStatus.SC_OK == r.getStatusLine().getStatusCode()) {
+
+        RequestConfig config = RequestConfig.custom()
+                .setConnectionRequestTimeout(Timeout.ofMilliseconds(NetWorkCenter.CONNECT_TIMEOUT))
+                .setConnectTimeout(Timeout.ofMilliseconds(NetWorkCenter.CONNECT_TIMEOUT))
+                .setResponseTimeout(Timeout.ofMilliseconds(NetWorkCenter.CONNECT_TIMEOUT))
+                .build();
+
+        // HttpClient5 创建 & 自动关闭
+        try(CloseableHttpClient client = HttpClients.custom()
+                .setDefaultRequestConfig(config)
+                .build();
+            org.apache.hc.client5.http.impl.classic.CloseableHttpResponse r = client.execute(new HttpGet(url))) {
+
+            if (HttpStatus.SC_OK == r.getCode()) {
                 InputStream inputStream = r.getEntity().getContent();
-                Header[] headers = r.getHeaders("Content-disposition");
-                Header length = r.getHeaders("Content-Length")[0];
-                response.setContent(inputStream, Integer.valueOf(length.getValue()));
-                response.setFileName(headers[0].getElements()[0].getParameterByName("filename").getValue());
+                long contentLength = r.getEntity().getContentLength();
+                // 获取头信息
+                org.apache.hc.core5.http.Header[] headers = r.getHeaders("Content-disposition");
+                org.apache.hc.core5.http.Header length = r.getHeaders("Content-Length")[0];
+
+                response.setContent(inputStream, Integer.parseInt(length.getValue()));
+                if (headers != null && headers.length > 0) {
+                    Arrays.stream(headers).filter(v->v.getName().equalsIgnoreCase("filename")).findAny().ifPresent(v->{
+                        response.setFileName(v.getValue());
+                    });
+                }
             }
         } catch (IOException e){
             LOG.error("IO异常处理", e);
@@ -239,7 +268,7 @@ public class MaterialAPI extends BaseAPI {
     public DownloadMaterialResponse getMaterial(String mediaId) {
         DownloadMaterialResponse materialresponse = null;
         String url = BASE_API_URL + "cgi-bin/material/get_material?access_token=#";
-        Map<String, String> param = new HashMap<String, String>();
+        Map<String, String> param = new HashMap<>();
         param.put("media_id", mediaId);
         BaseResponse r = executePost(url, JSONUtil.toJson(param));
         String resultJson = isSuccess(r.getErrcode()) ? r.getErrmsg() : r.toJsonString();

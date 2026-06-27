@@ -9,7 +9,7 @@ import com.eryansky.fastweixin.handle.ApiConfigChangeHandle;
 import com.eryansky.fastweixin.util.JSONUtil;
 import com.eryansky.fastweixin.util.NetWorkCenter;
 import com.eryansky.fastweixin.util.StrUtil;
-import org.apache.http.HttpStatus;
+import org.apache.hc.core5.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

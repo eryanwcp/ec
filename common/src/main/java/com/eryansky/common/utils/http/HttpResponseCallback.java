@@ -1,6 +1,6 @@
 package com.eryansky.common.utils.http;
 
-import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 
 /**
  * 回调接口

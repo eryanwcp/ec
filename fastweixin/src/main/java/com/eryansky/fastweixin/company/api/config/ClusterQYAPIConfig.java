@@ -10,7 +10,7 @@ import com.eryansky.fastweixin.exception.WeixinException;
 import com.eryansky.fastweixin.util.JSONUtil;
 import com.eryansky.fastweixin.util.NetWorkCenter;
 import com.eryansky.fastweixin.util.StrUtil;
-import org.apache.http.HttpStatus;
+import org.apache.hc.core5.http.HttpStatus;
 
 /**
  * 企业微信号配置 支持集群

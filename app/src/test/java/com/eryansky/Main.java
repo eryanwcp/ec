@@ -20,7 +20,6 @@ import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.monitor.domain.Server;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Maps;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.HardwareAbstractionLayer;
@@ -48,8 +47,8 @@ public class Main {
             int finalI = i;
             HttpCompoents.getInstance().get(url, null, httpResponse -> {
                 try {
-                    System.out.println(url + " " + httpResponse.getStatusLine().getStatusCode());
-                    if (httpResponse.getStatusLine().getStatusCode() != 200) {
+                    System.out.println(url + " " + httpResponse.getCode());
+                    if (httpResponse.getCode() != 200) {
                         return false;
                     }
                     IoUtils.write(httpResponse.getEntity().getContent().readAllBytes(), new FileOutputStream(new File("/Users/jfit_mac/work/workspace/mp_flutter/web/s/notosanssc/v37/k3kCo84MPvpLmixcA63oeAL7Iqp5IZJF9bmaG9_FnYkldv7JjxkkgFsFSSOPMOkySAZ73y9ViAt3acb8NexQ2w." + finalI + ".woff2")));
@@ -66,8 +65,8 @@ public class Main {
             int finalI = i;
             HttpCompoents.getInstance().get(url, null, httpResponse -> {
                 try {
-                    System.out.println(url + " " + httpResponse.getStatusLine().getStatusCode());
-                    if (httpResponse.getStatusLine().getStatusCode() != 200) {
+                    System.out.println(url + " " + httpResponse.getCode());
+                    if (httpResponse.getCode() != 200) {
                         return false;
                     }
                     IoUtils.write(httpResponse.getEntity().getContent().readAllBytes(),new FileOutputStream(new File("/Users/jfit_mac/work/workspace/mp_flutter/web/s/notosanshk/v32/nKKF-GM_FYFRJvXzVXaAPe97P1KHynJFP716qHB--oD7kYrUzT7-NvA3pTohjc3XVtNXX8A7gG1LO2KAPAw."+ finalI +".woff2")));
@@ -83,8 +82,8 @@ public class Main {
             int finalI = i;
             HttpCompoents.getInstance().get(url, null, httpResponse -> {
                 try {
-                    System.out.println(url + " " + httpResponse.getStatusLine().getStatusCode());
-                    if (httpResponse.getStatusLine().getStatusCode() != 200) {
+                    System.out.println(url + " " + httpResponse.getCode());
+                    if (httpResponse.getCode() != 200) {
                         return false;
                     }
                     IoUtils.write(httpResponse.getEntity().getContent().readAllBytes(),new FileOutputStream(new File("/Users/jfit_mac/work/workspace/mp_flutter/web/s/notosanskr/v36/PbyxFmXiEBPT4ITbgNA5Cgms3VYcOA-vvnIzzuoyeLGC5nwuDo-KBTUm6CryotyJROlrnQ."+ finalI +".woff2")));
@@ -101,8 +100,8 @@ public class Main {
             int finalI = i;
             HttpCompoents.getInstance().get(url, null, httpResponse -> {
                 try {
-                    System.out.println(url + " " + httpResponse.getStatusLine().getStatusCode());
-                    if (httpResponse.getStatusLine().getStatusCode() != 200) {
+                    System.out.println(url + " " + httpResponse.getCode());
+                    if (httpResponse.getCode() != 200) {
                         return false;
                     }
                     IoUtils.write(httpResponse.getEntity().getContent().readAllBytes(),new FileOutputStream(new File("/Users/jfit_mac/work/workspace/mp_flutter/web/s/notosansjp/v53/-F6jfjtqLzI2JPCgQBnw7HFyzSD-AsregP8VFBEj756wwr4v0qHnANADNsISRDl2PRkiiWsg."+ finalI +".woff2")));
