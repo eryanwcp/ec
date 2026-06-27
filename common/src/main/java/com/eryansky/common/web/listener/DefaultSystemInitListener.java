@@ -30,7 +30,6 @@ public class DefaultSystemInitListener implements ServletContextListener,
     private static final Logger logger = LoggerFactory.getLogger(DefaultSystemInitListener.class);
 
     public DefaultSystemInitListener() {
-        // TODO document why this constructor is empty
     }
 
     @Override
