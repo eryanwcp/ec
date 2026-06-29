@@ -25,7 +25,6 @@ import org.apache.hc.client5.http.fluent.Response;
 import org.apache.hc.client5.http.impl.DefaultConnectionKeepAliveStrategy;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
@@ -36,6 +35,7 @@ import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
 import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactoryBuilder;
 import org.apache.hc.client5.http.ssl.TrustAllStrategy;
 import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
@@ -255,9 +255,8 @@ public class HttpCompoents {
         }
         httpGet.setConfig(requestConfig);
 
-        try (CloseableHttpClient httpClient = createHttpClient(url);
-             CloseableHttpResponse response = httpClient.execute(httpGet)) {
-            return EntityUtils.toString(response.getEntity(), Charset.forName(useCharset));
+        try (CloseableHttpClient httpClient = createHttpClient(url)) {
+            return httpClient.execute(httpGet, response -> EntityUtils.toString(response.getEntity(), Charset.forName(useCharset)));
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
@@ -272,7 +271,7 @@ public class HttpCompoents {
      * @param callback 自定义结果回调函数
      * @return
      */
-    public <T> T get(String url, Map<String, String> headers, HttpResponseCallback<T> callback) throws Exception {
+    public <T> T get(String url, Map<String, String> headers, HttpClientResponseHandler<T> callback) throws Exception {
         HttpGet httpGet = new HttpGet(url);
         if (headers != null) {
             for (Map.Entry<String, String> entry : headers.entrySet()) {
@@ -280,9 +279,8 @@ public class HttpCompoents {
             }
         }
         httpGet.setConfig(requestConfig);
-        try (CloseableHttpClient httpClient = createHttpClient(url);
-             CloseableHttpResponse httpResponse =  httpClient.execute(httpGet)){
-            return callback.handle(httpResponse);
+        try (CloseableHttpClient httpClient = createHttpClient(url)){
+            return httpClient.execute(httpGet,callback);
         }
     }
 
@@ -312,9 +310,8 @@ public class HttpCompoents {
         }
         httpPost.setConfig(requestConfig);
 
-        try (CloseableHttpClient httpClient = createHttpClient(url);
-             CloseableHttpResponse response = httpClient.execute(httpPost)) {
-            return EntityUtils.toString(response.getEntity(), Charset.forName(useCharset));
+        try (CloseableHttpClient httpClient = createHttpClient(url)) {
+            return httpClient.execute(httpPost, response -> EntityUtils.toString(response.getEntity(), Charset.forName(useCharset)));
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
@@ -332,7 +329,7 @@ public class HttpCompoents {
      * @return
      */
     public <T> T post(String url, Map<String, String> params,
-                      Map<String, String> headers, String charset,HttpResponseCallback<T> callback) throws Exception {
+                      Map<String, String> headers, String charset,HttpClientResponseHandler<T> callback) throws Exception {
         String useCharset = charset;
         if (charset == null) {
             useCharset = _DEFLAUT_CHARSET;
@@ -352,9 +349,8 @@ public class HttpCompoents {
             httpPost.setEntity(new UrlEncodedFormEntity(nvps, Charset.forName(useCharset)));
         }
         httpPost.setConfig(requestConfig);
-        try (CloseableHttpClient httpClient = createHttpClient(url);
-             CloseableHttpResponse httpResponse =  httpClient.execute(httpPost)){
-            return callback.handle(httpResponse);
+        try (CloseableHttpClient httpClient = createHttpClient(url)){
+            return httpClient.execute(httpPost,callback);
         }
     }
 
@@ -375,9 +371,8 @@ public class HttpCompoents {
         }
         httpPost.setConfig(requestConfig);
 
-        try (CloseableHttpClient httpClient = createHttpClient(url);
-             CloseableHttpResponse response = httpClient.execute(httpPost)) {
-            return EntityUtils.toString(response.getEntity(), Charset.forName(useCharset));
+        try (CloseableHttpClient httpClient = createHttpClient(url)) {
+            return httpClient.execute(httpPost, response -> EntityUtils.toString(response.getEntity(), Charset.forName(useCharset)));
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
@@ -395,7 +390,7 @@ public class HttpCompoents {
      * @return
      */
     public <T> T  post(String url, String data,
-                       Map<String, String> headers, String charset,HttpResponseCallback<T> callback) throws Exception {
+                       Map<String, String> headers, String charset,HttpClientResponseHandler<T> callback) throws Exception {
         HttpPost httpPost = new HttpPost(url);
         if (headers != null) {
             for (Map.Entry<String, String> entry : headers.entrySet()) {
@@ -406,9 +401,8 @@ public class HttpCompoents {
         StringEntity requestEntity = new StringEntity(data, ContentType.APPLICATION_JSON);
         httpPost.setEntity(requestEntity);
         httpPost.setConfig(requestConfig);
-        try (CloseableHttpClient httpClient = createHttpClient(url);
-             CloseableHttpResponse httpResponse =  httpClient.execute(httpPost)){
-            return callback.handle(httpResponse);
+        try (CloseableHttpClient httpClient = createHttpClient(url)){
+            return httpClient.execute(httpPost,callback);
         }
     }
 
