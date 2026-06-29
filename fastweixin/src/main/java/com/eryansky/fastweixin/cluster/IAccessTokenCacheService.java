@@ -10,4 +10,6 @@ public interface IAccessTokenCacheService {
     AccessTokenCache getAccessTokenCache();
 
     void putAccessTokenCache(AccessTokenCache accessTokenCache);
+
+    void clearAccessTokenCache();
 }

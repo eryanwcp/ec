@@ -57,4 +57,13 @@ public class J2CacheAccessTokenCacheService implements IAccessTokenCacheService 
         Static.cache.set(region, this.prefix + AccessTokenCache.KEY_ACCESS_TOKEN_CACHE, accessTokenCache);
     }
 
+    @Override
+    public void clearAccessTokenCache() {
+        // 静态缓存未初始化直接返回空，避免提前触发序列化
+        if (Static.cache == null) {
+            return;
+        }
+        Static.cache.clear(region);
+    }
+
 }
