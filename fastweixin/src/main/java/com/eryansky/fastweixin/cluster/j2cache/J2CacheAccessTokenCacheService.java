@@ -38,11 +38,18 @@ public class J2CacheAccessTokenCacheService implements IAccessTokenCacheService 
 
     @Override
     public AccessTokenCache getAccessTokenCache() {
-        CacheObject cacheObject = Static.cache.get(region, this.prefix + AccessTokenCache.KEY_ACCESS_TOKEN_CACHE);
-        if (cacheObject != null) {
-            return (AccessTokenCache) cacheObject.getValue();
+         // 静态缓存未初始化直接返回空，避免提前触发序列化
+        if (Static.cache == null) {
+            return null;
         }
-        return null;
+        String key = this.prefix + AccessTokenCache.KEY_ACCESS_TOKEN_CACHE;
+        CacheObject cacheObject = Static.cache.get(region, key);
+        if (cacheObject == null) {
+            return null;
+        }
+        Object val = cacheObject.getValue();
+        // 类型校验，防止序列化脏数据强转异常
+        return val instanceof AccessTokenCache ? (AccessTokenCache) val : null;
     }
 
     @Override
