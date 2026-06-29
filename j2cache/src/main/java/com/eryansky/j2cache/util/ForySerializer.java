@@ -303,7 +303,6 @@ public class ForySerializer implements Serializer {
                 .withRefTracking(true)
                 .requireClassRegistration(false)
                 .withTypeChecker(typeChecker)
-                .withClassLoader(Thread.currentThread().getContextClassLoader())
                 .buildThreadSafeFory();
     }
 
