@@ -294,7 +294,7 @@ public class ForySerializer implements Serializer {
         AllowListChecker checker = new AllowListChecker(AllowListChecker.CheckLevel.WARN);
         checker.disallowClasses(DEFAULT_DISALLOWED_LIST_SET);
 
-        log.info("Using default TypeChecker: {} {}", checker.getClass().getName(), checker.getCheckLevel().name());
+        log.info("Using default TypeChecker: {} checkLevel: {}", checker.getClass().getName(), checker.getCheckLevel().name());
         typeChecker = checker;
 
         fory = Fory.builder().withLanguage(Language.JAVA)
