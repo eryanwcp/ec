@@ -68,8 +68,8 @@ public class DefaultConfigurer {
             logger.info("SerializerTypeCheck allowClasses : {}", JsonMapper.toJsonString(allowClassList));
             allowListChecker.allowClasses(allowClassList);
         }
-        allowListChecker.setCheckLevel(AllowListChecker.CheckLevel.STRICT);
-        logger.info("SerializerTypeCheck: {} checkLevel: {}",allowListChecker.getClass().getName(),allowListChecker.getCheckLevel().name());
+        // allowListChecker.setCheckLevel(AllowListChecker.CheckLevel.STRICT);
+       //  logger.info("SerializerTypeCheck: {} checkLevel: {}",allowListChecker.getClass().getName(),allowListChecker.getCheckLevel().name());
     }
 
     private void clearTempDir(){
