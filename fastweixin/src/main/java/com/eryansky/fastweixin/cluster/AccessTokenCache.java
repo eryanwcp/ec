@@ -12,7 +12,7 @@ public class AccessTokenCache implements Serializable {
 
     public static final String CACHE_NAME = "wechat_access_token_cache";
 
-    public static String KEY_ACCESS_TOKEN_CACHE = "accessTokenKey";
+    public static final String KEY_ACCESS_TOKEN_CACHE = "accessTokenKey";
 
     private boolean isFromExtend = false;
 
