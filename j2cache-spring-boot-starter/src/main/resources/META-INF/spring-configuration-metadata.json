@@ -20,6 +20,10 @@
       "type": "java.lang.Boolean",
       "defaultValue": false
     },{
+      "name": "j2cache.local-cache",
+      "type": "java.lang.Boolean",
+      "defaultValue": false
+    },{
       "name": "j2cache.redis-client",
       "type": "java.lang.String",
       "defaultValue": "lettuce"
