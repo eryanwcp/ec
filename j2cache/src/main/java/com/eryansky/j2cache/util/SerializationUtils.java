@@ -44,6 +44,12 @@ public class SerializationUtils {
             try {
                 if ("java".equals(ser)) {
                     g_serializer = new JavaSerializer();
+                } else if ("fst".equals(ser)) {
+                    g_serializer = Class.forName("com.eryansky.j2cache.util.FSTSerializer").asSubclass(Serializer.class).getDeclaredConstructor().newInstance();
+                } else if("fst-snappy".equals(ser)){
+                    g_serializer = Class.forName("com.eryansky.j2cache.util.FstSnappySerializer").asSubclass(Serializer.class).getDeclaredConstructor().newInstance();
+                } else if ("fst-json".equals(ser)) {
+                    g_serializer = Class.forName("com.eryansky.j2cache.util.FstJSONSerializer").asSubclass(Serializer.class).getConstructor(Properties.class).newInstance(props);
                 } else if("fory".equals(ser) || "fury".equals(ser)){
                     g_serializer = Class.forName("com.eryansky.j2cache.util.ForySerializer").asSubclass(Serializer.class).getDeclaredConstructor().newInstance();
                 } else if("jackson".equals(ser)){
