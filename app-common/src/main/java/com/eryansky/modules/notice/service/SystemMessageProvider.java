@@ -2,7 +2,6 @@ package com.eryansky.modules.notice.service;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-
 import com.eryansky.common.utils.DateUtils;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
@@ -16,11 +15,10 @@ import com.eryansky.modules.sys.mapper.Organ;
 import com.eryansky.modules.sys.service.OrganService;
 import com.eryansky.modules.notice.utils.IFunction;
 import com.google.common.collect.Lists;
+import jakarta.annotation.Resource;
 import org.apache.commons.compress.utils.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.modules.notice.utils.MessageUtils;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.service.UserService;
@@ -35,17 +33,14 @@ import org.springframework.stereotype.Component;
 public class SystemMessageProvider implements SystemMessageAPI {
 
     private static final Logger logger = LoggerFactory.getLogger(SystemMessageProvider.class);
-
-
-    /**
-     * 静态内部类，延迟加载，懒汉式，线程安全的单例模式
-     */
-    private static final class Static {
-        private static UserService userService = SpringContextHolder.getBean(UserService.class);
-        private static OrganService organService = SpringContextHolder.getBean(OrganService.class);
-        private static NoticeService noticeService = SpringContextHolder.getBean(NoticeService.class);
-        private static MessageReceiveService messageReceiveService = SpringContextHolder.getBean(MessageReceiveService.class);
-    }
+    @Resource
+    private UserService userService;
+    @Resource
+    private OrganService organService;
+    @Resource
+    private NoticeService noticeService;
+    @Resource
+    private MessageReceiveService messageReceiveService;
 
     @Override
     public WSResult sendMessage(String data) {
@@ -110,17 +105,17 @@ public class SystemMessageProvider implements SystemMessageAPI {
             //发送者
             User senderUser = null;
             if (StringUtils.isNotBlank(senderId)) {
-                senderUser = Static.userService.getUserByIdOrLoginName(senderId);
+                senderUser = userService.getUserByIdOrLoginName(senderId);
                 //用户转换
                 if (senderUser == null && null != function) {
-                    senderUser = Static.userService.getUserByIdOrLoginName(function.queryData(appId,senderId));
+                    senderUser = userService.getUserByIdOrLoginName(function.queryData(appId,senderId));
                 }
 //                if (senderUser == null) {
 //                    return WSResult.buildResult(WSResult.class, WSResult.IMAGE_ERROR, "senderId:" + senderId + ",无相关账号信息");
 //                }
             }
             if (senderUser == null) {
-                senderUser = Static.userService.getSuperUser();
+                senderUser = userService.getSuperUser();
             }
 
             MessageReceiveObjectType messageReceiveObjectType = MessageReceiveObjectType.getByValue(_receiveType);
@@ -131,10 +126,10 @@ public class SystemMessageProvider implements SystemMessageAPI {
             Set<String> receiveObjectIds = Sets.newHashSet();
             if(MessageReceiveObjectType.User.equals(messageReceiveObjectType)){
                 for (String localLoginName : receiveIds) {
-                    User receiveUser = Static.userService.getUserByIdOrLoginName(localLoginName);
+                    User receiveUser = userService.getUserByIdOrLoginName(localLoginName);
                     //用户转换
                     if (receiveUser == null && null != function) {
-                        receiveUser = Static.userService.getUserByIdOrLoginName(function.queryData(appId,localLoginName));
+                        receiveUser = userService.getUserByIdOrLoginName(function.queryData(appId,localLoginName));
                     }
                     if (receiveUser == null) {
                         logger.error("统一平台无相关账号信息：{} {}", appId,localLoginName);
@@ -144,12 +139,12 @@ public class SystemMessageProvider implements SystemMessageAPI {
                 }
             }else if(MessageReceiveObjectType.Organ.equals(messageReceiveObjectType)){
                 for (String companyCode : receiveIds) {
-                    Organ company = Static.organService.getByIdOrCode(companyCode);
+                    Organ company = organService.getByIdOrCode(companyCode);
                     if (company == null) {
                         logger.error("统一平台无相关机构信息：{} {}",appId,companyCode);
                         return WSResult.buildResult(WSResult.class, WSResult.IMAGE_ERROR, "统一平台无相关机构信息："+companyCode);
                     }
-                    List<String> organList = Static.organService.findDepartmentAndGroupOrganIdsByCompanyId(company.getId());
+                    List<String> organList = organService.findDepartmentAndGroupOrganIdsByCompanyId(company.getId());
                     if(Collections3.isNotEmpty(organList)){
                         receiveObjectIds.addAll(organList);
                     }
@@ -249,7 +244,7 @@ public class SystemMessageProvider implements SystemMessageAPI {
             try {
                 Message message  = MessageUtils.get(messageId);
                 if(null != message){
-                    message.setMessageReceives(Static.messageReceiveService.findByMessageId(messageId));
+                    message.setMessageReceives(messageReceiveService.findByMessageId(messageId));
                 }
                 return null == message ? WSResult.buildResult(WSResult.class, WSResult.IMAGE_ERROR, "消息获取失败"): WSResult.buildResult(WSResult.class, WSResult.SUCCESS, "消息获取成功").setData(message);
             } catch (Exception e) {
@@ -330,27 +325,27 @@ public class SystemMessageProvider implements SystemMessageAPI {
             //发送者
             User senderUser = null;
             if (StringUtils.isNotBlank(senderId)) {
-                senderUser = Static.userService.getUserByLoginName(senderId);
+                senderUser = userService.getUserByLoginName(senderId);
                 //用户转换
                 if (senderUser == null && null != function) {
-                    senderUser = Static.userService.getUserByIdOrLoginName(function.queryData(appId,senderId));
+                    senderUser = userService.getUserByIdOrLoginName(function.queryData(appId,senderId));
                 }
 //                if (senderUser == null) {
 //                    return WSResult.buildResult(WSResult.class, WSResult.IMAGE_ERROR, "senderId:" + senderId + ",统一平台无相关账号映射信息");
 //                }
             }
             if (senderUser == null) {
-                senderUser = Static.userService.getSuperUser();
+                senderUser = userService.getSuperUser();
             }
 
             Set<String> organIds = Sets.newHashSet();
             for (String companyCode : receiveIds) {
-                Organ company = Static.organService.getByIdOrCode(companyCode);
+                Organ company = organService.getByIdOrCode(companyCode);
                 if (company == null) {
                     logger.error("{},统一平台无相关机构信息:{}",appId,companyCode);
                     return WSResult.buildResult(WSResult.class, WSResult.IMAGE_ERROR, "统一平台无相关机构信息："+companyCode);
                 }
-                List<String> organList = Static.organService.findDepartmentAndGroupOrganIdsByCompanyId(company.getId());
+                List<String> organList = organService.findDepartmentAndGroupOrganIdsByCompanyId(company.getId());
                 if(Collections3.isNotEmpty(organList)){
                     organIds.addAll(organList);
                 }
@@ -359,7 +354,7 @@ public class SystemMessageProvider implements SystemMessageAPI {
 
             //发送
             try {
-                Static.noticeService.sendToOrganNotice(appId, type,title, content, sendTime, senderUser.getId(),senderUser.getDefaultOrganId(),organIds,messageChannels);
+                noticeService.sendToOrganNotice(appId, type,title, content, sendTime, senderUser.getId(),senderUser.getDefaultOrganId(),organIds,messageChannels);
                 return WSResult.buildResult(WSResult.class, WSResult.SUCCESS, "通知发送成功");
             } catch (Exception e) {
                 return WSResult.buildResult(WSResult.class, WSResult.IMAGE_ERROR, "通知发送失败");
