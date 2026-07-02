@@ -24,8 +24,6 @@ import com.eryansky.modules.notice.mapper.NoticeReceiveInfo;
 import com.eryansky.modules.notice.service.NoticeReceiveInfoService;
 import com.eryansky.modules.notice.service.NoticeService;
 import com.eryansky.utils.AppConstants;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;

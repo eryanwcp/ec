@@ -34,12 +34,9 @@ import com.eryansky.modules.sys.mapper.Resource;
 import com.eryansky.modules.sys.mapper.Role;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.service.*;
-import com.eryansky.modules.sys.utils.PostUtils;
 import com.eryansky.modules.sys.utils.RoleUtils;
-import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.utils.SelectType;
 import com.google.common.collect.Lists;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -65,11 +62,11 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "${adminPath}/sys/role")
 public class RoleController extends SimpleController {
 
-    @Autowired
+    @jakarta.annotation.Resource
     private RoleService roleService;
-    @Autowired
+    @jakarta.annotation.Resource
     private ResourceService resourceService;
-    @Autowired
+    @jakarta.annotation.Resource
     private UserService userService;
 
     @ModelAttribute("model")

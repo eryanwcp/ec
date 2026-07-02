@@ -39,9 +39,9 @@ import com.eryansky.modules.disk.service.*;
 import com.eryansky.modules.disk.utils.DiskUtils;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.utils.SelectType;
+import jakarta.annotation.Resource;
 import org.apache.commons.fileupload2.core.FileUploadSizeException;
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -65,9 +65,9 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "${adminPath}/disk")
 public class DiskController extends SimpleController {
 
-    @Autowired
+    @Resource
     private FolderService folderService;
-    @Autowired
+    @Resource
     private FileService fileService;
 
     public static final String NODE_TYPE = "nType";

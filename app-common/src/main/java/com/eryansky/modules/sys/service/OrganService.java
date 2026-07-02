@@ -23,7 +23,7 @@ import com.eryansky.utils.AppUtils;
 import com.eryansky.utils.CacheConstants;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -49,7 +49,7 @@ public class OrganService extends TreeService<OrganDao, Organ> {
     public static final String ICON_USER = "eu-icon-user";
     public static final String ICON_GROUP = "eu-icon-group";
 
-    @Autowired
+    @Resource
     private UserService userService;
 
 

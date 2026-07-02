@@ -26,7 +26,6 @@ import com.eryansky.modules.sys.service.SystemSerialNumberService;
 import com.eryansky.modules.sys.sn.MaxSerial;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Lists;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;

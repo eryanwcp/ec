@@ -27,7 +27,7 @@ import com.eryansky.modules.notice.mapper.ContactGroup;
 import com.eryansky.modules.notice.mapper.MailContact;
 import com.eryansky.modules.notice.service.ContactGroupService;
 import com.eryansky.modules.notice.service.MailContactService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -42,9 +42,9 @@ import java.util.List;
 @RequestMapping(value = "${adminPath}/notice/contactGroup")
 public class ContactGroupController extends SimpleController {
 
-    @Autowired
+    @Resource
     private ContactGroupService contactGroupService;
-    @Autowired
+    @Resource
     private MailContactService mailContactService;
 
     @ModelAttribute("model")

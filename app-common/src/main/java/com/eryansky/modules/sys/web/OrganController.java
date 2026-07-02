@@ -29,8 +29,8 @@ import com.eryansky.modules.sys.utils.OrganUtils;
 import com.eryansky.utils.AppUtils;
 import com.eryansky.utils.SelectType;
 import com.google.common.collect.Lists;
+import jakarta.annotation.Resource;
 import org.apache.commons.collections4.ListUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -54,13 +54,13 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "${adminPath}/sys/organ")
 public class OrganController extends SimpleController {
 
-    @Autowired
+    @Resource
     private OrganService organService;
-    @Autowired
+    @Resource
     private UserService userService;
-    @Autowired
+    @Resource
     private AreaService areaService;
-    @Autowired
+    @Resource
     private SystemService systemService;
 
     @ModelAttribute("model")

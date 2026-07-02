@@ -14,10 +14,9 @@ import com.eryansky.core.orm.mybatis.service.CrudService;
 import com.eryansky.modules.sys.dao.DictionaryItemDao;
 import com.eryansky.modules.sys.mapper.Dictionary;
 import com.eryansky.modules.sys.mapper.DictionaryItem;
-import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.utils.CacheConstants;
 import com.google.common.collect.Lists;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -34,7 +33,7 @@ import java.util.List;
 @Service
 public class DictionaryItemService extends CrudService<DictionaryItemDao, DictionaryItem> {
 
-    @Autowired
+    @Resource
     private DictionaryService dictionaryService;
 
     @CacheEvict(value = {CacheConstants.DICTIONARYITEM_BY_DICTIONARYCODE_CACHE,

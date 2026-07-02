@@ -23,7 +23,7 @@ import com.eryansky.modules.notice.service.NoticeReceiveInfoService;
 import com.eryansky.modules.notice.service.NoticeService;
 import com.eryansky.modules.notice.vo.NoticeQueryVo;
 import com.eryansky.modules.sys._enum.LogType;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,9 +39,9 @@ import jakarta.servlet.http.HttpServletResponse;
 @RequestMapping(value = "${mobilePath}/notice")
 public class NoticeMobileController extends SimpleController {
 
-    @Autowired
+    @Resource
     private NoticeReceiveInfoService noticeReceiveInfoService;
-    @Autowired
+    @Resource
     private NoticeService noticeService;
 
     @ModelAttribute("model")

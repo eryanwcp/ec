@@ -36,7 +36,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -65,8 +64,7 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "${adminPath}/sys/systemMonitor")
 public class SystemMonitorController extends SimpleController {
 
-    @jakarta.annotation.Resource
-    @Qualifier("defaultAsyncExecutor")
+    @jakarta.annotation.Resource(name = "defaultAsyncExecutor")
     private Executor asyncExecutor;
 
     /**

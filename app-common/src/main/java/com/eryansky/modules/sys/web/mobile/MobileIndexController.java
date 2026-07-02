@@ -9,7 +9,6 @@ import com.drew.metadata.Tag;
 import com.eryansky.common.exception.ActionException;
 import com.eryansky.common.model.Result;
 import com.eryansky.common.utils.*;
-import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.encode.Cryptos;
 import com.eryansky.common.utils.encode.EncodeUtils;
 import com.eryansky.common.utils.encode.RSAUtils;
@@ -42,9 +41,9 @@ import com.eryansky.modules.sys.utils.DownloadFileUtils;
 import com.eryansky.modules.sys.utils.VersionLogUtils;
 import com.eryansky.utils.AppUtils;
 import com.google.common.collect.Maps;
+import jakarta.annotation.Resource;
 import org.apache.commons.fileupload2.core.FileUploadSizeException;
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
@@ -71,7 +70,7 @@ import java.util.Map;
 @RequestMapping(value="${mobilePath}")
 public class MobileIndexController extends SimpleController {
 
-    @Autowired
+    @Resource
     private VersionLogService versionLogService;
 
     @Logging(logType = LogType.access, value = "移动APP")

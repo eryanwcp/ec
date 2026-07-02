@@ -7,11 +7,11 @@ package com.eryansky.modules.sys.quartz;
 
 import com.eryansky.core.quartz.QuartzJob;
 import com.eryansky.modules.sys.service.SystemSerialNumberService;
+import jakarta.annotation.Resource;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 /**
@@ -23,7 +23,7 @@ public class SystemSerialNumerJob extends QuartzJobBean {
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Autowired
+    @Resource
     private SystemSerialNumberService systemSerialNumberService;
 
     public void execute() {

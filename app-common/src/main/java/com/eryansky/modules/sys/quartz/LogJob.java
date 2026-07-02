@@ -8,11 +8,11 @@ package com.eryansky.modules.sys.quartz;
 import com.eryansky.core.quartz.QuartzJob;
 import com.eryansky.modules.sys.service.LogService;
 import com.eryansky.utils.AppConstants;
+import jakarta.annotation.Resource;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 /**
@@ -26,7 +26,7 @@ public class LogJob extends QuartzJobBean {
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Autowired
+    @Resource
     private LogService logService;
 
     /**

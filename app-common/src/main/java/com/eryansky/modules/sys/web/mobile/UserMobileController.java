@@ -41,9 +41,9 @@ import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import jakarta.annotation.Resource;
 import org.apache.commons.fileupload2.core.FileUploadSizeException;
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
@@ -71,7 +71,7 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "${mobilePath}/sys/user")
 public class UserMobileController extends SimpleController {
 
-    @Autowired
+    @Resource
     private UserService userService;
 
     @ModelAttribute("model")

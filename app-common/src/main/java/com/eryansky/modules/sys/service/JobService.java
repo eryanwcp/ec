@@ -7,14 +7,14 @@ import com.eryansky.core.quartz.QuartzJob;
 import com.eryansky.modules.sys.dao.JobDao;
 import com.eryansky.modules.sys.mapper.QuartzJobDetail;
 import com.eryansky.utils.AppConstants;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Service;
 
 @Service
 public class JobService extends BaseService {
 
-    @Autowired
+    @Resource
     private JobDao dao;
 
     public Page<QuartzJobDetail> findJobList(Page<QuartzJobDetail> page, String jobName, String jobState) {

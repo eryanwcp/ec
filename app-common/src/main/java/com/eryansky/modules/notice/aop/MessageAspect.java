@@ -14,13 +14,13 @@ import com.eryansky.modules.notice.service.MessageReceiveService;
 import com.eryansky.modules.notice.service.MessageSenderService;
 import com.eryansky.modules.notice.utils.NoticeUtils;
 import com.eryansky.modules.sys._enum.YesOrNo;
+import jakarta.annotation.Resource;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,9 +37,9 @@ public class MessageAspect implements InitializingBean, DisposableBean {
 
     private static final Logger logger = LoggerFactory.getLogger(MessageAspect.class);
 
-    @Autowired
+    @Resource
     private MessageReceiveService messageReceiveService;
-    @Autowired
+    @Resource
     private MessageSenderService messageSenderService;
 
     /**

@@ -10,7 +10,7 @@ import com.eryansky.common.utils.ThreadUtils;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.modules.disk.extend.FTPManager;
 import com.eryansky.modules.disk.extend.IFileManager;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = "${adminPath}/disk/ftp")
 public class FTPController extends SimpleController {
 
-    @Autowired
+    @Resource
     private IFileManager iFileManager;
 
     /**

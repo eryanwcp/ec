@@ -7,11 +7,11 @@ package com.eryansky.modules.notice.quartz;
 
 import com.eryansky.core.quartz.QuartzJob;
 import com.eryansky.modules.notice.service.NoticeService;
+import jakarta.annotation.Resource;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 /**
@@ -25,7 +25,7 @@ public class NoticeJob extends QuartzJobBean {
 
     private static final Logger logger = LoggerFactory.getLogger(NoticeJob.class);
 
-    @Autowired
+    @Resource
     private NoticeService noticeService;
 
     /**

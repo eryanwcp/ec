@@ -13,7 +13,6 @@ import com.eryansky.core.orm.mybatis.service.TreeService;
 import com.eryansky.modules.sys.dao.AreaDao;
 import com.eryansky.modules.sys.mapper.Area;
 import com.eryansky.utils.AppConstants;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;

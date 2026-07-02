@@ -17,8 +17,8 @@ import com.eryansky.modules.disk.web.DiskController;
 import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.AppUtils;
 import com.google.common.collect.Lists;
+import jakarta.annotation.Resource;
 import org.apache.commons.lang3.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.eryansky.modules.disk.mapper.Folder;
@@ -34,7 +34,7 @@ import java.util.List;
 @Service
 public class FolderService extends TreeService<FolderDao, Folder> {
 
-    @Autowired
+    @Resource
     private FileService fileService;
 
     /**

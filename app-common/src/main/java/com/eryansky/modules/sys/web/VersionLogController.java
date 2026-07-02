@@ -36,7 +36,6 @@ import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.SelectType;
 import com.google.common.collect.Lists;
 import org.apache.commons.fileupload2.core.FileUploadSizeException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

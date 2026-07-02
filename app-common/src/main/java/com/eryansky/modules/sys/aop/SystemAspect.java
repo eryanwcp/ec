@@ -18,6 +18,7 @@ import com.eryansky.modules.sys.service.SystemService;
 import com.eryansky.modules.sys.utils.OrganUtils;
 import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.utils.AppConstants;
+import jakarta.annotation.Resource;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -25,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -44,9 +44,9 @@ public class SystemAspect implements InitializingBean, DisposableBean {
 
     private static final Logger logger = LoggerFactory.getLogger(SystemAspect.class);
 
-    @Autowired
+    @Resource
     private SystemService systemService;
-    @Autowired
+    @Resource
     private OrganService organService;
 
     /**

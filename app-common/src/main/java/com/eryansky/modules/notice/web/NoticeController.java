@@ -45,8 +45,8 @@ import com.eryansky.modules.notice.vo.NoticeQueryVo;
 import com.eryansky.modules.sys._enum.DataScope;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.utils.SelectType;
+import jakarta.annotation.Resource;
 import org.apache.commons.fileupload2.core.FileUploadSizeException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -65,13 +65,13 @@ import java.util.*;
 @RequestMapping(value = "${adminPath}/notice")
 public class NoticeController extends SimpleController {
 
-    @Autowired
+    @Resource
     private NoticeService noticeService;
-    @Autowired
+    @Resource
     private NoticeReceiveInfoService noticeReceiveInfoService;
-    @Autowired
+    @Resource
     private NoticeSendInfoService noticeSendInfoService;
-    @Autowired
+    @Resource
     private UserService userService;
 
     /**

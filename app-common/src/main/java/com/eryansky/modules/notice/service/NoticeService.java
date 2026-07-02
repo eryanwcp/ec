@@ -32,8 +32,8 @@ import com.eryansky.modules.notice.mapper.NoticeReceiveInfo;
 import com.eryansky.modules.notice.vo.NoticeQueryVo;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -45,13 +45,13 @@ import java.util.stream.Collectors;
 @Service
 public class NoticeService extends CrudService<NoticeDao, Notice> {
 
-    @Autowired
+    @Resource
     private NoticeSendInfoService noticeSendInfoService;
-    @Autowired
+    @Resource
     private NoticeReceiveInfoService noticeReceiveInfoService;
-    @Autowired
+    @Resource
     private UserService userService;
-    @Autowired
+    @Resource
     private ContactGroupService contactGroupService;
 
     /**

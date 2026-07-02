@@ -37,8 +37,8 @@ import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys._enum.YesOrNo;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Lists;
+import jakarta.annotation.Resource;
 import org.apache.commons.fileupload2.core.FileUploadSizeException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -63,7 +63,7 @@ import java.util.List;
 @RequestMapping(value = "${adminPath}/notice/noticeReceiveInfo")
 public class NoticeReceiveController extends SimpleController {
 
-    @Autowired
+    @Resource
     private NoticeReceiveInfoService noticeReceiveInfoService;
 
     @ModelAttribute("model")

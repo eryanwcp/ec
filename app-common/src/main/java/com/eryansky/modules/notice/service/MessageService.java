@@ -27,7 +27,7 @@ import com.eryansky.modules.notice.mapper.MessageSender;
 import com.eryansky.modules.sys._enum.YesOrNo;
 import com.eryansky.modules.sys.service.UserService;
 import com.google.common.collect.Maps;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -39,11 +39,11 @@ import java.util.*;
 @Service
 public class MessageService extends CrudService<MessageDao, Message> {
 
-    @Autowired
+    @Resource
     private MessageSenderService messageSenderService;
-    @Autowired
+    @Resource
     private MessageReceiveService messageReceiveService;
-    @Autowired
+    @Resource
     private UserService userService;
 
 

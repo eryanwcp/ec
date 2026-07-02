@@ -22,7 +22,7 @@ import com.eryansky.modules.notice.task.MessageTask;
 import com.eryansky.modules.notice.utils.MessageUtils;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys._enum.YesOrNo;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -41,9 +41,9 @@ import jakarta.servlet.http.HttpServletResponse;
 @RequestMapping(value = "${adminPath}/notice/messageReceive")
 public class MessageReceiveController extends SimpleController {
 
-    @Autowired
+    @Resource
     private MessageReceiveService messageReceiveService;
-    @Autowired
+    @Resource
     private MessageTask messageTask;
 
     @ModelAttribute("model")
