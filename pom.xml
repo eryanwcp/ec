@@ -437,7 +437,6 @@
                 <configuration>
                     <skip>${skipTests}</skip>
                     <argLine>
-                        --illegal-access=deny
                         --add-opens=java.base/java.lang=ALL-UNNAMED
                         --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
                         --add-opens=java.base/java.lang.invoke=ALL-UNNAMED
