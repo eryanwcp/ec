@@ -19,7 +19,7 @@ import com.eryansky.modules.sys.vo.TableColumnDTO;
 import com.eryansky.modules.sys.vo.TableDTO;
 import com.eryansky.modules.sys.vo.TablePageDTO;
 import com.eryansky.utils.AppConstants;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,9 +34,9 @@ import java.util.Map;
 @Service
 public class SystemService extends BaseService {
 
-    @Autowired
+    @Resource
     private SystemDao systemDao;
-    @Autowired
+    @Resource
     private OrganService organService;
 
 
