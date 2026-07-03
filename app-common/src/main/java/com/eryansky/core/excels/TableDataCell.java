@@ -22,9 +22,9 @@ public class TableDataCell {
 
 	private int columnIndex;
 
-	private static DecimalFormat format2 = new DecimalFormat("0.##");
+	private static final DecimalFormat format2 = new DecimalFormat("0.##");
 
-	private static DecimalFormat format3 = new DecimalFormat("0.###");
+	private static final DecimalFormat format3 = new DecimalFormat("0.###");
 
 	private int cellStyle = TableData.STYLE_TYPE_STRING;
 
