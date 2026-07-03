@@ -13,10 +13,10 @@ import com.eryansky.modules.sys.utils.SystemSerialNumberUtils;
 import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.client.common.vo.ExtendAttr;
 import com.google.common.collect.Maps;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.mybatis.dynamic.sql.render.RenderingStrategies;
 import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.*;
@@ -28,15 +28,15 @@ import static org.mybatis.dynamic.sql.select.SelectDSL.select;
 @SpringBootTest(classes = Application.class)
 public class ApplicationTests {
 
-    @Autowired
+    @Resource
     private ConfigService configService;
-    @Autowired
+    @Resource
     private UserService userService;
-    @Autowired
+    @Resource
     private RoleService roleService;
-    @Autowired
+    @Resource
     private PostService postService;
-    @Autowired
+    @Resource
     private VersionLogService versionLogService;
 
     @Test

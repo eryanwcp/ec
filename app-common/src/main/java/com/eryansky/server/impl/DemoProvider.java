@@ -9,7 +9,7 @@ import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.service.UserService;
 import com.eryansky.server.DemoAPI;
 import com.google.common.collect.Maps;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.Map;
 @Component
 public class DemoProvider implements DemoAPI {
 
-    @Autowired
+    @Resource
     private UserService userService;
 
     @Logging(value = "rest1",logType = LogType.API)

@@ -9,8 +9,8 @@ import com.eryansky.j2cache.CacheChannel;
 import com.eryansky.j2cache.lock.DefaultLockCallback;
 import com.eryansky.utils.CacheUtils;
 import com.google.common.collect.Lists;
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 
@@ -20,9 +20,9 @@ import java.util.List;
 @SpringBootTest(classes = Application.class)
 public class CacheTests {
 
-	@Autowired(required = false)
+	@Resource
 	private RedisTemplate<String, Serializable> redisTemplate;
-	@Autowired()
+	@Resource
 	private CacheChannel cacheChannel;
 
 	@Test

@@ -1,10 +1,10 @@
 package com.eryansky.core.quartz;
 
 import com.eryansky.modules.sys.service.JobService;
+import jakarta.annotation.Resource;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -19,7 +19,7 @@ public class QuartJobSchedulingListener implements ApplicationListener<ContextRe
     Logger logger = LoggerFactory.getLogger(QuartJobSchedulingListener.class);
 
     private Scheduler scheduler;
-    @Autowired
+    @Resource
     private JobService jobService;
 
     public QuartJobSchedulingListener(Scheduler scheduler) {

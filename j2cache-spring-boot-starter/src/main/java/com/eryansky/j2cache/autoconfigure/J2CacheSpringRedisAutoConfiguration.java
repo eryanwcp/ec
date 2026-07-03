@@ -12,10 +12,10 @@ import io.lettuce.core.ClientOptions;
 import io.lettuce.core.cluster.ClusterClientOptions;
 import io.lettuce.core.cluster.ClusterTopologyRefreshOptions;
 import io.lettuce.core.protocol.ProtocolVersion;
+import jakarta.annotation.Resource;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -62,10 +62,10 @@ public class J2CacheSpringRedisAutoConfiguration {
 
 	private static final Logger log = LoggerFactory.getLogger(J2CacheSpringRedisAutoConfiguration.class);
 
-//    @Autowired(required = false)
+//    @Resource
 //    private JedisConnectionFactory jedisConnectionFactory;
 
-//    @Autowired(required = false)
+//    @Resource
 //    private LettuceConnectionFactory lettuceConnectionFactory;
 
 	@Primary

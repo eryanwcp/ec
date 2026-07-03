@@ -1,5 +1,6 @@
 package com.eryansky.core.quartz;
 
+import jakarta.annotation.Resource;
 import org.quartz.Job;
 import org.quartz.spi.TriggerFiredBundle;
 import org.slf4j.Logger;
@@ -7,14 +8,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyAccessorFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 
 public class SpringQuartzJobFactory extends SpringBeanJobFactory {
     private static Logger logger = LoggerFactory.getLogger(SpringQuartzJobFactory.class);
 
-    @Autowired
+    @Resource
     private ApplicationContext ctx;
 
     @Override

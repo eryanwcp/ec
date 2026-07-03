@@ -11,9 +11,8 @@ import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.core.orm.mybatis.entity.BaseEntity;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
 import com.google.common.collect.Lists;
+import jakarta.annotation.Resource;
 import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.util.Collection;
 import java.util.List;
 
@@ -27,7 +26,7 @@ public abstract class CrudService<D extends CrudDao<T>, T extends BaseEntity<T>>
 	/**
 	 * 持久层对象
 	 */
-	@Autowired
+	@Resource
 	protected D dao;
 
 

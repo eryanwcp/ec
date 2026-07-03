@@ -21,7 +21,6 @@ import com.eryansky.modules.sys.service.ConfigService;
 import com.eryansky.modules.sys.service.LogService;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Maps;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 

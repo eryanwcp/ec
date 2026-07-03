@@ -13,6 +13,7 @@ import com.eryansky.modules.disk.extend.IFileManager;
 import com.eryansky.utils.AppConstants;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.collect.Lists;
+import jakarta.annotation.Resource;
 import org.apache.hc.client5.http.cookie.*;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
@@ -28,7 +29,6 @@ import org.apache.hc.core5.http.config.RegistryBuilder;
 import org.apache.hc.core5.reactor.ssl.SSLBufferMode;
 import org.apache.hc.core5.ssl.SSLContexts;
 import org.apache.hc.core5.ssl.TrustStrategy;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -60,7 +60,7 @@ import static com.fasterxml.jackson.core.JsonParser.Feature.INCLUDE_SOURCE_IN_LO
 public class MvcConfigurer implements WebMvcConfigurer {
 
     @Lazy
-    @Autowired
+    @Resource
     private RequestMappingHandlerAdapter requestMappingHandlerAdapter;
 
     @Override

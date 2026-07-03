@@ -1,9 +1,9 @@
 package com.eryansky.j2cache.autoconfigure;
 
 import com.eryansky.j2cache.properties.J2CacheSessionProperties;
+import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.*;
@@ -28,7 +28,7 @@ public class J2CacheAutoConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(J2CacheAutoConfiguration.class);
 
-    @Autowired
+    @Resource
     private StandardEnvironment standardEnvironment;
 
     @Bean
