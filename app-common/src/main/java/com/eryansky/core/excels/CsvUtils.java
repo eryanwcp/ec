@@ -21,7 +21,7 @@ public class CsvUtils {
      **/
     public static void writeCsv(Object[] headers, List<Object[]> data, String filePath) throws IOException {
         //初始化csvformat
-        CSVFormat formator = CSVFormat.Builder.create(CSVFormat.DEFAULT).setRecordSeparator("\n").build();
+        CSVFormat formator = CSVFormat.Builder.create(CSVFormat.DEFAULT).setRecordSeparator("\n").get();
         //创建FileWriter对象
         try(FileWriter fileWriter = new FileWriter(filePath, true);
             //创建CSVPrinter对象
@@ -50,7 +50,7 @@ public class CsvUtils {
         byte[] bytes = {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF};
         outputStream.write(bytes);
         //初始化csvformat
-        CSVFormat formator = CSVFormat.Builder.create(CSVFormat.DEFAULT).setRecordSeparator("\n").build();
+        CSVFormat formator = CSVFormat.Builder.create(CSVFormat.DEFAULT).setRecordSeparator("\n").get();
         try(//创建FileWriter对象
             Writer outputStreamWriter = new OutputStreamWriter(outputStream);
             //创建CSVPrinter对象
@@ -88,7 +88,7 @@ public class CsvUtils {
         byte[] bytes = {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF};
         outputStream.write(bytes);
         //初始化csvformat
-        CSVFormat formator = CSVFormat.Builder.create(CSVFormat.DEFAULT).setRecordSeparator("\n").build();
+        CSVFormat formator = CSVFormat.Builder.create(CSVFormat.DEFAULT).setRecordSeparator("\n").get();
         try(//创建FileWriter对象
             Writer outputStreamWriter = new OutputStreamWriter(outputStream);
             //创建CSVPrinter对象
@@ -124,7 +124,7 @@ public class CsvUtils {
         byte[] bytes = {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF};
         outputStream.write(bytes);
         //初始化csvformat
-        CSVFormat formator = CSVFormat.Builder.create(CSVFormat.DEFAULT).setRecordSeparator("\n").build();
+        CSVFormat formator = CSVFormat.Builder.create(CSVFormat.DEFAULT).setRecordSeparator("\n").get();
         try(
             //创建FileWriter对象
             Writer outputStreamWriter = new OutputStreamWriter(outputStream,charsetName);
