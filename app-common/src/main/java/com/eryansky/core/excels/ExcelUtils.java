@@ -32,6 +32,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
@@ -60,8 +61,8 @@ public class ExcelUtils {
         try {
             PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
             PropertyDescriptor[] descriptors = propertyUtilsBean.getPropertyDescriptors(obj);
-            for (int i = 0; i < descriptors.length; i++) {
-                String name = descriptors[i].getName();
+            for (PropertyDescriptor descriptor : descriptors) {
+                String name = descriptor.getName();
                 if (!StringUtils.equals(name, "class")) {
                     params.put(name, propertyUtilsBean.getNestedProperty(obj, name));
                 }
@@ -172,7 +173,7 @@ public class ExcelUtils {
 
         TableData td = new TableData(headMeta);
         TableDataRow row = null;
-        if (list != null && list.size() > 0) {
+        if (list != null && !list.isEmpty()) {
             if (list.get(0).getClass().isArray()) {//数组类型
                 for (Object obj : list) {
                     row = new TableDataRow(td);
@@ -204,12 +205,8 @@ public class ExcelUtils {
     public static ZipOutputStream createZipStream(HttpServletResponse response, String zipName) {
         response.reset();
         response.setContentType("application/vnd.ms-excel"); // 不同类型的文件对应不同的MIME类型
-        try {
-            response.setHeader("Content-Disposition", "attachment;filename="
-                    .concat(String.valueOf(URLEncoder.encode(zipName + ".zip", "UTF-8"))));
-        } catch (UnsupportedEncodingException e) {
-            mLogger.error(e.getMessage(), e);
-        }
+        response.setHeader("Content-Disposition", "attachment;filename="
+                .concat(String.valueOf(URLEncoder.encode(zipName + ".zip", StandardCharsets.UTF_8))));
         OutputStream os = null;
         try {
             os = response.getOutputStream();
@@ -274,40 +271,38 @@ public class ExcelUtils {
     }
 
     public static String dumpCellStyle(HSSFCellStyle style) {
-        StringBuffer sb = new StringBuffer();
-        sb.append(style.getHidden()).append(",");
-        sb.append(style.getLocked()).append(",");
-        sb.append(style.getWrapText()).append(",");
-        sb.append(style.getAlignment()).append(",");
-        sb.append(style.getBorderBottom()).append(",");
-        sb.append(style.getBorderLeft()).append(",");
-        sb.append(style.getBorderRight()).append(",");
-        sb.append(style.getBorderTop()).append(",");
-        sb.append(style.getBottomBorderColor()).append(",");
-        sb.append(style.getDataFormat()).append(",");
-        sb.append(style.getFillBackgroundColor()).append(",");
-        sb.append(style.getFillForegroundColor()).append(",");
-        sb.append(style.getFillPattern()).append(",");
-        sb.append(style.getIndention()).append(",");
-        sb.append(style.getLeftBorderColor()).append(",");
-        sb.append(style.getRightBorderColor()).append(",");
-        sb.append(style.getRotation()).append(",");
-        sb.append(style.getTopBorderColor()).append(",");
-        sb.append(style.getVerticalAlignment());
+        String sb = style.getHidden() + "," +
+                style.getLocked() + "," +
+                style.getWrapText() + "," +
+                style.getAlignment() + "," +
+                style.getBorderBottom() + "," +
+                style.getBorderLeft() + "," +
+                style.getBorderRight() + "," +
+                style.getBorderTop() + "," +
+                style.getBottomBorderColor() + "," +
+                style.getDataFormat() + "," +
+                style.getFillBackgroundColor() + "," +
+                style.getFillForegroundColor() + "," +
+                style.getFillPattern() + "," +
+                style.getIndention() + "," +
+                style.getLeftBorderColor() + "," +
+                style.getRightBorderColor() + "," +
+                style.getRotation() + "," +
+                style.getTopBorderColor() + "," +
+                style.getVerticalAlignment();
 
-        return sb.toString();
+        return sb;
     }
 
     public static String dumpFont(HSSFFont font) {
-        StringBuffer sb = new StringBuffer();
-        sb.append(font.getItalic()).append(",").append(font.getStrikeout())
-                .append(",").append(font.getBold()).append(",").append(
-                        font.getCharSet()).append(",").append(font.getColor())
-                .append(",").append(font.getFontHeight()).append(",").append(
-                        font.getFontName()).append(",").append(
-                        font.getTypeOffset()).append(",").append(
-                        font.getUnderline());
-        return sb.toString();
+        String sb = font.getItalic() + "," + font.getStrikeout() +
+                "," + font.getBold() + "," +
+                font.getCharSet() + "," + font.getColor() +
+                "," + font.getFontHeight() + "," +
+                font.getFontName() + "," +
+                font.getTypeOffset() + "," +
+                font.getUnderline();
+        return sb;
     }
 
     public static void copyCellStyle(HSSFWorkbook destwb, HSSFCell dest,

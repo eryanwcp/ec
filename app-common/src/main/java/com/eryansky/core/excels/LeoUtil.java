@@ -84,7 +84,7 @@ public class LeoUtil {
 		if (cell!= null) {
 			switch (cell.getCellType()) {
 				case STRING:
-				cellStr = cell.getStringCellValue().toString();
+				cellStr = cell.getStringCellValue();
 				break;
 			case BOOLEAN:
 				// 得到Boolean对象的方法
@@ -102,7 +102,7 @@ public class LeoUtil {
 				break;
 			case FORMULA:
 				// 读取公式
-				cellStr = cell.getCellFormula().toString();
+				cellStr = cell.getCellFormula();
 				break;
 			}
 		} else {
@@ -117,7 +117,7 @@ public class LeoUtil {
 		if (cell!= null) {
 			switch (cell.getCellType()) {
 			case STRING:
-				cellDouble =Double.valueOf(cell.getStringCellValue().toString());
+				cellDouble =Double.valueOf(cell.getStringCellValue());
 				break;
 			case NUMERIC:
 				// 先看是否是日期格式

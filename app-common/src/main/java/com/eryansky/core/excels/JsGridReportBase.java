@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpSession;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -87,8 +88,7 @@ public class JsGridReportBase {
                 if (!isFirst) {
                     outData.append(",{");
                     for (int i = 0; i < size; i++) {
-                        outData.append(headerMetaData.getColumnAt(i).getId()
-                                + ": '" + dataCells.get(i).getValue() + "',");
+                        outData.append(headerMetaData.getColumnAt(i).getId()).append(": '").append(dataCells.get(i).getValue()).append("',");
                     }
                     int index = outData.lastIndexOf(",");
                     outData.deleteCharAt(index);
@@ -96,8 +96,7 @@ public class JsGridReportBase {
                 } else {
                     outData.append("{");
                     for (int i = 0; i < size; i++) {
-                        outData.append(headerMetaData.getColumnAt(i).getId()
-                                + ": '" + dataCells.get(i).getValue() + "',");
+                        outData.append(headerMetaData.getColumnAt(i).getId()).append(": '").append(dataCells.get(i).getValue()).append("',");
                     }
                     int index = outData.lastIndexOf(",");
                     outData.deleteCharAt(index);
@@ -722,7 +721,7 @@ public class JsGridReportBase {
             return null;
         } else {
             try {
-                return new String(string.getBytes("ISO8859-1"), "UTF-8");
+                return new String(string.getBytes("ISO8859-1"), StandardCharsets.UTF_8);
             } catch (UnsupportedEncodingException e) {
                 logger.error(e.getMessage(),e);
                 return string;
