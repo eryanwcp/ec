@@ -12,8 +12,8 @@ import com.eryansky.core.orm.mybatis.entity.PBaseEntity;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
 import com.eryansky.core.orm.mybatis.entity.PDataEntity;
 import com.google.common.collect.Lists;
-import jakarta.annotation.Resource;
 import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -29,7 +29,7 @@ public abstract class PCrudService<D extends PCrudDao<T,PK>, T extends PBaseEnti
 	/**
 	 * 持久层对象
 	 */
-	@Resource
+	@Autowired
 	protected D dao;
 
 
