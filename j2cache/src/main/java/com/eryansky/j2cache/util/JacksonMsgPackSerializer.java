@@ -30,7 +30,7 @@ public class JacksonMsgPackSerializer implements Serializer {
         //设置输入时忽略在JSON字符串中存在但Java对象实际没有的属性
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
-        // 3. 【核心闭环】开启全局多态类型支持
+        // 开启全局多态类型支持
         // 因为 deserialize 接口方法没有 Class 参数，必须将类元数据类型写入二进制流中
         // 使用 NON_FINAL 策略：在生成的 MsgPack 二进制中注入 ["类全限定名", {数据主体}]，从而完美还原 Object
         objectMapper.activateDefaultTyping(
