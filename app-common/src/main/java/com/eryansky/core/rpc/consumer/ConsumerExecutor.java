@@ -160,6 +160,7 @@ public class ConsumerExecutor {
     private static HttpEntity<?> createHttpEntity(Object[] params, Map<String,String> headers) throws Exception {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+//        httpHeaders.setContentType(new MediaType("application", "x-msgpack"));
         if(null != headers){
             headers.forEach(httpHeaders::add);
         }
