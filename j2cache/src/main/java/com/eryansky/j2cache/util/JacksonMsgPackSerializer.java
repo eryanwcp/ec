@@ -23,7 +23,7 @@ public class JacksonMsgPackSerializer implements Serializer {
         objectMapper = new ObjectMapper(new MessagePackFactory());
         objectMapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-//        objectMapper.configure(JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION, true);
+        objectMapper.configure(JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION, true);
         objectMapper.setTimeZone(TimeZone.getTimeZone("GMT+08:00"));
         objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
         objectMapper.setFilterProvider(new SimpleFilterProvider().setFailOnUnknownId(false));
