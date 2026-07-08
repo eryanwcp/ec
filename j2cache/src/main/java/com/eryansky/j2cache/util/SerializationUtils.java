@@ -60,6 +60,11 @@ public class SerializationUtils {
         log.info("Using Serializer -> [" + g_serializer.name() + ":" + g_serializer.getClass().getName() + ']');
     }
 
+
+    public static String getSerializerName() {
+        return g_serializer.name();
+    }
+
     /**
      * 针对不同类型做单独处理
      * @param obj 待序列化的对象

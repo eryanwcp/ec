@@ -20,6 +20,8 @@ public class ApiTests {
     @Test
     public void contextLoads() {
 
+        Date d1 = Calendar.getInstance().getTime();
+
         System.out.println(JsonMapper.toJsonString(demoApi.test1("1")));
         System.out.println(JsonMapper.toJsonString(demoApi.test1("1","2")));
         System.out.println(JsonMapper.toJsonString(demoApi.encrypt("1")));
@@ -29,8 +31,8 @@ public class ApiTests {
         map.put("str","maps");
         map.put("user",new User(User.SUPERUSER_ID));
         System.out.println(JsonMapper.toJsonString(demoApi.test11("1",1,map, Lists.newArrayList(new User(User.SUPERUSER_ID)),new Page<User>(1,2))));
-
-
+        Date d2 = Calendar.getInstance().getTime();
+        System.out.println("Time taken: " + (d2.getTime() - d1.getTime()) + " ms");
     }
 
 
