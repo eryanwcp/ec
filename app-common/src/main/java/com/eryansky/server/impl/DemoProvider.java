@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @RPCProvider
-//@Component
+@Component
 public class DemoProvider implements DemoAPI {
 
     @Resource
