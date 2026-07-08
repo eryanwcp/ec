@@ -147,12 +147,13 @@ public class ConsumerExecutor {
         String encrypt = headers.get(RPCUtils.HEADER_ENCRYPT);
         String serializer = headers.get(RPCUtils.HEADER_RPC_SERIALIZER);
         if (StringUtils.isNotBlank(encrypt)){
-            httpHeaders.setContentType(MediaType.parseMediaType("application/x-"+serializer));
-            httpHeaders.setAccept(Lists.newArrayList(MediaType.APPLICATION_JSON,MediaType.parseMediaType("application/x-"+serializer)));
+            httpHeaders.setContentType(MediaType.parseMediaType("application/x-"+serializer+"-secure"));
+            httpHeaders.setAccept(Lists.newArrayList(MediaType.APPLICATION_JSON,MediaType.parseMediaType("application/x-"+serializer+"-secure")));
         }else {
 //            httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-            httpHeaders.setContentType(MediaType.parseMediaType("application/x-"+serializer+"-secure"));
-            httpHeaders.setAccept(Lists.newArrayList(MediaType.APPLICATION_JSON,MediaType.parseMediaType("application/x-"+serializer+"-secure")));        }
+            httpHeaders.setContentType(MediaType.parseMediaType("application/x-"+serializer));
+            httpHeaders.setAccept(Lists.newArrayList(MediaType.APPLICATION_JSON,MediaType.parseMediaType("application/x-"+serializer)));
+        }
 
         String encryptKey =  null;
         String key = null;
