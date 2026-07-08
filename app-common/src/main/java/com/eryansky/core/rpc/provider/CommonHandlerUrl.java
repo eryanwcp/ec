@@ -52,7 +52,6 @@ public class CommonHandlerUrl {
         String encrypt = request.getHeader(RPCUtils.HEADER_ENCRYPT);
         String encryptKey = request.getHeader(RPCUtils.HEADER_ENCRYPT_KEY);
         String serializer = request.getHeader(RPCUtils.HEADER_RPC_SERIALIZER);
-        System.out.println(request.getContentType());
         // 获取请求体
         byte[] requestBody = StreamUtils.copyToByteArray(request.getInputStream());
         byte[] data = requestBody;
