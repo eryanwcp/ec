@@ -3,13 +3,14 @@ package com.eryansky.core.rpc.advice;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.encode.Cryptos;
-import com.eryansky.common.utils.encode.EncodeUtils;
 import com.eryansky.common.utils.encode.RSAUtils;
 import com.eryansky.common.utils.encode.Sm4Utils;
-import com.eryansky.common.utils.mapper.JsonMapper;
+import com.eryansky.core.rpc.utils.RPCUtils;
+import com.eryansky.core.rpc.utils.SerializerFactory;
 import com.eryansky.encrypt.anotation.EncryptResponseBody;
 import com.eryansky.encrypt.config.EncryptProvider;
 import com.eryansky.encrypt.enums.CipherMode;
+import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.MethodParameter;
@@ -21,7 +22,8 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * 默认加密策略 返回值为
@@ -46,53 +48,86 @@ public class EncryptRPCResponseBodyAdvice implements ResponseBodyAdvice<Object> 
         HttpHeaders headers = request.getHeaders();
         String requestEncrypt = Collections3.getFirst(headers.get(ENCRYPT));
         String requestEncryptKey = Collections3.getFirst(headers.get(ENCRYPT_KEY));
-        if (StringUtils.isNotBlank(requestEncrypt)) {
-            String data = JsonMapper.toJsonString(body);
-            if (CipherMode.SM4.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)) {
-                if (StringUtils.isNotBlank(data) && !StringUtils.equals(data, "null")) {
-                    try {
-                        String key = null;
-                        try {
-                            key = RSAUtils.decryptHexString(requestEncryptKey, EncryptProvider.privateKeyBase64());
-                        } catch (Exception e) {
-                            key = requestEncryptKey;
-                        }
-                        return Sm4Utils.encrypt(key, data);
-                    } catch (Exception e) {
-                        log.error(e.getMessage(), e);
-                        throw new RuntimeException(e);
-                    }
-                }
-            } else if (CipherMode.AES.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)) {
-                if (StringUtils.isNotBlank(data) && !StringUtils.equals(data, "null")) {
-                    try {
-                        String key = null;
-                        try {
-                            key = RSAUtils.decryptBase64String(requestEncryptKey, EncryptProvider.privateKeyBase64());
-                        } catch (Exception e) {
-                            key = requestEncryptKey;
-                        }
-                        return Cryptos.aesECBEncryptBase64String(data, key);
-                    } catch (Exception e) {
-                        log.error(e.getMessage(), e);
-                        throw new RuntimeException(e);
-                    }
-                }
+        String requestSerializer = Collections3.getFirst(headers.get(RPCUtils.HEADER_RPC_SERIALIZER));
 
-            } else if (CipherMode.BASE64.name().equals(requestEncrypt)) {
-                if (StringUtils.isNotBlank(data) && !StringUtils.equals(data, "null")) {
-                    try {
-                        return EncodeUtils.base64Encode(data.getBytes(StandardCharsets.UTF_8));
-                    } catch (Exception e) {
-                        log.error(e.getMessage(), e);
-                        throw new RuntimeException(e);
-                    }
-                }
-
-            }
+        // No encryption requested
+        if (StringUtils.isBlank(requestEncrypt)) {
+            return body;
         }
 
-        return body;
+        // Serialize once
+        byte[] payload = serializeBody(body, requestSerializer);
+
+        // Process encryption according to requested mode
+        byte[] out;
+        try {
+            out = processEncryption(requestEncrypt, requestEncryptKey, payload);
+        } catch (Exception e) {
+            log.error("Failed to process encryption for mode {}", requestEncrypt, e);
+            throw new RuntimeException(e);
+        }
+
+        // Write encrypted payload to response
+        try {
+            System.out.println(selectedContentType);
+            response.getHeaders().setContentType(selectedContentType);
+            response.getHeaders().setContentLength(out.length);
+
+            OutputStream os = response.getBody();
+            if (os == null) {
+                throw new IOException("Response OutputStream is null");
+            }
+            os.write(out);
+            os.flush();
+            return null;
+        } catch (IOException e) {
+            log.error("IO error while writing encrypted response", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    private byte[] serializeBody(Object body,String requestSerializer) {
+        try {
+            return SerializerFactory.getSerializer(requestSerializer).serialize(body);
+        } catch (IOException e) {
+            log.error("Failed to serialize response body", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    private byte[] processEncryption(String mode, String encryptKeyHeader, byte[] input) throws Exception {
+        if (CipherMode.SM4.name().equalsIgnoreCase(mode) && StringUtils.isNotBlank(encryptKeyHeader)) {
+            String key = tryDecryptKeyHex(encryptKeyHeader);
+            return Sm4Utils.encrypt(key, input);
+        }
+
+        if (CipherMode.AES.name().equalsIgnoreCase(mode) && StringUtils.isNotBlank(encryptKeyHeader)) {
+            String key = tryDecryptKeyBase64(encryptKeyHeader);
+            return Cryptos.aesECBEncrypt(input, key);
+        }
+
+        if (CipherMode.BASE64.name().equalsIgnoreCase(mode)) {
+            return Base64.encodeBase64(input);
+        }
+
+        // Unknown/unsupported mode — return original payload
+        return input;
+    }
+
+    private String tryDecryptKeyHex(String encryptedKey) {
+        try {
+            return RSAUtils.decryptHexString(encryptedKey, EncryptProvider.privateKeyBase64());
+        } catch (Exception e) {
+            return encryptedKey;
+        }
+    }
+
+    private String tryDecryptKeyBase64(String encryptedKey) {
+        try {
+            return RSAUtils.decryptBase64String(encryptedKey, EncryptProvider.privateKeyBase64());
+        } catch (Exception e) {
+            return encryptedKey;
+        }
     }
 
 }

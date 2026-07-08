@@ -4,17 +4,9 @@ import com.eryansky.client.common.rpc.RPCExchange;
 import com.eryansky.client.common.rpc.RPCMethodConfig;
 import com.eryansky.client.common.rpc.RPCPermissions;
 import com.eryansky.common.spring.SpringContextHolder;
-import com.eryansky.common.utils.encode.Cryptos;
-import com.eryansky.common.utils.encode.RSAUtils;
-import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.core.rpc.consumer.ConsumerExecutor;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security._enum.Logical;
-import com.eryansky.core.security.annotation.RequiresPermissions;
-import com.eryansky.core.security.annotation.RequiresRoles;
-import com.eryansky.core.security.annotation.RequiresUser;
-import com.eryansky.core.security.annotation.RestApi;
-import com.eryansky.encrypt.enums.CipherMode;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
@@ -44,6 +36,7 @@ public class RPCUtils {
     public static final String  HEADER_ENCRYPT = "Encrypt";
     public static final String  HEADER_ENCRYPT_KEY = "Encrypt-Key";
 
+    public static final String HEADER_RPC_SERIALIZER = "X-RPC-Serializer";
 
     public static <T> T createProxyObj(String serverUrl, Class clazz) {
         if (!clazz.isInterface()) { // 接口才可以进行代理
@@ -69,6 +62,7 @@ public class RPCUtils {
             headers.put(HEADER_API_SERVICE_METHOD,requestMethodName);
             headers.put(HEADER_AUTH_TYPE,AUTH_TYPE);
             headers.put(HEADER_X_API_KEY, StringUtils.hasLength(annotation.apiKey()) ? resolve(null,annotation.apiKey()):AppConstants.getRPCClientApiKey());
+            headers.put(HEADER_RPC_SERIALIZER, AppConstants.getRPCClientSerializer());
 
             //加密参数 加密方式
             String encrypt = null;

@@ -22,10 +22,9 @@ import org.springframework.aop.aspectj.AspectJExpressionPointcut;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.*;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
@@ -40,13 +39,14 @@ import javax.sql.DataSource;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
+// import java.util.Properties;
 
 /**
- * @author Eryan
- * @date 2019-01-23
+ * DB configuration for data source, MyBatis and transaction management.
+ *
+ * Author: Eryan
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class DBConfigurer {
 
     private static final Logger logger = LoggerFactory.getLogger(DBConfigurer.class);
@@ -61,6 +61,7 @@ public class DBConfigurer {
     @Bean(name = "dataSource")
     @ConfigurationProperties("spring.datasource.druid")
     @Primary
+    @Role(BeanDefinition.ROLE_INFRASTRUCTURE) // 标记为基础设施 Bean
     public DataSource dataSource(){
         return DruidDataSourceBuilder.create().build();
     }
@@ -75,6 +76,7 @@ public class DBConfigurer {
      * @throws Exception if factory creation fails
      */
     @Bean(name = "sqlSessionFactory")
+    @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     public SqlSessionFactory sqlSessionFactoryBean(@Qualifier("dataSource") DataSource dataSource,
                                                    Environment environment) throws Exception {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
@@ -131,6 +133,7 @@ public class DBConfigurer {
 
     @Order(2)
     @Bean(TX_MANAGER_NAME)
+    @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     public TransactionManager annotationDrivenTransactionManager(@Qualifier("dataSource") DataSource dataSource) {
         return new DataSourceTransactionManager(dataSource);
     }
@@ -141,6 +144,7 @@ public class DBConfigurer {
 
     // 事务的实现Advice
     @Bean
+    @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     public TransactionInterceptor txAdvice(@Qualifier(TX_MANAGER_NAME) TransactionManager m) {
         NameMatchTransactionAttributeSource source = new NameMatchTransactionAttributeSource();
         RuleBasedTransactionAttribute readOnlyTx = new RuleBasedTransactionAttribute();
@@ -167,8 +171,9 @@ public class DBConfigurer {
     // 切面的定义,pointcut及advice
     @Bean
     @Order(1)
+    @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     public Advisor txAdviceAdvisor(@Qualifier("txAdvice") TransactionInterceptor txAdvice,
-                                   @Value("${spring.dataSource.aopPointcutExpression}")String aopPointcutExpression) {
+                                   @Value("${spring.dataSource.aopPointcutExpression}") String aopPointcutExpression) {
         AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
         StringBuilder sb = new StringBuilder();
         sb.append("(");

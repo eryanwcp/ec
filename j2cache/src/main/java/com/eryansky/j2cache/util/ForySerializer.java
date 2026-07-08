@@ -288,6 +288,8 @@ public class ForySerializer implements Serializer {
     private static volatile ThreadSafeFory fory = null;
     private static final AllowListChecker typeChecker;
 
+    public static final String FORY = "fory";
+
     static {
         LoggerFactory.useSlf4jLogging(true);
 //        AllowListChecker checker = new AllowListChecker(AllowListChecker.CheckLevel.STRICT);
@@ -312,7 +314,7 @@ public class ForySerializer implements Serializer {
 
     @Override
     public String name() {
-        return "fory";
+        return FORY;
     }
 
     @Override

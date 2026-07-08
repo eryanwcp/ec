@@ -152,6 +152,17 @@ public class Cryptos {
     public static byte[] aesECBEncrypt(byte[] input, byte[] key) {
         return aesECB(input, key, Cipher.ENCRYPT_MODE);
     }
+
+    /**
+     * 使用AES加密原始字符串.
+     *
+     * @param input 原始输入字符数组
+     * @param base64Key 符合AES要求的Base64密钥
+     */
+    public static byte[] aesECBEncrypt(byte[] input, String base64Key) {
+        return aesECB(input, getBase64DecodeKey(base64Key), Cipher.ENCRYPT_MODE);
+    }
+
     /**
      * 使用AES加密原始字符串.
      *
@@ -237,6 +248,16 @@ public class Cryptos {
      */
     public static byte[] aesECBDecryptBytes(byte[] input, byte[] key) {
         return aesECB(input, key, Cipher.DECRYPT_MODE);
+    }
+
+    /**
+     * 使用AES解密字符串, 返回.
+     *
+     * @param input Hex编码的加密字符串
+     * @param base64Key 符合AES要求的base64密钥
+     */
+    public static byte[] aesECBDecrypt(byte[] input, String base64Key) {
+        return aesECB(input, getBase64DecodeKey(base64Key), Cipher.DECRYPT_MODE);
     }
 
     /**
