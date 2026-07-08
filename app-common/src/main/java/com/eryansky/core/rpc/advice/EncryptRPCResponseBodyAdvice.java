@@ -69,7 +69,6 @@ public class EncryptRPCResponseBodyAdvice implements ResponseBodyAdvice<Object> 
 
         // Write encrypted payload to response
         try {
-            System.out.println(selectedContentType);
             response.getHeaders().setContentType(selectedContentType);
             response.getHeaders().setContentLength(out.length);
 
