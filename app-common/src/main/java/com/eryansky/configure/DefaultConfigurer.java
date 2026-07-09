@@ -99,7 +99,6 @@ public class DefaultConfigurer {
 
         // 设置严格模式
         allowListChecker.setCheckLevel(AllowListChecker.CheckLevel.STRICT);
-        ForySerializer.getFory().register(com.eryansky.client.common.vo.ExtendAttr.class);
         logger.info("SerializerTypeCheck: {} checkLevel: {}", allowListChecker.getClass().getName(), allowListChecker.getCheckLevel().name());
     }
 
