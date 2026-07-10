@@ -17,6 +17,8 @@ import java.util.TimeZone;
  */
 public class JacksonSerializer implements Serializer {
 
+    public static final String JACKSON = "jackson";
+
     private static final ObjectMapper objectMapper;
 
     static {
@@ -40,12 +42,9 @@ public class JacksonSerializer implements Serializer {
         );
     }
 
-
-
-
     @Override
     public String name() {
-        return "jackson";
+        return JACKSON;
     }
 
 
