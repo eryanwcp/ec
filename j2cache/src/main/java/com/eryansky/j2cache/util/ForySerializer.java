@@ -24,8 +24,8 @@ public class ForySerializer implements Serializer {
     private static final String[] ALLOWE_CLASSES = {
             "org.springframework.web.servlet.FlashMap",
             "org.springframework.util.MultiValueMap",
-            "org.springframework.util.LinkedMultiValueMap",
-            "org.springframework.util.MultiValueMapAdapter"
+            "org.springframework.util.MultiValueMapAdapter",
+            "org.springframework.util.LinkedMultiValueMap"
     };
 
     private static final Set<String> DEFAULT_ALLOWE_LIST_SET =
