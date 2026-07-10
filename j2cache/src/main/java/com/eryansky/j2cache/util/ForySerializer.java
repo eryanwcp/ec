@@ -7,6 +7,7 @@ import org.apache.fory.logging.LoggerFactory;
 import org.apache.fory.resolver.AllowListChecker;
 import org.apache.fory.resolver.DisallowedList;
 import org.slf4j.Logger;
+import org.springframework.context.ApplicationContext;
 import org.springframework.web.servlet.FlashMap;
 
 import java.io.IOException;
@@ -52,8 +53,8 @@ public class ForySerializer implements Serializer {
                 .withRefTracking(true)
                 .requireClassRegistration(false)
                 .withTypeChecker(typeChecker)
+                .withCodegen(false)
                 .buildThreadSafeFory();
-        fory.register(FlashMap.class);
     }
 
     public ForySerializer(){
