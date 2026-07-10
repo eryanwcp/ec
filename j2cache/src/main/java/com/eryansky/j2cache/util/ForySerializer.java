@@ -22,8 +22,12 @@ public class ForySerializer implements Serializer {
 
     // Embedded allow class names list - no external file dependency
     private static final String[] ALLOWE_CLASSES = {
+            "java.util.HashMap",
             "org.springframework.web.servlet.FlashMap",
-            "org.springframework.util.LinkedMultiValueMap"
+            "org.springframework.util.MultiValueMap",
+            "org.springframework.util.MultiValueMapAdapter",
+            "org.springframework.util.LinkedMultiValueMap",
+            "org.springframework.util.LinkedCaseInsensitiveMap"
     };
 
     private static final Set<String> DEFAULT_ALLOWE_LIST_SET =
