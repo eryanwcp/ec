@@ -14,6 +14,7 @@ public class SerializerFactory {
         register(new JacksonSerializer());
         register(new JacksonMsgPackSerializer());
         register(new JavaSerializer());
+        register(new JsonSerializer());
     }
 
     public static void register(Serializer serializer) {
@@ -22,8 +23,10 @@ public class SerializerFactory {
 
     public static Serializer getSerializer(String type) {
         if (type == null) {
+//            return SERIALIZERS.get(JsonSerializer.JSON);
             return SERIALIZERS.get(ForySerializer.FORY);
         }
+//        return SERIALIZERS.getOrDefault(type, SERIALIZERS.get(JsonSerializer.JSON));
         return SERIALIZERS.getOrDefault(type, SERIALIZERS.get(ForySerializer.FORY));
     }
 }

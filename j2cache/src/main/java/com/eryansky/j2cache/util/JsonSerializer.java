@@ -19,7 +19,7 @@ import java.util.TimeZone;
  */
 public class JsonSerializer implements Serializer {
 
-    private static final String JSON = "json";
+    public static final String JSON = "json";
     private static final JsonMapper objectMapper;
 
     static {
