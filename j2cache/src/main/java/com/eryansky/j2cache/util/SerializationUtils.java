@@ -54,6 +54,10 @@ public class SerializationUtils {
                     g_serializer = Class.forName("com.eryansky.j2cache.util.ForySerializer").asSubclass(Serializer.class).getDeclaredConstructor().newInstance();
                 } else if("jackson".equals(ser)){
                     g_serializer = Class.forName("com.eryansky.j2cache.util.JacksonSerializer").asSubclass(Serializer.class).getDeclaredConstructor().newInstance();
+                } else if("jackson-msgpack".equals(ser)){
+                    g_serializer = Class.forName("com.eryansky.j2cache.util.JacksonMsgPackSerializer").asSubclass(Serializer.class).getDeclaredConstructor().newInstance();
+                } else if("json".equals(ser)){
+                    g_serializer = Class.forName("com.eryansky.j2cache.util.JsonSerializer").asSubclass(Serializer.class).getDeclaredConstructor().newInstance();
                 } else {
                     g_serializer = (Serializer) Class.forName(ser).getDeclaredConstructor().newInstance();
                 }
@@ -62,6 +66,11 @@ public class SerializationUtils {
             }
         }
         log.info("Using Serializer -> [" + g_serializer.name() + ":" + g_serializer.getClass().getName() + ']');
+    }
+
+
+    public static String getSerializerName() {
+        return g_serializer.name();
     }
 
     /**

@@ -228,6 +228,23 @@ public final class Sm4Utils {
     }
 
     /**
+     * sm4加密(CBC)
+     *
+     * @param hexKey   16进制密钥（忽略大小写）
+     * @param data 待加密
+     * @return 返回16进制的加密字符串
+     * @throws Exception
+     * @explain 加密模式：CBC
+     */
+    public static byte[] encrypt(String hexKey, byte[] data) throws Exception {
+        String result = "";
+        // 16进制字符串-->byte[]
+        byte[] keyData = Hex.decode(hexKey);
+        // 加密后的数组
+        return encryptCbcPadding(keyData, data);
+    }
+
+    /**
      * 加密模式之CBC
      *
      * @param key
@@ -291,6 +308,24 @@ public final class Sm4Utils {
         // byte[]-->String
         result = new String(srcData, ENCODING);
         return result;
+    }
+
+    /**
+     * sm4解密(CBC)
+     *
+     * @param hexKey 16进制密钥
+     * @param cipherText   16进制的加密字符串（忽略大小写）
+     * @return 解密后的字符串
+     * @throws Exception
+     * @explain 解密模式：采用CBC
+     */
+    public static byte[] decrypt(String hexKey, byte[] cipherText) throws Exception {
+        // 用于接收解密后的字符串
+        String result = "";
+        // hexString-->byte[]
+        byte[] keyData = Hex.decode(hexKey);
+        // hexString-->byte[]
+        return decryptCbcPadding(keyData, cipherText);
     }
 
     /**

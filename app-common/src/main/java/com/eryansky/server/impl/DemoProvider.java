@@ -12,6 +12,7 @@ import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +20,7 @@ import java.util.Map;
 @Component
 public class DemoProvider implements DemoAPI {
 
-    @Autowired
+    @Resource
     private UserService userService;
 
     @Logging(value = "rest1",logType = LogType.API)

@@ -1,5 +1,6 @@
 package com.eryansky.j2cache.util;
 
+import com.eryansky.common.utils.mapper.JsonMapper;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -8,21 +9,21 @@ import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
 /**
  * 使用 Jackson 实现序列化
- * j2cache.serialization = jackson
+ * j2cache.serialization = json
  */
-public class JacksonSerializer implements Serializer {
+public class JsonSerializer implements Serializer {
 
-    public static final String JACKSON = "jackson";
-
-    private static final ObjectMapper objectMapper;
+    public static final String JSON = "json";
+    private static final JsonMapper objectMapper;
 
     static {
-        objectMapper = new ObjectMapper();
+        objectMapper = new JsonMapper();
         objectMapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
         objectMapper.configure(JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION, true);
@@ -42,9 +43,12 @@ public class JacksonSerializer implements Serializer {
         );
     }
 
+
+
+
     @Override
     public String name() {
-        return JACKSON;
+        return JSON;
     }
 
 
@@ -67,7 +71,8 @@ public class JacksonSerializer implements Serializer {
         }
         try {
             // 依靠二进制流中自带的类元数据，自动寻找 ClassLoader 并精准闭环还原回原有的业务 DTO 对象
-            return objectMapper.readValue(bytes, Object.class);
+            return objectMapper.toJavaObject(new String(bytes, StandardCharsets.UTF_8), Object.class);
+//            return objectMapper.readValue(bytes, Object.class);
         } catch (Exception e) {
             throw new IOException("反序列化失败", e);
         }
