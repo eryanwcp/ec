@@ -1,7 +1,6 @@
 package com.eryansky.j2cache.cache.support.redis;
 
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -17,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
-
 import com.eryansky.j2cache.Level2Cache;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.integration.redis.util.RedisLockRegistry;
@@ -27,36 +25,38 @@ public class SpringRedisGenericCache implements Level2Cache {
 	private final static Logger log = LoggerFactory.getLogger(SpringRedisGenericCache.class);
 
 	private final String namespace;
-
 	private final String region;
-
 	private final RedisTemplate<String, Serializable> redisTemplate;
 	private final RedisLockRegistry redisLockRegistry;
-    private final int scanCount;
+	private final int scanCount;
 
-	public SpringRedisGenericCache(String namespace, String region, RedisTemplate<String, Serializable> redisTemplate,RedisLockRegistry redisLockRegistry, int scanCount) {
+	// 缓存 region 的字节数组，避免 queue 操作时反复调用 region.getBytes()
+	private final byte[] regionBytes;
+
+	public SpringRedisGenericCache(String namespace, String region, RedisTemplate<String, Serializable> redisTemplate,
+								   RedisLockRegistry redisLockRegistry, int scanCount) {
 		if (region == null || region.isEmpty()) {
-			region = "_"; // 缺省region
+			region = "_";
 		}
 		this.namespace = namespace;
 		this.redisTemplate = redisTemplate;
 		this.redisLockRegistry = redisLockRegistry;
 		this.region = getRegionName(region);
+		this.regionBytes = this.region.getBytes(StandardCharsets.UTF_8);
 		this.scanCount = scanCount;
 	}
 
 	private String getRegionName(String region) {
-		if (namespace != null && !namespace.isEmpty())
+		if (namespace != null && !namespace.isEmpty()) {
 			region = namespace + ":" + region;
+		}
 		return region;
 	}
 
 	@Override
 	public void clear() {
 		Collection<String> keys = keys();
-		keys.forEach(k -> {
-			redisTemplate.delete(this.region + ":" + k);
-		});
+		keys.forEach(k -> redisTemplate.delete(this.region + ":" + k));
 	}
 
 	@Override
@@ -71,36 +71,31 @@ public class SpringRedisGenericCache implements Level2Cache {
 		}
 	}
 
-//	@Override
-//	public Collection<String> keys() {
-//		return redisTemplate.keys(this.region + ":*").stream().map(k->k.substring(this.region.length()+1)).collect(Collectors.toSet());
-//	}
-
-    @Override
-    public Collection<String> keys() {
-        return redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
-            Set<String> keys = new HashSet<>();
-            ScanOptions scanOptions = ScanOptions.scanOptions()
-                    .match(this.region + ":*")  // 匹配命名空间前缀
-                    .count(this.scanCount)         // 每次扫描数量
-                    .build();
-
-            try (Cursor<byte[]> cursor = connection.scan(scanOptions)) {
-                while (cursor.hasNext()) {
-                    String fullKey = new String(cursor.next(), StandardCharsets.UTF_8);
-                    String keyWithoutNamespace = fullKey.substring(this.region.length() + 1);
-                    keys.add(keyWithoutNamespace);
-                }
-            }
-            return keys;
-        });
-    }
+	/**
+	 * 已采用 SCAN 命令优化，废弃并移除了旧的 redisTemplate.keys() 阻塞式实现
+	 */
+	@Override
+	public Collection<String> keys() {
+		return redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
+			Set<String> keys = new HashSet<>();
+			ScanOptions scanOptions = ScanOptions.scanOptions()
+					.match(this.region + ":*")
+					.count(this.scanCount)
+					.build();
+			try (Cursor<byte[]> cursor = connection.scan(scanOptions)) {
+				int prefixLength = this.region.length() + 1;
+				while (cursor.hasNext()) {
+					String fullKey = new String(cursor.next(), StandardCharsets.UTF_8);
+					keys.add(fullKey.substring(prefixLength));
+				}
+			}
+			return keys;
+		});
+	}
 
 	@Override
 	public byte[] getBytes(String key) {
-		return redisTemplate.execute((RedisCallback<byte[]>) redis -> {
-			return redis.get(_key(key));
-		});
+		return redisTemplate.execute((RedisCallback<byte[]>) redis -> redis.get(_key(key)));
 	}
 
 	@Override
@@ -114,10 +109,10 @@ public class SpringRedisGenericCache implements Level2Cache {
 	@Override
 	public void setBytes(String key, byte[] bytes, long timeToLiveInSeconds) {
 		if (timeToLiveInSeconds <= 0) {
-			log.debug(String.format("Invalid timeToLiveInSeconds value : %d , skipped it.", timeToLiveInSeconds));
+			log.debug("Invalid timeToLiveInSeconds value : {} , skipped it.", timeToLiveInSeconds);
 			setBytes(key, bytes);
 		} else {
-			redisTemplate.execute((RedisCallback<List<byte[]>>) redis -> {
+			redisTemplate.execute((RedisCallback<Void>) redis -> {
 				redis.setEx(_key(key), (int) timeToLiveInSeconds, bytes);
 				return null;
 			});
@@ -131,7 +126,7 @@ public class SpringRedisGenericCache implements Level2Cache {
 
 	@Override
 	public void setBytes(String key, byte[] bytes) {
-		redisTemplate.execute((RedisCallback<byte[]>) redis -> {
+		redisTemplate.execute((RedisCallback<Void>) redis -> {
 			redis.set(_key(key), bytes);
 			return null;
 		});
@@ -139,13 +134,11 @@ public class SpringRedisGenericCache implements Level2Cache {
 
 	@Override
 	public void setBytes(Map<String, byte[]> bytes) {
-		 bytes.forEach(this::setBytes);
+		bytes.forEach(this::setBytes);
 	}
 
 	private byte[] _key(String key) {
-		byte[] k;
-		k = (this.region + ":" + key).getBytes(StandardCharsets.UTF_8);
-		return k;
+		return (this.region + ":" + key).getBytes(StandardCharsets.UTF_8);
 	}
 
 	@Override
@@ -155,32 +148,38 @@ public class SpringRedisGenericCache implements Level2Cache {
 
 	@Override
 	public void queuePush(String... values) {
-		for(String value:values){
-			redisTemplate.execute((RedisCallback<Long>) redis -> redis.rPush(region.getBytes(), value.getBytes()));
+		for (String value : values) {
+			if (value != null) {
+				redisTemplate.execute((RedisCallback<Long>) redis -> redis.rPush(regionBytes, value.getBytes(StandardCharsets.UTF_8)));
+			}
 		}
 	}
 
 	@Override
 	public String queuePop() {
-		byte[] result = redisTemplate.execute((RedisCallback<byte[]>) redis -> redis.lPop(region.getBytes()));
-		return null == result ? null : new String(result);
+		byte[] result = redisTemplate.execute((RedisCallback<byte[]>) redis -> redis.lPop(regionBytes));
+		return null == result ? null : new String(result, StandardCharsets.UTF_8);
 	}
 
 	@Override
 	public int queueSize() {
-		Long result = redisTemplate.execute((RedisCallback<Long>) redis -> redis.lLen(region.getBytes()));
-		return null != result ? result.intValue():0;
+		Long result = redisTemplate.execute((RedisCallback<Long>) redis -> redis.lLen(regionBytes));
+		return null != result ? result.intValue() : 0;
 	}
 
 	@Override
 	public Collection<String> queueList() {
-		Long length = redisTemplate.execute((RedisCallback<Long>) redis -> redis.lLen(region.getBytes()));
-		if(null == length || length == 0){
+		Long length = redisTemplate.execute((RedisCallback<Long>) redis -> redis.lLen(regionBytes));
+		if (null == length || length == 0) {
 			return Collections.emptyList();
 		}
-		List<byte[]> result = redisTemplate.execute((RedisCallback<List<byte[]>>) redis -> redis.lRange(region.getBytes(),0,length-1));
-
-		return null == result ? Collections.emptyList() : result.stream().map(String::new).collect(Collectors.toList());
+		List<byte[]> result = redisTemplate.execute((RedisCallback<List<byte[]>>) redis -> redis.lRange(regionBytes, 0, length - 1));
+		if (result == null) {
+			return Collections.emptyList();
+		}
+		return result.stream()
+				.map(bytes -> new String(bytes, StandardCharsets.UTF_8))
+				.collect(Collectors.toList());
 	}
 
 	@Override
@@ -189,15 +188,15 @@ public class SpringRedisGenericCache implements Level2Cache {
 	}
 
 	@Override
-	public <T> T lock(LockRetryFrequency frequency, int timeoutInSecond, long keyExpireSeconds, LockCallback<T> lockCallback) throws LockInsideExecutedException, LockCantObtainException {
-		long now = System.currentTimeMillis();
-//		long expireSecond = now / 1000L + keyExpireSeconds;//设置加锁过期时间
-//		long expireMillisSecond = now + keyExpireSeconds * 1000L;//作为值存入锁中(记录这把锁持有最终时限)
-		int retryCount = Float.valueOf(timeoutInSecond * 1000 / frequency.getRetryInterval()).intValue();
+	public <T> T lock(LockRetryFrequency frequency, int timeoutInSecond, long keyExpireSeconds, LockCallback<T> lockCallback)
+			throws LockInsideExecutedException, LockCantObtainException {
+
+		// 选用更直观的类型转换计算重试次数
+		int retryCount = (timeoutInSecond * 1000) / frequency.getRetryInterval();
+
 		for (int i = 0; i < retryCount; i++) {
 			Lock lock = redisLockRegistry.obtain(region);
-			boolean flag = lock.tryLock();
-			if(flag) {
+			if (lock.tryLock()) {
 				try {
 					return lockCallback.handleObtainLock();
 				} catch (Exception e) {
@@ -206,9 +205,8 @@ public class SpringRedisGenericCache implements Level2Cache {
 				} finally {
 					try {
 						lock.unlock();
-//						redisLockRegistry.expireUnusedOlderThan(keyExpireSeconds);
 					} catch (Exception e) {
-						log.error(e.getMessage());
+						log.error("Failed to unlock for region: {}", region, e);
 					}
 				}
 			} else {
