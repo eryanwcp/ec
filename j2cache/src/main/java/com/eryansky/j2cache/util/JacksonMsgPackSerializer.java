@@ -1,6 +1,8 @@
 package com.eryansky.j2cache.util;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
@@ -28,8 +30,12 @@ public class JacksonMsgPackSerializer implements Serializer {
         objectMapper.setTimeZone(TimeZone.getTimeZone("GMT+08:00"));
         objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
         objectMapper.setFilterProvider(new SimpleFilterProvider().setFailOnUnknownId(false));
+
         //设置输入时忽略在JSON字符串中存在但Java对象实际没有的属性
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
+        // 开启全可见性支持，允许 Jackson 读写没有 getter/setter 的私有复杂属性
+        objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
 
         // 开启全局多态类型支持
         // 因为 deserialize 接口方法没有 Class 参数，必须将类元数据类型写入二进制流中
