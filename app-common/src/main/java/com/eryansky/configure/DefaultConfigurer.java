@@ -119,8 +119,6 @@ public class DefaultConfigurer {
         // 动态配置序列化安全策略
         checkSerializerTypeCheck();
 
-        logger.info("RPC客户端序列化方式：{}", AppConstants.getRPCClientSerializer());
-
         // 打印系统基础信息
         logger.info("当前启动系统：{}-V{}", AppConstants.getAppFullName(), AppConstants.getAppVersion());
 
