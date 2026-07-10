@@ -36,6 +36,10 @@ public class JsonSerializer implements Serializer {
         //设置输入时忽略在JSON字符串中存在但Java对象实际没有的属性
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
+        // 允許反序列化空明文對象，防止低版本傳出空字節流時爆出 MismatchedInputException
+//        objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true);
+//        objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
+
         // 开启全可见性支持，允许 Jackson 读写没有 getter/setter 的私有复杂属性
         objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
 
