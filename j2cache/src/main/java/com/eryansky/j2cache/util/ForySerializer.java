@@ -52,8 +52,8 @@ public class ForySerializer implements Serializer {
                 .withRefTracking(true)
                 .requireClassRegistration(false)
                 .withTypeChecker(typeChecker)
+                .withCodegen(false)
                 .buildThreadSafeFory();
-        fory.register(FlashMap.class);
     }
 
     public ForySerializer(){
