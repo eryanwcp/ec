@@ -15,12 +15,12 @@ public class J2CacheSerializer implements RedisSerializer<Object>{
 
 	private static final Logger logger = LoggerFactory.getLogger(J2CacheSerializer.class);
 
-	private static final JacksonSerializer jacksonSerializer = new JacksonSerializer();
+//	private static final JacksonSerializer jacksonSerializer = new JacksonSerializer();
 	@Override
 	public byte[] serialize(Object t) throws SerializationException {	
 		try {
-//			return SerializationUtils.serialize(t);
-			return jacksonSerializer.serialize(t);
+			return SerializationUtils.serialize(t);
+//			return jacksonSerializer.serialize(t);
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 		}
@@ -30,9 +30,8 @@ public class J2CacheSerializer implements RedisSerializer<Object>{
 	@Override
 	public Object deserialize(byte[] bytes) throws SerializationException {
 		try {
-			//动态序列化方式，当使用Fory容易出现CPU100%，临时强制指定Jackson方式
-//			return SerializationUtils.deserialize(bytes);
-			return jacksonSerializer.deserialize(bytes);
+			return SerializationUtils.deserialize(bytes);
+//			return jacksonSerializer.deserialize(bytes);
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 		}

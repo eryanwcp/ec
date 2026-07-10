@@ -4,7 +4,6 @@ import com.eryansky.common.orm.Page;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.server.DemoAPI;
-import com.eryansky.server.impl.DemoProvider;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import jakarta.annotation.Resource;
@@ -18,10 +17,9 @@ public class ApiTests {
 
     @Resource
     private DemoAPI demoApi;
-//    @Resource
-//    private DemoProvider demoApi;
     @Test
     public void contextLoads() {
+
         Date d1 = Calendar.getInstance().getTime();
 
         System.out.println(JsonMapper.toJsonString(demoApi.test1("1")));
@@ -35,7 +33,6 @@ public class ApiTests {
         System.out.println(JsonMapper.toJsonString(demoApi.test11("1",1,map, Lists.newArrayList(new User(User.SUPERUSER_ID)),new Page<User>(1,2))));
         Date d2 = Calendar.getInstance().getTime();
         System.out.println("Time taken: " + (d2.getTime() - d1.getTime()) + " ms");
-
     }
 
 

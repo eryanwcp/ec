@@ -6,18 +6,11 @@ import com.eryansky.common.utils.jackson.XssDefaultJsonSerializer;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.core.dialect.dialect.ShiroDialect;
 import com.eryansky.core.security.interceptor.*;
-import com.eryansky.core.web.MessagePackHttpMessageConverter;
 import com.eryansky.core.web.interceptor.MobileInterceptor;
 import com.eryansky.modules.disk.extend.DISKManager;
 import com.eryansky.modules.disk.extend.IFileManager;
 import com.eryansky.utils.AppConstants;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.google.common.collect.Lists;
 import jakarta.annotation.Resource;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -27,7 +20,6 @@ import org.apache.hc.client5.http.ssl.*;
 import org.apache.hc.core5.reactor.ssl.SSLBufferMode;
 import org.apache.hc.core5.ssl.SSLContexts;
 import org.apache.hc.core5.ssl.TrustStrategy;
-import org.msgpack.jackson.dataformat.MessagePackFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -48,7 +40,6 @@ import javax.net.ssl.SSLContext;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.*;
 
@@ -56,6 +47,9 @@ import static com.fasterxml.jackson.core.JsonParser.Feature.INCLUDE_SOURCE_IN_LO
 
 @Configuration
 public class MvcConfigurer implements WebMvcConfigurer {
+
+    public static final String MEDIA_TYPE_SECURE_MSGPACK = "application/x-secure-msgpack";
+    public static final String MEDIA_TYPE_MSGPACK = "application/x-msgpack";
 
     @Lazy
     @Resource
@@ -210,29 +204,6 @@ public class MvcConfigurer implements WebMvcConfigurer {
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
         // 创建一个 ObjectMapper 实例
-        ObjectMapper msgpackObjectMapper = new ObjectMapper(new MessagePackFactory());
-        msgpackObjectMapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
-        msgpackObjectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-        msgpackObjectMapper.configure(JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION, true);
-        msgpackObjectMapper.setTimeZone(TimeZone.getTimeZone("GMT+08:00"));
-        msgpackObjectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
-        msgpackObjectMapper.setFilterProvider(new SimpleFilterProvider().setFailOnUnknownId(false));
-        //设置输入时忽略在JSON字符串中存在但Java对象实际没有的属性
-        msgpackObjectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-
-        // 开启全局多态类型支持
-        // 因为 deserialize 接口方法没有 Class 参数，必须将类元数据类型写入二进制流中
-        // 使用 NON_FINAL 策略：在生成的 MsgPack 二进制中注入 ["类全限定名", {数据主体}]，从而完美还原 Object
-        msgpackObjectMapper.activateDefaultTyping(
-                LaissezFaireSubTypeValidator.instance,
-                ObjectMapper.DefaultTyping.NON_FINAL,
-                JsonTypeInfo.As.WRAPPER_ARRAY);
-
-        // 创建一个 MappingJackson2HttpMessageConverter 实例，并使用自定义的 ObjectMapper
-        MessagePackHttpMessageConverter messagePackHttpMessageConverter = new MessagePackHttpMessageConverter(msgpackObjectMapper);
-
-
-        // 创建一个 ObjectMapper 实例
         JsonMapper objectMapper = new JsonMapper();
         // 设置 INCLUDE_SOURCE_IN_LOCATION 特性
         objectMapper.enable(INCLUDE_SOURCE_IN_LOCATION);
@@ -243,7 +214,6 @@ public class MvcConfigurer implements WebMvcConfigurer {
 
 
         RestTemplate restTemplate = builder.requestFactory(this::getRequestFactory).connectTimeout(Duration.ofSeconds(20)).build();
-        restTemplate.getMessageConverters().add(messagePackHttpMessageConverter);
         restTemplate.getMessageConverters().add(mappingJackson2HttpMessageConverter);
         return restTemplate;
     }

@@ -16,8 +16,9 @@ import java.util.TimeZone;
  */
 public class JacksonMsgPackSerializer implements Serializer {
 
-    private static final ObjectMapper objectMapper;
+    public static final String JACKSON_MSGPACK = "jackson-msgpack";
 
+    private static final ObjectMapper objectMapper;
 
     static {
         objectMapper = new ObjectMapper(new MessagePackFactory());
@@ -44,7 +45,7 @@ public class JacksonMsgPackSerializer implements Serializer {
 
     @Override
     public String name() {
-        return "jackson-msgpack";
+        return JACKSON_MSGPACK;
     }
 
     @Override

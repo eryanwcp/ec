@@ -56,7 +56,7 @@
             <exclusions>
                 <exclusion>
                     <groupId>io.projectreactor</groupId>
-                    <artifactId>reactor-corze</artifactId>
+                    <artifactId>reactor-core</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
