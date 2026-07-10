@@ -42,9 +42,6 @@ public class JacksonSerializer implements Serializer {
         );
     }
 
-
-
-
     @Override
     public String name() {
         return JACKSON;
