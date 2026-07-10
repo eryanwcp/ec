@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.eryansky</groupId>
         <artifactId>ec-parent</artifactId>
-        <version>4.3.20260624.02</version>
+        <version>4.3.20260624.00</version>
     </parent>
 
     <artifactId>ec-j2cache</artifactId>
@@ -20,7 +20,7 @@
 
         <caffeine.version>3.2.4</caffeine.version>
         <lettuce.version>6.8.2.RELEASE</lettuce.version>
-        <fory.version>1.3.0</fory.version>
+        <fory.version>1.4.0-SNAPSHOT</fory.version>
         <spotbugs-annotations.version>4.10.2</spotbugs-annotations.version>
         <guava.version>33.6.0-jre</guava.version>
         <msgpack-core.version>0.9.12</msgpack-core.version>
@@ -56,7 +56,7 @@
             <exclusions>
                 <exclusion>
                     <groupId>io.projectreactor</groupId>
-                    <artifactId>reactor-core</artifactId>
+                    <artifactId>reactor-corze</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
