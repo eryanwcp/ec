@@ -7,7 +7,12 @@ import org.apache.fory.logging.LoggerFactory;
 import org.apache.fory.resolver.AllowListChecker;
 import org.apache.fory.resolver.DisallowedList;
 import org.slf4j.Logger;
+import org.springframework.web.servlet.FlashMap;
+
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 使用 Apache Fory 实现序列化
@@ -17,6 +22,14 @@ public class ForySerializer implements Serializer {
 
     private final static Logger log = org.slf4j.LoggerFactory.getLogger(ForySerializer.class);
 
+    // Embedded allow class names list - no external file dependency
+    private static final String[] ALLOWE_CLASSES = {
+            "org.springframework.web.servlet.FlashMap",
+            "org.springframework.util.LinkedMultiValueMap"
+    };
+
+    private static final Set<String> DEFAULT_ALLOWE_LIST_SET =
+            Arrays.stream(ALLOWE_CLASSES).collect(Collectors.toSet());
 
     private static volatile ThreadSafeFory fory = null;
     private static final AllowListChecker typeChecker;
@@ -28,6 +41,7 @@ public class ForySerializer implements Serializer {
 //        AllowListChecker checker = new AllowListChecker(AllowListChecker.CheckLevel.STRICT);
         AllowListChecker checker = new AllowListChecker(AllowListChecker.CheckLevel.WARN);
         checker.disallowClasses(DisallowedList.getDisallowedClasses());
+        checker.allowClasses(DEFAULT_ALLOWE_LIST_SET);
 
         log.info("Using default TypeChecker: {} checkLevel: {}", checker.getClass().getName(), checker.getCheckLevel().name());
         typeChecker = checker;
@@ -39,6 +53,7 @@ public class ForySerializer implements Serializer {
                 .requireClassRegistration(false)
                 .withTypeChecker(typeChecker)
                 .buildThreadSafeFory();
+        fory.register(FlashMap.class);
     }
 
     public ForySerializer(){
