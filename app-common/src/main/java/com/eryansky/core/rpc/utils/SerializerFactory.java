@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SerializerFactory {
+
     private static final Map<String, Serializer> SERIALIZERS = new ConcurrentHashMap<>();
 
     static {
