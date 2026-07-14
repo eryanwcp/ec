@@ -54,7 +54,7 @@ public class ForySerializer implements Serializer {
                 .withRefTracking(true)
                 .requireClassRegistration(false)
                 .withTypeChecker(typeChecker)
-                .withCodegen(false)
+//                .withCodegen(false)
                 .buildThreadSafeFory();
     }
 
