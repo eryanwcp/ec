@@ -43,8 +43,6 @@ public class ForySerializer implements Serializer {
         LoggerFactory.useSlf4jLogging(true);
 //        AllowListChecker checker = new AllowListChecker(AllowListChecker.CheckLevel.STRICT);
         AllowListChecker checker = new AllowListChecker(AllowListChecker.CheckLevel.WARN);
-        checker.disallowClasses(DisallowedList.getDisallowedClasses());
-        checker.allowClasses(DefaultJdkClassAllowList.getAllowClasses());
         checker.allowClasses(DEFAULT_ALLOWE_LIST_SET);
 
         log.info("Using default TypeChecker: {} checkLevel: {}", checker.getClass().getName(), checker.getCheckLevel().name());
