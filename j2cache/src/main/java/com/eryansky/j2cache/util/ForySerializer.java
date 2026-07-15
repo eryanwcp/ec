@@ -5,6 +5,7 @@ import org.apache.fory.ThreadSafeFory;
 import org.apache.fory.config.Language;
 import org.apache.fory.logging.LoggerFactory;
 import org.apache.fory.resolver.AllowListChecker;
+import org.apache.fory.resolver.DefaultJdkClassAllowList;
 import org.apache.fory.resolver.DisallowedList;
 import org.slf4j.Logger;
 import java.io.IOException;
@@ -43,6 +44,7 @@ public class ForySerializer implements Serializer {
 //        AllowListChecker checker = new AllowListChecker(AllowListChecker.CheckLevel.STRICT);
         AllowListChecker checker = new AllowListChecker(AllowListChecker.CheckLevel.WARN);
         checker.disallowClasses(DisallowedList.getDisallowedClasses());
+        checker.allowClasses(DefaultJdkClassAllowList.getAllowClasses());
         checker.allowClasses(DEFAULT_ALLOWE_LIST_SET);
 
         log.info("Using default TypeChecker: {} checkLevel: {}", checker.getClass().getName(), checker.getCheckLevel().name());
