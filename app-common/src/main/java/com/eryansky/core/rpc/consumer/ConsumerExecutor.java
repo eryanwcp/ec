@@ -59,7 +59,7 @@ public class ConsumerExecutor {
                 throw new RuntimeException("RPC请求异常：" + url + " " + responseEntity.getStatusCode().value() +" "+ JsonMapper.toJsonString(responseEntity));
             }
 
-            if(CipherMode.SM4.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)){
+            if(CipherMode.SM4.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey) && data != null && data.length > 0){
                 try {
                     String key = null;
                     try {
@@ -74,7 +74,7 @@ public class ConsumerExecutor {
                     throw new RuntimeException(e);
                 }
 
-            }else if(CipherMode.AES.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)){
+            }else if(CipherMode.AES.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey) && data != null && data.length > 0){
                 try {
                     String key = null;
                     try {
@@ -89,7 +89,7 @@ public class ConsumerExecutor {
                     throw new RuntimeException(e);
                 }
 
-            }else if(CipherMode.BASE64.name().equals(requestEncrypt)){
+            }else if(CipherMode.BASE64.name().equals(requestEncrypt) && data != null && data.length > 0){
                 try {
                     return (T) SerializerFactory.getSerializer(serializer).deserialize(Base64.decodeBase64(data));
                 } catch (Exception e) {
@@ -98,6 +98,25 @@ public class ConsumerExecutor {
                     throw new RuntimeException(e);
                 }
 
+            }else {
+                try {
+                    responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, responseType);
+                }catch (Exception exception){
+                    log.error(exception.getMessage());
+                    log.warn("RPC请求异常：{} {} {}", url, responseEntity.getStatusCode().value(), JsonMapper.toJsonString(responseEntity));
+
+                    //支持范型
+                    JavaType javaType = jsonMapper.getTypeFactory().constructType(responseType.getType());
+                    responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
+                    String json = (String)responseEntity.getBody();
+                    try {
+                        return jsonMapper.toJavaObject(json,javaType);
+                    } catch (Exception e) {
+                        log.error(e.getMessage(),e);
+                        log.error("RPC请求异常：{} {} {}", responseEntity.getStatusCode().value(),url,json);
+                        throw new RuntimeException(e);
+                    }
+                }
             }
         }else{
             //未加密
