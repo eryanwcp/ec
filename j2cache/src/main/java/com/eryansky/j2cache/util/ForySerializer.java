@@ -51,6 +51,7 @@ public class ForySerializer implements Serializer {
                 // but may be insecure if the classes contains malicious code.
                 .withRefTracking(true)
                 .requireClassRegistration(false)
+                .withCompatible(true)
                 .withTypeChecker(typeChecker)
                 .buildThreadSafeFory();
     }
