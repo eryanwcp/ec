@@ -11,9 +11,9 @@ public class SerializerFactory {
 
     static {
         // 注册支持的序列化器
-        register(new ForySerializer());
-        register(new JacksonSerializer());
         register(new JacksonMsgPackSerializer());
+        register(new JacksonSerializer());
+        register(new ForySerializer());
         register(new JavaSerializer());
         register(new JsonSerializer());
     }
@@ -23,11 +23,9 @@ public class SerializerFactory {
     }
 
     public static Serializer getSerializer(String type) {
-        if (type == null) {
-//            return SERIALIZERS.get(JsonSerializer.JSON);
-            return SERIALIZERS.get(ForySerializer.FORY);
+        if (type == null || type.isEmpty()) {
+            return SERIALIZERS.get(JacksonMsgPackSerializer.JACKSON_MSGPACK);
         }
-//        return SERIALIZERS.getOrDefault(type, SERIALIZERS.get(JsonSerializer.JSON));
-        return SERIALIZERS.getOrDefault(type, SERIALIZERS.get(ForySerializer.FORY));
+        return SERIALIZERS.getOrDefault(type, SERIALIZERS.get(JacksonMsgPackSerializer.JACKSON_MSGPACK));
     }
 }

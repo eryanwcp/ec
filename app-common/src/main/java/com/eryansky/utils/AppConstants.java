@@ -810,14 +810,12 @@ public class AppConstants extends SysConstants {
     }
 
     /**
-     * RPC 服务认证客户端序列化方式
+     * RPC 服务客户端序列化方式
      * @return
      */
     public static String getRPCClientSerializer() {
         String code = "system.rpc.client.serializer";
-//        return getConfigValue(code, "");
-        //此次配置成与J2Cache序列化方式一致，避免RPC服务调用时序列化方式不一致导致的异常
-        return getConfigValue(code, SerializationUtils.getSerializerName());
+        return getConfigValue(code, "");
     }
 
     /**
