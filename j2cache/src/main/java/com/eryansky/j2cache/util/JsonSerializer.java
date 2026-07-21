@@ -21,7 +21,7 @@ import java.util.TimeZone;
  */
 public class JsonSerializer implements Serializer {
 
-    public static final String JSON = "json";
+    public static final String NAME = "json";
     private static final JsonMapper objectMapper;
 
     static {
@@ -58,7 +58,7 @@ public class JsonSerializer implements Serializer {
 
     @Override
     public String name() {
-        return JSON;
+        return NAME;
     }
 
 

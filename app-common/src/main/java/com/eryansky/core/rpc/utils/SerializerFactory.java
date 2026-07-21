@@ -24,8 +24,8 @@ public class SerializerFactory {
 
     public static Serializer getSerializer(String type) {
         if (type == null || type.isEmpty()) {
-            return SERIALIZERS.get(JacksonMsgPackSerializer.JACKSON_MSGPACK);
+            return SERIALIZERS.get(JacksonMsgPackSerializer.NAME);
         }
-        return SERIALIZERS.getOrDefault(type, SERIALIZERS.get(JacksonMsgPackSerializer.JACKSON_MSGPACK));
+        return SERIALIZERS.getOrDefault(type, SERIALIZERS.get(JacksonMsgPackSerializer.NAME));
     }
 }
