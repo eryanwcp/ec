@@ -35,7 +35,7 @@ public class ForySerializer implements Serializer {
     private static volatile ThreadSafeFory fory = null;
     private static final AllowListChecker typeChecker;
 
-    public static final String FORY = "fory";
+    public static final String NAME = "fory";
 
     static {
         LoggerFactory.useSlf4jLogging(true);
@@ -53,7 +53,6 @@ public class ForySerializer implements Serializer {
                 .requireClassRegistration(false)
                 .withCompatible(true)
                 .withTypeChecker(typeChecker)
-//                .withCodegen(false)
                 .buildThreadSafeFory();
     }
 
@@ -63,7 +62,7 @@ public class ForySerializer implements Serializer {
 
     @Override
     public String name() {
-        return FORY;
+        return NAME;
     }
 
     @Override

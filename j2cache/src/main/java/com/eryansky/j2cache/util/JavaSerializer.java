@@ -26,11 +26,11 @@ import java.io.*;
  */
 public class JavaSerializer implements Serializer {
 
-	public static final String JAVA = "java";
+	public static final String NAME = "java";
 
 	@Override
 	public String name() {
-		return JAVA;
+		return NAME;
 	}
 	
 	@Override
