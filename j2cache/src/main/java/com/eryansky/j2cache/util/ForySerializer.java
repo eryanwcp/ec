@@ -52,6 +52,9 @@ public class ForySerializer implements Serializer {
                 .withRefTracking(true)
                 .requireClassRegistration(false)
                 .withCompatible(true)
+                .withMaxDepth(4 * 50)
+                .withMaxTypeFields(4 * 512)
+                .withMaxTypeMetaBytes(8 * 4096)
                 .withTypeChecker(typeChecker)
                 .buildThreadSafeFory();
     }
