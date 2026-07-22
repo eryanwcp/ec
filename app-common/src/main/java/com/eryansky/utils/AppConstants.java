@@ -11,6 +11,7 @@ import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.SysConstants;
 import com.eryansky.common.utils.io.FileUtils;
 import com.eryansky.common.utils.io.PropertiesLoader;
+import com.eryansky.core.rpc.utils.SerializerFactory;
 import com.eryansky.j2cache.util.SerializationUtils;
 import com.eryansky.modules.sys.service.ConfigService;
 
@@ -815,7 +816,7 @@ public class AppConstants extends SysConstants {
      */
     public static String getRPCClientSerializer() {
         String code = "system.rpc.client.serializer";
-        return getConfigValue(code, "");
+        return getConfigValue(code, SerializerFactory.DEFAULT_SERIALIZER);
     }
 
     /**
