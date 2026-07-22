@@ -275,7 +275,7 @@
         <div class="control-group">
             <label class="control-label">X-Api-Key：</label>
             <div class="controls">
-                <input name="system.rest.defaultApiKey" type="password" class="input-xxlarge"/>
+                <input name="system.rest.defaultApiKey" type="text" class="input-xxlarge"/>
                 <span class="help-inline"></span>
             </div>
         </div>
@@ -302,7 +302,7 @@
         <div class="control-group">
             <label class="control-label">密钥：</label>
             <div class="controls">
-                <input name="system.rpc.client.apiKey" type="password" class="input-xxlarge"/>
+                <input name="system.rpc.client.apiKey" type="text" class="input-xxlarge"/>
                 <span class="help-inline"></span>
             </div>
         </div>
