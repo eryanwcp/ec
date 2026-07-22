@@ -297,14 +297,36 @@
     </fieldset>
 
 
-    <%--    <div class="control-group">--%>
-    <%--        <label class="control-label">URL黑名单限制：</label>--%>
-    <%--        <div class="controls">--%>
-    <%--            <label><input name="system.rest.limit.url.enable" type="radio" value="true"/>启用</label>--%>
-    <%--            <label><input name="system.rest.limit.url.enable" type="radio" value="false"/>禁用</label>--%>
-    <%--            <span class="help-inline">需重启服务</span>--%>
-    <%--        </div>--%>
-    <%--    </div>--%>
+    <fieldset>
+        <legend>RPC客户端</legend>
+        <div class="control-group">
+            <label class="control-label">密钥：</label>
+            <div class="controls">
+                <input name="system.rpc.client.apiKey" type="password" class="input-xxlarge"/>
+                <span class="help-inline"></span>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">序列化方式：</label>
+            <div class="controls">
+                <label><input name="system.rpc.client.serializer" type="radio" value="jackson-msgpack"/>jackson-msgpack</label>
+                <label><input name="system.rpc.client.serializer" type="radio" value="fory"/>fory</label>
+                <label><input name="system.rpc.client.serializer" type="radio" value="jackson"/>jackson</label>
+                <label><input name="system.rpc.client.serializer" type="radio" value="java"/>java</label>
+                <span class="help-inline"></span>
+            </div>
+        </div>
+    </fieldset>
+
+
+<%--    <div class="control-group">--%>
+<%--        <label class="control-label">URL黑名单限制：</label>--%>
+<%--        <div class="controls">--%>
+<%--            <label><input name="system.rest.limit.url.enable" type="radio" value="true"/>启用</label>--%>
+<%--            <label><input name="system.rest.limit.url.enable" type="radio" value="false"/>禁用</label>--%>
+<%--            <span class="help-inline">需重启服务</span>--%>
+<%--        </div>--%>
+<%--    </div>--%>
 
     <div class="form-actions">
         <e:hasPermission name="sys:config:edit">

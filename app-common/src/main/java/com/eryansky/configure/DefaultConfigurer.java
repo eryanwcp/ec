@@ -9,6 +9,7 @@ import com.eryansky.common.utils.ObjectUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.io.PropertiesLoader;
 import com.eryansky.common.utils.mapper.JsonMapper;
+import com.eryansky.core.rpc.utils.SerializerFactory;
 import com.eryansky.j2cache.util.ForySerializer;
 import com.eryansky.modules.disk.utils.DiskUtils;
 import com.eryansky.modules.sys.mapper.Config;
@@ -119,7 +120,7 @@ public class DefaultConfigurer {
         // 动态配置序列化安全策略
         checkSerializerTypeCheck();
 
-        logger.info("RPC客户端序列化方式：{}", AppConstants.getRPCClientSerializer());
+        logger.info("RPC客户端-序列化方式：{}", ObjectUtils.defaultIfNull(AppConstants.getRPCClientSerializer(), SerializerFactory.DEFAULT_SERIALIZER));
 
         // 打印系统基础信息
         logger.info("当前启动系统：{}-V{}", AppConstants.getAppFullName(), AppConstants.getAppVersion());
