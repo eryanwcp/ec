@@ -9,6 +9,8 @@ public class SerializerFactory {
 
     private static final Map<String, Serializer> SERIALIZERS = new ConcurrentHashMap<>();
 
+    public static final String DEFAULT_SERIALIZER = ForySerializer.NAME;
+
     static {
         // 注册支持的序列化器
         register(new JacksonMsgPackSerializer());
@@ -24,10 +26,8 @@ public class SerializerFactory {
 
     public static Serializer getSerializer(String type) {
         if (type == null || type.isEmpty()) {
-            return SERIALIZERS.get(ForySerializer.NAME);
-//            return SERIALIZERS.get(JacksonMsgPackSerializer.NAME);
+            return SERIALIZERS.get(DEFAULT_SERIALIZER);
         }
-        return SERIALIZERS.getOrDefault(type, SERIALIZERS.get(ForySerializer.NAME));
-//        return SERIALIZERS.getOrDefault(type, SERIALIZERS.get(JacksonMsgPackSerializer.NAME));
+        return SERIALIZERS.getOrDefault(type, SERIALIZERS.get(DEFAULT_SERIALIZER));
     }
 }
