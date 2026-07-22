@@ -222,46 +222,6 @@
         </div>
     </fieldset>
 
-
-
-    <fieldset>
-        <legend>内部代理</legend>
-        <div class="control-group">
-            <label class="control-label">内部代理：</label>
-            <div class="controls">
-                <label><input name="system.security.proxy.enable" type="radio" value="true"/>启用</label>
-                <label><input name="system.security.proxy.enable" type="radio" value="false"/>禁用</label>
-                <span class="help-inline">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;内部代理/a/sys/proxy/*，全局配置</span>
-            </div>
-        </div>
-        <div class="control-group">
-            <label class="control-label">内部代理URL白名单：</label>
-            <div class="controls">
-                <textarea name="system.security.proxy.whitelist" class="input-xxlarge"></textarea>
-                <span class="help-inline">每行一个或多个之间以";"分割，支持"*"通配符</span>
-            </div>
-        </div>
-    </fieldset>
-
-    <fieldset>
-        <legend>序列化注册</legend>
-        <div class="control-group">
-            <label class="control-label">黑名单：</label>
-            <div class="controls">
-                <textarea name="system.security.SerializerTypeCheck.disallowClasses" class="input-xxlarge"></textarea>
-                <span class="help-inline">class names or name prefixes ends with * 每行一个或多个之间以";"分割，支持"*"通配符结尾</span>
-            </div>
-        </div>
-        <div class="control-group">
-            <label class="control-label">白名单：</label>
-            <div class="controls">
-                <textarea name="system.security.SerializerTypeCheck.allowClasses" class="input-xxlarge"></textarea>
-                <span class="help-inline">class names or name prefixes ends with * 每行一个或多个之间以";"分割，支持"*"通配符结尾</span>
-            </div>
-        </div>
-    </fieldset>
-
-
     <fieldset>
         <legend>REST服务</legend>
         <div class="control-group">
@@ -309,14 +269,52 @@
         <div class="control-group">
             <label class="control-label">序列化方式：</label>
             <div class="controls">
-                <label><input name="system.rpc.client.serializer" type="radio" value="jackson-msgpack"/>jackson-msgpack</label>
                 <label><input name="system.rpc.client.serializer" type="radio" value="fory"/>fory</label>
+                <label><input name="system.rpc.client.serializer" type="radio" value="jackson-msgpack"/>jackson-msgpack</label>
                 <label><input name="system.rpc.client.serializer" type="radio" value="jackson"/>jackson</label>
                 <label><input name="system.rpc.client.serializer" type="radio" value="java"/>java</label>
                 <span class="help-inline"></span>
             </div>
         </div>
     </fieldset>
+
+    <fieldset>
+        <legend>序列化注册</legend>
+        <div class="control-group">
+            <label class="control-label">黑名单：</label>
+            <div class="controls">
+                <textarea name="system.security.SerializerTypeCheck.disallowClasses" class="input-xxlarge"></textarea>
+                <span class="help-inline">class names or name prefixes ends with * 每行一个或多个之间以";"分割，支持"*"通配符结尾</span>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">白名单：</label>
+            <div class="controls">
+                <textarea name="system.security.SerializerTypeCheck.allowClasses" class="input-xxlarge"></textarea>
+                <span class="help-inline">class names or name prefixes ends with * 每行一个或多个之间以";"分割，支持"*"通配符结尾</span>
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>内部代理</legend>
+        <div class="control-group">
+            <label class="control-label">内部代理：</label>
+            <div class="controls">
+                <label><input name="system.security.proxy.enable" type="radio" value="true"/>启用</label>
+                <label><input name="system.security.proxy.enable" type="radio" value="false"/>禁用</label>
+                <span class="help-inline">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;内部代理/a/sys/proxy/*，全局配置</span>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">内部代理URL白名单：</label>
+            <div class="controls">
+                <textarea name="system.security.proxy.whitelist" class="input-xxlarge"></textarea>
+                <span class="help-inline">每行一个或多个之间以";"分割，支持"*"通配符</span>
+            </div>
+        </div>
+    </fieldset>
+
 
 
 <%--    <div class="control-group">--%>
