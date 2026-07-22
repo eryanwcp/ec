@@ -6,6 +6,7 @@
 package com.eryansky.configure;
 
 import com.eryansky.common.utils.ObjectUtils;
+import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.io.PropertiesLoader;
 import com.eryansky.common.utils.mapper.JsonMapper;
@@ -121,7 +122,7 @@ public class DefaultConfigurer {
         // 动态配置序列化安全策略
         checkSerializerTypeCheck();
 
-        logger.info("RPC客户端-序列化方式：{}", Objects.requireNonNullElse(AppConstants.getRPCClientSerializer(), SerializerFactory.DEFAULT_SERIALIZER));
+        logger.info("RPC客户端-序列化方式：{}", StringUtils.defaultIfBlank(AppConstants.getRPCClientSerializer(), SerializerFactory.DEFAULT_SERIALIZER));
 
         // 打印系统基础信息
         logger.info("当前启动系统：{}-V{}", AppConstants.getAppFullName(), AppConstants.getAppVersion());
