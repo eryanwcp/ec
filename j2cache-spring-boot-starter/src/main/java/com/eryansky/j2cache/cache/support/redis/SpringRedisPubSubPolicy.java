@@ -8,6 +8,8 @@ import java.util.Properties;
 
 import com.eryansky.j2cache.CacheProviderHolder;
 import com.eryansky.j2cache.J2CacheConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
@@ -21,6 +23,8 @@ import com.eryansky.j2cache.cache.support.util.SpringUtil;
  * @author zhangsaizz
  */
 public class SpringRedisPubSubPolicy implements ClusterPolicy {
+
+	private static final Logger logger = LoggerFactory.getLogger(SpringRedisPubSubPolicy.class);
 
 	private final int LOCAL_COMMAND_ID = Command.genRandomSrc(); //命令源标识，随机生成，每个节点都有唯一标识
 
@@ -65,6 +69,7 @@ public class SpringRedisPubSubPolicy implements ClusterPolicy {
 		topics.add(new PatternTopic(expired));
 		topics.add(new PatternTopic(del));
 
+		long ct = System.currentTimeMillis();
 		if("active".equals(config.getCacheCleanMode())) {
 			isActive = true;
 			//设置键值回调 需要redis支持键值回调
@@ -80,6 +85,8 @@ public class SpringRedisPubSubPolicy implements ClusterPolicy {
 		}else {
 			listenerContainer.addMessageListener(new SpringRedisMessageListener(this, this.channel,LOCAL_COMMAND_ID,redisTemplate.getDefaultSerializer()), new PatternTopic(this.channel));
 		}
+		logger.info("Connected to redis channel : {} {} , time {}ms.", this.channel, com.eryansky.j2cache.session.Command.LocalID(), System.currentTimeMillis() - ct);
+
 
 	}
 
