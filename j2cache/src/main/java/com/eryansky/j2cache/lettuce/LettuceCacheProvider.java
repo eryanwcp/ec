@@ -286,7 +286,7 @@ public class LettuceCacheProvider extends RedisPubSubAdapter<String, String> imp
     @Override
     public void message(String channel, String message) {
         Command cmd = Command.parse(message);
-        handleCommand(cmd);
+        handleCommand(channel,cmd);
     }
 
     @Override
