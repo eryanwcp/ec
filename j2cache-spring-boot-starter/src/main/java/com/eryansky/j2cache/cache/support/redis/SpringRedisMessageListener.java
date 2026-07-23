@@ -46,7 +46,7 @@ public class SpringRedisMessageListener implements MessageListener{
 		}
         try {
             Command cmd = (Command) redisSerializer.deserialize(messageBody);
-			clusterPolicy.handleCommand(cmd);
+			clusterPolicy.handleCommand(channel,cmd);
         } catch (Exception e) {
         	logger.error("Failed to handle received msg", e);
         }

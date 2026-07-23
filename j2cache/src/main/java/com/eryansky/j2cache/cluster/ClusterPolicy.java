@@ -88,16 +88,17 @@ public interface ClusterPolicy {
 
     /**
      * 处理缓存事件逻辑
+     * @param channel
      * @param cmd
      */
-    default void handleCommand(Command cmd) {
+    default void handleCommand(String channel,Command cmd) {
         try {
             if (cmd == null || isLocalCommand(cmd))
                 return;
 
             switch (cmd.getOperator()) {
                 case Command.OPT_JOIN:
-                    log.info("Node-"+cmd.getSrc() + " joined !");
+                    log.info("Node-{} joined {} !", cmd.getSrc(), channel);
                     break;
                 case Command.OPT_EVICT_KEY:
                     this.evict(cmd.getRegion(), cmd.getKeys());
@@ -108,7 +109,7 @@ public interface ClusterPolicy {
                     log.debug("Received cache clear message, region=" + cmd.getRegion());
                     break;
                 case Command.OPT_QUIT:
-                    log.info("Node-"+cmd.getSrc() + " quit !");
+                    log.info("Node-{} quit {} !", cmd.getSrc(), channel);
                     break;
                 default:
                     log.warn("Unknown message type = " + cmd.getOperator());

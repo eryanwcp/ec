@@ -15,7 +15,7 @@ public class J2CacheSerializer implements RedisSerializer<Object>{
 
 	private static final Logger logger = LoggerFactory.getLogger(J2CacheSerializer.class);
 
-	private static final JacksonSerializer jacksonSerializer = new JacksonSerializer();
+//	private static final JacksonSerializer jacksonSerializer = new JacksonSerializer();
 	@Override
 	public byte[] serialize(Object t) throws SerializationException {	
 		try {
