@@ -221,7 +221,7 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
         this.pubsub_subscriber.addListener(this);
         RedisPubSubAsyncCommands<String, String> async = this.pubsub_subscriber.async();
         async.subscribe(this.pubsub_channel);
-        logger.info("Connected to redis session channel:{}, time {}ms.", this.pubsub_channel, System.currentTimeMillis()-ct);
+        logger.info("Connected to redis session channel : {} {} , time {}ms.", this.pubsub_channel, Command.LocalID(), System.currentTimeMillis() - ct);
 
         this.publish(Command.join());
     }
