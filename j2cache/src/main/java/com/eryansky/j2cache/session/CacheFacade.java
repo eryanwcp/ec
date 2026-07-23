@@ -317,14 +317,14 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
 
             switch (cmd.getOperator()) {
                 case Command.OPT_JOIN:
-                    logger.info("Server-"+cmd.getSrc() + " joined !");
+                    logger.info("Server-{} joined {} !",cmd.getSrc(),this.pubsub_channel);
                     break;
                 case Command.OPT_DELETE_SESSION:
                     cache1.evict(cmd.getSession());
                     logger.debug("Received session clear command, session=" + cmd.getSession());
                     break;
                 case Command.OPT_QUIT:
-                    logger.info("Server-"+cmd.getSrc() + " quit !");
+                    logger.info("Server-{} quit {} !",cmd.getSrc(), this.pubsub_channel);
                     break;
                 default:
                     logger.warn("Unknown command type = " + cmd.getOperator());
