@@ -206,7 +206,7 @@ public class SpringRedisGenericCache implements Level2Cache {
 					try {
 						lock.unlock();
 					} catch (Exception e) {
-						log.error("Failed to unlock for region: {} {} ", region, timeoutInSecond, e);
+						log.error("Failed to unlock for region: {} retryCount: {} timeout: {}s ", region, retryCount, timeoutInSecond, e);
 					}
 				}
 			} else {
