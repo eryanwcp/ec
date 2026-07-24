@@ -44,7 +44,7 @@ import java.util.zip.ZipOutputStream;
  */
 public class ExcelUtils {
 
-    private static Logger logger = LoggerFactory.getLogger(ExcelUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExcelUtils.class);
 
     /**
      * JavaBean转Map
