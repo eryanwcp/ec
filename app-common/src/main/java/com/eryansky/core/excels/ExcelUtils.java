@@ -44,7 +44,7 @@ import java.util.zip.ZipOutputStream;
  */
 public class ExcelUtils {
 
-    private static Logger mLogger = LoggerFactory.getLogger(ExcelUtils.class);
+    private static Logger logger = LoggerFactory.getLogger(ExcelUtils.class);
 
     /**
      * JavaBean转Map
@@ -63,7 +63,7 @@ public class ExcelUtils {
                 }
             }
         } catch (Exception e) {
-            mLogger.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
         return params;
     }
@@ -207,7 +207,7 @@ public class ExcelUtils {
             os = response.getOutputStream();
         } catch (IOException e) {
 //			e.printStackTrace();
-            mLogger.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
         return new ZipOutputStream(os);
     }
@@ -697,7 +697,7 @@ public class ExcelUtils {
                 bool = true;
             }
         } catch (IOException e) {
-            mLogger.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
 
         return bool;
@@ -767,7 +767,7 @@ public class ExcelUtils {
             Double d = (Double) sandbox.eval("source",ex);
             return d;
         } catch (Exception e) {
-            mLogger.error(e.getMessage());
+            logger.error(e.getMessage());
             return null;
         }
     }
@@ -1497,7 +1497,7 @@ public class ExcelUtils {
                 }
             }
         } catch (IOException e) {
-            mLogger.error(e.toString(), e);
+            logger.error(e.toString(), e);
         }
     }
 
@@ -1521,7 +1521,7 @@ public class ExcelUtils {
                         Cell cell = row.createCell(j);
                         // cell max length 32767
                         if (r[j].length() > 32767) {
-                            mLogger.warn("异常处理", "--此字段过长(超过32767),已被截断--" + r[j]);
+                            logger.warn("异常处理", "--此字段过长(超过32767),已被截断--" + r[j]);
                             r[j] = r[j].substring(0, 32766);
                         }
                         cell.setCellValue(r[j]);
@@ -1539,7 +1539,7 @@ public class ExcelUtils {
                 out.close();
             }
         } catch (IOException e) {
-            mLogger.error(e.toString(), e);
+            logger.error(e.toString(), e);
         }
     }
 
@@ -1579,7 +1579,7 @@ public class ExcelUtils {
                 }
             }
         } catch (IOException e) {
-            mLogger.error(e.toString(), e);
+            logger.error(e.toString(), e);
         }
     }
 
@@ -1610,7 +1610,7 @@ public class ExcelUtils {
                 int cellNum = 0;
                 for (String k : headers) {
                     if (!map.containsKey(k)) {
-                        mLogger.error("Map 中 不存在 key [" + k + "]");
+                        logger.error("Map 中 不存在 key [" + k + "]");
                         continue;
                     }
                     Cell cell = row.createCell(cellNum);
@@ -1689,7 +1689,7 @@ public class ExcelUtils {
                             cell.setCellValue(StringUtils.EMPTY);
                         }
                     } catch (Exception e) {
-                        mLogger.error(e.getMessage(), e);
+                        logger.error(e.getMessage(), e);
                     }
 
                 }
@@ -1728,7 +1728,7 @@ public class ExcelUtils {
                 toClient.flush();
             }
         } catch (IOException ex) {
-            mLogger.error(ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
         }
     }
 
