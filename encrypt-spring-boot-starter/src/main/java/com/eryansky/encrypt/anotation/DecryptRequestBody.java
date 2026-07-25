@@ -4,7 +4,7 @@ import java.lang.annotation.*;
 
 /**
  * 加密注解
- * @author : 尔演@Eryan
+ * @author Eryan
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

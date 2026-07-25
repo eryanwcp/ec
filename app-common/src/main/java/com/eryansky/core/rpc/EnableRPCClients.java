@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Import;
 /**
  * RPC客户端开启 默认值true 为false 则关闭
  *
- * @author : 尔演@Eryan
+ * @author Eryan
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

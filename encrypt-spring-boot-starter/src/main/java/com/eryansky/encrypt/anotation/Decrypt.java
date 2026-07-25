@@ -7,7 +7,7 @@ import java.lang.annotation.*;
 
 /**
  * 加密注解  满足多种场景需求 网络接传输、加密存储、远程调用加密
- * @author : 尔演@Eryan
+ * @author Eryan
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

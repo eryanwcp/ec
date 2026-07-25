@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * The type Scenario schedule.
  *
- * @author : 尔演@Eryan
+ * @author Eryan
  *
  */
 public abstract class ScenarioSchedule{

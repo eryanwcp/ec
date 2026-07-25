@@ -24,7 +24,7 @@ import java.util.UUID;
 /**
  * The type Register bean definition.
  * BeanDefinition 后置处理
- * @author : 尔演@Eryan
+ * @author Eryan
  *
  */
 public class RegisterBeanDefinition implements BeanFactoryPostProcessor{

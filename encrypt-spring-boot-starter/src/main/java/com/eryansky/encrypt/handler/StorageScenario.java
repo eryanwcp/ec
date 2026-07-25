@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 /**
  * The type Storage scenario.
  * StorageScenario 使用场景加密存储
- * @author : 尔演@Eryan
+ * @author Eryan
  *
  */
 public class StorageScenario extends ScenarioHandler {

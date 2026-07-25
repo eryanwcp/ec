@@ -23,7 +23,7 @@ import java.util.UUID;
 /**
  * The type Encrypt utils.
  *
- * @author : 尔演@Eryan
+ * @author Eryan
  *
  */
 public class EncryptUtils {

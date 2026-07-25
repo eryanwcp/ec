@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * The type Honey badger encrypt.
  *
- * @author : 尔演@Eryan 蜜獾 还可以用来当作吉祥物品
+ * @author Eryan 蜜獾 还可以用来当作吉祥物品
 
  * @description : 加解密工具类
  * 

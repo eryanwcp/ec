@@ -9,7 +9,7 @@ import java.util.UUID;
 
 /**
  * SM4配置
- * @author : 尔演@Eryan
+ * @author Eryan
  *
  */
 @SuppressWarnings({"all"})

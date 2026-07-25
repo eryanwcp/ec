@@ -7,7 +7,7 @@ import org.springframework.lang.NonNull;
 /**
  * The type Encrypt import selector.
  *
- * @author : 尔演@Eryan
+ * @author Eryan
  *
  */
 public class EncryptImportSelector implements ImportSelector{

@@ -392,7 +392,7 @@ import {b64tohex, hex2b64} from "jsencrypt/lib/lib/jsbn/base64";
 //npm install node-polyfill-webpack-plugin
 
 /**
- * @email 尔演@Eryan0130@163.com
+ * @email Eryan
  * @description aes 加解密器
  */
 //引入 crypto-js 该包 解决aes加解密
@@ -412,7 +412,7 @@ const jsEncrypt = new JSEncrypt()
 const SM4 = require("gm-crypt").sm4;
 
 /**
- * @email 尔演@Eryan0130@163.com
+ * @email Eryan
  * @description rsa 加解密器
  */
 export class RsaHandler {
@@ -438,7 +438,7 @@ export class RsaHandler {
     }
     /**
      * @description rsa加密
-     * @author 尔演@Eryan
+     * @author Eryan
      * @param content
      * @returns {string}
      */
@@ -453,7 +453,7 @@ export class RsaHandler {
 
     /**
      * @description rsa解密
-     * @author 尔演@Eryan
+     * @author Eryan
      * @param hexStr
      * @returns {*}
      */

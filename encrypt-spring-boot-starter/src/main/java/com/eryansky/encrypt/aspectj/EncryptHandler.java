@@ -18,7 +18,7 @@ import org.springframework.lang.NonNull;
  * The type Encrypt handler.
  * AES加密处理器
  *
- * @author : 尔演@Eryan
+ * @author Eryan
  * @date : 2022-07-23
  */
 @Order(1)
