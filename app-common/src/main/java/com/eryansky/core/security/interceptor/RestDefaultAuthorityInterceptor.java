@@ -182,6 +182,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                 //请求密钥
                 String authType = request.getHeader(RPCUtils.HEADER_AUTH_TYPE);
                 String apiKey = request.getHeader(RPCUtils.HEADER_X_API_KEY);
+                String applicationId = request.getHeader(RPCUtils.HEADER_APPLICATION_ID);
                 if (null == apiKey) {
                     notPermittedPermission(request, response, requestUrl, "未识别参数:Header['X-API-Key']=" + apiKey);
                     return false;
@@ -192,7 +193,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                     notPermittedPermission(request, response, requestUrl, "未授权访问:Header['X-API-Key']=" + apiKey);
                     return false;
                 }
-                request.getSession().setAttribute("loginUser","内部系统[" + ip + "]");
+                request.getSession().setAttribute("loginUser", (null != applicationId ? applicationId : "内部系统") + "[" + ip + "]");
                 return true;
             }
 
