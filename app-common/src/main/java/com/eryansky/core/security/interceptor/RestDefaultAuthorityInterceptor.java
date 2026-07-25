@@ -32,6 +32,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -44,6 +45,9 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
     public static final String SESSION_KEY_REST_AUTHORITY = "REST_AUTHORITY";
+
+    private static final String SESSION_TAG_NAME = "loginUser";
+    private static final String SYSTEM_PREFIX_NAME = "内部系统";
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) throws Exception {
@@ -181,6 +185,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                 }
                 //请求密钥
                 String authType = request.getHeader(RPCUtils.HEADER_AUTH_TYPE);
+                String encrypt = request.getHeader(RPCUtils.HEADER_ENCRYPT);
                 String apiKey = request.getHeader(RPCUtils.HEADER_X_API_KEY);
                 String applicationId = request.getHeader(RPCUtils.HEADER_APPLICATION_ID);
                 if (null == apiKey) {
@@ -193,7 +198,11 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                     notPermittedPermission(request, response, requestUrl, "未授权访问:Header['X-API-Key']=" + apiKey);
                     return false;
                 }
-                request.getSession().setAttribute("loginUser", (null != applicationId ? applicationId : "内部系统") + "[" + ip + "]");
+                HttpSession httpSession = request.getSession();
+                String suffix = Optional.ofNullable(applicationId).map(id -> "[" + id + "]").orElse("");
+                httpSession.setAttribute(SESSION_TAG_NAME, SYSTEM_PREFIX_NAME + suffix);
+                httpSession.setAttribute(RPCUtils.HEADER_AUTH_TYPE, authType);
+                httpSession.setAttribute(RPCUtils.HEADER_ENCRYPT, encrypt);
                 return true;
             }
 
