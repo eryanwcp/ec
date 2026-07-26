@@ -52,7 +52,7 @@ public class CommonHandlerUrl {
 
         int contentLength = request.getContentLength();
         if (contentLength > MAX_BODY_SIZE) {
-            log.warn("Request body too large: {}",contentLength);
+            log.warn("Request body too large: {} {}",request.getRequestURI(),contentLength);
         }
         byte[] data = StreamUtils.copyToByteArray(request.getInputStream());
         
