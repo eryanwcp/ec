@@ -61,7 +61,7 @@ public class EncryptRPCResponseBodyAdvice implements ResponseBodyAdvice<Object> 
         // Process encryption according to requested mode
         byte[] out;
         try {
-            out = processEncryption(requestEncrypt, requestEncryptKey, payload);
+            out = RPCUtils.encryptDataByRequest(requestEncrypt, requestEncryptKey, payload);
         } catch (Exception e) {
             log.error("Failed to process encryption for mode {}", requestEncrypt, e);
             throw new RuntimeException(e);
@@ -91,41 +91,6 @@ public class EncryptRPCResponseBodyAdvice implements ResponseBodyAdvice<Object> 
         } catch (IOException e) {
             log.error("Failed to serialize response body", e);
             throw new RuntimeException(e);
-        }
-    }
-
-    private byte[] processEncryption(String mode, String encryptKeyHeader, byte[] input) throws Exception {
-        if (CipherMode.SM4.name().equalsIgnoreCase(mode) && StringUtils.isNotBlank(encryptKeyHeader)) {
-            String key = tryDecryptKeyHex(encryptKeyHeader);
-            return Sm4Utils.encrypt(key, input);
-        }
-
-        if (CipherMode.AES.name().equalsIgnoreCase(mode) && StringUtils.isNotBlank(encryptKeyHeader)) {
-            String key = tryDecryptKeyBase64(encryptKeyHeader);
-            return Cryptos.aesECBEncrypt(input, key);
-        }
-
-        if (CipherMode.BASE64.name().equalsIgnoreCase(mode)) {
-            return Base64.encodeBase64(input);
-        }
-
-        // Unknown/unsupported mode — return original payload
-        return input;
-    }
-
-    private String tryDecryptKeyHex(String encryptedKey) {
-        try {
-            return RSAUtils.decryptHexString(encryptedKey, EncryptProvider.privateKeyBase64());
-        } catch (Exception e) {
-            return encryptedKey;
-        }
-    }
-
-    private String tryDecryptKeyBase64(String encryptedKey) {
-        try {
-            return RSAUtils.decryptBase64String(encryptedKey, EncryptProvider.privateKeyBase64());
-        } catch (Exception e) {
-            return encryptedKey;
         }
     }
 

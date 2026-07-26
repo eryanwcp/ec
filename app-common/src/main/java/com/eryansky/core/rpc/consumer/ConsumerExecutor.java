@@ -28,15 +28,16 @@ public class ConsumerExecutor {
     public static <T> T  execute(String url, Map<String,String> headers, Object[] params, ParameterizedTypeReference responseType) throws Exception {
         // 获取RestTemplate对象
         RestTemplate restTemplate = RestTemplateHolder.restTemplate();
+        // 返回接口 数据解密
+        String requestEncrypt = headers.get(RPCUtils.HEADER_ENCRYPT);
+        String serializer = headers.get(RPCUtils.HEADER_RPC_SERIALIZER);
+        RPCUtils.EncryptRequestKey encryptRequestKey = RPCUtils.generateEncryptKey(requestEncrypt);
         // 构建请求体
-        HttpEntity<?> httpEntity = createHttpEntity(params,headers);
+        HttpEntity<?> httpEntity = createHttpEntity(params,headers,encryptRequestKey);
 
         // 进行远程rpc请求
         ResponseEntity responseEntity = null;
-        // 返回接口 数据解密
-        String requestEncrypt = headers.get(RPCUtils.HEADER_ENCRYPT);
-        String requestEncryptKey = headers.get(RPCUtils.HEADER_ENCRYPT_KEY);
-        String serializer = headers.get(RPCUtils.HEADER_RPC_SERIALIZER);
+
 
         if (StringUtils.isNotBlank(requestEncrypt)){
 //            responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, String.class);//多一层引号““””
@@ -59,45 +60,8 @@ public class ConsumerExecutor {
                 throw new RuntimeException("RPC请求异常：" + url + " " + responseEntity.getStatusCode().value() +" "+ JsonMapper.toJsonString(responseEntity));
             }
 
-            if(CipherMode.SM4.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey) && data != null && data.length > 0){
-                try {
-                    String key = null;
-                    try {
-                        key = RSAUtils.decryptHexString(requestEncryptKey);
-                    } catch (Exception e) {
-                        key = requestEncryptKey;
-                    }
-                    return (T) SerializerFactory.getSerializer(serializer).deserialize(Sm4Utils.decrypt(key,data));
-                } catch (Exception e) {
-                    log.error(e.getMessage(),e);
-                    log.error("RPC请求异常：{} {} {}", responseEntity.getStatusCode().value(),url,JsonMapper.toJsonString(responseEntity));
-                    throw new RuntimeException(e);
-                }
-
-            }else if(CipherMode.AES.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey) && data != null && data.length > 0){
-                try {
-                    String key = null;
-                    try {
-                        key = RSAUtils.decryptBase64String(requestEncryptKey);
-                    } catch (Exception e) {
-                        key = requestEncryptKey;
-                    }
-                    return (T) SerializerFactory.getSerializer(serializer).deserialize(Cryptos.aesECBDecrypt(data,key));
-                } catch (Exception e) {
-                    log.error(e.getMessage(),e);
-                    log.error("RPC请求异常：{} {} {}", responseEntity.getStatusCode().value(),url,JsonMapper.toJsonString(responseEntity));
-                    throw new RuntimeException(e);
-                }
-
-            }else if(CipherMode.BASE64.name().equals(requestEncrypt) && data != null && data.length > 0){
-                try {
-                    return (T) SerializerFactory.getSerializer(serializer).deserialize(Base64.decodeBase64(data));
-                } catch (Exception e) {
-                    log.error(e.getMessage(),e);
-                    log.error("RPC请求异常：{} {} {}", responseEntity.getStatusCode().value(),url,JsonMapper.toJsonString(responseEntity));
-                    throw new RuntimeException(e);
-                }
-
+            if(StringUtils.isNotBlank(requestEncrypt) && data != null && data.length > 0){
+                return (T) SerializerFactory.getSerializer(serializer).deserialize(RPCUtils.decryptData(requestEncrypt,encryptRequestKey.getKey(),data));
             }else {
                 try {
                     responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, responseType);
@@ -157,7 +121,7 @@ public class ConsumerExecutor {
      * @param params
      * @return
      */
-    private static HttpEntity<?> createHttpEntity(Object[] params, Map<String,String> headers) throws Exception {
+    private static HttpEntity<?> createHttpEntity(Object[] params, Map<String,String> headers, RPCUtils.EncryptRequestKey encryptRequestKey) throws Exception {
         HttpHeaders httpHeaders = new HttpHeaders();
         if(null != headers){
             headers.forEach(httpHeaders::add);
@@ -174,30 +138,12 @@ public class ConsumerExecutor {
             httpHeaders.setAccept(Lists.newArrayList(MediaType.APPLICATION_JSON,MediaType.parseMediaType("application/x-"+serializer)));
         }
 
-        String encryptKey =  null;
-        String key = null;
-        if (StringUtils.isNotBlank(encrypt)){
-            if(CipherMode.SM4.name().equals(encrypt)){
-                key = Sm4Utils.generateHexKeyString();
-                encryptKey = RSAUtils.encryptHexString(key);
-            }else if(CipherMode.AES.name().equals(encrypt)){
-                key = Cryptos.getBase64EncodeKey();
-                encryptKey = RSAUtils.encryptBase64String(key);
-            }
-            headers.put(RPCUtils.HEADER_ENCRYPT_KEY, encryptKey);
-            httpHeaders.put(RPCUtils.HEADER_ENCRYPT_KEY, Lists.newArrayList(encryptKey));
+        if (StringUtils.isNotBlank(encryptRequestKey.getEncryptKey())){
+            headers.put(RPCUtils.HEADER_ENCRYPT_KEY, encryptRequestKey.getEncryptKey());
+            httpHeaders.put(RPCUtils.HEADER_ENCRYPT_KEY, Lists.newArrayList(encryptRequestKey.getEncryptKey()));
         }
         byte[] bytes = SerializerFactory.getSerializer(serializer).serialize(params);
-        byte[] data = bytes;
-        if (StringUtils.isNotBlank(encrypt)){
-            if(CipherMode.SM4.name().equals(encrypt)){
-                data = Sm4Utils.encrypt(key, bytes);
-            }else if(CipherMode.AES.name().equals(encrypt)){
-                data = Cryptos.aesECBEncrypt(bytes, key);
-            }else if(CipherMode.BASE64.name().equals(encrypt)){
-                data = Base64.encodeBase64(bytes);
-            }
-        }
+        byte[] data = RPCUtils.encryptData(encrypt, encryptRequestKey.getKey(), bytes);
         return new HttpEntity<>(data, httpHeaders);
     }
 }

@@ -52,57 +52,42 @@ public class CommonHandlerUrl {
         String encrypt = request.getHeader(RPCUtils.HEADER_ENCRYPT);
         String encryptKey = request.getHeader(RPCUtils.HEADER_ENCRYPT_KEY);
         String serializer = request.getHeader(RPCUtils.HEADER_RPC_SERIALIZER);
-        // 获取请求体
-        byte[] requestBody = StreamUtils.copyToByteArray(request.getInputStream());
-        byte[] data = requestBody;
-        //请求体解密
-        if (StringUtils.isNotBlank(encrypt)){
-            String key = null;
-            if(CipherMode.SM4.name().equals(encrypt) && StringUtils.isNotBlank(encryptKey) ){
-                try {
-                    key = RSAUtils.decryptHexString(encryptKey);
-                } catch (Exception e) {
-                    key = encryptKey;
-                }
-                data = Sm4Utils.decrypt(key, requestBody);
-            }else if(CipherMode.AES.name().equals(encrypt) && StringUtils.isNotBlank(encryptKey) ){
-                try {
-                    key = RSAUtils.decryptBase64String(encryptKey);
-                } catch (Exception e) {
-                    key = encryptKey;
-                }
-                data = Cryptos.aesECBDecrypt(requestBody, key);
-            }else if(CipherMode.BASE64.name().equals(encrypt)){
-                data = Base64.decodeBase64(requestBody);
-            }
+        
+        byte[] data = StreamUtils.copyToByteArray(request.getInputStream());
+        
+        if (StringUtils.isNotBlank(encrypt)) {
+            data = RPCUtils.decryptDataByRequest(encrypt, encryptKey, data);
         }
 
-        // 解析参数
         Object[] params = (Object[]) SerializerFactory.getSerializer(serializer).deserialize(data);
-        // 执行方法
         return execute(rpcService, methodName, params);
     }
 
+
     /**
      * 执行方法
-     *
-     * @param rpcService
-     * @param methodName
-     * @param params
-     * @return
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
      */
     private Object execute(String rpcService, String methodName, Object[] params) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        // 获取RpcProvider的相关信息
         ProviderHolder.ProviderInfo providerInfo = ProviderHolder.RPC_PROVIDER_MAP.get(rpcService);
+        if (providerInfo == null) {
+            log.warn("RPC service not found: {}", rpcService);
+            return null;
+        }
+
         Object rpcBean = providerInfo.getRpcBean();
         List<ProviderHolder.RPCMethod> urlCoreMethod = providerInfo.getUrlCoreMethod();
-        for (ProviderHolder.RPCMethod rm : urlCoreMethod) {
-            if (rm.getAlias().equals(methodName)) {
-                return rm.getMethod().invoke(rpcBean, params);
-            }
-        }
-        return null;
+        
+        return urlCoreMethod.stream()
+                .filter(rm -> rm.getAlias().equals(methodName))
+                .findFirst()
+                .map(rm -> {
+                    try {
+                        return rm.getMethod().invoke(rpcBean, params);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        log.error("Failed to invoke method: {}", methodName, e);
+                        throw new RuntimeException(e);
+                    }
+                })
+                .orElse(null);
     }
 }
