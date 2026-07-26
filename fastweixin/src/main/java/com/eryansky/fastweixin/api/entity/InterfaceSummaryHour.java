@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.entity;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Eryan
@@ -8,7 +8,7 @@ import com.alibaba.fastjson.annotation.JSONField;
  */
 public class InterfaceSummaryHour extends InterfaceSummary {
 
-    @JSONField(name = "ref_hour")
+    @JsonProperty("ref_hour")
     private Integer refHour;
 
     public Integer getRefHour() {

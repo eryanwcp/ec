@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.entity;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Eryan
@@ -8,13 +8,13 @@ import com.alibaba.fastjson.annotation.JSONField;
  */
 public class UserShareHour extends BaseDataCube {
 
-    @JSONField(name = "ref_hour")
+    @JsonProperty("ref_hour")
     private Integer refHour;
-    @JSONField(name = "share_scene")
+    @JsonProperty("share_scene")
     private Integer shareScene;
-    @JSONField(name = "share_count")
+    @JsonProperty("share_count")
     private Integer shareCount;
-    @JSONField(name = "share_user")
+    @JsonProperty("share_user")
     private Integer shareUser;
 
     public Integer getRefHour() {

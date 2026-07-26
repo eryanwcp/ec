@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.response;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Date;
 
@@ -11,9 +11,9 @@ import java.util.Date;
 public class UploadMediaResponse extends BaseResponse {
 
     private String type;
-    @JSONField(name = "media_id")
+    @JsonProperty("media_id")
     private String mediaId;
-    @JSONField(name = "created_at")
+    @JsonProperty("created_at")
     private Date   createdAt;
 
     public String getType() {

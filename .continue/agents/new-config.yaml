@@ -1,0 +1,17 @@
+# This is an example configuration file
+# To learn more, see the full config.yaml reference: https://docs.continue.dev/reference
+
+name: Example Config
+version: 1.0.0
+schema: v1
+
+# Define which models can be used
+# https://docs.continue.dev/customization/models
+models:
+  # 定义使用的模型
+  - name: gemma4:cloud (Local)
+    provider: ollama
+    model: gemma4:cloud # 替换为你通过 ollama pull 下载的准确模型名称
+    apiBase: http://localhost:11434 # Ollama 的默认本地地址，可省写
+
+

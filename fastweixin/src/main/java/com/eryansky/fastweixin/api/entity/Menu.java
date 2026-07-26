@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.entity;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.eryansky.fastweixin.exception.WeixinException;
 
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ public class Menu extends BaseModel {
      *
      * @since 1.3.7
      */
-    @JSONField(name = "menuid")
+    @JsonProperty("menuid")
     private String menuId;
 
     public List<MenuButton> getButton() {

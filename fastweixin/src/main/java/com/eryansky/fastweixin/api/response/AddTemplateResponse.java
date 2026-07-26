@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.response;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 添加模版响应
@@ -9,7 +9,7 @@ public class AddTemplateResponse extends BaseResponse {
     /**
      * 模版id
      */
-    @JSONField(name = "template_id")
+    @JsonProperty("template_id")
     private String templateId;
 
     public String getTemplateId() {

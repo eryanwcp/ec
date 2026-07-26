@@ -2,7 +2,7 @@ package com.eryansky.fastweixin.company.api.response;
 
 import com.eryansky.fastweixin.api.response.BaseResponse;
 import com.eryansky.fastweixin.company.api.entity.QYDepartment;
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class GetDepartmentListResponse extends BaseResponse {
 
-    @JSONField(name = "department")
+    @JsonProperty("department")
     private List<QYDepartment> departments;
 
     public List<QYDepartment> getDepartments() {

@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.company.api.entity;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.eryansky.fastweixin.api.entity.BaseModel;
 
 /**
@@ -10,18 +10,18 @@ import com.eryansky.fastweixin.api.entity.BaseModel;
  */
 public class QYDepartment extends BaseModel{
 
-    @JSONField(name = "id")
+    @JsonProperty("id")
     private Integer id;
-    @JSONField(name = "name")
+    @JsonProperty("name")
     private String name;
     /**
      * 英文名称，此字段从2019年12月30日起，对新创建第三方应用不再返回，2020年6月30日起，对所有历史第三方应用不再返回该字段
      */
-    @JSONField(name = "name_en")
+    @JsonProperty("name_en")
     private String nameEn;
-    @JSONField(name = "parentid")
+    @JsonProperty("parentid")
     private Integer parentId;
-    @JSONField(name = "order")
+    @JsonProperty("order")
     private Integer order;
 
     public QYDepartment() {

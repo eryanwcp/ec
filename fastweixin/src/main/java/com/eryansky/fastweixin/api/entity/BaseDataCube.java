@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.entity;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Date;
 
@@ -10,7 +10,7 @@ import java.util.Date;
  */
 public class BaseDataCube extends BaseModel {
 
-    @JSONField(name = "ref_date", format = "yyyy-MM-dd")
+    @JsonProperty(""ref_date", format = "yyyy-MM-dd")
     private Date refDate;
 
     public Date getRefDate() {

@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.response;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 发送模版消息响应
@@ -10,7 +10,7 @@ public class SendTemplateResponse extends BaseResponse {
     /**
      * 消息id
      */
-    @JSONField(name = "msgid")
+    @JsonProperty("msgid")
     private String msgid;
 
     public String getMsgid() {

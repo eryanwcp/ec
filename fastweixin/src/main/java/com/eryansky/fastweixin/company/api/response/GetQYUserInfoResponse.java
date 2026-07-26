@@ -1,7 +1,7 @@
 package com.eryansky.fastweixin.company.api.response;
 
 import com.eryansky.fastweixin.api.response.BaseResponse;
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.eryansky.fastweixin.company.api.entity.QYUser;
 import com.eryansky.fastweixin.company.api.entity.QYUserExternalProfile;
 
@@ -17,7 +17,7 @@ public class GetQYUserInfoResponse extends BaseResponse {
     /**
      * 成员UserID。对应管理端的帐号
      */
-    @JSONField(name = "userid")
+    @JsonProperty("userid")
     private String userId;
     /**
      * 成员名称；第三方不可获取，调用时返回userid以代替name；代开发自建应用需要管理员授权才返回；对于非第三方创建的成员，第三方通讯录应用也不可获取；未返回名称的情况需要通过通讯录展示组件来展示名字
@@ -38,7 +38,7 @@ public class GetQYUserInfoResponse extends BaseResponse {
     /**
      * 表示在所在的部门内是否为上级。0-否；1-是。是一个列表，数量必须与department一致。第三方仅通讯录应用可获取；对于非第三方创建的成员，第三方通讯录应用也不可获取
      */
-    @JSONField(name = "is_leader_in_dept")
+    @JsonProperty("is_leader_in_dept")
     private Integer[] isLeaderInDept;
     /**
      * 职务信息；代开发自建应用需要管理员授权才返回；第三方仅通讯录应用可获取；对于非第三方创建的成员，第三方通讯录应用也不可获取
@@ -55,7 +55,7 @@ public class GetQYUserInfoResponse extends BaseResponse {
     /**
      * 企业邮箱，代开发自建应用需要管理员授权且成员oauth2授权获取；第三方仅通讯录应用可获取；对于非第三方创建的成员，第三方通讯录应用也不可获取；上游企业不可获取下游企业成员该字段
      */
-    @JSONField(name = "biz_mail")
+    @JsonProperty("biz_mail")
     private String bizMail;
     /**
      * 头像url。 代开发自建应用需要管理员授权且成员oauth2授权获取；第三方仅通讯录应用可获取；对于非第三方创建的成员，第三方通讯录应用也不可获取；上游企业不可获取下游企业成员该字段
@@ -64,7 +64,7 @@ public class GetQYUserInfoResponse extends BaseResponse {
     /**
      * 头像缩略图url。第三方仅通讯录应用可获取；对于非第三方创建的成员，第三方通讯录应用也不可获取；上游企业不可获取下游企业成员该字段
      */
-    @JSONField(name = "thumb_avatar")
+    @JsonProperty("thumb_avatar")
     private String thumbAvatar;
     /**
      * 座机。代开发自建应用需要管理员授权才返回；第三方仅通讯录应用可获取；对于非第三方创建的成员，第三方通讯录应用也不可获取
@@ -82,12 +82,12 @@ public class GetQYUserInfoResponse extends BaseResponse {
     /**
      * 全局唯一。对于同一个服务商，不同应用获取到企业内同一个成员的open_userid是相同的，最多64个字节。仅第三方应用可获取
      */
-    @JSONField(name = "open_userid")
+    @JsonProperty("open_userid")
     private String openUserId;
     /**
      * 员工个人二维码，扫描可添加为外部联系人(注意返回的是一个url，可在浏览器上打开该url以展示二维码)；代开发自建应用需要管理员授权且成员oauth2授权获取；第三方仅通讯录应用可获取；对于非第三方创建的成员，第三方通讯录应用也不可获取；上游企业不可获取下游企业成员该字段
      */
-    @JSONField(name = "qr_code")
+    @JsonProperty("qr_code")
     private String qrCode;
     /**
      * 地址。代开发自建应用需要管理员授权且成员oauth2授权获取；第三方仅通讯录应用可获取；对于非第三方创建的成员，第三方通讯录应用也不可获取；上游企业不可获取下游企业成员该字段
@@ -96,7 +96,7 @@ public class GetQYUserInfoResponse extends BaseResponse {
     /**
      * 主部门
      */
-    @JSONField(name = "main_department")
+    @JsonProperty("main_department")
     private Integer mainDepartment;
     /**
      * 扩展属性，代开发自建应用需要管理员授权才返回；第三方仅通讯录应用可获取；对于非第三方创建的成员，第三方通讯录应用也不可获取
@@ -105,18 +105,18 @@ public class GetQYUserInfoResponse extends BaseResponse {
     /**
      * 是否邀请该成员使用企业微信，默认值为true
      */
-    @JSONField(name = "to_invite")
+    @JsonProperty("to_invite")
     private Boolean toInvite;
     /**
      * 成员对外属性，字段详情见对外属性；代开发自建应用需要管理员授权才返回；第三方仅通讯录应用可获取；对于非第三方创建的成员，第三方通讯录应用也不可获取
      * {@link QYUserExternalProfile}
      */
-    @JSONField(name = "external_profile")
+    @JsonProperty("external_profile")
     private QYUserExternalProfile  externalProfile;
     /**
      * 对外职务，如果设置了该值，则以此作为对外展示的职务，否则以position来展示。代开发自建应用需要管理员授权才返回；第三方仅通讯录应用可获取；对于非第三方创建的成员，第三方通讯录应用也不可获取
      */
-    @JSONField(name = "external_position")
+    @JsonProperty("external_position")
     private String externalPosition;
 
     public String getUserId() {

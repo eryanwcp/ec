@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.response;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.eryansky.fastweixin.message.Article;
 import com.eryansky.fastweixin.util.StreamUtil;
 import org.slf4j.Logger;

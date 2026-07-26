@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.company.message;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class QYTemplateCardMsg extends QYBaseMsg {
 
-    @JSONField(name = "template_card")
+    @JsonProperty("template_card")
     private TemplateCard templateCard;
 
     public QYTemplateCardMsg() {
@@ -31,37 +31,37 @@ public class QYTemplateCardMsg extends QYBaseMsg {
         /**
          * 模板卡片类型，图文展示型卡片此处填写 “news_notice”,文本通知型卡片填写 “text_notice”
          */
-        @JSONField(name = "card_type")
+        @JsonProperty("card_type")
         private String cardType;
         /**
          * 卡片来源样式信息，不需要来源样式可不填写
          */
-        @JSONField(name = "source")
+        @JsonProperty("source")
         private Source source;
         /**
          * 一级标题
          */
-        @JSONField(name = "main_title")
+        @JsonProperty("main_title")
         private MainTitle mainTitle;
         /**
          * 卡片二级垂直内容，该字段可为空数组，但有数据的话需确认对应字段是否必填，列表长度不超过4
          */
-        @JSONField(name = "vertical_content_list")
+        @JsonProperty("vertical_content_list")
         private List<VerticalContent> verticalContentList;
         /**
          * 二级标题+文本列表，该字段可为空数组，但有数据的话需确认对应字段是否必填，列表长度不超过6
          */
-        @JSONField(name = "horizontal_content_list")
+        @JsonProperty("horizontal_content_list")
         private List<HorizontalContent> horizontalContentList;
         /**
          * 跳转指引样式的列表，该字段可为空数组，但有数据的话需确认对应字段是否必填，列表长度不超过3
          */
-        @JSONField(name = "jump_list")
+        @JsonProperty("jump_list")
         private List<Jump> jumpList;
         /**
          * 整体卡片的点击跳转事件，news_notice必填本字段
          */
-        @JSONField(name = "card_action")
+        @JsonProperty("card_action")
         private CardAction cardAction;
 
         public TemplateCard() {
@@ -147,12 +147,12 @@ public class QYTemplateCardMsg extends QYBaseMsg {
             /**
              * 来源图片的url
              */
-            @JSONField(name = "icon_url")
+            @JsonProperty("icon_url")
             private String iconUrl;
             /**
              * 源图片的描述，建议不超过20个字
              */
-            @JSONField(name = "desc")
+            @JsonProperty("desc")
             private String desc;
 
             public Source() {
@@ -190,12 +190,12 @@ public class QYTemplateCardMsg extends QYBaseMsg {
             /**
              * 一级标题，建议不超过36个字
              */
-            @JSONField(name = "title")
+            @JsonProperty("title")
             private String title;
             /**
              * 标题辅助信息，建议不超过44个字
              */
-            @JSONField(name = "desc")
+            @JsonProperty("desc")
             private String desc;
 
             public MainTitle() {
@@ -233,12 +233,12 @@ public class QYTemplateCardMsg extends QYBaseMsg {
             /**
              * 图片的url
              */
-            @JSONField(name = "url")
+            @JsonProperty("url")
             private String url;
             /**
              * 图片的宽高比，宽高比要小于2.25，大于1.3，不填该参数默认1.3
              */
-            @JSONField(name = "aspect_ratio")
+            @JsonProperty("aspect_ratio")
             private Double aspectRatio;
 
             public CardImage() {
@@ -275,12 +275,12 @@ public class QYTemplateCardMsg extends QYBaseMsg {
             /**
              * 卡片二级标题，建议不超过38个字
              */
-            @JSONField(name = "title")
+            @JsonProperty("title")
             private String title;
             /**
              * 级普通文本，建议不超过160个字
              */
-            @JSONField(name = "desc")
+            @JsonProperty("desc")
             private String desc;
 
             public VerticalContent() {
@@ -317,7 +317,7 @@ public class QYTemplateCardMsg extends QYBaseMsg {
             /**
              * 链接类型，0或不填代表不是链接，1 代表跳转url，2 代表下载附件
              */
-            @JSONField(name = "type")
+            @JsonProperty("type")
             private Integer type;
             /**
              * 二级标题，建议不超过5个字
@@ -334,7 +334,7 @@ public class QYTemplateCardMsg extends QYBaseMsg {
             /**
              * 附件的media_id，horizontal_content_list.type是2时必填
              */
-            @JSONField(name = "media_id")
+            @JsonProperty("media_id")
             private String mediaId;
 
             public HorizontalContent() {
@@ -402,7 +402,7 @@ public class QYTemplateCardMsg extends QYBaseMsg {
             /**
              * 跳转链接类型，0或不填代表不是链接，1 代表跳转url，2 代表跳转小程序
              */
-            @JSONField(name = "type")
+            @JsonProperty("type")
             private Integer type;
             /**
              * 跳转链接样式的文案内容，建议不超过18个字
@@ -415,12 +415,12 @@ public class QYTemplateCardMsg extends QYBaseMsg {
             /**
              * 跳转链接的小程序的appid，必须是与当前应用关联的小程序，jump_list.type是2时必填
              */
-            @JSONField(name = "appid")
+            @JsonProperty("appid")
             private String appid;
             /**
              * 跳转链接的小程序的pagepath，jump_list.type是2时选填
              */
-            @JSONField(name = "pagepath")
+            @JsonProperty("pagepath")
             private String pagepath;
 
             public Jump() {
@@ -488,7 +488,7 @@ public class QYTemplateCardMsg extends QYBaseMsg {
             /**
              * 跳转事件类型，1 代表跳转url，2 代表打开小程序。news_notice卡片模版中该字段取值范围为[1,2]
              */
-            @JSONField(name = "type")
+            @JsonProperty("type")
             private Integer type;
             /**
              * 跳转事件的url，card_action.type是1时必填
@@ -497,12 +497,12 @@ public class QYTemplateCardMsg extends QYBaseMsg {
             /**
              * 跳转事件的小程序的appid，必须是与当前应用关联的小程序，card_action.type是2时必填
              */
-            @JSONField(name = "appid")
+            @JsonProperty("appid")
             private String appid;
             /**
              * 跳转事件的小程序的pagepath，card_action.type是2时选填
              */
-            @JSONField(name = "pagepath")
+            @JsonProperty("pagepath")
             private String pagepath;
 
 

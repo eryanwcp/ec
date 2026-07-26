@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.entity;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.eryansky.fastweixin.api.enums.LangType;
 import com.eryansky.fastweixin.api.enums.MiniprogramState;
 
@@ -17,13 +17,13 @@ public class SubcribeMsg extends BaseModel {
     /**
      * 订阅模板id
      */
-    @JSONField(name = "template_id")
+    @JsonProperty("template_id")
     private String templateId;
     /**
      * 跳转小程序类型：developer为开发版；trial为体验版；formal为正式版；默认为正式版
      * {@link  MiniprogramState}
      */
-    @JSONField(name = "miniprogram_state")
+    @JsonProperty("miniprogram_state")
     private String miniprogramState;
     /**
      * 进入小程序查看”的语言类型，支持zh_CN(简体中文)、en_US(英文)、zh_HK(繁体中文)、zh_TW(繁体中文)，默认为zh_CN

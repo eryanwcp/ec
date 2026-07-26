@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.response;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Eryan
@@ -9,7 +9,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 public class QrcodeResponse extends BaseResponse {
 
     private String  ticket;
-    @JSONField(name = "expire_seconds")
+    @JsonProperty("expire_seconds")
     private Integer expireSeconds;
     private String  url;
 

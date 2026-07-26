@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.entity;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 累计用户数据
@@ -10,7 +10,7 @@ import com.alibaba.fastjson.annotation.JSONField;
  */
 public class UserCumulate extends BaseDataCube {
 
-    @JSONField(name = "cumulate_user")
+    @JsonProperty("cumulate_user")
     private Integer cumulateUser;
 
     public Integer getCumulateUser() {

@@ -4,7 +4,7 @@ package com.eryansky.fastweixin.company.api.response;/**
 
 import com.eryansky.fastweixin.api.response.BaseResponse;
 import com.eryansky.fastweixin.company.api.entity.QYUser;
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class GetQYUserInfo4DepartmentResponse extends BaseResponse {
 
-    @JSONField(name = "userlist")
+    @JsonProperty("userlist")
     public List<QYUser> userList;
 
     public List<QYUser> getUserList() {
