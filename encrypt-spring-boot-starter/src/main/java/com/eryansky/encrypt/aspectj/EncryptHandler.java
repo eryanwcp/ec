@@ -27,8 +27,8 @@ public class EncryptHandler{
      * The constant echo.
      */
     private static final Logger logger = LoggerFactory.getLogger(EncryptHandler.class);
-    public static final String AESKEY = "AES-RSA";
-    public static final String SM4KEY = "SM4-RSA";
+    public static String AESKEY = "AES-RSA";
+    public static String SM4KEY = "SM4-RSA";
 
 
     private final HoneyBadgerEncrypt honeyBadgerEncrypt;
