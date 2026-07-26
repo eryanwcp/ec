@@ -22,9 +22,6 @@ public class IpLimitInterceptor implements HandlerInterceptor {
 
     private static final Logger log = LoggerFactory.getLogger(IpLimitInterceptor.class);
 
-    public static final String LOCK_IP_LIMIT_REGION = "lock_ip_limit";
-    public static final String LOCK_IP_LIMIT_WHITELIST_REGION = "lock_ip_limit_whitelist";
-
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) throws Exception {
         if(!AppConstants.isLimitIpEnable()){
@@ -61,11 +58,6 @@ public class IpLimitInterceptor implements HandlerInterceptor {
         if("127.0.0.1".equals(ip) || "localhost".equals(ip)){
             return false;
         }
-        //白名单 缓存
-        Collection<String> whiteList = CacheUtils.keys(LOCK_IP_LIMIT_WHITELIST_REGION);
-        if (null != whiteList && null != whiteList.stream().filter(v-> "*".equals(v) || com.eryansky.j2cache.util.IpUtils.checkIPMatching(v,ip)).findAny().orElse(null)) {
-            return false;
-        }
         //白名单 配置文件
         Collection<String> configWhiteList = AppConstants.getLimitIpWhiteList();
         if (null != configWhiteList && null != configWhiteList.stream().filter(v-> "*".equals(v) || com.eryansky.j2cache.util.IpUtils.checkIPMatching(v,ip)).findAny().orElse(null)) {
@@ -74,12 +66,6 @@ public class IpLimitInterceptor implements HandlerInterceptor {
         if(AppConstants.isLimitIpWhiteEnable()){
             return true;
         }else{
-            //黑名单 缓存
-            Boolean value = CacheUtils.get(LOCK_IP_LIMIT_REGION, ip);
-            if(null != value){
-                return  true;
-            }
-
             //黑名单 配置文件
             Collection<String> blackWhiteList = AppConstants.getLimitIpBlackList();
             if (null != blackWhiteList && null != blackWhiteList.stream().filter(v->com.eryansky.j2cache.util.IpUtils.checkIPMatching(v,ip)).findAny().orElse(null)) {
