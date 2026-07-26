@@ -22,15 +22,15 @@ public class DownloadMaterialResponse extends BaseResponse {
     private static final Logger LOG = LoggerFactory.getLogger(DownloadMaterialResponse.class);
 
     // 当素材是图文素材的时候
-    @JSONField(name="news_item")
+    @JsonProperty("news_item")
     private List<Article> news;
 
     // 当素材是视频素材的时候
-    @JSONField(name="title")
+    @JsonProperty("title")
     private String title;
-    @JSONField(name="description")
+    @JsonProperty("description")
     private String description;
-    @JSONField(name="down_url")
+    @JsonProperty("down_url")
     private String downUrl;
 
     private byte[] content;

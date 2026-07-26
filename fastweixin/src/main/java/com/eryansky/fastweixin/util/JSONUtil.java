@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -54,9 +55,9 @@ public final class JSONUtil {
      * @param jsonString json字符串
      * @return 转换成的json对象
      */
-    public static Object getJSONFromString(final String jsonString) {
+    public static JsonNode getJSONFromString(final String jsonString) {
         if (StrUtil.isBlank(jsonString)) {
-            return new com.fasterxml.jackson.databind.node.ObjectNode();
+            return mapper.createObjectNode();
         }
         try {
             return mapper.readTree(jsonString);

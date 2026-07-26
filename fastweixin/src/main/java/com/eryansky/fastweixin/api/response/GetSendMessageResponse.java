@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class GetSendMessageResponse extends BaseResponse {
 
-    @JSONField(name="msg_id")
+    @JsonProperty("msg_id")
     private String msgId;
 
     public String getMsgId() {

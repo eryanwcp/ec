@@ -1,6 +1,7 @@
 package com.eryansky.fastweixin.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
 
@@ -10,7 +11,8 @@ import java.util.Date;
  */
 public class ArticleTotalDetail extends BaseModel {
 
-    @JsonProperty(""stat_date", format = "yyyy-MM-dd")
+    @JsonProperty("stat_date")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date    statDate;
     @JsonProperty("target_user")
     private Integer targetUser;

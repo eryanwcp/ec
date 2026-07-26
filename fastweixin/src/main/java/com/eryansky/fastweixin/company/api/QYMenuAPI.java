@@ -71,8 +71,9 @@ public class QYMenuAPI extends QYBaseAPI {
     private void processMenuButtons(JsonNode root) {
         JsonNode menu = root.get("menu");
         if (menu == null) return;
-        ArrayNode buttons = menu.get("button");
-        if (buttons == null || !buttons.isArray()) return;
+        JsonNode buttonsNode = menu.get("button");
+        if (buttonsNode == null || !buttonsNode.isArray()) return;
+        ArrayNode buttons = (ArrayNode) buttonsNode;
 
         for (JsonNode button : buttons) {
             if (button instanceof ObjectNode buttonNode) {

@@ -11,7 +11,7 @@ public class PrivateTemplate extends BaseModel {
     /**
 	 * 模板ID
 	 */
-	@JSONField(name="template_id")
+	@JsonProperty("template_id")
 	private String templateId;
 	
 	/**
@@ -22,13 +22,13 @@ public class PrivateTemplate extends BaseModel {
 	/**
 	 * 模板所属行业的一级行业
 	 */
-	@JSONField(name="primary_industry")
+	@JsonProperty("primary_industry")
 	private String primaryIndustry;
 	
 	/**
 	 * 模板所属行业的二级行业
 	 */
-	@JSONField(name="deputy_industry")
+	@JsonProperty("deputy_industry")
 	private String deputyIndustry;
 	
 	/**
