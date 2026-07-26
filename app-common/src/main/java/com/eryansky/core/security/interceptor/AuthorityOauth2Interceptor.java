@@ -29,99 +29,137 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.lang.annotation.Annotation;
 import java.util.List;
-
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 模拟Outho2认证拦截器
+ * 模拟OAuth2认证拦截器（注解缓存优化版）
  * @author Eryan
  * @date 2021-09-09
  */
 public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
 
-
     protected Logger logger = LoggerFactory.getLogger(getClass());
-
 
     /**
      * 不需要拦截的资源
      */
     private List<String> excludeUrls = Lists.newArrayList();
 
+    /**
+     * PrepareOauth2 注解解析结果缓存，避免重复反射
+     */
+    private final Map<HandlerMethod, Oauth2AnnotationMetadata> oauth2AnnotationCache = new ConcurrentHashMap<>();
+
+    /**
+     * OAuth2 注解元数据封装
+     */
+    private static class Oauth2AnnotationMetadata {
+        final boolean enable;        // 是否开启 OAuth2 准备
+        final String authType;       // 认证类型
+
+        public Oauth2AnnotationMetadata(boolean enable, String authType) {
+            this.enable = enable;
+            this.authType = authType;
+        }
+    }
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        //已登录用户
+        // 已登录用户
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo(request, false);
-        if (null != sessionInfo){
+        if (null != sessionInfo) {
             return true;
         }
 
-        //注解处理 满足设置不拦截
-        if(handler instanceof HandlerMethod) {
-            HandlerMethod handlerMethod = (HandlerMethod)handler;
-            PrepareOauth2 prepareOauth2Method = handlerMethod.getMethodAnnotation(PrepareOauth2.class);
-            PrepareOauth2 prepareOauth2Class = this.getAnnotation(handlerMethod.getBean().getClass(), PrepareOauth2.class);
-            if ((prepareOauth2Method != null && !prepareOauth2Method.enable()) || (prepareOauth2Class != null && !prepareOauth2Class.enable())) {
+        // 注解处理 满足设置不拦截
+        if (handler instanceof HandlerMethod) {
+            HandlerMethod handlerMethod = (HandlerMethod) handler;
+
+            // 优先获取缓存中的注解解析结果，避免高并发下频繁反射调用
+            Oauth2AnnotationMetadata metadata = oauth2AnnotationCache.computeIfAbsent(handlerMethod, this::parseOauth2AnnotationMetadata);
+
+            // 未开启 OAuth2 直接放行
+            if (!metadata.enable) {
                 return true;
             }
-            String authType = null != prepareOauth2Method ? prepareOauth2Method.authType():null;
-            if(null == authType){
-                authType = null != prepareOauth2Class ? prepareOauth2Class.authType():null;
-            }
-            //非内置用户 自动跳过
-            if(null != authType && !PrepareOauth2.DEFAULT_AUTH_TYPE.equals(authType)){
+
+            // 非内置用户 自动跳过
+            if (null != metadata.authType && !PrepareOauth2.DEFAULT_AUTH_TYPE.equals(metadata.authType)) {
                 return true;
             }
 
             String token = AppUtils.extractToken(request);
-
-            if(StringUtils.isNotBlank(token)){
-                String lockKey = "lock_oauth2_token:"+ Encrypt.md5(token);
+            if (StringUtils.isNotBlank(token)) {
+                String lockKey = "lock_oauth2_token:" + Encrypt.md5(token);
                 CacheUtils.getCacheChannel().lock(lockKey, 5, 10, new DefaultLockCallback<Boolean>(false, false) {
-                            @Override
-                            public Boolean handleObtainLock() {
-                                SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo(request, false);
-                                if (null != sessionInfo) {
-                                    return true;
-                                }
-                                String requestUrl = request.getRequestURI();
-                                String loginName = null;
-                                try {
-                                    loginName = SecurityUtils.getLoginNameByToken(token);
-                                } catch (Exception e) {
-                                    if (!(e instanceof TokenExpiredException)) {
-                                        logger.error("Token校验失败：{},{},{},{},{}", loginName, SpringMVCHolder.getIp(), requestUrl, token, e.getMessage());
-                                    }
-                                }
-                                if (StringUtils.isBlank(loginName)) {
-                                    return true;
-                                }
-                                //自动登录
-                                boolean verify = false;
-                                User user = null;
-                                try {
-                                    user = UserUtils.getUserByLoginName(loginName);
-                                    if (null == user) {
-                                        logger.warn("Token校验失败（用户不存在）：{},{},{}", loginName, requestUrl, token);
-                                        return true;
-                                    }
-                                    verify = SecurityUtils.verifySessionInfoToken(token, loginName, user.getPassword());
-                                } catch (Exception e) {
-                                    if (!(e instanceof TokenExpiredException)) {
-                                        logger.error("Token校验失败：{},{},{},{},{}", loginName, SpringMVCHolder.getIp(), requestUrl, token, e.getMessage());
-                                    }
-                                }
-                                if (verify) {
-                                    SecurityUtils.putUserToSession(request, user);
-                                    UserUtils.recordLogin(user.getId());
-                                    logger.debug("自动登录成功：{},{},{} {}", loginName, IpUtils.getIpAddr0(request), requestUrl,lockKey);
-                                }
+                    @Override
+                    public Boolean handleObtainLock() {
+                        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo(request, false);
+                        if (null != sessionInfo) {
+                            return true;
+                        }
+                        String requestUrl = request.getRequestURI();
+                        String loginName = null;
+                        try {
+                            loginName = SecurityUtils.getLoginNameByToken(token);
+                        } catch (Exception e) {
+                            if (!(e instanceof TokenExpiredException)) {
+                                logger.error("Token校验失败：{},{},{},{},{}", loginName, SpringMVCHolder.getIp(), requestUrl, token, e.getMessage());
+                            }
+                        }
+                        if (StringUtils.isBlank(loginName)) {
+                            return true;
+                        }
+                        // 自动登录
+                        boolean verify = false;
+                        User user = null;
+                        try {
+                            user = UserUtils.getUserByLoginName(loginName);
+                            if (null == user) {
+                                logger.warn("Token校验失败（用户不存在）：{},{},{}", loginName, requestUrl, token);
                                 return true;
                             }
-                        });
-
+                            verify = SecurityUtils.verifySessionInfoToken(token, loginName, user.getPassword());
+                        } catch (Exception e) {
+                            if (!(e instanceof TokenExpiredException)) {
+                                logger.error("Token校验失败：{},{},{},{},{}", loginName, SpringMVCHolder.getIp(), requestUrl, token, e.getMessage());
+                            }
+                        }
+                        if (verify) {
+                            SecurityUtils.putUserToSession(request, user);
+                            UserUtils.recordLogin(user.getId());
+                            logger.debug("自动登录成功：{},{},{} {}", loginName, IpUtils.getIpAddr0(request), requestUrl, lockKey);
+                        }
+                        return true;
+                    }
+                });
             }
         }
         return true;
+    }
+
+    /**
+     * 解析 HandlerMethod 及 Class 上的 PrepareOauth2 注解（首次调用时触发）
+     */
+    private Oauth2AnnotationMetadata parseOauth2AnnotationMetadata(HandlerMethod handlerMethod) {
+        PrepareOauth2 prepareOauth2Method = handlerMethod.getMethodAnnotation(PrepareOauth2.class);
+        PrepareOauth2 prepareOauth2Class = AppUtils.getAnnotation(handlerMethod.getBeanType(), PrepareOauth2.class);
+
+        // 方法级别禁用，或类级别禁用
+        boolean enable = true;
+        if ((prepareOauth2Method != null && !prepareOauth2Method.enable()) ||
+                (prepareOauth2Class != null && !prepareOauth2Class.enable())) {
+            enable = false;
+        }
+
+        // 决定 authType 优先级：方法注解 > 类注解
+        String authType = null != prepareOauth2Method ? prepareOauth2Method.authType() : null;
+        if (null == authType) {
+            authType = null != prepareOauth2Class ? prepareOauth2Class.authType() : null;
+        }
+
+        return new Oauth2AnnotationMetadata(enable, authType);
     }
 
     @Override
@@ -131,10 +169,8 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse httpServletResponse, Object o, Exception e) throws Exception {
         if (e != null) {
-
         }
     }
-
 
     public List<String> getExcludeUrls() {
         return excludeUrls;
@@ -149,19 +185,4 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
         this.excludeUrls.add(excludeUrl);
         return this;
     }
-
-    private <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> annotationType) {
-        T result = clazz.getAnnotation(annotationType);
-        if (result == null) {
-            Class<?> superclass = clazz.getSuperclass();
-            if (superclass != null) {
-                return getAnnotation(superclass, annotationType);
-            } else {
-                return null;
-            }
-        } else {
-            return result;
-        }
-    }
-
 }
