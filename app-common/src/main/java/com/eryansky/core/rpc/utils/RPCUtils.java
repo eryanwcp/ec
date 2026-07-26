@@ -231,7 +231,7 @@ public class RPCUtils {
                 return Base64.decodeBase64(bytes);
             }
         } catch (Exception e) {
-            log.error("Failed to decrypt data with cipher mode: {}", encrypt, e);
+            log.error("Failed to decryptDataByRequest with cipher mode: {}", encrypt, e);
         }
         return bytes;
     }
@@ -354,7 +354,7 @@ public class RPCUtils {
                 }
             }
         } catch (Exception e) {
-            log.error("Failed to decrypt data with cipher mode: {}", encrypt, e);
+            log.error("Failed to encrypt data with cipher mode: {}", encrypt, e);
         }
         return bytes;
     }
