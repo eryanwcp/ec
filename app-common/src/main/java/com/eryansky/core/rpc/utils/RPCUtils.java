@@ -154,19 +154,19 @@ public class RPCUtils {
     }
 
     public static Boolean isPermitted(Class clazz, Method method){
-        //资源/权限注解
+        // 资源/权限注解
         RPCPermissions requiresPermissions = method.getAnnotation(RPCPermissions.class);
-        if(requiresPermissions == null){
-            requiresPermissions = getAnnotation(clazz,RPCPermissions.class);
+        if (requiresPermissions == null) {
+            requiresPermissions = getAnnotation(clazz, RPCPermissions.class);
         }
-        if (requiresPermissions != null) {//方法注解处理
+        if (requiresPermissions != null) { // 方法注解处理
             String[] permissions = requiresPermissions.value();
             boolean permittedResource = false;
             for (String permission : permissions) {
                 permittedResource = SecurityUtils.isPermitted(permission);
                 if (Logical.AND.equals(requiresPermissions.logical())) {
                     if (!permittedResource) {
-                        return false;
+                        return Boolean.FALSE;
                     }
                 } else {
                     if (permittedResource) {
@@ -174,8 +174,8 @@ public class RPCUtils {
                     }
                 }
             }
-            if(!permittedResource){
-                return false;
+            if (!permittedResource) {
+                return Boolean.FALSE;
             }
         }
         return null;
