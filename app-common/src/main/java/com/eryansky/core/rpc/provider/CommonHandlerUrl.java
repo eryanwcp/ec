@@ -23,6 +23,8 @@ public class CommonHandlerUrl {
 
     public static final Method HANDLE_CUSTOM_URL_METHOD;
 
+    // 设置最大限制：如 100MB
+    private static final int MAX_BODY_SIZE = 100 * 1024 * 1024;
 
     static {
         // 提前准备方法对象
@@ -48,6 +50,10 @@ public class CommonHandlerUrl {
         String encryptKey = request.getHeader(RPCUtils.HEADER_ENCRYPT_KEY);
         String serializer = request.getHeader(RPCUtils.HEADER_RPC_SERIALIZER);
 
+        int contentLength = request.getContentLength();
+        if (contentLength > MAX_BODY_SIZE) {
+            log.warn("Request body too large: {}",contentLength);
+        }
         byte[] data = StreamUtils.copyToByteArray(request.getInputStream());
         
         if (StringUtils.isNotBlank(encrypt)) {
