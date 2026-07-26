@@ -181,6 +181,86 @@ public class RPCUtils {
         return null;
     }
 
+    //RPC客户端相关
+
+    public static final class EncryptRequestKey {
+        final String encrypt;
+        final String key;
+        final String encryptKey;
+
+        EncryptRequestKey(String encrypt,String key, String encryptKey) {
+            this.encrypt = encrypt;
+            this.key = key;
+            this.encryptKey = encryptKey;
+        }
+
+        public String getEncrypt() {
+            return encrypt;
+        }
+
+        public String getKey() {
+            return key;
+        }
+
+        public String getEncryptKey() {
+            return encryptKey;
+        }
+    }
+
+    /**
+     * 生成加密密钥
+     * @param encrypt 加密方式
+     * @return
+     */
+    public static EncryptRequestKey generateEncryptKey(String encrypt) {
+        if (com.eryansky.common.utils.StringUtils.isBlank(encrypt) || CipherMode.BASE64.name().equals(encrypt)) {
+            return new EncryptRequestKey(encrypt,null,null);
+        }
+
+        try {
+            if(CipherMode.SM4.name().equals(encrypt)){
+                String key = Sm4Utils.generateHexKeyString();
+                String encryptKey =  RSAUtils.encryptHexString(key,EncryptProvider.publicKeyBase64());
+                return new EncryptRequestKey(encrypt,key,encryptKey);
+            }else if(CipherMode.AES.name().equals(encrypt)){
+                String key = Cryptos.getBase64EncodeKey();
+                String encryptKey =  RSAUtils.encryptBase64String(key,EncryptProvider.publicKeyBase64());
+                return new EncryptRequestKey(encrypt,key,encryptKey);
+            }
+        } catch (Exception e) {
+            log.error("Failed to generateEncryptKey cipher mode: {}", encrypt, e);
+        }
+        return new EncryptRequestKey(encrypt,null,null);
+    }
+
+
+    /**
+     * 数据加密
+     * @param encrypt 加密方式
+     * @param key 密钥
+     * @param bytes 数据
+     * @return
+     */
+    public static byte[] encryptData(String encrypt, String key, byte[] bytes) {
+        if (!com.eryansky.common.utils.StringUtils.isNotBlank(key) && !CipherMode.BASE64.name().equals(encrypt)) {
+            return bytes;
+        }
+
+        try {
+            if (com.eryansky.common.utils.StringUtils.isNotBlank(encrypt)){
+                if(CipherMode.SM4.name().equals(encrypt)){
+                    bytes = Sm4Utils.encrypt(key, bytes);
+                }else if(CipherMode.AES.name().equals(encrypt)){
+                    bytes = Cryptos.aesECBEncrypt(bytes, key);
+                }else if(CipherMode.BASE64.name().equals(encrypt)){
+                    bytes = Base64.encodeBase64(bytes);
+                }
+            }
+        } catch (Exception e) {
+            log.error("Failed to encrypt data with cipher mode: {}", encrypt, e);
+        }
+        return bytes;
+    }
 
     /**
      * 数据解密
@@ -207,6 +287,8 @@ public class RPCUtils {
         }
         return bytes;
     }
+
+//    服务端相关代码
 
     /**
      * 数据解密（根据请求加密密钥）
@@ -276,86 +358,5 @@ public class RPCUtils {
         } catch (Exception e) {
             return encryptedKey;
         }
-    }
-
-
-
-    public static final class EncryptRequestKey {
-        final String encrypt;
-        final String key;
-        final String encryptKey;
-
-        EncryptRequestKey(String encrypt,String key, String encryptKey) {
-            this.encrypt = encrypt;
-            this.key = key;
-            this.encryptKey = encryptKey;
-        }
-
-        public String getEncrypt() {
-            return encrypt;
-        }
-
-        public String getKey() {
-            return key;
-        }
-
-        public String getEncryptKey() {
-            return encryptKey;
-        }
-    }
-
-    /**
-     * 生成加密密钥
-     * @param encrypt
-     * @return
-     */
-    public static EncryptRequestKey generateEncryptKey(String encrypt) {
-        if (com.eryansky.common.utils.StringUtils.isBlank(encrypt) || CipherMode.BASE64.name().equals(encrypt)) {
-            return new EncryptRequestKey(encrypt,null,null);
-        }
-
-        try {
-            if(CipherMode.SM4.name().equals(encrypt)){
-                String key = Sm4Utils.generateHexKeyString();
-                String encryptKey =  RSAUtils.encryptHexString(key,EncryptProvider.publicKeyBase64());
-                return new EncryptRequestKey(encrypt,key,encryptKey);
-            }else if(CipherMode.AES.name().equals(encrypt)){
-                String key = Cryptos.getBase64EncodeKey();
-                String encryptKey =  RSAUtils.encryptBase64String(key,EncryptProvider.publicKeyBase64());
-                return new EncryptRequestKey(encrypt,key,encryptKey);
-            }
-        } catch (Exception e) {
-            log.error("Failed to generateEncryptKey cipher mode: {}", encrypt, e);
-        }
-        return new EncryptRequestKey(encrypt,null,null);
-    }
-
-
-    /**
-     * 数据加密
-     * @param encrypt 加密方式
-     * @param key 密钥
-     * @param bytes 数据
-     * @return
-     */
-    public static byte[] encryptData(String encrypt, String key, byte[] bytes) {
-        if (!com.eryansky.common.utils.StringUtils.isNotBlank(key) && !CipherMode.BASE64.name().equals(encrypt)) {
-            return bytes;
-        }
-
-        try {
-            if (com.eryansky.common.utils.StringUtils.isNotBlank(encrypt)){
-                if(CipherMode.SM4.name().equals(encrypt)){
-                    bytes = Sm4Utils.encrypt(key, bytes);
-                }else if(CipherMode.AES.name().equals(encrypt)){
-                    bytes = Cryptos.aesECBEncrypt(bytes, key);
-                }else if(CipherMode.BASE64.name().equals(encrypt)){
-                    bytes = Base64.encodeBase64(bytes);
-                }
-            }
-        } catch (Exception e) {
-            log.error("Failed to encrypt data with cipher mode: {}", encrypt, e);
-        }
-        return bytes;
     }
 }
