@@ -19,7 +19,7 @@ import com.eryansky.core.rpc.utils.RPCUtils;
 import com.eryansky.core.security.annotation.RequiresUser;
 import com.eryansky.core.security.annotation.RestApi;
 import com.eryansky.utils.AppConstants;
-
+import com.eryansky.utils.AppUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.method.HandlerMethod;
@@ -32,11 +32,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Rest权限拦截器
+ * Rest权限拦截器（注解缓存优化版）
  * @author Eryan
  * @date 2020-09-09
  */
@@ -45,9 +46,28 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
     public static final String SESSION_KEY_REST_AUTHORITY = "REST_AUTHORITY";
-
     private static final String SESSION_TAG_NAME = "loginUser";
     private static final String SYSTEM_PREFIX_NAME = "内部系统";
+
+    /**
+     * Rest 权限注解解析结果缓存，避免重复反射
+     */
+    private final Map<HandlerMethod, RestAnnotationMetadata> restAnnotationCache = new ConcurrentHashMap<>();
+
+    /**
+     * REST 权限注解元数据封装
+     */
+    private static class RestAnnotationMetadata {
+        final RestApi restApi;
+        final boolean restApiRequired;
+        final boolean requiresUserSkip; // requiresUser != null && !requiresUser.required()
+
+        public RestAnnotationMetadata(RestApi restApi, boolean restApiRequired, boolean requiresUserSkip) {
+            this.restApi = restApi;
+            this.restApiRequired = restApiRequired;
+            this.requiresUserSkip = requiresUserSkip;
+        }
+    }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) throws Exception {
@@ -56,23 +76,26 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
         if (null != handlerResult && handlerResult) {
             return handlerResult;
         }
+
         String requestUrl = request.getRequestURI().replaceAll("//", "/");
         if (logger.isDebugEnabled()) {
-            logger.debug("{} {}",request.getSession().getId(),requestUrl);
+            logger.debug("{} {}", request.getSession().getId(), requestUrl);
         }
+
         boolean restEnable = AppConstants.getIsSystemRestEnable();
         if (!restEnable) {
             R<Boolean> result = R.rest(false).setMsg("系统维护中，请稍后再试！");
-            renderJson(request,response, result);
+            renderJson(request, response, result);
             return false;
         }
 
-        //注解处理
+        // 注解处理
         handlerResult = this.defaultHandler(request, response, o, requestUrl);
         httpSession.setAttribute(SESSION_KEY_REST_AUTHORITY, handlerResult);
         if (null != handlerResult) {
             return handlerResult;
         }
+
         return true;
     }
 
@@ -82,9 +105,9 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
      * @param response
      * @param r
      */
-    private void renderJson(HttpServletRequest request, HttpServletResponse response, R<Boolean> r){
+    private void renderJson(HttpServletRequest request, HttpServletResponse response, R<Boolean> r) {
         String requestUrl = request.getRequestURI().replaceAll("//", "/");
-        logger.warn("{} {} {}",IpUtils.getIpAddr0(request) ,JsonMapper.toJsonString(WebUtils.getHeaders(request)),requestUrl);
+        logger.warn("{} {} {}", IpUtils.getIpAddr0(request), JsonMapper.toJsonString(WebUtils.getHeaders(request)), requestUrl);
         WebUtils.renderJson(response, r);
 
         // 返回接口 数据解密
@@ -142,7 +165,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
     }
 
     /**
-     * 注解处理
+     * 注解处理（带缓存机制）
      * @param request
      * @param response
      * @param handler
@@ -152,38 +175,31 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
      */
     private Boolean defaultHandler(HttpServletRequest request, HttpServletResponse response, Object handler, String requestUrl) throws Exception {
         HandlerMethod handlerMethod = null;
-        //注解处理 满足设置不拦截
-        if(handler instanceof HandlerMethod) {
+        if (handler instanceof HandlerMethod) {
             handlerMethod = (HandlerMethod) handler;
         }
 
         if (handlerMethod != null) {
-            Object bean = handlerMethod.getBean();
-            //权限校验
-            RestApi restApi = handlerMethod.getMethodAnnotation(RestApi.class);
-            if (restApi == null) {
-                restApi = this.getAnnotation(bean.getClass(), RestApi.class);
-            }
-            RequiresUser requiresUser = handlerMethod.getMethodAnnotation(RequiresUser.class);
-            if (requiresUser == null) {
-                requiresUser = this.getAnnotation(bean.getClass(), RequiresUser.class);
-            }
+            // 优先获取缓存中的注解解析元数据
+            RestAnnotationMetadata metadata = restAnnotationCache.computeIfAbsent(handlerMethod, this::parseRestAnnotationMetadata);
 
-            if (restApi != null) {//方法注解处理
-                if (!restApi.required()) {
+            if (metadata.restApi != null) {
+                // 方法/类注解配置处理：未开启 required，直接放行
+                if (!metadata.restApiRequired) {
+                    return true;
+                }
+                if (metadata.requiresUserSkip) {
                     return true;
                 }
 
-                if (null != requiresUser && !requiresUser.required()) {
-                    return true;
-                }
-                //IP访问限制
+                // IP访问限制
                 String ip = IpUtils.getIpAddr0(request);
                 if (checkIpLimit(ip)) {
                     notPermittedPermission(request, response, requestUrl, "REST禁止访问：" + ip);
                     return false;
                 }
-                //请求密钥
+
+                // 请求密钥
                 String authType = request.getHeader(RPCUtils.HEADER_AUTH_TYPE);
                 String encrypt = request.getHeader(RPCUtils.HEADER_ENCRYPT);
                 String apiKey = request.getHeader(RPCUtils.HEADER_X_API_KEY);
@@ -192,12 +208,14 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                     notPermittedPermission(request, response, requestUrl, "未识别参数:Header['X-API-Key']=" + apiKey);
                     return false;
                 }
-                //密钥认证
+
+                // 密钥认证
                 String DEFAULT_API_KEY = AppConstants.getRestDefaultApiKey();
                 if (!DEFAULT_API_KEY.equals(apiKey)) {
                     notPermittedPermission(request, response, requestUrl, "未授权访问:Header['X-API-Key']=" + apiKey);
                     return false;
                 }
+
                 HttpSession httpSession = request.getSession();
                 String suffix = Optional.ofNullable(applicationId).map(id -> "[" + id + "]").orElse("");
                 httpSession.setAttribute(SESSION_TAG_NAME, SYSTEM_PREFIX_NAME + suffix);
@@ -205,13 +223,36 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                 httpSession.setAttribute(RPCUtils.HEADER_ENCRYPT, encrypt);
                 return true;
             }
-
         }
         return null;
     }
 
-    private boolean checkIpLimit(String ip){
-        //IP访问限制
+    /**
+     * 解析 HandlerMethod 及 Class 上的 RestApi 和 RequiresUser 注解（首次调用时触发）
+     */
+    private RestAnnotationMetadata parseRestAnnotationMetadata(HandlerMethod handlerMethod) {
+        Class<?> beanType = handlerMethod.getBeanType();
+
+        // 获取 RestApi 注解（方法优先，类注解兜底）
+        RestApi restApi = handlerMethod.getMethodAnnotation(RestApi.class);
+        if (restApi == null) {
+            restApi = AppUtils.getAnnotation(beanType, RestApi.class);
+        }
+
+        // 获取 RequiresUser 注解（方法优先，类注解兜底）
+        RequiresUser requiresUser = handlerMethod.getMethodAnnotation(RequiresUser.class);
+        if (requiresUser == null) {
+            requiresUser = AppUtils.getAnnotation(beanType, RequiresUser.class);
+        }
+
+        boolean restApiRequired = restApi != null && restApi.required();
+        boolean requiresUserSkip = requiresUser != null && !requiresUser.required();
+
+        return new RestAnnotationMetadata(restApi, restApiRequired, requiresUserSkip);
+    }
+
+    private boolean checkIpLimit(String ip) {
+        // IP访问限制
         boolean isRestLimitEnable = AppConstants.getIsSystemRestLimitEnable();
         boolean isLimit = false;
         if (isRestLimitEnable) {
@@ -220,13 +261,11 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
             if (Collections3.isNotEmpty(ipList) && (null == ipList.stream().filter(v -> "*".equals(v) || com.eryansky.j2cache.util.IpUtils.checkIPMatching(v, ip)).findAny().orElse(null))) {
                 isLimit = false;
             }
-            if("127.0.0.1".equals(ip) || "localhost".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip)){
+            if ("127.0.0.1".equals(ip) || "localhost".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip)) {
                 isLimit = false;
             }
-
-
         }
-        return  isLimit;
+        return isLimit;
     }
 
     /**
@@ -238,24 +277,8 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
      * @throws IOException
      */
     private void notPermittedPermission(HttpServletRequest request, HttpServletResponse response, String requestUrl, String msg) throws ServletException, IOException {
-//        response.setStatus(HttpStatus.FORBIDDEN.value());
         R<Boolean> result = new R<>(false).setCode(R.NO_PERMISSION).setMsg(msg);
-        renderJson(request,response, result);
-    }
-
-
-    private <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> annotationType) {
-        T result = clazz.getAnnotation(annotationType);
-        if (result == null) {
-            Class<?> superclass = clazz.getSuperclass();
-            if (superclass != null) {
-                return getAnnotation(superclass, annotationType);
-            } else {
-                return null;
-            }
-        } else {
-            return result;
-        }
+        renderJson(request, response, result);
     }
 
     @Override
@@ -265,8 +288,6 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse httpServletResponse, Object o, Exception e) throws Exception {
         if (e != null) {
-
         }
     }
-
 }

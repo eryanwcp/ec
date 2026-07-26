@@ -1,3 +1,8 @@
+/**
+ * Copyright (c) 2012-2026 https://www.eryansky.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ */
 package com.eryansky.core.excels;
 
 import bsh.Interpreter;
@@ -16,7 +21,7 @@ public class FormulaProcessor {
 
 	private static final Logger logger = LoggerFactory.getLogger(FormulaProcessor.class);
 
-	private Pattern pattern = Pattern.compile("\\$(\\d+)");
+	private final Pattern pattern = Pattern.compile("\\$(\\d+)");
 
 	/**
 	 * 静态内部类，延迟加载，懒汉式，线程安全的单例模式

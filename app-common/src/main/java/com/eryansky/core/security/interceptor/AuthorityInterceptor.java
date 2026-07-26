@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2012-2024 https://www.eryansky.com
+ *  Copyright (c) 2012-2026 https://www.eryansky.com
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -33,6 +33,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -63,6 +65,26 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
      * 验证数据库标记URL 默认值：false
      */
     private Boolean authorMarkUrl = false;
+
+    /**
+     * 注解解析结果缓存：Key 为 HandlerMethod，Value 为解析后的权限元数据
+     */
+    private final Map<HandlerMethod, AnnotationMetadata> annotationCache = new ConcurrentHashMap<>();
+
+    /**
+     * 存储反射解析出来的注解元数据，避免每次请求重复反射
+     */
+    private static class AnnotationMetadata {
+        final boolean skipCheck;               // 是否直接放行（如 RequiresUser(required=false) 或 RestApi 不检查默认权限）
+        final RequiresRoles requiresRoles;     // 角色注解
+        final RequiresPermissions requiresPermissions; // 权限注解
+
+        public AnnotationMetadata(boolean skipCheck, RequiresRoles requiresRoles, RequiresPermissions requiresPermissions) {
+            this.skipCheck = skipCheck;
+            this.requiresRoles = requiresRoles;
+            this.requiresPermissions = requiresPermissions;
+        }
+    }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) throws Exception {
@@ -108,40 +130,22 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
             return null;
         }
 
-        //需要登录
-        RequiresUser methodRequiresUser = handlerMethod.getMethodAnnotation(RequiresUser.class);
-        if (methodRequiresUser != null && !methodRequiresUser.required()) {
+        // 从缓存中获取元数据，不存在则计算解析并写入缓存
+        AnnotationMetadata metadata = annotationCache.computeIfAbsent(handlerMethod, this::parseAnnotationMetadata);
+        // 如果配置了可跳过校验的注解，直接放行
+        if (metadata.skipCheck) {
             return true;
         }
 
-        if(methodRequiresUser == null){//类注解处理
-            RequiresUser classRequiresUser =  AppUtils.getAnnotation(handlerMethod.getBean().getClass(),RequiresUser.class);
-            if (classRequiresUser != null && !classRequiresUser.required()) {
-                return true;
-            }
-        }
-
-        RestApi restApi = handlerMethod.getMethodAnnotation(RestApi.class);
-        if (restApi == null) {
-            restApi = AppUtils.getAnnotation(handlerMethod.getBean().getClass(), RestApi.class);
-        }
-        if(null != restApi && !restApi.checkDefaultPermission()){
-            return true;
-        }
-
-        //角色注解
-        RequiresRoles requiresRoles = handlerMethod.getMethodAnnotation(RequiresRoles.class);
-        if(requiresRoles == null){
-            requiresRoles = AppUtils.getAnnotation(handlerMethod.getBean().getClass(),RequiresRoles.class);
-        }
-        if (requiresRoles != null) {//方法注解处理
-            String[] roles = requiresRoles.value();
+        // 校验角色注解
+        if (metadata.requiresRoles != null) {
+            String[] roles = metadata.requiresRoles.value();
             boolean permittedRole = false;
             for (String role : roles) {
                 permittedRole = SecurityUtils.isPermittedRole(role);
-                if (Logical.AND.equals(requiresRoles.logical())) {
+                if (Logical.AND.equals(metadata.requiresRoles.logical())) {
                     if (!permittedRole) {
-                        notPermittedRole(request,response,sessionInfo,requestUrl,role);
+                        notPermittedRole(request, response, sessionInfo, requestUrl, role);
                         return false;
                     }
                 } else {
@@ -150,25 +154,21 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
                     }
                 }
             }
-            if(!permittedRole){
-                notPermittedPermission(request,response,sessionInfo,requestUrl,null);
+            if (!permittedRole) {
+                notPermittedPermission(request, response, sessionInfo, requestUrl, null);
                 return false;
             }
         }
 
-        //资源/权限注解
-        RequiresPermissions requiresPermissions = handlerMethod.getMethodAnnotation(RequiresPermissions.class);
-        if(requiresPermissions == null){
-            requiresPermissions = AppUtils.getAnnotation(handlerMethod.getBean().getClass(),RequiresPermissions.class);
-        }
-        if (requiresPermissions != null) {//方法注解处理
-            String[] permissions = requiresPermissions.value();
+        // 校验权限/资源注解
+        if (metadata.requiresPermissions != null) {
+            String[] permissions = metadata.requiresPermissions.value();
             boolean permittedResource = false;
             for (String permission : permissions) {
                 permittedResource = SecurityUtils.isPermitted(permission);
-                if (Logical.AND.equals(requiresPermissions.logical())) {
+                if (Logical.AND.equals(metadata.requiresPermissions.logical())) {
                     if (!permittedResource) {
-                        notPermittedPermission(request,response,sessionInfo,requestUrl,permission);
+                        notPermittedPermission(request, response, sessionInfo, requestUrl, permission);
                         return false;
                     }
                 } else {
@@ -177,12 +177,51 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
                     }
                 }
             }
-            if(!permittedResource){
-                notPermittedPermission(request,response,sessionInfo,requestUrl,null);
+            if (!permittedResource) {
+                notPermittedPermission(request, response, sessionInfo, requestUrl, null);
                 return false;
             }
         }
         return null;
+    }
+
+    /**
+     * 解析 HandlerMethod 上的注解元数据（仅在第一次调用时触发）
+     */
+    private AnnotationMetadata parseAnnotationMetadata(HandlerMethod handlerMethod) {
+        Class<?> beanType = handlerMethod.getBeanType();
+
+        // 1. 检查 RequiresUser
+        RequiresUser requiresUser = handlerMethod.getMethodAnnotation(RequiresUser.class);
+        if (requiresUser == null) {
+            requiresUser = AppUtils.getAnnotation(beanType, RequiresUser.class);
+        }
+        if (requiresUser != null && !requiresUser.required()) {
+            return new AnnotationMetadata(true, null, null);
+        }
+
+        // 2. 检查 RestApi
+        RestApi restApi = handlerMethod.getMethodAnnotation(RestApi.class);
+        if (restApi == null) {
+            restApi = AppUtils.getAnnotation(beanType, RestApi.class);
+        }
+        if (restApi != null && !restApi.checkDefaultPermission()) {
+            return new AnnotationMetadata(true, null, null);
+        }
+
+        // 3. 解析 RequiresRoles
+        RequiresRoles requiresRoles = handlerMethod.getMethodAnnotation(RequiresRoles.class);
+        if (requiresRoles == null) {
+            requiresRoles = AppUtils.getAnnotation(beanType, RequiresRoles.class);
+        }
+
+        // 4. 解析 RequiresPermissions
+        RequiresPermissions requiresPermissions = handlerMethod.getMethodAnnotation(RequiresPermissions.class);
+        if (requiresPermissions == null) {
+            requiresPermissions = AppUtils.getAnnotation(beanType, RequiresPermissions.class);
+        }
+
+        return new AnnotationMetadata(false, requiresRoles, requiresPermissions);
     }
 
     /**

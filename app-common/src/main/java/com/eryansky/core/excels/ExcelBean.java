@@ -1,11 +1,7 @@
-/*
- * Created on 2013-2-4
- * ExcelInfo.java V1.0
- *
- * Copyright Notice =========================================================
- * This file contains proprietary information of Eastcom Technologies Co. Ltd.
- * Copying or reproduction without prior written approval is prohibited.
- * Copyright (c) 2012 =======================================================
+/**
+ * Copyright (c) 2012-2026 https://www.eryansky.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.eryansky.core.excels;
 

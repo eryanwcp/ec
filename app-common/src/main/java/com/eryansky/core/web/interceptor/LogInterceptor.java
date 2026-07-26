@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012-2024 https://www.eryansky.com
+ * Copyright (c) 2012-2026 https://www.eryansky.com
  * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -15,6 +15,7 @@ import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.security.jwt.JWTUtils;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.event.SysLogEvent;
+import com.eryansky.utils.AppUtils;
 import com.google.common.collect.Lists;
 import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.security.SecurityUtils;
@@ -41,14 +42,14 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 日志拦截器
+ * 日志拦截器（注解缓存优化版）
  *
  * @author Eryan
  * @date : 2015-07-10
@@ -56,19 +57,35 @@ import java.util.concurrent.ConcurrentHashMap;
 public class LogInterceptor implements HandlerInterceptor {
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
-	private static final ThreadLocal<Long> startTimeThreadLocal =
-			new NamedThreadLocal<>("ThreadLocal StartTime");
+
+	private static final ThreadLocal<Long> startTimeThreadLocal = new NamedThreadLocal<>("ThreadLocal StartTime");
 
 	private final RequestMappingHandlerAdapter adapter;
 	private final Map<Class<?>, Set<Method>> initBinderCache = new ConcurrentHashMap<>(64);
 	private final List<HandlerMethodArgumentResolver> argumentResolvers;
-	private final Map<MethodParameter, HandlerMethodArgumentResolver> argumentResolverCache =
-			new ConcurrentHashMap<>(256);
+	private final Map<MethodParameter, HandlerMethodArgumentResolver> argumentResolverCache = new ConcurrentHashMap<>(256);
+
+	/**
+	 * Logging 注解解析结果缓存，避免重复反射调用
+	 */
+	private final Map<HandlerMethod, LoggingAnnotationMetadata> loggingAnnotationCache = new ConcurrentHashMap<>();
+
+	/**
+	 * Logging 注解元数据封装
+	 */
+	private static class LoggingAnnotationMetadata {
+		final Logging logging;
+
+		public LoggingAnnotationMetadata(Logging logging) {
+			this.logging = logging;
+		}
+	}
 
 	/**
 	 * 需要拦截的资源
 	 */
 	private List<String> includeUrls = Lists.newArrayList();
+
 	/**
 	 * 排除拦截的资源
 	 */
@@ -80,40 +97,35 @@ public class LogInterceptor implements HandlerInterceptor {
 	}
 
 	@Override
-	public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
-							 Object handler) throws Exception {
-		long beginTime = System.currentTimeMillis();//1、开始时间
-		startTimeThreadLocal.set(beginTime);        //线程绑定变量（该数据只有当前请求的线程可见）
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+		long beginTime = System.currentTimeMillis(); // 1、开始时间
+		startTimeThreadLocal.set(beginTime);        // 线程绑定变量（该数据只有当前请求的线程可见）
 		if (logger.isDebugEnabled()) {
-			logger.debug("开始计时: {}  URI: {}", new SimpleDateFormat("hh:mm:ss.SSS")
-					.format(beginTime), request.getRequestURI());
+			logger.debug("开始计时: {}  URI: {}", new SimpleDateFormat("hh:mm:ss.SSS").format(beginTime), request.getRequestURI());
 		}
 		return true;
 	}
 
 	@Override
-	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
-						   ModelAndView modelAndView) throws Exception {
+	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
 		if (modelAndView != null) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("ViewName: " + modelAndView.getViewName());
 			}
-
 		}
 	}
 
 	@Override
-	public void afterCompletion(HttpServletRequest request, HttpServletResponse response,
-								Object handler, Exception ex) throws Exception {
-		long beginTime = startTimeThreadLocal.get();//得到线程绑定的局部变量（开始时间）
+	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+		long beginTime = startTimeThreadLocal.get(); // 得到线程绑定的局部变量（开始时间）
 		startTimeThreadLocal.remove();
-		long endTime = System.currentTimeMillis();    //2、结束时间
+		long endTime = System.currentTimeMillis();   // 2、结束时间
+
 		// 保存日志
 		SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
 		ServletWebRequest webRequest = new ServletWebRequest(request, response);
 		String requestUrl = request.getRequestURI();
 		requestUrl = requestUrl.replaceAll("//", "/");
-
 		String newLogValue = null;
 		String logType = LogType.access.getValue();
 		HandlerMethod handlerMethod = null;
@@ -122,15 +134,21 @@ public class LogInterceptor implements HandlerInterceptor {
 		String remark = null;
 		String requestData = null;
 		String requestHeaders = null;
+
 		if (ex != null) {
 			flag = true;
 			newLogValue = LogType.exception.getDescription();
 			logType = LogType.exception.getValue();
 		}
-		//注解处理
+
+		// 注解处理
 		if (!flag && handler instanceof HandlerMethod) {
 			handlerMethod = (HandlerMethod) handler;
-			Logging logging = handlerMethod.getMethodAnnotation(Logging.class);
+
+			// 优先获取缓存中的 Logging 注解解析结果
+			LoggingAnnotationMetadata metadata = loggingAnnotationCache.computeIfAbsent(handlerMethod, this::parseLoggingAnnotationMetadata);
+			Logging logging = metadata.logging;
+
 			MethodParameter[] parameters = handlerMethod.getMethodParameters();
 			Object[] parameterValues = new Object[parameters.length];
 			for (int i = 0; i < parameters.length; i++) {
@@ -143,8 +161,8 @@ public class LogInterceptor implements HandlerInterceptor {
 					Object value = resolver.resolveArgument(parameter, mavContainer, webRequest, webDataBinderFactory);
 					parameterValues[i] = value;
 				} catch (Exception e) {
-					if(!(e instanceof org.springframework.http.converter.HttpMessageNotReadableException)){
-						logger.error(e.getMessage() + ",{}" ,requestUrl);
+					if (!(e instanceof org.springframework.http.converter.HttpMessageNotReadableException)) {
+						logger.error(e.getMessage() + ",{}", requestUrl);
 					}
 				}
 			}
@@ -161,21 +179,20 @@ public class LogInterceptor implements HandlerInterceptor {
 				if (StringUtils.isNotBlank(logging.remark())) {
 					remark = SpringUtils.parseSpel(logging.remark(), handlerMethod.getMethod(), parameterValues);
 				}
-				//异常情况记录参数
+				// 异常情况记录参数
 				if (StringUtils.isNotBlank(logging.data()) || LogType.exception.getValue().equals(logType)) {
 					requestData = SpringUtils.parseSpel(logging.data(), handlerMethod.getMethod(), parameterValues);
 				}
-				//异常情况记录请求Headers
+				// 异常情况记录请求Headers
 				if (logging.requestHeaders() || LogType.exception.getValue().equals(logType)) {
-					requestHeaders= JsonMapper.toJsonString(WebUtils.getHeaders(request));
+					requestHeaders = JsonMapper.toJsonString(WebUtils.getHeaders(request));
 				}
 			} else if (logging != null && !Boolean.parseBoolean(SpringUtils.parseSpel(logging.logging(), handlerMethod.getMethod(), parameterValues))) {
 				_flag = false;
 			}
-
 		}
 
-		//自定义配置URL 处理
+		// 自定义配置URL 处理
 		if ((_flag == null || _flag) && !flag && Collections3.isNotEmpty(includeUrls)) {
 			for (String includeUrl : includeUrls) {
 				flag = StringUtils.simpleWildcardMatch(request.getContextPath() + includeUrl, requestUrl);
@@ -185,7 +202,7 @@ public class LogInterceptor implements HandlerInterceptor {
 			}
 		}
 
-		//自定义配置URL 处理
+		// 自定义配置URL 处理
 		if ((_flag == null || _flag) && flag && Collections3.isNotEmpty(excludeUrls)) {
 			for (String excludeUrl : excludeUrls) {
 				boolean matchFlag = StringUtils.simpleWildcardMatch(request.getContextPath() + excludeUrl, requestUrl);
@@ -201,7 +218,7 @@ public class LogInterceptor implements HandlerInterceptor {
 			log.setTitle(newLogValue);
 			log.setUserId(sessionInfo == null ? User.SUPERUSER_ID : sessionInfo.getUserId());
 			log.setType(logType);
-			log.setIp(sessionInfo == null ? IpUtils.getIpAddr0(request):sessionInfo.getIp());
+			log.setIp(sessionInfo == null ? IpUtils.getIpAddr0(request) : sessionInfo.getIp());
 			log.setUserAgent(UserAgentUtils.getHTTPUserAgent(request));
 			log.setDeviceType(UserAgentUtils.getDeviceType(request).toString());
 			log.setBrowserType(UserAgentUtils.getBrowser(request).getName());
@@ -211,53 +228,47 @@ public class LogInterceptor implements HandlerInterceptor {
 			log.setAction(request.getMethod());
 			log.setRemark(remark);
 			ExtendAttr extendAttr = new ExtendAttr();
-			if(null != sessionInfo){
+			if (null != sessionInfo) {
 				log.setUserAgent(sessionInfo.getUserAgent());
 				log.setDeviceType(sessionInfo.getDeviceType());
 				log.setBrowserType(sessionInfo.getBrowserType());
 				log.setUserId(sessionInfo.getUserId());
-				extendAttr.put("userType",sessionInfo.getUserType());
-				extendAttr.put("userName",sessionInfo.getName());
-				extendAttr.put("userLoginName",sessionInfo.getLoginName());
-				extendAttr.put("userMobile",sessionInfo.getMobile());
-			}else {
+				extendAttr.put("userType", sessionInfo.getUserType());
+				extendAttr.put("userName", sessionInfo.getName());
+				extendAttr.put("userLoginName", sessionInfo.getLoginName());
+				extendAttr.put("userMobile", sessionInfo.getMobile());
+			} else {
 				String userLoginName = null;
 				log.setUserAgent(UserAgentUtils.getHTTPUserAgent(request));
 				log.setDeviceType(UserAgentUtils.getDeviceType(request).toString());
 				log.setBrowserType(UserAgentUtils.getBrowser(request).getName());
 				Map<String, List<String>> headers = WebUtils.getHeaders(request);
 				userLoginName = Collections3.getFirst(headers.get("appCode"));
-				if(StringUtils.isBlank(userLoginName)){
+				if (StringUtils.isBlank(userLoginName)) {
 					userLoginName = Collections3.getFirst(headers.get("appcode"));
 				}
-				if(StringUtils.isBlank(userLoginName)){
+				if (StringUtils.isBlank(userLoginName)) {
 					userLoginName = request.getParameter("appCode");
 				}
-				if(StringUtils.isBlank(userLoginName)){
-					String access_token = Collections3.getFirst(headers.get("access_token"));;
-					if(StringUtils.isNotBlank(access_token)){
+				if (StringUtils.isBlank(userLoginName)) {
+					String access_token = Collections3.getFirst(headers.get("access_token"));
+					if (StringUtils.isNotBlank(access_token)) {
 						try {
 							userLoginName = JWTUtils.getUsername(access_token);
 						} catch (Exception e) {
 							logger.error(e.getMessage());
 						}
 					}
-
 				}
-				extendAttr.put("userType","S");//自定义 系统
-				log.setUserId(StringUtils.isNotBlank(userLoginName) ? userLoginName:User.SUPERUSER_ID);
-				extendAttr.put("userName",StringUtils.isNotBlank(userLoginName) ? userLoginName:"系统");
+				extendAttr.put("userType", "S"); // 自定义 系统
+				log.setUserId(StringUtils.isNotBlank(userLoginName) ? userLoginName : User.SUPERUSER_ID);
+				extendAttr.put("userName", StringUtils.isNotBlank(userLoginName) ? userLoginName : "系统");
 				extendAttr.put("userLoginName", userLoginName);
 			}
-
-			extendAttr.put("requestData",requestData);
-
-
-
-			if(null != requestHeaders){
-				extendAttr.put("requestHeaders",requestHeaders);
+			extendAttr.put("requestData", requestData);
+			if (null != requestHeaders) {
+				extendAttr.put("requestHeaders", requestHeaders);
 			}
-
 			log.setExtendAttr(extendAttr);
 			// 如果有异常，设置异常信息
 			log.setException(Exceptions.getStackTraceAsString(ex));
@@ -265,14 +276,25 @@ public class LogInterceptor implements HandlerInterceptor {
 			SpringContextHolder.publishEvent(new SysLogEvent(log));
 		}
 
-		// 打印JVM信息。
+		// 打印JVM信息
 		if (logger.isDebugEnabled()) {
 			logger.debug("计时结束：{}  耗时：{}  URI: {}  最大内存: {}m  已分配内存: {}m  已分配内存中的剩余空间: {}m  最大可用内存: {}m",
-					new SimpleDateFormat("hh:mm:ss.SSS").format(endTime), DateUtils.formatDateTime(endTime - beginTime),
-					request.getRequestURI(), Runtime.getRuntime().maxMemory() / 1024 / 1024, Runtime.getRuntime().totalMemory() / 1024 / 1024, Runtime.getRuntime().freeMemory() / 1024 / 1024,
+					new SimpleDateFormat("hh:mm:ss.SSS").format(endTime), DateUtils.formatDateTime(endTime - beginTime), request.getRequestURI(),
+					Runtime.getRuntime().maxMemory() / 1024 / 1024, Runtime.getRuntime().totalMemory() / 1024 / 1024,
+					Runtime.getRuntime().freeMemory() / 1024 / 1024,
 					(Runtime.getRuntime().maxMemory() - Runtime.getRuntime().totalMemory() + Runtime.getRuntime().freeMemory()) / 1024 / 1024);
 		}
+	}
 
+	/**
+	 * 解析 HandlerMethod 及 Class 上的 Logging 注解（首次调用时触发）
+	 */
+	private LoggingAnnotationMetadata parseLoggingAnnotationMetadata(HandlerMethod handlerMethod) {
+		Logging logging = handlerMethod.getMethodAnnotation(Logging.class);
+		if (logging == null) {
+			logging = AppUtils.getAnnotation(handlerMethod.getBeanType(), Logging.class);
+		}
+		return new LoggingAnnotationMetadata(logging);
 	}
 
 	private WebDataBinderFactory getDataBinderFactory(HandlerMethod handlerMethod) throws Exception {
@@ -290,14 +312,12 @@ public class LogInterceptor implements HandlerInterceptor {
 		return new ServletRequestDataBinderFactory(initBinderMethods, adapter.getWebBindingInitializer());
 	}
 
-	private HandlerMethodArgumentResolver getArgumentResolver(
-			MethodParameter parameter) {
+	private HandlerMethodArgumentResolver getArgumentResolver(MethodParameter parameter) {
 		HandlerMethodArgumentResolver result = this.argumentResolverCache.get(parameter);
 		if (result == null) {
 			for (HandlerMethodArgumentResolver methodArgumentResolver : this.argumentResolvers) {
 				if (logger.isTraceEnabled()) {
-					logger.trace("Testing if argument resolver [" + methodArgumentResolver + "] supports [" +
-							parameter.getGenericParameterType() + "]");
+					logger.trace("Testing if argument resolver [" + methodArgumentResolver + "] supports [" + parameter.getGenericParameterType() + "]");
 				}
 				if (methodArgumentResolver.supportsParameter(parameter)) {
 					result = methodArgumentResolver;

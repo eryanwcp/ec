@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012-2024 https://www.eryansky.com
+ * Copyright (c) 2012-2026 https://www.eryansky.com
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -20,18 +20,14 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.script.CompiledScript;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 import javax.servlet.http.HttpServletResponse;
 import java.beans.PropertyDescriptor;
 import java.io.*;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
@@ -48,7 +44,7 @@ import java.util.zip.ZipOutputStream;
  */
 public class ExcelUtils {
 
-    private static Logger mLogger = LoggerFactory.getLogger(ExcelUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExcelUtils.class);
 
     /**
      * JavaBean转Map
@@ -60,14 +56,14 @@ public class ExcelUtils {
         try {
             PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
             PropertyDescriptor[] descriptors = propertyUtilsBean.getPropertyDescriptors(obj);
-            for (int i = 0; i < descriptors.length; i++) {
-                String name = descriptors[i].getName();
+            for (PropertyDescriptor descriptor : descriptors) {
+                String name = descriptor.getName();
                 if (!StringUtils.equals(name, "class")) {
                     params.put(name, propertyUtilsBean.getNestedProperty(obj, name));
                 }
             }
         } catch (Exception e) {
-            mLogger.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
         return params;
     }
@@ -172,7 +168,7 @@ public class ExcelUtils {
 
         TableData td = new TableData(headMeta);
         TableDataRow row = null;
-        if (list != null && list.size() > 0) {
+        if (list != null && !list.isEmpty()) {
             if (list.get(0).getClass().isArray()) {//数组类型
                 for (Object obj : list) {
                     row = new TableDataRow(td);
@@ -208,14 +204,13 @@ public class ExcelUtils {
             response.setHeader("Content-Disposition", "attachment;filename="
                     .concat(String.valueOf(URLEncoder.encode(zipName + ".zip", "UTF-8"))));
         } catch (UnsupportedEncodingException e) {
-            mLogger.error(e.getMessage(), e);
-        }
-        OutputStream os = null;
+            logger.error(e.getMessage(), e);
+        }   OutputStream os = null;
         try {
             os = response.getOutputStream();
         } catch (IOException e) {
 //			e.printStackTrace();
-            mLogger.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
         return new ZipOutputStream(os);
     }
@@ -274,40 +269,38 @@ public class ExcelUtils {
     }
 
     public static String dumpCellStyle(HSSFCellStyle style) {
-        StringBuffer sb = new StringBuffer();
-        sb.append(style.getHidden()).append(",");
-        sb.append(style.getLocked()).append(",");
-        sb.append(style.getWrapText()).append(",");
-        sb.append(style.getAlignment()).append(",");
-        sb.append(style.getBorderBottom()).append(",");
-        sb.append(style.getBorderLeft()).append(",");
-        sb.append(style.getBorderRight()).append(",");
-        sb.append(style.getBorderTop()).append(",");
-        sb.append(style.getBottomBorderColor()).append(",");
-        sb.append(style.getDataFormat()).append(",");
-        sb.append(style.getFillBackgroundColor()).append(",");
-        sb.append(style.getFillForegroundColor()).append(",");
-        sb.append(style.getFillPattern()).append(",");
-        sb.append(style.getIndention()).append(",");
-        sb.append(style.getLeftBorderColor()).append(",");
-        sb.append(style.getRightBorderColor()).append(",");
-        sb.append(style.getRotation()).append(",");
-        sb.append(style.getTopBorderColor()).append(",");
-        sb.append(style.getVerticalAlignment());
+        String sb = style.getHidden() + "," +
+                style.getLocked() + "," +
+                style.getWrapText() + "," +
+                style.getAlignment() + "," +
+                style.getBorderBottom() + "," +
+                style.getBorderLeft() + "," +
+                style.getBorderRight() + "," +
+                style.getBorderTop() + "," +
+                style.getBottomBorderColor() + "," +
+                style.getDataFormat() + "," +
+                style.getFillBackgroundColor() + "," +
+                style.getFillForegroundColor() + "," +
+                style.getFillPattern() + "," +
+                style.getIndention() + "," +
+                style.getLeftBorderColor() + "," +
+                style.getRightBorderColor() + "," +
+                style.getRotation() + "," +
+                style.getTopBorderColor() + "," +
+                style.getVerticalAlignment();
 
-        return sb.toString();
+        return sb;
     }
 
     public static String dumpFont(HSSFFont font) {
-        StringBuffer sb = new StringBuffer();
-        sb.append(font.getItalic()).append(",").append(font.getStrikeout())
-                .append(",").append(font.getBold()).append(",").append(
-                        font.getCharSet()).append(",").append(font.getColor())
-                .append(",").append(font.getFontHeight()).append(",").append(
-                        font.getFontName()).append(",").append(
-                        font.getTypeOffset()).append(",").append(
-                        font.getUnderline());
-        return sb.toString();
+        String sb = font.getItalic() + "," + font.getStrikeout() +
+                "," + font.getBold() + "," +
+                font.getCharSet() + "," + font.getColor() +
+                "," + font.getFontHeight() + "," +
+                font.getFontName() + "," +
+                font.getTypeOffset() + "," +
+                font.getUnderline();
+        return sb;
     }
 
     public static void copyCellStyle(HSSFWorkbook destwb, HSSFCell dest,
@@ -707,7 +700,7 @@ public class ExcelUtils {
                 bool = true;
             }
         } catch (IOException e) {
-            mLogger.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
 
         return bool;
@@ -777,7 +770,7 @@ public class ExcelUtils {
             Double d = (Double) sandbox.eval("source",ex);
             return d;
         } catch (Exception e) {
-            mLogger.error(e.getMessage());
+            logger.error(e.getMessage());
             return null;
         }
     }
@@ -1507,7 +1500,7 @@ public class ExcelUtils {
                 }
             }
         } catch (IOException e) {
-            mLogger.error(e.toString(), e);
+            logger.error(e.toString(), e);
         }
     }
 
@@ -1531,7 +1524,7 @@ public class ExcelUtils {
                         Cell cell = row.createCell(j);
                         // cell max length 32767
                         if (r[j].length() > 32767) {
-                            mLogger.warn("异常处理", "--此字段过长(超过32767),已被截断--" + r[j]);
+                            logger.warn("异常处理", "--此字段过长(超过32767),已被截断--" + r[j]);
                             r[j] = r[j].substring(0, 32766);
                         }
                         cell.setCellValue(r[j]);
@@ -1549,7 +1542,7 @@ public class ExcelUtils {
                 out.close();
             }
         } catch (IOException e) {
-            mLogger.error(e.toString(), e);
+            logger.error(e.toString(), e);
         }
     }
 
@@ -1589,7 +1582,7 @@ public class ExcelUtils {
                 }
             }
         } catch (IOException e) {
-            mLogger.error(e.toString(), e);
+            logger.error(e.toString(), e);
         }
     }
 
@@ -1620,7 +1613,7 @@ public class ExcelUtils {
                 int cellNum = 0;
                 for (String k : headers) {
                     if (!map.containsKey(k)) {
-                        mLogger.error("Map 中 不存在 key [" + k + "]");
+                        logger.error("Map 中 不存在 key [" + k + "]");
                         continue;
                     }
                     Cell cell = row.createCell(cellNum);
@@ -1699,7 +1692,7 @@ public class ExcelUtils {
                             cell.setCellValue(StringUtils.EMPTY);
                         }
                     } catch (Exception e) {
-                        mLogger.error(e.getMessage(), e);
+                        logger.error(e.getMessage(), e);
                     }
 
                 }
@@ -1738,7 +1731,7 @@ public class ExcelUtils {
                 toClient.flush();
             }
         } catch (IOException ex) {
-            mLogger.error(ex.getMessage(), ex);
+            logger.error(ex.getMessage(), ex);
         }
     }
 

@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2012-2024 https://www.eryansky.com
+ *  Copyright (c) 2012-2026 https://www.eryansky.com
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -22,9 +22,9 @@ public class TableDataCell {
 
 	private int columnIndex;
 
-	private static DecimalFormat format2 = new DecimalFormat("0.##");
+	private static final DecimalFormat format2 = new DecimalFormat("0.##");
 
-	private static DecimalFormat format3 = new DecimalFormat("0.###");
+	private static final DecimalFormat format3 = new DecimalFormat("0.###");
 
 	private int cellStyle = TableData.STYLE_TYPE_STRING;
 

@@ -38,7 +38,7 @@ import java.nio.file.Paths;
  */
 public class WordToHtmlBase64Converter {
 
-    private static Logger log = LoggerFactory.getLogger(WordToHtmlBase64Converter.class);
+    private static final Logger log = LoggerFactory.getLogger(WordToHtmlBase64Converter.class);
 
     /**
      * doc/docx转换成html 
