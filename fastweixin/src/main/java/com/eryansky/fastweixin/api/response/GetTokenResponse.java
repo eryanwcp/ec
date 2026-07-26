@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.alibaba.fastjson.annotation.JSONField;
 
 /**
  * @author Eryan
@@ -8,9 +8,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class GetTokenResponse extends BaseResponse {
 
-    @JsonProperty("access_token")
+    @JSONField(name = "access_token")
     private String  accessToken;
-    @JsonProperty("expires_in")
+    @JSONField(name = "expires_in")
     private Integer expiresIn;
 
     public String getAccessToken() {

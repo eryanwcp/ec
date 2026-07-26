@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.company.api.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.eryansky.fastweixin.api.entity.BaseModel;
 
 import java.util.Map;
@@ -15,7 +15,7 @@ public class QYUserExternalProfile extends BaseModel {
     /**
      * 企业对外简称，需从已认证的企业简称中选填。可在“我的企业”页中查看企业简称认证状态。
      */
-    @JsonProperty("external_corp_name")
+    @JSONField(name = "external_corp_name")
     private String externalCorpName;
     /**
      * 视频号
@@ -38,12 +38,12 @@ public class QYUserExternalProfile extends BaseModel {
         /**
          * 视频号名字（设置后，成员将对外展示该视频号）
          */
-        @JsonProperty("nicknam")
+        @JSONField(name = "nicknam")
         private String nicknam;
         /**
          * 对外展示视频号状态。0表示企业视频号已被确认，可正常使用，1表示企业视频号待确认
          */
-        @JsonProperty("status")
+        @JSONField(name = "status")
         private Integer status;
 
         public WechatChannels() {
@@ -80,12 +80,12 @@ public class QYUserExternalProfile extends BaseModel {
         /**
          * 属性类型: 0-文本 1-网页 2-小程序
          */
-        @JsonProperty("type")
+        @JSONField(name = "type")
         private Integer type;
         /**
          * 属性名称： 需要先确保在管理端有创建该属性，否则会忽略
          */
-        @JsonProperty("name")
+        @JSONField(name = "name")
         private String name;
         /**
          * 文本类型的属性
@@ -113,7 +113,7 @@ public class QYUserExternalProfile extends BaseModel {
             /**
              * 属性名称： 需要先确保在管理端有创建该属性，否则会忽略
              */
-            @JsonProperty("value")
+            @JSONField(name = "value")
             private String value;
 
             public Text() {
@@ -141,7 +141,7 @@ public class QYUserExternalProfile extends BaseModel {
             /**
              * 网页的url,必须包含http或者https头
              */
-            @JsonProperty("url")
+            @JSONField(name = "url")
             private String url;
             /**
              * 网页的展示标题,长度限制12个UTF8字符
@@ -182,18 +182,18 @@ public class QYUserExternalProfile extends BaseModel {
             /**
              * 网小程序appid，必须是有在本企业安装授权的小程序，否则会被忽略
              */
-            @JsonProperty("appid")
+            @JSONField(name = "appid")
             private String appid;
             /**
              * 小程序的展示标题,长度限制12个UTF8字符
              */
-            @JsonProperty("title")
+            @JSONField(name = "title")
             private String title;
 
             /**
              * 小程序的页面路径
              */
-            @JsonProperty("pagepath")
+            @JSONField(name = "pagepath")
             private String pagepath;
 
             public Miniprogram() {

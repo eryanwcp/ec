@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.company.api.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.eryansky.fastweixin.api.response.BaseResponse;
 
 /**
@@ -12,7 +12,7 @@ import com.eryansky.fastweixin.api.response.BaseResponse;
 public class GetUserConvertToOpenidResponse extends BaseResponse {
 
 
-    @JsonProperty("openid")
+    @JSONField(name = "openid")
     private String openid;
 
     public GetUserConvertToOpenidResponse() {

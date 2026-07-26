@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.company.message;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.alibaba.fastjson.annotation.JSONField;
 
 /**
  *
@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class QYFileMsg extends QYBaseMsg {
 
-    @JsonProperty("file")
+    @JSONField(name = "file")
     private File file;
 
     public File getFile() {
@@ -22,7 +22,7 @@ public class QYFileMsg extends QYBaseMsg {
     }
 
     public static class File{
-        @JsonProperty("media_id")
+        @JSONField(name = "media_id")
         private String mediaId;
 
         public String getMediaId() {

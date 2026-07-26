@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.alibaba.fastjson.annotation.JSONField;
 
 /**
  * 群发图文信息时Article实体
@@ -15,15 +15,15 @@ public class Article extends BaseModel {
         public static final Integer NO  = 0;// 不显式封面
     }
 
-    @JsonProperty("thumb_media_id")
+    @JSONField(name = "thumb_media_id")
     private String thumbMediaId;
     private String author;
     private String title;
-    @JsonProperty("content_source_url")
+    @JSONField(name = "content_source_url")
     private String contentSourceUrl;
     private String content;
     private String digest;
-    @JsonProperty("show_cover_pic")
+    @JSONField(name = "show_cover_pic")
     private Integer showConverPic = ShowConverPic.YES;
 
     public Article(){

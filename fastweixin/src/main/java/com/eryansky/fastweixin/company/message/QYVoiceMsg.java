@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.company.message;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.alibaba.fastjson.annotation.JSONField;
 
 /**
  *
@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class QYVoiceMsg extends QYBaseMsg {
 
-    @JsonProperty("voice")
+    @JSONField(name = "voice")
     private Voice voice;
 
     public Voice getVoice() {
@@ -22,7 +22,7 @@ public class QYVoiceMsg extends QYBaseMsg {
     }
 
     public static class Voice{
-        @JsonProperty("media_id")
+        @JSONField(name = "media_id")
         private String mediaId;
 
         public String getMediaId() {

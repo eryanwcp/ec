@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.company.api.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.eryansky.fastweixin.api.entity.BaseModel;
 
 import java.util.Map;
@@ -12,31 +12,31 @@ import java.util.Map;
  */
 public class QYAgent extends BaseModel {
 
-    @JsonProperty("agentid")
+    @JSONField(name = "agentid")
     private String              agentId;
-    @JsonProperty("name")
+    @JSONField(name = "name")
     private String              name;
-    @JsonProperty("square_logo_url")
+    @JSONField(name = "square_logo_url")
     private String              squareLogoUrl;
-    @JsonProperty("round_logo_url")
+    @JSONField(name = "round_logo_url")
     private String              roundLogoUrl;
-    @JsonProperty("description")
+    @JSONField(name = "description")
     private String              description;
-    @JsonProperty("allow_userinfos")
+    @JSONField(name = "allow_userinfos")
     private Map<String, Object> allowUserInfos;
-    @JsonProperty("allow_partys")
+    @JSONField(name = "allow_partys")
     private Map<String, Object> allowPartys;
-    @JsonProperty("allow_tags")
+    @JSONField(name = "allow_tags")
     private Map<String, Object> allowTags;
-    @JsonProperty("close")
+    @JSONField(name = "close")
     private Integer             close;
-    @JsonProperty("redirect_domain")
+    @JSONField(name = "redirect_domain")
     private String              redirectDomain;
-    @JsonProperty("report_location_flag")
+    @JSONField(name = "report_location_flag")
     private Integer             reportLocationFlag;
-    @JsonProperty("isreportuser")
+    @JSONField(name = "isreportuser")
     private Integer             isReportUser;
-    @JsonProperty("isreportenter")
+    @JSONField(name = "isreportenter")
     private Integer             isReportEnter;
 
     public QYAgent() {

@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.alibaba.fastjson.annotation.JSONField;
 
 /**
  * @author Eryan
@@ -46,7 +46,7 @@ public class GetUserInfoResponse extends BaseResponse {
     /**
      * 用户关注时间，为时间戳。如果用户曾多次关注，则取最后关注时间
      */
-    @JsonProperty("subscribe_time")
+    @JSONField(name = "subscribe_time")
     private Long    subscribeTime;
     /**
      * 只有在用户将公众号绑定到微信开放平台帐号后，才会出现该字段。
@@ -63,7 +63,7 @@ public class GetUserInfoResponse extends BaseResponse {
     /**
      * 用户被打上的标签ID列表
      */
-    @JsonProperty("tagid_list")
+    @JSONField(name = "tagid_list")
     private Integer[] tagidList;
 
     public Integer getSubscribe() {

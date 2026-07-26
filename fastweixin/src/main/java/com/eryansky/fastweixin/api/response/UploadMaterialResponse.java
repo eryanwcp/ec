@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.alibaba.fastjson.annotation.JSONField;
 
 /**
  *
@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class UploadMaterialResponse extends BaseResponse  {
 
-    @JsonProperty("media_id")
+    @JSONField(name = "media_id")
     private String mediaId;
 
     public String getMediaId() {

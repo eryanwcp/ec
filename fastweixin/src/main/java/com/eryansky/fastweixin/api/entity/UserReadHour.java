@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.alibaba.fastjson.annotation.JSONField;
 
 /**
  * @author Eryan
@@ -8,23 +8,23 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class UserReadHour extends BaseDataCube {
 
-    @JsonProperty("ref_hour")
+    @JSONField(name = "ref_hour")
     private Integer refHour;
-    @JsonProperty("int_page_read_user")
+    @JSONField(name = "int_page_read_user")
     private Integer intPageReadUser;
-    @JsonProperty("int_page_read_count")
+    @JSONField(name = "int_page_read_count")
     private Integer intPageReadCount;
-    @JsonProperty("ori_page_read_user")
+    @JSONField(name = "ori_page_read_user")
     private Integer oriPageReadUser;
-    @JsonProperty("ori_page_read_count")
+    @JSONField(name = "ori_page_read_count")
     private Integer oriPageReadCount;
-    @JsonProperty("share_user")
+    @JSONField(name = "share_user")
     private Integer shareUser;
-    @JsonProperty("share_count")
+    @JSONField(name = "share_count")
     private Integer shareCount;
-    @JsonProperty("add_to_fav_user")
+    @JSONField(name = "add_to_fav_user")
     private Integer addToFavUser;
-    @JsonProperty("add_to_fav_count")
+    @JSONField(name = "add_to_fav_count")
     private Integer addToFavCount;
 
     public Integer getRefHour() {

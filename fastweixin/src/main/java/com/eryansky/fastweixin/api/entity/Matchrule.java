@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.alibaba.fastjson.annotation.JSONField;
 
 /**
  * @author Eryan
@@ -8,11 +8,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class Matchrule extends BaseModel {
 
-    @JsonProperty("tag_id")
+    @JSONField(name = "tag_id")
     private String tagId;
 
     @Deprecated
-    @JsonProperty("group_id")
+    @JSONField(name = "group_id")
     private String groupId;
 
     private String sex;
@@ -23,7 +23,7 @@ public class Matchrule extends BaseModel {
 
     private String city;
 
-    @JsonProperty("client_platform_type")
+    @JSONField(name = "client_platform_type")
     private String clientPlatformType;
 
     /**

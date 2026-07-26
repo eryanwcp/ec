@@ -1,7 +1,7 @@
 package com.eryansky.fastweixin.company.message;
 
 import com.eryansky.fastweixin.api.entity.BaseModel;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import java.io.Serializable;
 
@@ -17,32 +17,32 @@ public class QYBaseMsg extends BaseModel implements Serializable {
         public static final String NO  = "0";// 非保密消息
     }
 
-    @JsonProperty("touser")
+    @JSONField(name = "touser")
     private String toUser;
-    @JsonProperty("toparty")
+    @JSONField(name = "toparty")
     private String toParty;
-    @JsonProperty("totag")
+    @JSONField(name = "totag")
     private String toTag;
-    @JsonProperty("msgtype")
+    @JSONField(name = "msgtype")
     private String msgType;
-    @JsonProperty("agentid")
+    @JSONField(name = "agentid")
     private String agentId;
-    @JsonProperty("safe")
+    @JSONField(name = "safe")
     private String safe = Safe.NO;
     /**
      * 表示是否开启id转译，0表示否，1表示是，默认0。仅第三方应用需要用到，企业自建应用可以忽略。
      */
-    @JsonProperty("enable_id_trans")
+    @JSONField(name = "enable_id_trans")
     private Integer enableIdTrans;
     /**
      * 表示是否开启重复消息检查，0表示否，1表示是，默认0
      */
-    @JsonProperty("enable_duplicate_check")
+    @JSONField(name = "enable_duplicate_check")
     private Integer enableDuplicateCheck;
     /**
      * 表示是否重复消息检查的时间间隔，默认1800s，最大不超过4小时
      */
-    @JsonProperty("duplicate_check_interval")
+    @JSONField(name = "duplicate_check_interval")
     private Integer duplicateCheckInterval;
 
     public String getToUser() {

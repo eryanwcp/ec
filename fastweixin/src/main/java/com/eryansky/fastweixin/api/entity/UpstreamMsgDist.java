@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.alibaba.fastjson.annotation.JSONField;
 
 /**
  * @author Eryan
@@ -8,9 +8,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class UpstreamMsgDist extends BaseDataCube {
 
-    @JsonProperty("count_interval")
+    @JSONField(name = "count_interval")
     private Integer countInterval;
-    @JsonProperty("msg_user")
+    @JSONField(name = "msg_user")
     private Integer msgUser;
 
     public Integer getCountInterval() {

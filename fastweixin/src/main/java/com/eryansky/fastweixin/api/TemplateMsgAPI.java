@@ -1,5 +1,6 @@
 package com.eryansky.fastweixin.api;
 
+import com.alibaba.fastjson.JSONArray;
 import com.eryansky.fastweixin.api.enums.ResultType;
 import com.eryansky.fastweixin.api.config.ApiConfig;
 import com.eryansky.fastweixin.api.entity.Industry;
@@ -88,7 +89,7 @@ public class TemplateMsgAPI extends BaseAPI {
         String url = BASE_API_URL + "cgi-bin/template/get_all_private_template?access_token=#";
         BaseResponse r = executeGet(url);
         String resultJson = isSuccess(r.getErrcode()) ? r.getErrmsg() : r.toJsonString();
-        PrivateTemplate[] templates = JSONUtil.toBean(JSONUtil.getJSONFromString(resultJson).get("template_list").toString(), PrivateTemplate[].class);
+        PrivateTemplate[] templates = JSONArray.toJavaObject((JSONArray)JSONUtil.getJSONFromString(resultJson).get("template_list"), PrivateTemplate[].class);
         return templates;
     }
 

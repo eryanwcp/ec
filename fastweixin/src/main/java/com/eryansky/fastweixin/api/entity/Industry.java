@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.alibaba.fastjson.annotation.JSONField;
 
 /**
  * 设置行业参数
@@ -9,12 +9,12 @@ public class Industry extends BaseModel {
     /**
      * 行业1
      */
-    @JsonProperty("industry_id1")
+    @JSONField(name = "industry_id1")
     private String industryId1;
     /**
      * 行业2
      */
-    @JsonProperty("industry_id2")
+    @JSONField(name = "industry_id2")
     private String industryId2;
 
     public String getIndustryId1() {

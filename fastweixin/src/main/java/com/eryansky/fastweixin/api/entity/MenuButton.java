@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.eryansky.fastweixin.api.enums.MenuType;
 import com.eryansky.fastweixin.exception.WeixinException;
 
@@ -38,13 +38,13 @@ public class MenuButton extends BaseModel {
     /**
      * 菜单显示的永久素材的MaterialID,当MenuType值为media_id和view_limited时必需
      */
-    @JsonProperty("media_id")
+    @JSONField(name = "media_id")
     private String mediaId;
 
     /**
      * 二级菜单列表，每个一级菜单下最多5个
      */
-    @JsonProperty("sub_button")
+    @JSONField(name = "sub_button")
     private List<MenuButton> subButton;
 
     public MenuType getType() {

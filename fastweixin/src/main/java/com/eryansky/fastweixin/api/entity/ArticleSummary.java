@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.alibaba.fastjson.annotation.JSONField;
 
 /**
  * 图文群发每日数据
@@ -12,21 +12,21 @@ public class ArticleSummary extends BaseDataCube {
 
     private String  msgid;
     private String  title;
-    @JsonProperty("int_page_read_user")
+    @JSONField(name = "int_page_read_user")
     private Integer intPageReadUser;
-    @JsonProperty("int_page_read_count")
+    @JSONField(name = "int_page_read_count")
     private Integer intPageReadCount;
-    @JsonProperty("ori_page_read_user")
+    @JSONField(name = "ori_page_read_user")
     private Integer oriPageReadUser;
-    @JsonProperty("ori_page_read_count")
+    @JSONField(name = "ori_page_read_count")
     private Integer oriPageReadCount;
-    @JsonProperty("share_user")
+    @JSONField(name = "share_user")
     private Integer shareUser;
-    @JsonProperty("shareCount")
+    @JSONField(name = "shareCount")
     private Integer share_count;
-    @JsonProperty("add_to_fav_user")
+    @JSONField(name = "add_to_fav_user")
     private Integer addToFavUser;
-    @JsonProperty("add_to_fav_count")
+    @JSONField(name = "add_to_fav_count")
     private Integer addToFavCount;
 
     public String getMsgid() {

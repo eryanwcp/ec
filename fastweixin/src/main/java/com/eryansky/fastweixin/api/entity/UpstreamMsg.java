@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.alibaba.fastjson.annotation.JSONField;
 
 /**
  * @author Eryan
@@ -8,11 +8,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class UpstreamMsg extends BaseDataCube {
 
-    @JsonProperty("msg_type")
+    @JSONField(name = "msg_type")
     private Integer msgType;
-    @JsonProperty("msg_user")
+    @JSONField(name = "msg_user")
     private Integer msgUser;
-    @JsonProperty("msg_count")
+    @JSONField(name = "msg_count")
     private Integer msgCount;
 
     public Integer getMsgType() {

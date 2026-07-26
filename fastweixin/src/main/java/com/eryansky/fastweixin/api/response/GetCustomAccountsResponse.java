@@ -1,7 +1,7 @@
 package com.eryansky.fastweixin.api.response;
 
 import com.eryansky.fastweixin.api.entity.CustomAccount;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class GetCustomAccountsResponse extends BaseResponse {
 
-    @JsonProperty("kf_list")
+    @JSONField(name = "kf_list")
     private List<CustomAccount> customAccountList;
 
     public List<CustomAccount> getCustomAccountList() {

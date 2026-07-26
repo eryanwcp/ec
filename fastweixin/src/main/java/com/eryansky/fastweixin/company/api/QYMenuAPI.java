@@ -1,9 +1,8 @@
 package com.eryansky.fastweixin.company.api;
 
 import com.eryansky.fastweixin.company.api.config.QYAPIConfig;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONPath;
 import com.eryansky.fastweixin.api.response.BaseResponse;
 import com.eryansky.fastweixin.company.api.entity.QYMenu;
 import com.eryansky.fastweixin.company.api.enums.QYResultType;
@@ -59,42 +58,28 @@ public class QYMenuAPI extends QYBaseAPI {
         String url = BASE_API_URL + "cgi-bin/menu/get?access_token=#&agentid=" + agentId;
         BaseResponse r = executeGet(url);
         if (isSuccess(r.getErrcode())) {
-            JsonNode jsonNode = JSONUtil.getJSONFromString(r.getErrmsg());
-            processMenuButtons(jsonNode);
-            response = JSONUtil.toBean(jsonNode.toString(), GetQYMenuResponse.class);
+            JSONObject jsonObject = JSONUtil.getJSONFromString(r.getErrmsg());
+            //通过jsonpath不断修改type的值，才能正常解析- -
+            List buttonList = (List) JSONPath.eval(jsonObject, "$.menu.button");
+            if (CollectionUtil.isNotEmpty(buttonList)) {
+                for (Object button : buttonList) {
+                    List subList = (List) JSONPath.eval(button, "$.sub_button");
+                    if (CollectionUtil.isNotEmpty(subList)) {
+                        for (Object sub : subList) {
+                            Object type = JSONPath.eval(sub, "$.type");
+                            JSONPath.set(sub, "$.type", type.toString().toUpperCase());
+                        }
+                    }else{
+                        Object type = JSONPath.eval(button, "$.type");
+                        JSONPath.set(button, "$.type", type.toString().toUpperCase());
+                    }
+                }
+            }
+            response = JSONUtil.toBean(jsonObject.toJSONString(), GetQYMenuResponse.class);
         } else {
             response = JSONUtil.toBean(r.toJsonString(), GetQYMenuResponse.class);
         }
         return response;
-    }
-
-    private void processMenuButtons(JsonNode root) {
-        JsonNode menu = root.get("menu");
-        if (menu == null) return;
-        ArrayNode buttons = menu.get("button");
-        if (buttons == null || !buttons.isArray()) return;
-
-        for (JsonNode button : buttons) {
-            if (button instanceof ObjectNode buttonNode) {
-                JsonNode subButtons = buttonNode.get("sub_button");
-                if (subButtons != null && subButtons.isArray()) {
-                    for (JsonNode sub : subButtons) {
-                        if (sub instanceof ObjectNode subNode) {
-                            updateTypeToUpper(subNode);
-                        }
-                    }
-                } else {
-                    updateTypeToUpper(buttonNode);
-                }
-            }
-        }
-    }
-
-    private void updateTypeToUpper(ObjectNode node) {
-        JsonNode typeNode = node.get("type");
-        if (typeNode != null && typeNode.isTextual()) {
-            node.put("type", typeNode.asText().toUpperCase());
-        }
     }
 
     /**

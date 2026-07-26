@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.Map;
 
@@ -9,7 +9,7 @@ import java.util.Map;
  */
 public class TemplateMsg extends BaseModel {
     private String touser;
-    @JsonProperty("template_id")
+    @JSONField(name = "template_id")
     private String templateId;
     private String url;
     private String topcolor;

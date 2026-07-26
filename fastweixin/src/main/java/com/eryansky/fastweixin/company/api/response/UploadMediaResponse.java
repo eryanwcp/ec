@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.company.api.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.eryansky.fastweixin.api.response.BaseResponse;
 
 /**
@@ -10,11 +10,11 @@ import com.eryansky.fastweixin.api.response.BaseResponse;
  */
 public class UploadMediaResponse extends BaseResponse {
 
-    @JsonProperty("type")
+    @JSONField(name = "type")
     private String type;
-    @JsonProperty("media_id")
+    @JSONField(name = "media_id")
     private String mediaId;
-    @JsonProperty("created_at")
+    @JSONField(name = "created_at")
     private String createTime;
 
     public String getType() {

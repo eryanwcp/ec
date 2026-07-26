@@ -1,7 +1,7 @@
 package com.eryansky.fastweixin.company.api.response;
 
 import com.eryansky.fastweixin.api.response.BaseResponse;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.eryansky.fastweixin.company.api.entity.QYTag;
 
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class GetTagListResponse extends BaseResponse {
 
-    @JsonProperty("taglist")
+    @JSONField(name = "taglist")
     private List<QYTag> tags;
 
     public List<QYTag> getTags() {

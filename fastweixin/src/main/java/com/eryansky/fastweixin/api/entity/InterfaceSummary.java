@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.alibaba.fastjson.annotation.JSONField;
 
 /**
  * @author Eryan
@@ -8,13 +8,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class InterfaceSummary extends BaseDataCube {
 
-    @JsonProperty("callback_count")
+    @JSONField(name = "callback_count")
     private Integer callbackCount;
-    @JsonProperty("fail_count")
+    @JSONField(name = "fail_count")
     private Integer failCount;
-    @JsonProperty("total_time_cost")
+    @JSONField(name = "total_time_cost")
     private Integer totalTimeCost;
-    @JsonProperty("max_time_cost")
+    @JSONField(name = "max_time_cost")
     private Integer maxTimeCost;
 
     public Integer getCallbackCount() {

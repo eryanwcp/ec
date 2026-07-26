@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.alibaba.fastjson.annotation.JSONField;
 
 /**
  * 客服帐号对象
@@ -10,18 +10,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class CustomAccount extends BaseModel {
 
-    @JsonProperty("kf_account")
+    @JSONField(name = "kf_account")
     private String accountName;
 
-    @JsonProperty("kf_nick")
+    @JSONField(name = "kf_nick")
     private String nickName;
 
     private String password;
 
-    @JsonProperty("kf_id")
+    @JSONField(name = "kf_id")
     private String id;
 
-    @JsonProperty("kf_headimg")
+    @JSONField(name = "kf_headimg")
     private String headImg;
 
     public String getAccountName() {

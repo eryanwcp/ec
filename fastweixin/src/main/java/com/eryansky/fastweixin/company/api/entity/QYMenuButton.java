@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.company.api.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.eryansky.fastweixin.api.entity.BaseModel;
 import com.eryansky.fastweixin.company.api.enums.QYMenuType;
 import com.eryansky.fastweixin.exception.WeixinException;
@@ -20,7 +20,7 @@ public class QYMenuButton extends BaseModel {
     private String name;// 菜单显式的名称
     private String key;// 菜单类型不为view或为空时可用。代表事件名称
     private String url;// 菜单类型为view时可用。代表点击按钮后跳转的页面地址
-    @JsonProperty("sub_button")
+    @JSONField(name = "sub_button")
     private List<QYMenuButton> subButton;
 
     public QYMenuType getType() {

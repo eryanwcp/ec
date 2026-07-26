@@ -1,7 +1,7 @@
 package com.eryansky.fastweixin.company.api.response;
 
 import com.eryansky.fastweixin.api.response.BaseResponse;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.alibaba.fastjson.annotation.JSONField;
 
 /**
  * Response -- 从Oauth中获取的用户信息
@@ -11,11 +11,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class GetOauthUserInfoResponse extends BaseResponse {
 
-    @JsonProperty("UserId")
+    @JSONField(name = "UserId")
     private String userid;
-    @JsonProperty("OpenId")
+    @JSONField(name = "OpenId")
     private String openid;
-    @JsonProperty("DeviceId")
+    @JSONField(name = "DeviceId")
     private String deviceid;
 
     public String getUserid() {
