@@ -11,5 +11,4 @@ public interface IAccessTokenCacheService {
 
     void putAccessTokenCache(AccessTokenCache accessTokenCache);
 
-    void clearAccessTokenCache();
 }
