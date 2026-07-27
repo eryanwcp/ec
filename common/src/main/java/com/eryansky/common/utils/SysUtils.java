@@ -193,7 +193,7 @@ public class SysUtils {
 			output = new byte[100];
 			compresser.deflate(output);
 			for (int i = 0; i < output.length; i++) {
-				al.add(new Byte(output[i]));
+				al.add(Byte.valueOf(output[i]));
 			}
 		}
 		output = new byte[al.size()];
@@ -224,7 +224,7 @@ public class SysUtils {
 				logger.error(e.getMessage(),e);
 			}
 			for (int i = 0; i < result.length; i++) {
-				al.add(new Byte(result[i]));
+				al.add(Byte.valueOf(result[i]));
 			}
 		}
 		result = new byte[al.size()];
