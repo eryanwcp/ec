@@ -28,7 +28,7 @@ public class HanziToPinYin {
 	}
 
 	private static void spellPut(String spell, int ascii) {
-		spellMap.put(spell, new Integer(ascii));
+		spellMap.put(spell, Integer.valueOf(ascii));
 	}
 
 	private static void initialize() {

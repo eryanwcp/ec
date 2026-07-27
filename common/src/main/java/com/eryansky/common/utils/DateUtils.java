@@ -496,7 +496,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 
         String tempmonth = strArray[1]; // 得到字符串中的月
 
-        return new Integer(tempmonth);
+        return Integer.valueOf(tempmonth);
     }
 
     /**
@@ -508,7 +508,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
 
         String tempmonth = strArray[0]; // 得到字符串中的月
 
-        return new Integer(tempmonth);
+        return Integer.valueOf(tempmonth);
     }
 
     /**
