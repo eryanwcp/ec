@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012-2024 https://www.eryansky.com
+ * Copyright (c) 2012-2026 https://www.eryansky.com
  * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -319,85 +319,65 @@ public class AppUtils {
      * @param treeNodes
      * @return
      */
-    public static List<TreeNode> toTreeTreeNodes(List<TreeNode> treeNodes){
-        return toTreeTreeNodes(treeNodes,true);
+    public static List<TreeNode> toTreeTreeNodes(List<TreeNode> treeNodes) {
+        return toTreeTreeNodes(treeNodes, true);
     }
+
     /**
      * 按树形结构排列
      * @param treeNodes
-     * @param sameNodeType
+     * @param sameNodeType 是否检查节点类型一致
      * @return
      */
-    public static List<TreeNode> toTreeTreeNodes(List<TreeNode> treeNodes,boolean sameNodeType){
-        if(Collections3.isEmpty(treeNodes)){
+    public static List<TreeNode> toTreeTreeNodes(List<TreeNode> treeNodes, boolean sameNodeType) {
+        if (Collections3.isEmpty(treeNodes)) {
             return Collections.emptyList();
         }
-        List<TreeNode> tempTreeNodes = Lists.newArrayList();
-        Map<String,TreeNode> tempMap = Maps.newLinkedHashMap();
 
-        for(TreeNode treeNode:treeNodes){
-            tempMap.put(treeNode.getId(),treeNode);
-            tempTreeNodes.add(treeNode);
+        // 1. 将所有节点映射到 Map 中，Key 为 node.getId()，方便 O(1) 查找
+        Map<String, TreeNode> nodeMap = Maps.newLinkedHashMap();
+        for (TreeNode node : treeNodes) {
+            if (node != null && StringUtils.isNotBlank(node.getId())) {
+                nodeMap.put(node.getId(), node);
+            }
         }
 
+        List<TreeNode> rootNodes = Lists.newArrayList();
 
-        Set<String> keyIds = tempMap.keySet();
-        Set<String> removeKeyIds = Sets.newHashSet();
-        Iterator<String> iteratorKey = keyIds.iterator();
-        while (iteratorKey.hasNext()){
-            String key = iteratorKey.next();
-            TreeNode treeNode = null;
-            for(TreeNode treeNode1:tempTreeNodes){
-                if(treeNode1.getId().equals(key)){
-                    treeNode = treeNode1;
-                    break;
+        // 2. 遍历所有节点，建立父子节点关系
+        for (TreeNode node : nodeMap.values()) {
+            String pId = node.getpId();
+            TreeNode parentNode = StringUtils.isNotBlank(pId) ? nodeMap.get(pId) : null;
+
+            // 判断父节点是否存在且类型相符（如果 sameNodeType 为 true）
+            boolean hasValidParent = false;
+            if (parentNode != null) {
+                if (!sameNodeType) {
+                    hasValidParent = true;
+                } else {
+                    String nodeType = (String) node.getAttributes().get("nType");
+                    String parentType = (String) parentNode.getAttributes().get("nType");
+                    hasValidParent = Objects.equals(nodeType, parentType);
                 }
             }
 
-            if(StringUtils.isNotBlank(treeNode.getpId())){
-                TreeNode pTreeNode = getParentTreeNode(treeNode.getpId(),sameNodeType ? (String)treeNode.getAttributes().get("nType"):null, tempTreeNodes);
-                if(pTreeNode != null){
-                    for(TreeNode treeNode2:tempTreeNodes){
-                        if(treeNode2.getId().equals(pTreeNode.getId())){
-                            pTreeNode.setState(TreeNode.STATE_CLOASED);
-                            if(Collections3.isEmpty(treeNode.getChildren())){
-                                treeNode.setState(TreeNode.STATE_OPEN);
-                            }
-                            treeNode2.addChild(treeNode);
-                            removeKeyIds.add(treeNode.getId());
-                            break;
-                        }
-                    }
-
+            if (hasValidParent) {
+                // 找到合法父节点：将当前节点加入父节点的 children 中，并调整父节点状态
+                parentNode.setState(TreeNode.STATE_CLOASED);
+                if (Collections3.isEmpty(node.getChildren())) {
+                    node.setState(TreeNode.STATE_OPEN);
                 }
-            }
-
-        }
-
-        //remove
-        if(Collections3.isNotEmpty(removeKeyIds)){
-            keyIds.removeAll(removeKeyIds);
-        }
-
-        List<TreeNode> result = Lists.newArrayList();
-        keyIds = tempMap.keySet();
-        iteratorKey = keyIds.iterator();
-        while (iteratorKey.hasNext()){
-            String _key = iteratorKey.next();
-            TreeNode treeNode = null;
-            for(TreeNode treeNode4:tempTreeNodes){
-                if(treeNode4.getId().equals(_key)){
-                    treeNode = treeNode4;
-                    if(Collections3.isEmpty(treeNode.getChildren())){
-                        treeNode.setState(TreeNode.STATE_OPEN);
-                    }
-                    result.add(treeNode);
-                    break;
+                parentNode.addChild(node);
+            } else {
+                // 没有父节点或父节点不匹配：作为根节点
+                if (Collections3.isEmpty(node.getChildren())) {
+                    node.setState(TreeNode.STATE_OPEN);
                 }
+                rootNodes.add(node);
             }
-
         }
-        return result;
+
+        return rootNodes;
     }
 
 
