@@ -23,6 +23,7 @@ import com.eryansky.common.web.filter.XsslHttpServletRequestWrapper;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.aop.annotation.Logging;
+import com.eryansky.core.security.ApplicationSessionContext;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.annotation.RequiresPermissions;
 import com.eryansky.j2cache.CacheChannel;
@@ -216,47 +217,13 @@ public class SystemMonitorController extends SimpleController {
 
         if (WebUtils.isAjaxRequest(request)) {
             Collection<String> keys = SecurityUtils.findSessionKeys();
-            List<SessionVo> list;
-            final int threshold = 1000;
-
-            if (Objects.isNull(keys) || keys.isEmpty()) {
-                list = Collections.emptyList();
-            } else if (keys.size() <= threshold) {
-                list = new ArrayList<>();
-                toSessionVo(keys, list);
-            } else {
-                List<String> keyList = new ArrayList<>(keys);
-                int parallelism = Math.min(Runtime.getRuntime().availableProcessors(), keyList.size());
-                int batchSize = (keyList.size() + parallelism - 1) / parallelism;
-                List<CompletableFuture<List<SessionVo>>> futures = new ArrayList<>(parallelism);
-
-                ExecutorService executor = Executors.newFixedThreadPool(Math.max(1, parallelism));
-                try {
-                    for (int i = 0; i < parallelism; i++) {
-                        int from = i * batchSize;
-                        if (from >= keyList.size()) break;
-                        int to = Math.min(from + batchSize, keyList.size());
-                        List<String> sliceKeys = keyList.subList(from, to);
-                        futures.add(CompletableFuture.supplyAsync(() -> {
-                            List<SessionVo> sub = new ArrayList<>(sliceKeys.size());
-                            toSessionVo(sliceKeys, sub);
-                            return sub;
-                        }, executor));
-                    }
-                    list = futures.stream()
-                            .map(CompletableFuture::join)
-                            .flatMap(List::stream)
-                            .collect(Collectors.toList());
-                } finally {
-                    executor.shutdown(); // 优雅关闭线程池，防止资源泄露
-                }
-            }
+            List<SessionVo> list = ApplicationSessionContext.getInstance().executeParallel(keys, this::toSessionVo);
 
             // 排序并分页
             list.sort(Comparator.comparing(SessionVo::getUpdateTime, Comparator.nullsLast(Comparator.naturalOrder())).reversed()
                     .thenComparing(Comparator.comparing(SessionVo::getCreatedTime, Comparator.nullsLast(Comparator.naturalOrder())).reversed()));
             List<SessionVo> dataList = AppUtils.getPagedList(list, page.getPageNo(), page.getPageSize());
-            page.autoTotalCount(keys.size());
+            page.autoTotalCount(keys != null ? keys.size() : 0);
             page.autoResult(dataList);
             return renderString(response, page);
         }
@@ -266,7 +233,8 @@ public class SystemMonitorController extends SimpleController {
         return "modules/sys/systemMonitor-sessionCache";
     }
 
-    private void toSessionVo(Collection<String> keys, List<SessionVo> list) {
+    private List<SessionVo> toSessionVo(List<String> keys) {
+        List<SessionVo> list = new ArrayList<>(keys.size());
         for (String key : keys) {
             SessionObject sessionObject = SecurityUtils.getSessionObjectBySessionId(key);
             SessionVo sessionVo = new SessionVo();
@@ -285,6 +253,7 @@ public class SystemMonitorController extends SimpleController {
             sessionVo.setAccessCount(Optional.ofNullable(sessionObject).map(SessionObject::getAccessCount).orElse(null));
             list.add(sessionVo);
         }
+        return list;
     }
 
     /**
