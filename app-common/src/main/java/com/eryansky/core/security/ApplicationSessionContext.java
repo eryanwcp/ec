@@ -10,9 +10,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -23,64 +21,96 @@ public class ApplicationSessionContext {
 
 	private static final Logger logger = LoggerFactory.getLogger(ApplicationSessionContext.class);
 
-	// 定义并行处理的阈值，避免“魔术数字”
+	/** 并行处理阈值 */
 	private static final int PARALLEL_PROCESSING_THRESHOLD = 1000;
 
-	private J2CacheSessionFilter sessionFilter;
-	private CacheFacade cacheFacade;
+	private static volatile ApplicationSessionContext instance;
+
+	private final J2CacheSessionFilter sessionFilter;
+	private final CacheFacade cacheFacade;
 	private final ExecutorService executor;
 
 	/**
-	 * 静态内部类，延迟加载，懒汉式，线程安全的单例模式
+	 * 双重检查锁（DCL）获取单例，避免类加载阶段死锁或 Spring 未就绪问题
 	 */
-	public static final class Static {
-		// 假设j2CacheSessionFilter在Spring上下文中是FilterRegistrationBean<J2CacheSessionFilter>类型
-		private static final FilterRegistrationBean<?> filterRegistrationBean = SpringContextHolder.getBean("j2CacheSessionFilter", FilterRegistrationBean.class);
-		// 确保获取到的是J2CacheSessionFilter实例
-		private static final ApplicationSessionContext instance = new ApplicationSessionContext((J2CacheSessionFilter) filterRegistrationBean.getFilter());
-	}
-
-	private ApplicationSessionContext() {
-		this.executor = null; // Not used in this constructor
+	public static ApplicationSessionContext getInstance() {
+		if (instance == null) {
+			synchronized (ApplicationSessionContext.class) {
+				if (instance == null) {
+					FilterRegistrationBean<?> filterRegistrationBean =
+							SpringContextHolder.getBean("j2CacheSessionFilter", FilterRegistrationBean.class);
+					if (filterRegistrationBean == null || filterRegistrationBean.getFilter() == null) {
+						throw new IllegalStateException("J2CacheSessionFilter bean is not initialized in Spring Context.");
+					}
+					instance = new ApplicationSessionContext((J2CacheSessionFilter) filterRegistrationBean.getFilter());
+				}
+			}
+		}
+		return instance;
 	}
 
 	public ApplicationSessionContext(J2CacheSessionFilter sessionFilter) {
 		this.sessionFilter = sessionFilter;
 		this.cacheFacade = sessionFilter.getCache();
-		this.executor = Executors.newFixedThreadPool(
-				Math.max(1, Runtime.getRuntime().availableProcessors()),
+
+		int cpus = Runtime.getRuntime().availableProcessors();
+		// 使用 ThreadPoolExecutor 显式指定有界队列与拒绝策略
+		this.executor = new ThreadPoolExecutor(
+				Math.max(1, cpus),
+				Math.max(2, cpus * 2),
+				60L, TimeUnit.SECONDS,
+				new LinkedBlockingQueue<>(2000),
 				r -> {
 					Thread t = new Thread(r);
 					t.setDaemon(true);
 					t.setName("session-context-parallel-pool-" + t.getId());
 					return t;
-				});
+				},
+				new ThreadPoolExecutor.CallerRunsPolicy()
+		);
+
+		// 注册 JVM 优雅关闭钩子
+		Runtime.getRuntime().addShutdownHook(new Thread(this::shutdownExecutor));
 	}
 
-	public static ApplicationSessionContext getInstance() {
-		return Static.instance;
-	}
-
-	public void addSession(SessionInfo sessionInfo) {
-		if (sessionInfo != null) {
-			SessionObject sessionObject = cacheFacade.getSession(sessionInfo.getSessionId());
-			if (sessionObject == null) {
-				logger.warn("SessionObject for sessionId {} not found when adding session. This might indicate an issueT or a new session.", sessionInfo.getSessionId());
-				return;
+	/**
+	 * 关闭线程池资源
+	 */
+	private void shutdownExecutor() {
+		if (executor != null && !executor.isShutdown()) {
+			executor.shutdown();
+			try {
+				if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
+					executor.shutdownNow();
+				}
+			} catch (InterruptedException e) {
+				executor.shutdownNow();
+				Thread.currentThread().interrupt();
 			}
-			sessionObject.put(SessionObject.KEY_SESSION_DATA, sessionInfo);
-			cacheFacade.setSessionAttribute(sessionObject, SessionObject.KEY_SESSION_DATA);
 		}
 	}
 
+	public void addSession(SessionInfo sessionInfo) {
+		if (sessionInfo == null || sessionInfo.getSessionId() == null) {
+			return;
+		}
+		SessionObject sessionObject = cacheFacade.getSession(sessionInfo.getSessionId());
+		if (sessionObject == null) {
+			logger.warn("SessionObject for sessionId {} not found when adding session. This might indicate an issue or a new session.", sessionInfo.getSessionId());
+			return;
+		}
+		sessionObject.put(SessionObject.KEY_SESSION_DATA, sessionInfo);
+		cacheFacade.setSessionAttribute(sessionObject, SessionObject.KEY_SESSION_DATA);
+	}
+
 	public void removeSessionInfo(String sessionId) {
-		if (sessionId != null) {
-			SessionObject sessionObject = cacheFacade.getSession(sessionId);
-			if (null != sessionObject) {
-				// 假设cacheFacade.removeSessionAttribute会负责将SessionObject的修改持久化到缓存
-				sessionObject.remove(SessionObject.KEY_SESSION_DATA);
-				cacheFacade.removeSessionAttribute(sessionObject, SessionObject.KEY_SESSION_DATA);
-			}
+		if (sessionId == null) {
+			return;
+		}
+		SessionObject sessionObject = cacheFacade.getSession(sessionId);
+		if (sessionObject != null) {
+			sessionObject.remove(SessionObject.KEY_SESSION_DATA);
+			cacheFacade.removeSessionAttribute(sessionObject, SessionObject.KEY_SESSION_DATA);
 		}
 	}
 
@@ -94,16 +124,18 @@ public class ApplicationSessionContext {
 
 	public SessionInfo getSession(String sessionId) {
 		SessionObject sessionObject = getSessionObjectBySessionId(sessionId);
-		SessionInfo sessionInfo = null != sessionObject ? (SessionInfo) sessionObject.get(SessionObject.KEY_SESSION_DATA) : null;
-		if (null != sessionInfo) {
+		if (sessionObject == null) {
+			return null;
+		}
+		SessionInfo sessionInfo = (SessionInfo) sessionObject.get(SessionObject.KEY_SESSION_DATA);
+		if (sessionInfo != null) {
 			sessionInfo.setUpdateTime(Date.from(Instant.ofEpochMilli(sessionObject.getLastAccess_at())));
 		}
 		return sessionInfo;
 	}
 
 	public List<SessionInfo> findSessionInfoData() {
-		Collection<String> keys = cacheFacade.keys();
-		return findSessionInfoData(keys);
+		return findSessionInfoData(cacheFacade.keys());
 	}
 
 	public List<SessionInfo> findSessionInfoData(Collection<String> keys) {
@@ -133,32 +165,86 @@ public class ApplicationSessionContext {
 		return findSessionInfoKeys().size();
 	}
 
+	/**
+	 * 根据 SessionInfo ID 查找（优化：支持找到后快速短路返回）
+	 */
 	public SessionInfo getSessionInfoBySessionInfoId(String sessionInfoId) {
+		if (sessionInfoId == null) {
+			return null;
+		}
 		Collection<String> keys = cacheFacade.keys();
-		List<SessionInfo> results = executeParallel(keys, batch -> batch.stream()
-				.map(cacheFacade::getSession)
-				.filter(Objects::nonNull)
-				.map(sessionObject -> {
-					Object sessionData = sessionObject.get(SessionObject.KEY_SESSION_DATA);
-					return (sessionData instanceof SessionInfo) ? (SessionInfo) sessionData : null;
-				})
-				.filter(Objects::nonNull)
-				.filter(sessionInfo -> sessionInfoId.equals(sessionInfo.getId()))
-				.collect(Collectors.toList()));
-		return results.isEmpty() ? null : results.get(0);
+		if (keys == null || keys.isEmpty()) {
+			return null;
+		}
+
+		// 短路查找：并行任务中只要任意批次命中，直接返回并取消其他任务
+		if (keys.size() > PARALLEL_PROCESSING_THRESHOLD) {
+			List<String> keyList = new ArrayList<>(keys);
+			int parallelism = Math.max(1, Runtime.getRuntime().availableProcessors());
+			int batchSize = (keyList.size() + parallelism - 1) / parallelism;
+
+			CompletionService<SessionInfo> completionService = new ExecutorCompletionService<>(executor);
+			List<Future<SessionInfo>> futures = new ArrayList<>(parallelism);
+
+			for (int i = 0; i < parallelism; i++) {
+				int from = i * batchSize;
+				if (from >= keyList.size()) break;
+				int to = Math.min(from + batchSize, keyList.size());
+				List<String> slice = keyList.subList(from, to);
+
+				futures.add(completionService.submit(() -> searchSessionInfoInBatch(slice, sessionInfoId)));
+			}
+
+			try {
+				for (int i = 0; i < futures.size(); i++) {
+					Future<SessionInfo> completedFuture = completionService.take();
+					SessionInfo result = completedFuture.get();
+					if (result != null) {
+						// 取消其余所有正在执行的批次任务
+						for (Future<SessionInfo> f : futures) {
+							f.cancel(true);
+						}
+						return result;
+					}
+				}
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			} catch (ExecutionException e) {
+				logger.error("Error during parallel session lookup: {}", e.getMessage(), e);
+			}
+			return null;
+		}
+
+		return searchSessionInfoInBatch(keys, sessionInfoId);
+	}
+
+	private SessionInfo searchSessionInfoInBatch(Collection<String> keys, String sessionInfoId) {
+		for (String key : keys) {
+			if (Thread.currentThread().isInterrupted()) {
+				return null;
+			}
+			SessionObject sessionObject = cacheFacade.getSession(key);
+			if (sessionObject != null) {
+				Object sessionData = sessionObject.get(SessionObject.KEY_SESSION_DATA);
+				if (sessionData instanceof SessionInfo) {
+					SessionInfo info = (SessionInfo) sessionData;
+					if (sessionInfoId.equals(info.getId())) {
+						info.setUpdateTime(Date.from(Instant.ofEpochMilli(sessionObject.getLastAccess_at())));
+						return info;
+					}
+				}
+			}
+		}
+		return null;
 	}
 
 	/**
-	 * 并行执行处理任务
-	 * @param items 输入项集合
-	 * @param batchTask 处理批次的函数
-	 * @return 结果列表
+	 * 通用并行执行分批任务
 	 */
 	public <T, R> List<R> executeParallel(Collection<T> items, Function<List<T>, List<R>> batchTask) {
-		if (Objects.isNull(items) || items.isEmpty()) {
+		if (items == null || items.isEmpty()) {
 			return Collections.emptyList();
 		}
-
 		if (items.size() <= PARALLEL_PROCESSING_THRESHOLD) {
 			return batchTask.apply(new ArrayList<>(items));
 		}
@@ -166,8 +252,8 @@ public class ApplicationSessionContext {
 		List<T> itemList = new ArrayList<>(items);
 		int parallelism = Math.max(1, Runtime.getRuntime().availableProcessors());
 		int batchSize = (itemList.size() + parallelism - 1) / parallelism;
-		List<CompletableFuture<List<R>>> futures = new ArrayList<>(parallelism);
 
+		List<CompletableFuture<List<R>>> futures = new ArrayList<>(parallelism);
 		for (int i = 0; i < parallelism; i++) {
 			int from = i * batchSize;
 			if (from >= itemList.size()) break;
@@ -182,21 +268,18 @@ public class ApplicationSessionContext {
 				.collect(Collectors.toList());
 	}
 
-	/**
-	 * 将SessionObject转换为SessionInfo，并设置更新时间
-	 * @param sessionObject 缓存中的会话对象
-	 * @return 填充了更新时间的SessionInfo（转换失败返回null）
-	 */
 	private SessionInfo convertToSessionInfoWithUpdateTime(SessionObject sessionObject) {
 		try {
+			if (sessionObject == null) {
+				return null;
+			}
 			Object sessionData = sessionObject.get(SessionObject.KEY_SESSION_DATA);
 			if (!(sessionData instanceof SessionInfo)) {
 				return null;
 			}
 			SessionInfo sessionInfo = (SessionInfo) sessionData;
 			long lastAccessTime = sessionObject.getLastAccess_at();
-			Date updateTime = Date.from(Instant.ofEpochMilli(lastAccessTime));
-			sessionInfo.setUpdateTime(updateTime);
+			sessionInfo.setUpdateTime(Date.from(Instant.ofEpochMilli(lastAccessTime)));
 			return sessionInfo;
 		} catch (Exception e) {
 			logger.warn("Failed to convert SessionObject to SessionInfo for session id: {}. Error: {}",
