@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -27,6 +28,7 @@ public class ApplicationSessionContext {
 
 	private J2CacheSessionFilter sessionFilter;
 	private CacheFacade cacheFacade;
+	private final ExecutorService executor;
 
 	/**
 	 * 静态内部类，延迟加载，懒汉式，线程安全的单例模式
@@ -39,11 +41,20 @@ public class ApplicationSessionContext {
 	}
 
 	private ApplicationSessionContext() {
+		this.executor = null; // Not used in this constructor
 	}
 
 	public ApplicationSessionContext(J2CacheSessionFilter sessionFilter) {
 		this.sessionFilter = sessionFilter;
 		this.cacheFacade = sessionFilter.getCache();
+		this.executor = Executors.newFixedThreadPool(
+				Math.max(1, Runtime.getRuntime().availableProcessors()),
+				r -> {
+					Thread t = new Thread(r);
+					t.setDaemon(true);
+					t.setName("session-context-parallel-pool-" + t.getId());
+					return t;
+				});
 	}
 
 	public static ApplicationSessionContext getInstance() {
@@ -54,14 +65,9 @@ public class ApplicationSessionContext {
 		if (sessionInfo != null) {
 			SessionObject sessionObject = cacheFacade.getSession(sessionInfo.getSessionId());
 			if (sessionObject == null) {
-				// 如果sessionObject不存在，可能需要创建一个新的，或者根据业务逻辑决定如何处理
-				// 这里假设getSession会返回一个可用的SessionObject，或者需要先创建
-				logger.warn("SessionObject for sessionId {} not found when adding session. This might indicate an issue or a new session.", sessionInfo.getSessionId());
-				// 考虑是否需要在这里创建新的SessionObject并添加到缓存
-				// 例如: sessionObject = new SessionObject(sessionInfo.getSessionId()); cacheFacade.setSession(sessionObject);
-				return; // 或者继续处理，取决于cacheFacade.getSession的行为
+				logger.warn("SessionObject for sessionId {} not found when adding session. This might indicate an issueT or a new session.", sessionInfo.getSessionId());
+				return;
 			}
-			// 假设cacheFacade.setSessionAttribute会负责将SessionObject的修改持久化到缓存
 			sessionObject.put(SessionObject.KEY_SESSION_DATA, sessionInfo);
 			cacheFacade.setSessionAttribute(sessionObject, SessionObject.KEY_SESSION_DATA);
 		}
@@ -101,50 +107,79 @@ public class ApplicationSessionContext {
 	}
 
 	public List<SessionInfo> findSessionInfoData(Collection<String> keys) {
-		if (Objects.isNull(keys) || keys.isEmpty()) {
-			return Collections.emptyList(); // 使用Collections.emptyList()代替List.of()以兼容旧版本Java或避免不必要的对象创建
-		}
+		return executeParallel(keys, batch -> batch.stream()
+				.map(cacheFacade::getSession)
+				.filter(Objects::nonNull)
+				.map(this::convertToSessionInfoWithUpdateTime)
+				.filter(Objects::nonNull)
+				.collect(Collectors.toList()));
+	}
 
-		if (keys.size() <= PARALLEL_PROCESSING_THRESHOLD) {
-			return keys.stream()
-					.map(cacheFacade::getSession)
-					.filter(Objects::nonNull)
-					.map(this::convertToSessionInfoWithUpdateTime)
-					.filter(Objects::nonNull)
-					.collect(Collectors.toList());
-		}
-
-		List<String> keyList = new ArrayList<>(keys);
-		// 优化：使用ForkJoinPool.commonPool()，除非cacheFacade::getSession是I/O密集型操作
-		// 如果是I/O密集型，当前创建固定线程池的方式是合适的
-		ExecutorService executor = Executors.newFixedThreadPool(Math.max(1, Runtime.getRuntime().availableProcessors()));
-		try {
-			int parallelism = Math.max(1, Runtime.getRuntime().availableProcessors());
-			int batchSize = (keyList.size() + parallelism - 1) / parallelism;
-			List<CompletableFuture<List<SessionInfo>>> futures = new ArrayList<>(parallelism);
-
-			for (int i = 0; i < parallelism; i++) {
-				int from = i * batchSize;
-				if (from >= keyList.size()) break;
-				int to = Math.min(from + batchSize, keyList.size());
-				List<String> slice = keyList.subList(from, to);
-				futures.add(CompletableFuture.supplyAsync(() ->
-						slice.stream()
-								.map(cacheFacade::getSession)
-								.filter(Objects::nonNull)
-								.map(this::convertToSessionInfoWithUpdateTime)
-								.filter(Objects::nonNull)
-								.collect(Collectors.toList())
-						, executor));
+	public Collection<String> findSessionInfoKeys() {
+		Collection<String> keys = cacheFacade.keys();
+		return executeParallel(keys, batch -> {
+			List<String> sub = new ArrayList<>();
+			for (String key : batch) {
+				SessionObject sessionObject = cacheFacade.getSession(key);
+				if (sessionObject != null && sessionObject.get(SessionObject.KEY_SESSION_DATA) != null) {
+					sub.add(key);
+				}
 			}
+			return sub;
+		});
+	}
 
-			return futures.stream()
-					.map(CompletableFuture::join)
-					.flatMap(List::stream)
-					.collect(Collectors.toList());
-		} finally {
-			executor.shutdown();
+	public int findSessionInfoKeySize() {
+		return findSessionInfoKeys().size();
+	}
+
+	public SessionInfo getSessionInfoBySessionInfoId(String sessionInfoId) {
+		Collection<String> keys = cacheFacade.keys();
+		List<SessionInfo> results = executeParallel(keys, batch -> batch.stream()
+				.map(cacheFacade::getSession)
+				.filter(Objects::nonNull)
+				.map(sessionObject -> {
+					Object sessionData = sessionObject.get(SessionObject.KEY_SESSION_DATA);
+					return (sessionData instanceof SessionInfo) ? (SessionInfo) sessionData : null;
+				})
+				.filter(Objects::nonNull)
+				.filter(sessionInfo -> sessionInfoId.equals(sessionInfo.getId()))
+				.collect(Collectors.toList()));
+		return results.isEmpty() ? null : results.get(0);
+	}
+
+	/**
+	 * 并行执行处理任务
+	 * @param items 输入项集合
+	 * @param batchTask 处理批次的函数
+	 * @return 结果列表
+	 */
+	public <T, R> List<R> executeParallel(Collection<T> items, Function<List<T>, List<R>> batchTask) {
+		if (Objects.isNull(items) || items.isEmpty()) {
+			return Collections.emptyList();
 		}
+
+		if (items.size() <= PARALLEL_PROCESSING_THRESHOLD) {
+			return batchTask.apply(new ArrayList<>(items));
+		}
+
+		List<T> itemList = new ArrayList<>(items);
+		int parallelism = Math.max(1, Runtime.getRuntime().availableProcessors());
+		int batchSize = (itemList.size() + parallelism - 1) / parallelism;
+		List<CompletableFuture<List<R>>> futures = new ArrayList<>(parallelism);
+
+		for (int i = 0; i < parallelism; i++) {
+			int from = i * batchSize;
+			if (from >= itemList.size()) break;
+			int to = Math.min(from + batchSize, itemList.size());
+			List<T> slice = itemList.subList(from, to);
+			futures.add(CompletableFuture.supplyAsync(() -> batchTask.apply(slice), executor));
+		}
+
+		return futures.stream()
+				.map(CompletableFuture::join)
+				.flatMap(List::stream)
+				.collect(Collectors.toList());
 	}
 
 	/**
@@ -154,99 +189,20 @@ public class ApplicationSessionContext {
 	 */
 	private SessionInfo convertToSessionInfoWithUpdateTime(SessionObject sessionObject) {
 		try {
-			// 提取会话数据并做类型校验，避免强制类型转换异常
 			Object sessionData = sessionObject.get(SessionObject.KEY_SESSION_DATA);
 			if (!(sessionData instanceof SessionInfo)) {
-//				logger.warn("SessionObject with id {} contains non-SessionInfo data for KEY_SESSION_DATA. Actual type: {}",
-//						sessionObject.getId(), sessionData != null ? sessionData.getClass().getName() : "null");
 				return null;
 			}
 			SessionInfo sessionInfo = (SessionInfo) sessionData;
-
-			// 转换最后访问时间为Date类型，填充到SessionInfo
 			long lastAccessTime = sessionObject.getLastAccess_at();
 			Date updateTime = Date.from(Instant.ofEpochMilli(lastAccessTime));
 			sessionInfo.setUpdateTime(updateTime);
-
 			return sessionInfo;
 		} catch (Exception e) {
-			// 捕获时间转换/空值等异常，避免单个异常导致整个流终止
 			logger.warn("Failed to convert SessionObject to SessionInfo for session id: {}. Error: {}",
 					sessionObject != null ? sessionObject.getId() : "unknown", e.getMessage(), e);
 			return null;
 		}
-	}
-
-	public SessionInfo getSessionInfoBySessionInfoId(String sessionInfoId) {
-		Collection<String> keys = cacheFacade.keys();
-		if (Objects.isNull(keys) || keys.isEmpty()) {
-			return null;
-		}
-		return keys.stream()
-				.map(cacheFacade::getSession)
-				.filter(Objects::nonNull)
-				.map(sessionObject -> {
-					Object sessionData = sessionObject.get(SessionObject.KEY_SESSION_DATA);
-					return (sessionData instanceof SessionInfo) ? (SessionInfo) sessionData : null;
-				})
-				.filter(Objects::nonNull)
-				.filter(sessionInfo -> sessionInfoId.equals(sessionInfo.getId()))
-				.findFirst()
-				.orElse(null);
-	}
-
-	public Collection<String> findSessionInfoKeys() {
-		Collection<String> keys = cacheFacade.keys();
-		if (Objects.isNull(keys) || keys.isEmpty()) {
-			return Collections.emptyList();
-		}
-
-		if (keys.size() <= PARALLEL_PROCESSING_THRESHOLD) {
-			List<String> result = new ArrayList<>();
-			for (String key : keys) {
-				SessionObject sessionObject = cacheFacade.getSession(key);
-				if (sessionObject != null && sessionObject.get(SessionObject.KEY_SESSION_DATA) != null) {
-					result.add(key);
-				}
-			}
-			return result;
-		}
-
-		List<String> keyList = new ArrayList<>(keys);
-		ExecutorService executor = Executors.newFixedThreadPool(Math.max(1, Runtime.getRuntime().availableProcessors()));
-		try {
-			int parallelism = Math.max(1, Runtime.getRuntime().availableProcessors());
-			int batchSize = (keyList.size() + parallelism - 1) / parallelism;
-			List<CompletableFuture<List<String>>> futures = new ArrayList<>(parallelism);
-
-			for (int i = 0; i < parallelism; i++) {
-				int from = i * batchSize;
-				if (from >= keyList.size()) break;
-				int to = Math.min(from + batchSize, keyList.size());
-				List<String> slice = keyList.subList(from, to);
-				futures.add(CompletableFuture.supplyAsync(() -> {
-					List<String> sub = new ArrayList<>();
-					for (String key : slice) {
-						SessionObject sessionObject = cacheFacade.getSession(key);
-						if (sessionObject != null && sessionObject.get(SessionObject.KEY_SESSION_DATA) != null) {
-							sub.add(key);
-						}
-					}
-					return sub;
-				}, executor));
-			}
-
-			return futures.stream()
-					.map(CompletableFuture::join)
-					.flatMap(List::stream)
-					.collect(Collectors.toList());
-		} finally {
-			executor.shutdown();
-		}
-	}
-
-	public int findSessionInfoKeySize() {
-		return findSessionInfoKeys().size();
 	}
 
 	public SessionObject getSessionObjectBySessionId(String sessionId) {
@@ -285,5 +241,4 @@ public class ApplicationSessionContext {
 	public Collection<String> findSessionKeys() {
 		return cacheFacade.keys();
 	}
-
 }
