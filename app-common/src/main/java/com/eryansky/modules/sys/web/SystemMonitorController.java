@@ -234,26 +234,25 @@ public class SystemMonitorController extends SimpleController {
     }
 
     private List<SessionVo> toSessionVo(List<String> keys) {
-        List<SessionVo> list = new ArrayList<>(keys.size());
-        for (String key : keys) {
+        return keys.stream().map(key -> {
             SessionObject sessionObject = SecurityUtils.getSessionObjectBySessionId(key);
             SessionVo sessionVo = new SessionVo();
             sessionVo.setId(key);
             sessionVo.setTtl1(SecurityUtils.sessionTTL1(key));
             sessionVo.setTtl2(SecurityUtils.sessionTTL2(key));
-            sessionVo.setLoginUser(Optional.ofNullable(sessionObject)
-                    .map(SessionObject::getAttributes)
-                    .map(attr -> (String) attr.get("loginUser"))
-                    .orElse(null));
-            sessionVo.setHost(Optional.ofNullable(sessionObject).map(SessionObject::getHost).orElse(null));
-            sessionVo.setClientIP(Optional.ofNullable(sessionObject).map(SessionObject::getClientIP).orElse(null));
-            sessionVo.setCreatedTime(Optional.ofNullable(sessionObject).map(v -> Date.from(Instant.ofEpochMilli(v.getCreated_at()))).orElse(null));
-            sessionVo.setUpdateTime(Optional.ofNullable(sessionObject).map(v -> Date.from(Instant.ofEpochMilli(v.getLastAccess_at()))).orElse(null));
-            sessionVo.setData(Optional.ofNullable(sessionObject).map(SessionObject::getAttributes).orElse(null));
-            sessionVo.setAccessCount(Optional.ofNullable(sessionObject).map(SessionObject::getAccessCount).orElse(null));
-            list.add(sessionVo);
-        }
-        return list;
+
+            if (sessionObject != null) {
+                Map<String, Object> attributes = sessionObject.getAttributes();
+                sessionVo.setLoginUser((String) attributes.get("loginUser"));
+                sessionVo.setHost(sessionObject.getHost());
+                sessionVo.setClientIP(sessionObject.getClientIP());
+                sessionVo.setCreatedTime(new Date(sessionObject.getCreated_at()));
+                sessionVo.setUpdateTime(new Date(sessionObject.getLastAccess_at()));
+                sessionVo.setData(attributes);
+                sessionVo.setAccessCount(sessionObject.getAccessCount());
+            }
+            return sessionVo;
+        }).collect(Collectors.toList());
     }
 
     /**
