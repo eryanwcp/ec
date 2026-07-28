@@ -1,7 +1,7 @@
 /**
- *  Copyright (c) 2012-2024 https://www.eryansky.com
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
+ * Copyright (c) 2012-2024 https://www.eryansky.com
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.eryansky.core.web.upload;
 
@@ -33,8 +33,8 @@ import java.util.Date;
  */
 public class FileUploadUtils {
 
-    //默认大小 50M
-    public static final long DEFAULT_MAX_SIZE = 50*1024*1024;
+    //默认大小 100M
+    public static final long DEFAULT_MAX_SIZE = 100 * 1024 * 1024;
 
     //默认上传的地址
     private static String defaultBaseDir = "disk";
@@ -43,7 +43,7 @@ public class FileUploadUtils {
     protected static final int DEFAULT_FILE_NAME_LENGTH = 200;
 
     public static final String[] IMAGE_EXTENSION = {
-            "bmp", "gif", "jpg", "jpeg", "png","heic","webp","svg"
+            "jpg", "jpeg", "png", "gif", "bmp", "webp", "svg", "heic", "heif", "tif", "tiff", "ico"
     };
 
     public static final String[] FLASH_EXTENSION = {
@@ -56,16 +56,16 @@ public class FileUploadUtils {
 
     public static final String[] DEFAULT_ALLOWED_EXTENSION = {
             //图片
-            "bmp", "gif", "jpg", "jpeg", "png","heic","webp","svg",
+            "jpg", "jpeg", "png", "gif", "bmp", "webp", "svg", "heic", "heif", "tif", "tiff", "ico",
             //word excel powerpoint
-            "doc", "docx", "xls", "xlsx", "ppt", "pptx", "wps",
-            "html", "htm", "txt",
+            "doc", "docx", "xls", "xlsx", "ppt", "pptx", "wps", "et", "dps", "odt", "ods", "odp",
+            "html", "htm", "txt", "csv", "rtf",
             //压缩文件
-            "rar", "zip", "gz", "bz2",
+            "rar", "zip", "gz", "bz2", "7z",
             //pdf
-            "pdf",
+            "pdf", "ofd",
             //APP
-            "apk","ipa","plist"
+            "apk", "ipa", "plist"
     };
 
 
@@ -104,7 +104,7 @@ public class FileUploadUtils {
      */
     public static final String upload(HttpServletRequest request, MultipartFile file, BindingResult result, String[] allowedExtension) {
         try {
-            return upload(request, getDefaultBaseDir(), file, allowedExtension, DEFAULT_MAX_SIZE, true,null);
+            return upload(request, getDefaultBaseDir(), file, allowedExtension, DEFAULT_MAX_SIZE, true, null);
         } catch (IOException e) {
             LogUtils.logError("file upload error", e);
             result.reject("upload.server.error");
@@ -198,20 +198,20 @@ public class FileUploadUtils {
             desc = getAbsoluteFile(fileBasePath);
         }
 
-        if(!file.isDirectory()){
-            FileUtils.copyFile(file,desc);
+        if (!file.isDirectory()) {
+            FileUtils.copyFile(file, desc);
         }
         return filename;
     }
 
 
-    public static final void upload(String path,String local)
-            throws IOException{
-        FileUtils.copyFile(new File(local),new File(path));
+    public static final void upload(String path, String local)
+            throws IOException {
+        FileUtils.copyFile(new File(local), new File(path));
     }
 
-    public static void upload(String path,InputStream inputStream)
-            throws IOException{
+    public static void upload(String path, InputStream inputStream)
+            throws IOException {
         FileUtils.copyInputStreamToFile(inputStream, new File(path));
     }
 
@@ -267,7 +267,6 @@ public class FileUploadUtils {
     }
 
 
-
     /**
      * 获取文件绝对路径
      * @param request HTTP请求对象
@@ -275,8 +274,8 @@ public class FileUploadUtils {
      * @return
      * @throws java.io.IOException
      */
-    public static final File getAbsoluteFile(HttpServletRequest request,String filename) throws IOException{
-        return  getAbsoluteFile(extractUploadDir(request), filename);
+    public static final File getAbsoluteFile(HttpServletRequest request, String filename) throws IOException {
+        return getAbsoluteFile(extractUploadDir(request), filename);
     }
 
     /**
@@ -305,7 +304,6 @@ public class FileUploadUtils {
         return extractFilename(fileAllName, baseDir, needDatePathAndRandomName,
                 _prefix);
     }
-
 
 
     public static final String extractFilename(String fileAllName,
@@ -339,7 +337,7 @@ public class FileUploadUtils {
      * @return
      */
     public static final String encodingFilename(String filename) {
-        filename = encodingFilenamePrefix("",filename) + "_" + filename;
+        filename = encodingFilenamePrefix("", filename) + "_" + filename;
         return filename;
     }
 
@@ -351,9 +349,9 @@ public class FileUploadUtils {
      * @param filename 原始文件名
      * @return
      */
-    public static final String encodingFilenamePrefix(String userId,String filename) {
+    public static final String encodingFilenamePrefix(String userId, String filename) {
         filename = filename.replace("_", "");
-        filename = userId + "_" + Encrypt.hash(filename + System.nanoTime() + counter++) ;
+        filename = userId + "_" + Encrypt.hash(filename + System.nanoTime() + counter++);
         return filename;
     }
 
