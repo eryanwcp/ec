@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012-2018 http://www.eryansky.com
+ * Copyright (c) 2012-2026 http://www.eryansky.com
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -46,8 +46,8 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
     public static final String SESSION_KEY_REST_AUTHORITY = "REST_AUTHORITY";
-    private static final String SESSION_TAG_NAME = "loginUser";
-    private static final String SYSTEM_PREFIX_NAME = "内部系统";
+    public static final String SESSION_TAG_NAME = "loginUser";
+    public static final String SYSTEM_PREFIX_NAME = "内部系统";
 
     /**
      * Rest 权限注解解析结果缓存，避免重复反射
