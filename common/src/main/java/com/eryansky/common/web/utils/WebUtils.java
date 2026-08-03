@@ -317,7 +317,7 @@ public class WebUtils extends org.springframework.web.util.WebUtils {
 
     /**
      * 直接输出文本.
-     * @see #render(javax.servlet.http.HttpServletResponse, String, Object, String...)
+     * @see #render(jakarta.servlet.http.HttpServletResponse, String, Object, String...)
      * @param response
      * @param data 输出数据 可以是List Map等
      * @param headers 相应头 为null 则默认值：UTF-8编码 无缓存
@@ -329,7 +329,7 @@ public class WebUtils extends org.springframework.web.util.WebUtils {
 
     /**
      * 直接输出HTML.
-     * @see #render(javax.servlet.http.HttpServletResponse, String, Object, String...)
+     * @see #render(jakarta.servlet.http.HttpServletResponse, String, Object, String...)
      * @param response
      * @param data 输出数据 可以是List Map等
      * @param headers 相应头 为null 则默认值：UTF-8编码 无缓存
@@ -341,7 +341,7 @@ public class WebUtils extends org.springframework.web.util.WebUtils {
 
     /**
      * 直接输出XML.
-     * @see #render(javax.servlet.http.HttpServletResponse, String, Object, String...)
+     * @see #render(jakarta.servlet.http.HttpServletResponse, String, Object, String...)
      * @param response
      * @param data 输出数据 可以是List Map等
      * @param headers 相应头 为null 则默认值：UTF-8编码 无缓存
@@ -353,7 +353,7 @@ public class WebUtils extends org.springframework.web.util.WebUtils {
 
     /**
      * 直接输出XML.
-     * @see #render(javax.servlet.http.HttpServletResponse, String, Object, String...)
+     * @see #render(jakarta.servlet.http.HttpServletResponse, String, Object, String...)
      * @param response
      * @param data 输出数据 可以是List Map等
      * @param xmlMapper {@link XmlMapper}
@@ -372,7 +372,7 @@ public class WebUtils extends org.springframework.web.util.WebUtils {
 
     /**
      * 直接输出JSON.
-     * @see #render(javax.servlet.http.HttpServletResponse, String, Object, String...)
+     * @see #render(jakarta.servlet.http.HttpServletResponse, String, Object, String...)
      * @param response
      * @param data 输出数据 可以是List Map等
      * @param headers 相应头 为null 则默认值：UTF-8编码 无缓存
@@ -385,7 +385,7 @@ public class WebUtils extends org.springframework.web.util.WebUtils {
     /**
      * 直接输出支持跨域Mashup的JSONP.
      *
-     * @see #render(javax.servlet.http.HttpServletResponse, String, Object, String...)
+     * @see #render(jakarta.servlet.http.HttpServletResponse, String, Object, String...)
      * @param response
      * @param data 输出数据 可以是List Map等
      * @param headers 相应头 为null 则默认值：UTF-8编码 无缓存

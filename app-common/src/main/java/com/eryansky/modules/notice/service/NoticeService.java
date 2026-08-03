@@ -15,21 +15,20 @@ import com.eryansky.common.utils.Identities;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.core.orm.mybatis.entity.BaseEntity;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
+import com.eryansky.core.orm.mybatis.service.CrudService;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.modules.disk.utils.DiskUtils;
 import com.eryansky.modules.notice._enum.*;
-import com.eryansky.modules.notice.mapper.NoticeSendInfo;
-import com.eryansky.modules.notice.utils.NoticeConstants;
-import com.eryansky.modules.notice.utils.NoticeUtils;
-import com.eryansky.modules.sys._enum.YesOrNo;
-import com.eryansky.modules.sys.service.UserService;
-import com.eryansky.modules.sys.utils.UserUtils;
-import com.google.common.collect.Lists;
-import com.eryansky.core.orm.mybatis.service.CrudService;
 import com.eryansky.modules.notice.dao.NoticeDao;
 import com.eryansky.modules.notice.mapper.Notice;
 import com.eryansky.modules.notice.mapper.NoticeReceiveInfo;
+import com.eryansky.modules.notice.mapper.NoticeSendInfo;
+import com.eryansky.modules.notice.utils.NoticeConstants;
+import com.eryansky.modules.notice.utils.NoticeUtils;
 import com.eryansky.modules.notice.vo.NoticeQueryVo;
+import com.eryansky.modules.sys._enum.YesOrNo;
+import com.eryansky.modules.sys.service.UserService;
+import com.eryansky.modules.sys.utils.UserUtils;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import jakarta.annotation.Resource;
@@ -57,13 +56,17 @@ public class NoticeService extends CrudService<NoticeDao, Notice> {
     /**
      * 保存通知和文件
      *
-     * @param entity
-     * @param isPub
-     * @param userIds
-     * @param organIds
-     * @param fileIds
+     * @param entity           通知实体
+     * @param isPub            是否立即发布
+     * @param userIds          用户ID列表
+     * @param organIds         机构ID列表
+     * @param contactGroupIds  联系人组ID列表
+     * @param fileIds          附件ID列表
+     * @return Notice
      */
-    public Notice saveNoticeAndFiles(Notice entity, Boolean isPub, Collection<String> userIds, Collection<String> organIds, Collection<String> contactGroupIds, List<String> fileIds) {
+    public Notice saveNoticeAndFiles(Notice entity, Boolean isPub, Collection<String> userIds,
+                                     Collection<String> organIds, Collection<String> contactGroupIds,
+                                     List<String> fileIds) {
         List<String> oldFileIds = Collections.emptyList();
         if (!entity.getIsNewRecord()) {
             oldFileIds = findFileIdsByNoticeId(entity.getId());
@@ -77,40 +80,40 @@ public class NoticeService extends CrudService<NoticeDao, Notice> {
             DiskUtils.deleteFolderFiles(removeFileIds);
         }
 
-        //历史数据
-//        noticeReceiveInfoService.deleteByNoticeId(entity.getId());
+        // 清理并重新插入发送目标关联表
         noticeSendInfoService.deleteByNoticeId(entity.getId());
-
         saveNoticeSendInfos(userIds, entity.getId(), ReceiveObjectType.User.getValue());
         saveNoticeSendInfos(organIds, entity.getId(), ReceiveObjectType.Organ.getValue());
         saveNoticeSendInfos(contactGroupIds, entity.getId(), ReceiveObjectType.ContactGroup.getValue());
 
-        if (isPub != null && isPub) {
+        if (Boolean.TRUE.equals(isPub)) {
             publish(entity);
         }
         return entity;
     }
 
-    private void saveNoticeSendInfos(Collection<String> ids, String noticeId, String receieveObjectType) {
-        if (Collections3.isNotEmpty(ids)) {
-            for (String id : ids) {
-                if(StringUtils.isBlank(id)){
-                    continue;
-                }
-                NoticeSendInfo noticeSendInfo = new NoticeSendInfo();
-                noticeSendInfo.setReceiveObjectType(receieveObjectType);
-                noticeSendInfo.setNoticeId(noticeId);
-                noticeSendInfo.setReceiveObjectId(id);
-                noticeSendInfoService.save(noticeSendInfo);
-            }
+    private void saveNoticeSendInfos(Collection<String> ids, String noticeId, String receiveObjectType) {
+        if (Collections3.isEmpty(ids)) {
+            return;
         }
+        // 过滤空串与去重后统一保存
+        Set<String> uniqueIds = ids.stream()
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.toSet());
 
+        for (String id : uniqueIds) {
+            NoticeSendInfo noticeSendInfo = new NoticeSendInfo();
+            noticeSendInfo.setReceiveObjectType(receiveObjectType);
+            noticeSendInfo.setNoticeId(noticeId);
+            noticeSendInfo.setReceiveObjectId(id);
+            noticeSendInfoService.save(noticeSendInfo);
+        }
     }
 
     /**
-     * 删除通知
+     * 根据ID批量删除通知
      *
-     * @param ids
+     * @param ids 通知ID集合
      */
     public void deleteByIds(List<String> ids) {
         if (Collections3.isNotEmpty(ids)) {
@@ -121,12 +124,13 @@ public class NoticeService extends CrudService<NoticeDao, Notice> {
     }
 
     /**
-     * 属性过滤器查找得到分页数据.
+     * 属性过滤器查找得到分页数据
      *
      * @param page          分页对象
-     * @param userId        发布人 查询所有则传null
-     * @param noticeQueryVo 标查询条件
-     * @return
+     * @param notice        通知实体
+     * @param userId        发布人ID，查询所有则传 null
+     * @param noticeQueryVo 查询条件扩展VO
+     * @return Page<Notice>
      */
     public Page<Notice> findPage(Page<Notice> page, Notice notice, String userId, NoticeQueryVo noticeQueryVo) {
         Parameter parameter = new Parameter();
@@ -141,7 +145,6 @@ public class NoticeService extends CrudService<NoticeDao, Notice> {
         if (noticeQueryVo != null) {
             parameter.put("isTop", noticeQueryVo.getIsTop());
             parameter.put("query", noticeQueryVo.getQuery());
-
             if (noticeQueryVo.getStartTime() != null) {
                 parameter.put("startTime", DateUtils.format(noticeQueryVo.getStartTime(), DateUtils.DATE_TIME_FORMAT));
             }
@@ -153,20 +156,20 @@ public class NoticeService extends CrudService<NoticeDao, Notice> {
         notice.setEntityPage(page);
         parameter.put(BaseInterceptor.PAGE, page);
         parameter.put("dbName", notice.getDbName());
+
         Map<String, String> sqlMap = Maps.newHashMap();
         sqlMap.put("dsf", super.dataScopeFilter(SecurityUtils.getCurrentUser(), "o", "u"));
         parameter.put("sqlMap", sqlMap);
+
         page.autoResult(dao.findQueryList(parameter));
-
         return page;
-
     }
 
-
     /**
-     * 发布公告 切面实现消息推送
+     * 发布公告
      *
      * @param noticeId 公告ID
+     * @return Notice
      */
     public Notice publish(String noticeId) {
         Notice notice = this.get(noticeId);
@@ -177,65 +180,74 @@ public class NoticeService extends CrudService<NoticeDao, Notice> {
     }
 
     /**
-     * 发布公告 切面实现消息推送
+     * 发布公告 (包含接收人员去重计算与批量发件明细生成)
      *
-     * @param notice 通知
+     * @param notice 通知实体
+     * @return Notice
      */
     public Notice publish(Notice notice) {
         notice.setBizMode(NoticeMode.Effective.getValue());
         if (notice.getPublishTime() == null) {
-            Date nowTime = Calendar.getInstance().getTime();
-            notice.setPublishTime(nowTime);
+            notice.setPublishTime(new Date());
         }
         this.save(notice);
-        List<NoticeReceiveInfo> receiveInfos = Lists.newArrayList();
-        List<String> receiveUserIds = Lists.newArrayList();
 
-        if (NoticeReceiveScope.CUSTOM.getValue().equals(notice.getReceiveScope())) {
+        // 使用 Set 直接在内存中完成去重，避免重复追加与 List 转 Set
+        Set<String> receiveUserIds = Sets.newHashSet();
+        String receiveScope = notice.getReceiveScope();
+
+        if (NoticeReceiveScope.CUSTOM.getValue().equals(receiveScope)) {
             List<String> _receiveUserIds = NoticeUtils.findNoticeReceiveUserIds(notice.getId());
             List<String> receiveOrganIds = NoticeUtils.findNoticeReceiveOrganIds(notice.getId());
             List<String> userIds = userService.findUserIdsByOrganIds(receiveOrganIds);
             List<String> receiveContactGroupIds = NoticeUtils.findNoticeReceivContactGroupIds(notice.getId());
-            if(Collections3.isNotEmpty(receiveContactGroupIds)){
-                List<String> finalReceiveUserIds = receiveUserIds;
-                receiveContactGroupIds.forEach(v-> finalReceiveUserIds.addAll(contactGroupService.findContactGroupUsers(v).stream().map(BaseEntity::getId).collect(Collectors.toList())));
-            }
+
             if (Collections3.isNotEmpty(_receiveUserIds)) {
                 receiveUserIds.addAll(_receiveUserIds);
             }
             if (Collections3.isNotEmpty(userIds)) {
                 receiveUserIds.addAll(userIds);
             }
-        } else if (NoticeReceiveScope.ALL.getValue().equals(notice.getReceiveScope())) {
-            receiveUserIds = userService.findAllNormalUserIds();
-        } else if (NoticeReceiveScope.COMPANY_AND_CHILD.getValue().equals(notice.getReceiveScope())) {
-            receiveUserIds = userService.findOwnerAndChildsUserIds(UserUtils.getCompanyId(notice.getUserId()));
-        } else if (NoticeReceiveScope.COMPANY.getValue().equals(notice.getReceiveScope())) {
-            receiveUserIds = userService.findUserIdsByCompanyId(UserUtils.getCompanyId(notice.getUserId()));
-        } else if (NoticeReceiveScope.OFFICE_AND_CHILD.getValue().equals(notice.getReceiveScope())) {
-            receiveUserIds = userService.findOwnerAndChildsUserIds(UserUtils.getDefaultOrganId(notice.getUserId()));
-        } else if (NoticeReceiveScope.OFFICE.getValue().equals(notice.getReceiveScope())) {
-            receiveUserIds = userService.findUserIdsByOrganId(UserUtils.getDefaultOrganId(notice.getUserId()));
+            if (Collections3.isNotEmpty(receiveContactGroupIds)) {
+                for (String groupId : receiveContactGroupIds) {
+                    List<String> groupUserIds = contactGroupService.findContactGroupUsers(groupId).stream()
+                            .map(BaseEntity::getId)
+                            .collect(Collectors.toList());
+                    receiveUserIds.addAll(groupUserIds);
+                }
+            }
+        } else if (NoticeReceiveScope.ALL.getValue().equals(receiveScope)) {
+            receiveUserIds.addAll(userService.findAllNormalUserIds());
+        } else if (NoticeReceiveScope.COMPANY_AND_CHILD.getValue().equals(receiveScope)) {
+            receiveUserIds.addAll(userService.findOwnerAndChildsUserIds(UserUtils.getCompanyId(notice.getUserId())));
+        } else if (NoticeReceiveScope.COMPANY.getValue().equals(receiveScope)) {
+            receiveUserIds.addAll(userService.findUserIdsByCompanyId(UserUtils.getCompanyId(notice.getUserId())));
+        } else if (NoticeReceiveScope.OFFICE_AND_CHILD.getValue().equals(receiveScope)) {
+            receiveUserIds.addAll(userService.findOwnerAndChildsUserIds(UserUtils.getDefaultOrganId(notice.getUserId())));
+        } else if (NoticeReceiveScope.OFFICE.getValue().equals(receiveScope)) {
+            receiveUserIds.addAll(userService.findUserIdsByOrganId(UserUtils.getDefaultOrganId(notice.getUserId())));
         }
+
+        // 构建并批量插入接收记录
         if (Collections3.isNotEmpty(receiveUserIds)) {
-            Sets.newHashSet(receiveUserIds).forEach(v->{
-                NoticeReceiveInfo receiveInfo = new NoticeReceiveInfo(v, notice.getId());
-//                receiveInfo.setIsSend(YesOrNo.YES.getValue());
-                if(YesOrNo.YES.getValue().equals(notice.getIsReply())){
+            List<NoticeReceiveInfo> receiveInfos = receiveUserIds.stream().map(userId -> {
+                NoticeReceiveInfo receiveInfo = new NoticeReceiveInfo(userId, notice.getId());
+                if (YesOrNo.YES.getValue().equals(notice.getIsReply())) {
                     receiveInfo.setIsReply(YesOrNo.NO.getValue());
                 }
                 receiveInfo.prePersist();
-                receiveInfos.add(receiveInfo);
-            });
+                return receiveInfo;
+            }).collect(Collectors.toList());
+
+            noticeReceiveInfoService.deleteByNoticeId(notice.getId());
+            noticeReceiveInfoService.insertAutoBatch(receiveInfos);
         }
-        noticeReceiveInfoService.deleteByNoticeId(notice.getId());
-//        receiveInfos.forEach(n->noticeReceiveInfoService.save(n));
-        noticeReceiveInfoService.insertAutoBatch(receiveInfos);
+
         return notice;
     }
 
     /**
-     * 推送（仅限推送,由切面实现）
+     * 推送（仅限推送，切面实现）
      *
      * @param noticeId 公告ID
      */
@@ -244,78 +256,47 @@ public class NoticeService extends CrudService<NoticeDao, Notice> {
     }
 
     /**
-     * 发布公告
-     *
-     * @param type
-     * @param title
-     * @param content
-     * @param sendTime
-     * @param userId
-     * @param organId
-     * @param organIds
-     * @param messageChannels
+     * 按机构发送公告
      */
-    public void sendToOrganNotice(String appId, String type, String title, String content, Date sendTime, String userId, String organId, Collection<String> organIds,List<MessageChannel> messageChannels) {
-        //保存到notice表
+    public void sendToOrganNotice(String appId, String type, String title, String content,
+                                  Date sendTime, String userId, String organId,
+                                  Collection<String> organIds, List<MessageChannel> messageChannels) {
         Notice notice = new Notice();
         notice.setId(Identities.uuid7());
         notice.setAppId(appId);
         notice.setType(type);
         notice.setTitle(title);
         notice.setContent(content);
-        notice.setPublishTime(null != sendTime ? sendTime:Calendar.getInstance().getTime());
+        notice.setPublishTime(sendTime != null ? sendTime : new Date());
         notice.setReceiveScope(NoticeReceiveScope.CUSTOM.getValue());
         notice.setUserId(userId);
         notice.setOrganId(organId);
-        if(Collections3.isEmpty(messageChannels)){
-//            notice.setTipMessage(MessageChannel.Message.getValue()+","+MessageChannel.QYWeixin.getValue()+","+MessageChannel.APP.getValue());
-            notice.setTipMessage(NoticeConstants.getNoticeDefaultTipChannel());
-        }else{
-            notice.setTipMessage(Collections3.extractToString(messageChannels,"value",","));
-        }
 
-        notice.setCreateTime(Calendar.getInstance().getTime());
+        if (Collections3.isEmpty(messageChannels)) {
+            notice.setTipMessage(NoticeConstants.getNoticeDefaultTipChannel());
+        } else {
+            notice.setTipMessage(Collections3.extractToString(messageChannels, "value", ","));
+        }
+        notice.setCreateTime(new Date());
         dao.insert(notice);
 
         if (Collections3.isNotEmpty(organIds)) {
-            //去重
-            for (String _organId : organIds) {
-                //保存到notice send表
+            // 对传入的 organIds 进行 HashSet 去重，避免重复保存
+            Set<String> uniqueOrganIds = Sets.newHashSet(organIds);
+            for (String _organId : uniqueOrganIds) {
+                if (StringUtils.isBlank(_organId)) {
+                    continue;
+                }
                 NoticeSendInfo noticeSendInfo = new NoticeSendInfo();
                 noticeSendInfo.setNoticeId(notice.getId());
                 noticeSendInfo.setReceiveObjectType(ReceiveObjectType.Organ.getValue());
                 noticeSendInfo.setReceiveObjectId(_organId);
                 noticeSendInfoService.save(noticeSendInfo);
             }
-            //发布
+            // 发布
             publish(notice);
         }
-
     }
-
-
-    /**
-     * 去除重复
-     *
-     * @param receiveInfos
-     * @param receiveInfo
-     */
-    private void checkReceiveInfoAdd(List<NoticeReceiveInfo> receiveInfos, NoticeReceiveInfo receiveInfo) {
-        boolean flag = false;
-        for (NoticeReceiveInfo r : receiveInfos) {
-            if (r.getUserId().equals(receiveInfo.getUserId())) {
-                flag = true;
-                break;
-            }
-
-        }
-        if (!flag) {
-            receiveInfo.prePersist();
-            receiveInfos.add(receiveInfo);
-        }
-
-    }
-
 
     /**
      * 标记为已读
@@ -333,9 +314,8 @@ public class NoticeService extends CrudService<NoticeDao, Notice> {
                 }
             }
         } else {
-            logger.warn("参数[entitys]为空.");
+            logger.warn("参数[noticeIds]为空.");
         }
-
     }
 
     /**
@@ -345,31 +325,31 @@ public class NoticeService extends CrudService<NoticeDao, Notice> {
      * @param ids 文件IDS
      */
     public void insertNoticeFiles(String id, Collection<String> ids) {
-        Parameter parameter = Parameter.newParameter();
-        parameter.put("id", id);
-        parameter.put("ids", ids);
         if (Collections3.isNotEmpty(ids)) {
+            Parameter parameter = Parameter.newParameter();
+            parameter.put("id", id);
+            parameter.put("ids", ids);
             dao.insertNoticeFiles(parameter);
         }
     }
 
     /**
-     * 刪除通知附件关联信息
+     * 删除通知附件关联信息
      *
      * @param id  通知ID
      * @param ids 文件IDS
      */
     public void deleteNoticeFiles(String id, Collection<String> ids) {
-        Parameter parameter = Parameter.newParameter();
-        parameter.put("id", id);
-        parameter.put("ids", ids);
-        dao.deleteNoticeFiles(parameter);
+        if (Collections3.isNotEmpty(ids)) {
+            Parameter parameter = Parameter.newParameter();
+            parameter.put("id", id);
+            parameter.put("ids", ids);
+            dao.deleteNoticeFiles(parameter);
+        }
     }
 
-
     /**
-     * 保存通知附件关联信息
-     * 保存之前先删除原有
+     * 保存通知附件关联信息（先删后插）
      *
      * @param id  通知ID
      * @param ids 文件IDS
@@ -379,55 +359,62 @@ public class NoticeService extends CrudService<NoticeDao, Notice> {
         parameter.put("id", id);
         parameter.put("ids", ids);
         dao.deleteNoticeFiles(parameter);
+
         if (Collections3.isNotEmpty(ids)) {
             dao.insertNoticeFiles(parameter);
         }
     }
 
-
     /**
-     * 查找通知附件ID
+     * 查找通知关联的文件ID列表
      *
-     * @param noticeId
-     * @return
+     * @param noticeId 通知ID
+     * @return List<String>
      */
     public List<String> findFileIdsByNoticeId(String noticeId) {
         return dao.findFileIdsByNoticeId(noticeId);
     }
 
-
     /**
-     * 轮询通知 定时发布、到时失效、取消置顶
+     * 轮询通知：定时发布、到时失效、取消置顶
      */
     public void pollNotice() {
-        // 查询到今天为止所有未删除的通知
-        Date nowTime = Calendar.getInstance().getTime();
+        Date nowTime = new Date();
         Notice notice = new Notice();
         notice.setStatus(StatusState.NORMAL.getValue());
         List<Notice> noticeList = dao.findList(notice);
-        if (Collections3.isNotEmpty(noticeList)) {
-            for (Notice n : noticeList) {
-                if (NoticeMode.UnPublish.getValue().equals(n.getBizMode())
-                        && n.getEffectTime() != null
-                        && nowTime.compareTo(n.getEffectTime()) != -1) {//定时发布
-                    this.publish(n);
-                } else if (NoticeMode.Effective.getValue().equals(n.getBizMode())
-                        && n.getInvalidTime() != null
-                        && nowTime.compareTo(n.getInvalidTime()) != -1) {//到时失效
-                    n.setBizMode(NoticeMode.Invalidated.getValue());
+
+        if (Collections3.isEmpty(noticeList)) {
+            return;
+        }
+
+        for (Notice n : noticeList) {
+            // 1. 定时发布
+            if (NoticeMode.UnPublish.getValue().equals(n.getBizMode())
+                    && n.getEffectTime() != null
+                    && !nowTime.before(n.getEffectTime())) {
+                this.publish(n);
+            }
+            // 2. 到时失效
+            else if (NoticeMode.Effective.getValue().equals(n.getBizMode())
+                    && n.getInvalidTime() != null
+                    && !nowTime.before(n.getInvalidTime())) {
+                n.setBizMode(NoticeMode.Invalidated.getValue());
+                this.save(n);
+            }
+
+            // 3. 取消置顶
+            if (IsTop.Yes.getValue().equals(n.getIsTop())
+                    && n.getEndTopDay() != null
+                    && n.getEndTopDay() > 0) {
+                Date publishTime = (n.getPublishTime() == null) ? nowTime : n.getPublishTime();
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(publishTime);
+                cal.add(Calendar.DATE, n.getEndTopDay());
+
+                if (!nowTime.before(cal.getTime())) {
+                    n.setIsTop(IsTop.No.getValue());
                     this.save(n);
-                }
-                //取消置顶
-                if (IsTop.Yes.getValue().equals(n.getIsTop())
-                        && n.getEndTopDay() != null && n.getEndTopDay() > 0) {
-                    Date publishTime = (n.getPublishTime() == null) ? nowTime : n.getPublishTime();
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTime(publishTime);
-                    cal.add(Calendar.DATE, n.getEndTopDay());
-                    if (nowTime.compareTo(cal.getTime()) != -1) {
-                        n.setIsTop(IsTop.No.getValue());
-                        this.save(n);
-                    }
                 }
             }
         }

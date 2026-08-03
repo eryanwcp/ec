@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2012-2026 https://www.eryansky.com
  * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +23,7 @@ import com.eryansky.common.web.filter.XsslHttpServletRequestWrapper;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.aop.annotation.Logging;
+import com.eryansky.core.security.ApplicationSessionContext;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.annotation.RequiresPermissions;
 import com.eryansky.j2cache.CacheChannel;
@@ -48,6 +49,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -55,7 +57,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
 /**
- * 系统监控
+ * 系统监控控制器
  *
  * @author Eryan
  * @date 2016-10-28
@@ -69,8 +71,6 @@ public class SystemMonitorController extends SimpleController {
 
     /**
      * 系统信息
-     *
-     * @return
      */
     @RequiresPermissions("sys:systemMonitor:view")
     @Logging(value = "系统监控", logType = LogType.access, logging = "!#isAjax")
@@ -83,18 +83,15 @@ public class SystemMonitorController extends SimpleController {
                 server.setSessionSize(SecurityUtils.getSessionSize());
                 return renderString(response, Result.successResult().setData(server));
             } catch (Exception e) {
-                logger.error(e.getMessage(),e);
+                logger.error("获取系统监控信息失败", e);
                 return renderString(response, Result.errorResult().setMsg(e.getMessage()));
             }
         }
         return "modules/sys/systemMonitor";
     }
 
-
     /**
      * 系统监控-缓存管理
-     *
-     * @return
      */
     @RequiresPermissions("sys:systemMonitor:view")
     @Logging(value = "系统监控-缓存管理", logType = LogType.access, logging = "!#isAjax")
@@ -122,9 +119,7 @@ public class SystemMonitorController extends SimpleController {
     }
 
     /**
-     * 系统监控-缓存管理
-     *
-     * @return
+     * 系统监控-缓存详情
      */
     @RequiresPermissions("sys:systemMonitor:view")
     @Logging(value = "系统监控-缓存管理", logType = LogType.access, logging = "!#isAjax")
@@ -154,9 +149,7 @@ public class SystemMonitorController extends SimpleController {
     }
 
     /**
-     * 系统监控-缓存管理
-     *
-     * @return
+     * 系统监控-缓存Key详情
      */
     @RequiresPermissions("sys:systemMonitor:view")
     @Logging(value = "系统监控-缓存管理", logType = LogType.access, logging = "!#isAjax")
@@ -166,13 +159,12 @@ public class SystemMonitorController extends SimpleController {
         try {
             uiModel.addAttribute("data", JsonMapper.getInstance().writeValueAsString(object));
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
+            logger.error("JSON序列化失败，尝试字节序列化", e);
             try {
-                uiModel.addAttribute("data", new String(SerializationUtils.serialize(object)));
+                uiModel.addAttribute("data", new String(SerializationUtils.serialize(object), StandardCharsets.UTF_8));
             } catch (IOException e1) {
-                logger.error(e1.getMessage(), e1);
+                logger.error("字节序列化失败", e1);
             }
-
         }
         uiModel.addAttribute("object", object);
         uiModel.addAttribute("region", region);
@@ -180,18 +172,13 @@ public class SystemMonitorController extends SimpleController {
         return "modules/sys/systemMonitor-cacheKeyDetail";
     }
 
-
     /**
      * 清空缓存
-     *
-     * @param region 缓存名称
-     * @return
      */
-    @Logging(value = "系统监控-清空缓存",data = "#region", logType = LogType.operate)
+    @Logging(value = "系统监控-清空缓存", data = "#region", logType = LogType.operate)
     @RequiresPermissions("sys:systemMonitor:edit")
     @GetMapping(value = "clearCache")
     public String clearCache(String region, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
-        //清空ehcache缓存
         if (StringUtils.isNotBlank(region)) {
             CacheUtils.clearCache(region);
         } else {
@@ -200,21 +187,16 @@ public class SystemMonitorController extends SimpleController {
             for (String _cacheName : regions) {
                 CacheUtils.clearCache(_cacheName);
             }
-            //更新客户端缓存时间戳
             AppConstants.SYS_INIT_TIME = System.currentTimeMillis();
         }
         addMessage(redirectAttributes, "操作成功！");
         return "redirect:" + AppConstants.getAdminPath() + "/sys/systemMonitor/cache?repage";
     }
 
-
     /**
-     * 清空缓存
-     *
-     * @param region 缓存名称
-     * @return
+     * 清空指定Key缓存
      */
-    @Logging(value = "系统监控-清空缓存",remark = "#region",data = "#key", logType = LogType.operate)
+    @Logging(value = "系统监控-清空缓存", remark = "#region", data = "#key", logType = LogType.operate)
     @RequiresPermissions("sys:systemMonitor:edit")
     @GetMapping(value = "clearCacheKey")
     public String clearCacheKey(String region, String key, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
@@ -223,135 +205,94 @@ public class SystemMonitorController extends SimpleController {
         return "redirect:" + AppConstants.getAdminPath() + "/sys/systemMonitor/cacheDetail?region=" + region + "&repage";
     }
 
-
     /**
      * 系统监控-会话监控
-     *
-     * @return
      */
     @RequiresPermissions("sys:systemMonitor:view")
     @Logging(value = "系统监控-会话监控", logType = LogType.access, logging = "!#isAjax")
     @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST}, value = "sessionCache")
     public String sessionCache(Model uiModel, HttpServletRequest request, HttpServletResponse response) {
         Page<SessionVo> page = new Page<>(request, response);
-        String region = AppConstants.getConfigValue("j2cache.session.redis.cluster_name","j2cache-session");
+        String region = AppConstants.getConfigValue("j2cache.session.redis.cluster_name", "j2cache-session");
+
         if (WebUtils.isAjaxRequest(request)) {
             Collection<String> keys = SecurityUtils.findSessionKeys();
-            // 替换后的代码片段
-            List<SessionVo> list;
-            final int threshold = 1000;
-            if (Objects.isNull(keys) || keys.isEmpty()) {
-                list = Collections.emptyList();
-            } else if (keys.size() <= threshold) {
-                list = new ArrayList<>();
-                toSessionVo(keys, list);
-            } else {
-                List<String> keyList = new ArrayList<>(keys);
-                int parallelism = Math.min(Runtime.getRuntime().availableProcessors(), keyList.size());
-                int batchSize = (keyList.size() + parallelism - 1) / parallelism;
-                List<java.util.concurrent.CompletableFuture<List<SessionVo>>> futures = new ArrayList<>(parallelism);
-                ExecutorService executor = Executors.newFixedThreadPool(Math.max(1, parallelism));
-                for (int i = 0; i < parallelism; i++) {
-                    int from = i * batchSize;
-                    if (from >= keyList.size()) break;
-                    int to = Math.min(from + batchSize, keyList.size());
-                    List<String> sliceKeys = keyList.subList(from, to);
-                    futures.add(java.util.concurrent.CompletableFuture.supplyAsync(() -> {
-                        List<SessionVo> sub = new ArrayList<>(sliceKeys.size());
-                        toSessionVo(sliceKeys, sub);
-                        return sub;
-                    }, executor));
-                }
+            List<SessionVo> list = ApplicationSessionContext.getInstance().executeParallel(keys, this::toSessionVo);
 
-                list = futures.stream()
-                        .map(java.util.concurrent.CompletableFuture::join)
-                        .flatMap(List::stream)
-                        .collect(Collectors.toList());
-            }
-
-            // 排序并分页（保持原有排序逻辑）
+            // 排序并分页
             list.sort(Comparator.comparing(SessionVo::getUpdateTime, Comparator.nullsLast(Comparator.naturalOrder())).reversed()
                     .thenComparing(Comparator.comparing(SessionVo::getCreatedTime, Comparator.nullsLast(Comparator.naturalOrder())).reversed()));
             List<SessionVo> dataList = AppUtils.getPagedList(list, page.getPageNo(), page.getPageSize());
-            page.autoTotalCount(keys.size());
+            page.autoTotalCount(keys != null ? keys.size() : 0);
             page.autoResult(dataList);
             return renderString(response, page);
         }
+
         uiModel.addAttribute("region", region);
         uiModel.addAttribute("page", page);
         return "modules/sys/systemMonitor-sessionCache";
     }
 
-    private void toSessionVo(Collection<String> keys, List<SessionVo> list) {
-        for (String key : keys) {
+    private List<SessionVo> toSessionVo(List<String> keys) {
+        return keys.stream().map(key -> {
             SessionObject sessionObject = SecurityUtils.getSessionObjectBySessionId(key);
             SessionVo sessionVo = new SessionVo();
             sessionVo.setId(key);
             sessionVo.setTtl1(SecurityUtils.sessionTTL1(key));
             sessionVo.setTtl2(SecurityUtils.sessionTTL2(key));
-            sessionVo.setLoginUser(null != sessionObject && null != sessionObject.getAttributes() ? (String) sessionObject.getAttributes().get("loginUser") : null);
-            sessionVo.setHost(Optional.ofNullable(sessionObject).map(SessionObject::getHost).orElse(null));
-            sessionVo.setClientIP(Optional.ofNullable(sessionObject).map(SessionObject::getClientIP).orElse(null));
-            sessionVo.setCreatedTime(Optional.ofNullable(sessionObject).map(v -> Date.from(Instant.ofEpochMilli(sessionObject.getCreated_at()))).orElse(null));
-            sessionVo.setUpdateTime(Optional.ofNullable(sessionObject).map(v -> Date.from(Instant.ofEpochMilli(sessionObject.getLastAccess_at()))).orElse(null));
-            sessionVo.setData(Optional.ofNullable(sessionObject).map(SessionObject::getAttributes).orElse(null));
-            sessionVo.setAccessCount(Optional.ofNullable(sessionObject).map(SessionObject::getAccessCount).orElse(null));
-            list.add(sessionVo);
-        }
+
+            if (sessionObject != null) {
+                Map<String, Object> attributes = sessionObject.getAttributes();
+                sessionVo.setLoginUser((String) attributes.get("loginUser"));
+                sessionVo.setHost(sessionObject.getHost());
+                sessionVo.setClientIP(sessionObject.getClientIP());
+                sessionVo.setCreatedTime(new Date(sessionObject.getCreated_at()));
+                sessionVo.setUpdateTime(new Date(sessionObject.getLastAccess_at()));
+                sessionVo.setData(attributes);
+                sessionVo.setAccessCount(sessionObject.getAccessCount());
+            }
+            return sessionVo;
+        }).collect(Collectors.toList());
     }
 
-
     /**
-     * 清空会话缓存
-     *
-     * @param id 缓存id/sessionid
-     * @return
+     * 清空指定会话缓存
      */
-    @Logging(value = "系统监控-清空会话缓存key",data = "#id", logType = LogType.operate)
+    @Logging(value = "系统监控-清空会话缓存key", data = "#id", logType = LogType.operate)
     @RequiresPermissions("sys:systemMonitor:edit")
     @GetMapping(value = "clearSessionCacheKey")
     public String clearSessionCacheKey(String id, RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
         SecurityUtils.removeSession(id);
         addMessage(redirectAttributes, "操作成功！");
-        return "redirect:" + AppConstants.getAdminPath() + "/sys/systemMonitor/sessionCache?" + "repage";
+        return "redirect:" + AppConstants.getAdminPath() + "/sys/systemMonitor/sessionCache?repage";
     }
 
-
     /**
-     * 清空会话缓存
-     *
-     * @return
+     * 清空全部会话
      */
     @Logging(value = "系统监控-清空全部会话", logType = LogType.operate)
     @RequiresPermissions("sys:systemMonitor:edit")
     @GetMapping(value = "clearSession")
-    public String clearSessionCacheKey(RedirectAttributes redirectAttributes) {
+    public String clearSession(RedirectAttributes redirectAttributes) {
         SecurityUtils.findSessionKeys().forEach(SecurityUtils::removeSession);
         addMessage(redirectAttributes, "操作成功！");
-        return "redirect:" + AppConstants.getAdminPath() + "/sys/systemMonitor/sessionCache?" + "repage";
+        return "redirect:" + AppConstants.getAdminPath() + "/sys/systemMonitor/sessionCache?repage";
     }
-
-
 
     /**
      * 删除过期会话缓存
-     *
-     * @return
      */
     @Logging(value = "系统监控-删除过期会话", logType = LogType.operate)
     @RequiresPermissions("sys:systemMonitor:edit")
     @GetMapping(value = "clearExpireSession")
     public String clearExpireSession(RedirectAttributes redirectAttributes) {
         long count = SecurityUtils.cleanupExpiredSessions();
-        addMessage(redirectAttributes, "操作成功！清空："+count+"条");
-        return "redirect:" + AppConstants.getAdminPath() + "/sys/systemMonitor/sessionCache?" + "repage";
+        addMessage(redirectAttributes, "操作成功！清空：" + count + "条");
+        return "redirect:" + AppConstants.getAdminPath() + "/sys/systemMonitor/sessionCache?repage";
     }
 
-
     /**
-     * 系统监控-缓存管理
-     *
-     * @return
+     * 系统监控-队列管理
      */
     @RequiresPermissions("sys:systemMonitor:view")
     @Logging(value = "系统监控-队列管理", logType = LogType.access, logging = "!#isAjax")
@@ -388,7 +329,7 @@ public class SystemMonitorController extends SimpleController {
     }
 
     @RequiresPermissions("sys:systemMonitor:edit")
-    @Logging(value = "系统监控-队列管理:清空队列",data = "#region", logType = LogType.operate, logging = "!#isAjax")
+    @Logging(value = "系统监控-队列管理:清空队列", data = "#region", logType = LogType.operate, logging = "!#isAjax")
     @GetMapping(value = "queueClear")
     public String queueClear(HttpServletRequest request, RedirectAttributes redirectAttributes, String region, HttpServletResponse response) {
         CacheUtils.getCacheChannel().queueClear(region);
@@ -461,40 +402,45 @@ public class SystemMonitorController extends SimpleController {
                         if (split.length >= 2) {
                             String[] split1 = split[1].split("-");
                             if (split1.length == 2) {
-                                line = split[0] + "] " + "<span style='color: #298a8a;'>" + split1[0] + "</span>" + "-" + split1[1];
+                                line = split[0] + "] <span style='color: #298a8a;'>" + split1[0] + "</span>-" + split1[1];
                             } else if (split1.length > 2) {
-                                line = split[0] + "] " + "<span style='color: #298a8a;'>" + split1[0] + "</span>" + "-" + StringUtils.substringAfter(split[1], "-");
+                                line = split[0] + "] <span style='color: #298a8a;'>" + split1[0] + "</span>-" + StringUtils.substringAfter(split[1], "-");
                             }
                         }
-                        return line;
                     }
                     return line;
                 }).collect(Collectors.toList());
                 page.autoResult(resultLogs);
                 return renderString(response, Result.successResult().setData(page).setObj(PrettyMemoryUtils.prettyByteSize(file.length())));
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                logger.error("读取日志文件失败", e);
                 return renderString(response, Result.errorResult().setData(e.getMessage()));
             }
         }
-        List<String> fileNames = Arrays.stream(Objects.requireNonNull(rootFile.getParentFile().listFiles())).map(File::getName).sorted(Comparator.reverseOrder()).collect(Collectors.toList());
+        List<String> fileNames = Optional.ofNullable(rootFile.getParentFile().listFiles())
+                .map(files -> Arrays.stream(files).map(File::getName).sorted(Comparator.reverseOrder()).collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
+
         uiModel.addAttribute("page", page);
         uiModel.addAttribute("fileNames", fileNames);
         uiModel.addAttribute("fileName", file.getName());
         return "modules/sys/systemMonitor-log";
     }
 
+    /**
+     * 日志文件下载
+     */
     @Logging(value = "系统监控-系统日志文件下载", logType = LogType.operate)
     @RequiresPermissions("sys:systemMonitor:view")
     @GetMapping(value = "downloadLogFile")
     public String downloadLogFile(HttpServletRequest request, HttpServletResponse response, String fileName) {
-        String _logPath = AppConstants.getLogPath(findLogFilePath());//读取配置文件配置的路径
+        String _logPath = AppConstants.getLogPath(findLogFilePath());
         if (null == _logPath) {
             try (OutputStream os = response.getOutputStream();
                  InputStream is = new ByteArrayInputStream("暂无数据".getBytes(StandardCharsets.UTF_8))) {
-                 IOUtils.copy(is, os);
+                IOUtils.copy(is, os);
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                logger.error("写入响应数据失败", e);
             }
             return null;
         }
@@ -503,29 +449,28 @@ public class SystemMonitorController extends SimpleController {
         if (StringUtils.isNotBlank(fileName)) {
             file = new File(rootFile.getParentFile(), FileUtils.getFileName(fileName));
             try {
-                if (!file.getCanonicalPath().startsWith(rootFile.getParentFile().getPath())) {
-                    logger.warn("危险注入：{} {}", IpUtils.getIpAddr0(request),file.getAbsolutePath());
+                if (!file.getCanonicalPath().startsWith(rootFile.getParentFile().getCanonicalPath())) {
+                    logger.warn("危险路径穿越尝试：IP={} Path={}", IpUtils.getIpAddr0(request), file.getAbsolutePath());
                     throw new SystemException("危险注入！");
                 }
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                logger.error("检验路径安全时发生异常", e);
+                throw new SystemException("非法路径拦截！");
             }
         }
         WebUtils.setDownloadableHeader(request, response, file.getName());
         try (OutputStream os = response.getOutputStream();
              FileInputStream fileInputStream = new FileInputStream(file);
              InputStream is = new BufferedInputStream(fileInputStream)) {
-             IOUtils.copy(is, os);
+            IOUtils.copy(is, os);
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            logger.error("日志文件下载失败", e);
         }
         return null;
     }
 
     /**
      * 动态获取日志文件所在路径
-     *
-     * @return
      */
     private String findLogFilePath() {
         String canonicalPath = null;
@@ -534,12 +479,12 @@ public class SystemMonitorController extends SimpleController {
             for (Iterator<Appender<ILoggingEvent>> index = logger.iteratorForAppenders(); index.hasNext(); ) {
                 Appender<ILoggingEvent> appender = index.next();
                 if (appender instanceof FileAppender) {
-                    FileAppender fileAppender = (FileAppender) appender;
+                    FileAppender<ILoggingEvent> fileAppender = (FileAppender<ILoggingEvent>) appender;
                     File file = new File(fileAppender.getFile());
                     try {
                         canonicalPath = file.exists() ? file.getCanonicalPath() : null;
                     } catch (IOException e) {
-                        logger.error(e.getMessage(), e);
+                        this.logger.error("获取日志基准路径失败", e);
                     }
                     return canonicalPath;
                 }
@@ -551,8 +496,6 @@ public class SystemMonitorController extends SimpleController {
 
     /**
      * 系统监控-异步任务
-     *
-     * @return
      */
     @RequiresPermissions("sys:systemMonitor:view")
     @Logging(value = "系统监控-异步任务", logType = LogType.access, logging = "!#isAjax")
@@ -564,7 +507,6 @@ public class SystemMonitorController extends SimpleController {
             ThreadPoolExecutor threadPoolExecutor = threadTask.getThreadPoolExecutor();
             map.put("corePoolSize", threadTask.getCorePoolSize());
             map.put("maxPoolSize", threadTask.getMaxPoolSize());
-
             map.put("taskCount", threadPoolExecutor.getTaskCount());
             map.put("activeCount", threadPoolExecutor.getActiveCount());
             map.put("completedTaskCount", threadPoolExecutor.getCompletedTaskCount());
