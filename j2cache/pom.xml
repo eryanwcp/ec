@@ -67,11 +67,6 @@
         </dependency>
         <dependency>
             <groupId>org.apache.fory</groupId>
-            <artifactId>fory-json</artifactId>
-            <version>${fory.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.fory</groupId>
             <artifactId>fory-extensions</artifactId>
             <version>${fory.version}</version>
             <exclusions>
