@@ -14,6 +14,7 @@ import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
+import java.util.Optional;
 
 public class ConsumerExecutor {
 
@@ -83,7 +84,10 @@ public class ConsumerExecutor {
                 responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, responseType);
             }catch (Exception exception){
                 log.error(exception.getMessage());
-                log.warn("RPC请求异常：{} {} {}", url, responseEntity.getStatusCode().value(), JsonMapper.toJsonString(responseEntity));
+                log.warn("RPC请求异常：{} {} {}", url, Optional.ofNullable(responseEntity)
+                        .map(ResponseEntity::getStatusCode)
+                        .map(HttpStatus::value)
+                        .orElse(-1), JsonMapper.toJsonString(responseEntity));
 
                 //支持范型
                 JavaType javaType = jsonMapper.getTypeFactory().constructType(responseType.getType());
