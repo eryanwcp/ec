@@ -16,143 +16,110 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Map;
 
 public class ConsumerExecutor {
-
     private static final Logger log = LoggerFactory.getLogger(ConsumerExecutor.class);
     private static final JsonMapper jsonMapper = JsonMapper.getInstance();
 
-    public static <T> T  execute(String url, Map<String,String> headers, Object[] params, ParameterizedTypeReference responseType) throws Exception {
-        // 获取RestTemplate对象
+    public static <T> T execute(String url, Map<String, String> headers, Object[] params, ParameterizedTypeReference<T> responseType) throws Exception {
         RestTemplate restTemplate = RestTemplateHolder.restTemplate();
-        // 返回接口 数据解密
-        String requestEncrypt = headers.get(RPCUtils.HEADER_ENCRYPT);
-        String serializer = headers.get(RPCUtils.HEADER_RPC_SERIALIZER);
+
+        String requestEncrypt = headers != null ? headers.get(RPCUtils.HEADER_ENCRYPT) : null;
+        String serializer = headers != null ? headers.get(RPCUtils.HEADER_RPC_SERIALIZER) : "json";
         RPCUtils.EncryptRequestKey encryptRequestKey = RPCUtils.generateEncryptKey(requestEncrypt);
-        // 构建请求体
-        HttpEntity<?> httpEntity = createHttpEntity(params,headers,encryptRequestKey);
 
-        // 进行远程rpc请求
-        ResponseEntity responseEntity = null;
+        HttpEntity<?> httpEntity = createHttpEntity(params, headers, encryptRequestKey, serializer, requestEncrypt);
+        boolean isEncrypted = StringUtils.isNotBlank(requestEncrypt);
 
+        try {
+            if (isEncrypted) {
+                // 加密请求处理
+                ResponseEntity<byte[]> byteResponse = restTemplate.exchange(url, HttpMethod.POST, httpEntity, byte[].class);
+                checkResponseStatus(url, byteResponse);
 
-        if (StringUtils.isNotBlank(requestEncrypt)){
-//            responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, String.class);//多一层引号““””
-//            responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Serializable.class);
-
-            responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, byte[].class);
-
-            if (!responseEntity.getStatusCode().is2xxSuccessful()) {
-                log.error("RPC请求异常：{} {} {}", url, responseEntity.getStatusCode().value(), responseEntity.getBody());
-                throw new RuntimeException("RPC请求异常：" + url + " " + responseEntity.getStatusCode().value()+" "+ JsonMapper.toJsonString(responseEntity));
-            }
-
-            byte[] data = null;
-            Object body = responseEntity.getBody();
-            try {
-                data = (byte[]) body;
-            } catch (Exception e) {
-                log.error(e.getMessage(),e);
-                logRpcException(url, responseEntity);
-                throw new RuntimeException("RPC请求异常：" + url + " " + responseEntity.getStatusCode().value() +" "+ JsonMapper.toJsonString(responseEntity));
-            }
-
-            if(StringUtils.isNotBlank(requestEncrypt) && data != null && data.length > 0){
-                return (T) SerializerFactory.getSerializer(serializer).deserialize(RPCUtils.decryptData(requestEncrypt,encryptRequestKey.getKey(),data));
-            }else {
-                try {
-                    responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, responseType);
-                }catch (Exception exception){
-                    log.error("{}",url,exception);
-                    logRpcException(url, responseEntity);
-
-                    //支持范型
-                    JavaType javaType = jsonMapper.getTypeFactory().constructType(responseType.getType());
-                    responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
-                    String json = (String)responseEntity.getBody();
-                    try {
-                        return jsonMapper.toJavaObject(json,javaType);
-                    } catch (Exception e) {
-                        log.error("{} {}",url,json,e);
-                        logRpcException(url, responseEntity);
-                        throw new RuntimeException(e);
-                    }
+                byte[] data = byteResponse.getBody();
+                if (data != null && data.length > 0) {
+                    byte[] decryptedData = RPCUtils.decryptData(requestEncrypt, encryptRequestKey.getKey(), data);
+                    return (T) SerializerFactory.getSerializer(serializer).deserialize(decryptedData);
                 }
+                log.warn("RPC请求成功，但返回的数据为空: {}", url);
+                return null; // 避免原代码中数据为空时，再次发起危险的二次 POST 请求
+            } else {
+                // 非加密请求处理
+                ResponseEntity<T> responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, responseType);
+                checkResponseStatus(url, responseEntity);
+                return responseEntity.getBody();
             }
-        }else{
-            //未加密
-            try {
-                responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, responseType);
-            }catch (Exception exception){
-                log.error("{}",url,exception);
-                logRpcException(url, responseEntity);
-
-                //支持范型
-                JavaType javaType = jsonMapper.getTypeFactory().constructType(responseType.getType());
-                responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
-                String json = (String)responseEntity.getBody();
-                try {
-                    return jsonMapper.toJavaObject(json,javaType);
-                } catch (Exception e) {
-                    log.error(e.getMessage(),e);
-                    log.error("RPC请求异常：{} {} {}", responseEntity.getStatusCode().value(),url,json);
-                    throw new RuntimeException(e);
-                }
+        } catch (Exception e) {
+            log.warn("RPC请求出现异常或泛型解析失败，尝试降级解析. URL: {}", url);
+            // 降级处理：针对泛型解析失败的情况
+            return executeFallback(url, httpEntity, restTemplate, responseType);
+        } finally {
+            if (log.isDebugEnabled()) {
+                log.debug("Request Headers: {}", headers != null ? JsonMapper.toJsonString(headers) : "null");
             }
-
-
-        }
-        if(log.isDebugEnabled()){
-            log.debug(JsonMapper.toJsonString(headers));
-            log.debug(JsonMapper.toJsonString(responseEntity.getHeaders()));
-        }
-        if(!HttpStatus.OK.equals(responseEntity.getStatusCode())){
-            log.error("RPC请求异常：{} {} {}",url,responseEntity.getStatusCode(),JsonMapper.toJsonString(responseEntity.getBody()));
-        }
-        return (T) responseEntity.getBody();
-    }
-
-    /**
-     * 记录RPC请求异常信息
-     *
-     * @param url 请求URL
-     * @param responseEntity 响应实体（可能为null）
-     */
-    private static void logRpcException(String url, ResponseEntity responseEntity) {
-        if (responseEntity != null) {
-            log.warn("RPC请求异常：{} {} {}", url, responseEntity.getStatusCode().value(), JsonMapper.toJsonString(responseEntity));
-        } else {
-            log.warn("RPC请求异常：{} responseEntity is null", url);
         }
     }
 
     /**
-     * 构建请求体，默认是JSON数组
-     *
-     * @param params
-     * @return
+     * 降级解析逻辑：当带有复杂泛型的 exchange 失败时，尝试转为 Object 接收并手动映射
      */
-    private static HttpEntity<?> createHttpEntity(Object[] params, Map<String,String> headers, RPCUtils.EncryptRequestKey encryptRequestKey) throws Exception {
+    private static <T> T executeFallback(String url, HttpEntity<?> httpEntity, RestTemplate restTemplate, ParameterizedTypeReference<T> responseType) {
+        ResponseEntity<Object> fallbackResponse = null;
+        try {
+            fallbackResponse = restTemplate.exchange(url, HttpMethod.POST, httpEntity, Object.class);
+            checkResponseStatus(url, fallbackResponse);
+
+            // 避免强转 (String) 导致 ClassCastException，直接转换为 JSON 字符串再解析
+            String json = jsonMapper.toJsonString(fallbackResponse.getBody());
+            JavaType javaType = jsonMapper.getTypeFactory().constructType(responseType.getType());
+            return jsonMapper.toJavaObject(json, javaType);
+        } catch (Exception ex) {
+            Object responseBody = fallbackResponse != null ? fallbackResponse.getBody() : "null";
+            log.error("RPC降级解析依然失败: URL={}, ResponseBody={}", url, responseBody, ex);
+            throw new RuntimeException("RPC请求或解析异常: " + url, ex);
+        }
+    }
+
+    /**
+     * 统一校验 HTTP 状态码
+     */
+    private static void checkResponseStatus(String url, ResponseEntity<?> responseEntity) {
+        if (responseEntity == null) {
+            throw new RuntimeException("RPC请求异常: responseEntity is null, URL=" + url);
+        }
+        if (!responseEntity.getStatusCode().is2xxSuccessful()) {
+            // 性能优化：不要使用 JsonMapper 序列化整个 ResponseEntity
+            log.error("RPC请求异常: URL={}, Status={}, Body={}", url, responseEntity.getStatusCodeValue(), responseEntity.getBody());
+            throw new RuntimeException("RPC请求异常: URL=" + url + ", 状态码=" + responseEntity.getStatusCodeValue());
+        }
+    }
+
+    /**
+     * 构建请求体
+     */
+    private static HttpEntity<?> createHttpEntity(Object[] params, Map<String, String> headers,
+                                                  RPCUtils.EncryptRequestKey encryptRequestKey,
+                                                  String serializer, String encrypt) throws Exception {
         HttpHeaders httpHeaders = new HttpHeaders();
-        if(null != headers){
+        if (headers != null) {
             headers.forEach(httpHeaders::add);
         }
-        //加密处理
-        String encrypt = headers.get(RPCUtils.HEADER_ENCRYPT);
-        String serializer = headers.get(RPCUtils.HEADER_RPC_SERIALIZER);
-        if (StringUtils.isNotBlank(encrypt)){
-            httpHeaders.setContentType(MediaType.parseMediaType("application/x-"+serializer+"-secure"));
-            httpHeaders.setAccept(Lists.newArrayList(MediaType.APPLICATION_JSON,MediaType.parseMediaType("application/x-"+serializer+"-secure")));
-        }else {
-//            httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-            httpHeaders.setContentType(MediaType.parseMediaType("application/x-"+serializer));
-            httpHeaders.setAccept(Lists.newArrayList(MediaType.APPLICATION_JSON,MediaType.parseMediaType("application/x-"+serializer)));
+
+        if (StringUtils.isNotBlank(encrypt)) {
+            httpHeaders.setContentType(MediaType.parseMediaType("application/x-" + serializer + "-secure"));
+            httpHeaders.setAccept(Lists.newArrayList(MediaType.APPLICATION_JSON, MediaType.parseMediaType("application/x-" + serializer + "-secure")));
+        } else {
+            httpHeaders.setContentType(MediaType.parseMediaType("application/x-" + serializer));
+            httpHeaders.setAccept(Lists.newArrayList(MediaType.APPLICATION_JSON, MediaType.parseMediaType("application/x-" + serializer)));
         }
 
-        if (StringUtils.isNotBlank(encryptRequestKey.getEncryptKey())){
+        if (StringUtils.isNotBlank(encryptRequestKey.getEncryptKey())) {
             headers.put(RPCUtils.HEADER_ENCRYPT_KEY, encryptRequestKey.getEncryptKey());
             httpHeaders.put(RPCUtils.HEADER_ENCRYPT_KEY, Lists.newArrayList(encryptRequestKey.getEncryptKey()));
         }
+
         byte[] bytes = SerializerFactory.getSerializer(serializer).serialize(params);
         byte[] data = RPCUtils.encryptData(encrypt, encryptRequestKey.getKey(), bytes);
+
         return new HttpEntity<>(data, httpHeaders);
     }
 }
