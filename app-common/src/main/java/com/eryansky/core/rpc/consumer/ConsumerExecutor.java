@@ -88,8 +88,9 @@ public class ConsumerExecutor {
         }
         if (!responseEntity.getStatusCode().is2xxSuccessful()) {
             // 性能优化：不要使用 JsonMapper 序列化整个 ResponseEntity
-            log.error("RPC请求异常: URL={}, Status={}, Body={}", url, responseEntity.getStatusCodeValue(), responseEntity.getBody());
-            throw new RuntimeException("RPC请求异常: URL=" + url + ", 状态码=" + responseEntity.getStatusCodeValue());
+            log.error("RPC请求异常: URL={}, Status={}, Body={}",
+                    url, responseEntity.getStatusCode().value(), responseEntity.getBody());
+            throw new RuntimeException("RPC请求异常: URL=" + url + ", 状态码=" + responseEntity.getStatusCode().value());
         }
     }
 
