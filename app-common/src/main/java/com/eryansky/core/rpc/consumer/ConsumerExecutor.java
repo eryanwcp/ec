@@ -51,7 +51,7 @@ public class ConsumerExecutor {
                 data = (byte[]) body;
             } catch (Exception e) {
                 log.error(e.getMessage(),e);
-                log.error("RPC请求异常：{} {} {}", responseEntity.getStatusCode().value(),url,JsonMapper.toJsonString(responseEntity));
+                logRpcException(url, responseEntity);
                 throw new RuntimeException("RPC请求异常：" + url + " " + responseEntity.getStatusCode().value() +" "+ JsonMapper.toJsonString(responseEntity));
             }
 
@@ -61,8 +61,8 @@ public class ConsumerExecutor {
                 try {
                     responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, responseType);
                 }catch (Exception exception){
-                    log.error(exception.getMessage());
-                    log.warn("RPC请求异常：{} {} {}", url, responseEntity.getStatusCode().value(), JsonMapper.toJsonString(responseEntity));
+                    log.error("{}",url,exception);
+                    logRpcException(url, responseEntity);
 
                     //支持范型
                     JavaType javaType = jsonMapper.getTypeFactory().constructType(responseType.getType());
@@ -71,8 +71,8 @@ public class ConsumerExecutor {
                     try {
                         return jsonMapper.toJavaObject(json,javaType);
                     } catch (Exception e) {
-                        log.error(e.getMessage(),e);
-                        log.error("RPC请求异常：{} {} {}", responseEntity.getStatusCode().value(),url,json);
+                        log.error("{} {}",url,json,e);
+                        logRpcException(url, responseEntity);
                         throw new RuntimeException(e);
                     }
                 }
@@ -82,8 +82,8 @@ public class ConsumerExecutor {
             try {
                 responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, responseType);
             }catch (Exception exception){
-                log.error(exception.getMessage());
-                log.warn("RPC请求异常：{} {} {}", url, responseEntity.getStatusCode().value(), JsonMapper.toJsonString(responseEntity));
+                log.error("{}",url,exception);
+                logRpcException(url, responseEntity);
 
                 //支持范型
                 JavaType javaType = jsonMapper.getTypeFactory().constructType(responseType.getType());
@@ -108,6 +108,20 @@ public class ConsumerExecutor {
             log.error("RPC请求异常：{} {} {}",url,responseEntity.getStatusCode(),JsonMapper.toJsonString(responseEntity.getBody()));
         }
         return (T) responseEntity.getBody();
+    }
+
+    /**
+     * 记录RPC请求异常信息
+     *
+     * @param url 请求URL
+     * @param responseEntity 响应实体（可能为null）
+     */
+    private static void logRpcException(String url, ResponseEntity responseEntity) {
+        if (responseEntity != null) {
+            log.warn("RPC请求异常：{} {} {}", url, responseEntity.getStatusCode().value(), JsonMapper.toJsonString(responseEntity));
+        } else {
+            log.warn("RPC请求异常：{} responseEntity is null", url);
+        }
     }
 
     /**
