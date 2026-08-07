@@ -3,7 +3,7 @@ package com.eryansky.encrypt.enums;
 /**
  * 加密模式
  *
- * @author : 尔演@Eryan
+ * @author Eryan
  * @date : 2024-06-17
  */
 public enum CipherMode {

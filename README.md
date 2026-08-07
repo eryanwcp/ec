@@ -11,21 +11,20 @@
 Docker打包
 
 
-    mvn package -P prod
-    mvn package com.google.cloud.tools:jib-maven-plugin:3.5.1:buildTar -P docker
-    mvn package com.google.cloud.tools:jib-maven-plugin:3.5.1:buildTar -DsendCredentialsOverHttp=true
+    mvn package com.google.cloud.tools:jib-maven-plugin:3.5.2:buildTar -P docker
+    mvn package com.google.cloud.tools:jib-maven-plugin:3.5.2:buildTar -DsendCredentialsOverHttp=true
 
 Docker本地部署
 
 
-    mvn clean compile com.google.cloud.tools:jib-maven-plugin:3.5.1:dockerBuild -P docker
-    mvn clean compile com.google.cloud.tools:jib-maven-plugin:3.5.1:dockerBuild -DsendCredentialsOverHttp=true -P docker
+    mvn clean compile com.google.cloud.tools:jib-maven-plugin:3.5.2:dockerBuild -P docker
+    mvn clean compile com.google.cloud.tools:jib-maven-plugin:3.5.2:dockerBuild -DsendCredentialsOverHttp=true -P docker
 
 Docker发布
 
 
-    mvn package com.google.cloud.tools:jib-maven-plugin:3.5.1:build -P docker
-    mvn package com.google.cloud.tools:jib-maven-plugin:3.5.1:build -DsendCredentialsOverHttp=true -P docker
+    mvn package com.google.cloud.tools:jib-maven-plugin:3.5.2:build -P docker
+    mvn package com.google.cloud.tools:jib-maven-plugin:3.5.2:build -DsendCredentialsOverHttp=true -P docker
 
 
 Docker加载镜像

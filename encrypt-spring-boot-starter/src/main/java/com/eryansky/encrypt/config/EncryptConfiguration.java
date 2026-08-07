@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * The type Encrypt configuration.
  *
- * @author : 尔演@Eryan
+ * @author Eryan
  *
  */
 @Configuration

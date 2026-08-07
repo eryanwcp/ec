@@ -8,7 +8,7 @@ import org.springframework.context.ApplicationContextAware;
 /**
  * The type Scenario post processor.
  * 场景调度器 后置处理器
- * @author : 尔演@Eryan
+ * @author Eryan
  *
  */
 public class ScenarioPostProcessor implements ApplicationContextAware {

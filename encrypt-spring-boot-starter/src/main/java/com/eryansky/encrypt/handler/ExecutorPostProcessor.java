@@ -9,7 +9,7 @@ import java.util.concurrent.Executor;
 /**
  * The type Executor post processor.
  * 线程池后置处理 装配
- * @author : 尔演@Eryan
+ * @author Eryan
  *
  */
 public class ExecutorPostProcessor implements ApplicationContextAware {

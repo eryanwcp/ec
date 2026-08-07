@@ -10,7 +10,7 @@ import org.springframework.util.StringUtils;
 /**
  * The type Rsa configuration.
  * RSA配置文件 私钥 公钥
- * @author : 尔演@Eryan
+ * @author Eryan
  *
  */
 @SuppressWarnings({"all"})

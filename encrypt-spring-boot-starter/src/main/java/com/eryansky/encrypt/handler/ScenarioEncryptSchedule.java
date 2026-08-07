@@ -5,7 +5,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 /**
  * The type Scenario encrypt schedule.
  * 可以在此处重写你的调度策略
- * @author : 尔演@Eryan
+ * @author Eryan
  *
  */
 public class ScenarioEncryptSchedule extends ScenarioSchedule {

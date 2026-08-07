@@ -19,7 +19,7 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
  * The type Encrypt auto configuration.
  * 加密容器
  *
- * @author : 尔演@Eryan
+ * @author Eryan
  * @date : 2022-07-23 16:22
  */
 //导入选择

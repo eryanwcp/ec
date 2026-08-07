@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 /**
  * The type Scenario handler.
  *
- * @author : 尔演@Eryan
+ * @author Eryan
  *
  */
 public abstract class ScenarioHandler  implements ScenarioHolder {

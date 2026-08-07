@@ -5,7 +5,6 @@ import com.eryansky.encrypt.anotation.Encrypt;
 import com.eryansky.encrypt.badger.HoneyBadgerEncrypt;
 import com.eryansky.encrypt.enums.CipherMode;
 import com.eryansky.encrypt.handler.ScenarioHolder;
-import com.eryansky.encrypt.handler.StorageScenario;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -18,7 +17,7 @@ import org.springframework.lang.NonNull;
  * The type Encrypt handler.
  * AES加密处理器
  *
- * @author : 尔演@Eryan
+ * @author Eryan
  * @date : 2022-07-23
  */
 @Order(1)
@@ -27,9 +26,9 @@ public class EncryptHandler{
     /**
      * The constant echo.
      */
-    private static final Logger echo = LoggerFactory.getLogger(EncryptHandler.class);
-    public static String  AESKEY = "AES-RSA";
-    public static String  SM4KEY = "SM4-RSA";
+    private static final Logger logger = LoggerFactory.getLogger(EncryptHandler.class);
+    public static final String AESKEY = "AES-RSA";
+    public static final String SM4KEY = "SM4-RSA";
 
 
     private final HoneyBadgerEncrypt honeyBadgerEncrypt;

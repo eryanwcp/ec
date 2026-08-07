@@ -5,7 +5,7 @@ import com.eryansky.encrypt.enums.CipherMode;
 /**
  * The interface Generator secret key.
  * 密钥生成统一接口
- * @author : 尔演@Eryan
+ * @author Eryan
  *
  */
 public interface GeneratorSecretKey {

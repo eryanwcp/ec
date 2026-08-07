@@ -93,7 +93,7 @@ scenario值为枚举类型
 ```java
 /**
  * The enum Scenario.
- * @author : 尔演@Eryan
+ * @author Eryan
 
  * @description : 应用场景 网络接传输 、存储
  * 
@@ -118,7 +118,7 @@ cipher值为枚举类型
 /**
  * The enum Cipher mode.
  *
- * @author : 尔演@Eryan
+ * @author Eryan
 
  * @description : 加密模式
  * 
@@ -452,7 +452,7 @@ RSA加密AES 或者是SM4的密钥
 
 ```java
 /**
- * @author : 尔演@Eryan
+ * @author Eryan
 
  * @description : 案例
  * 
@@ -488,7 +488,7 @@ public class ResponseAdvice implements ResponseBodyAdvice {
 
 ```java
 /**
- * @author : 尔演@Eryan
+ * @author Eryan
 
  * @description : 案例
  * 

@@ -15,7 +15,7 @@ import java.util.concurrent.Executor;
 /**
  * The interface Scenario holder.
  * 场景
- * @author : 尔演@Eryan
+ * @author Eryan
  *
  */
 public interface ScenarioHolder {

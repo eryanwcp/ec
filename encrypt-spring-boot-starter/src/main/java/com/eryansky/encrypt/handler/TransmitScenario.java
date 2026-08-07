@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 /**
  * The type Transmit scenario.
  * TransmitScenario 适用场景网络传输
- * @author : 尔演@Eryan
+ * @author Eryan
  *
  */
 public class TransmitScenario extends ScenarioHandler {
