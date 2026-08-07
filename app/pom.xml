@@ -396,7 +396,7 @@
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
-                <version>3.5.1</version>
+                <version>3.5.2</version>
                 <configuration>
                     <from>
 <!--                        <image>openjdk:8-jre-alpine</image>-->
@@ -418,8 +418,8 @@
                             <jvmFlag>-XX:+UnlockExperimentalVMOptions</jvmFlag>
 <!--                            <jvmFlag>-XX:+UseCGroupSubsystemConstraints</jvmFlag>-->
 
-                            <jvmFlag>-XX:MaxRAMPercentage=75.0</jvmFlag>
-                            <jvmFlag>-XX:InitialRAMPercentage=40.0</jvmFlag>
+                            <jvmFlag>-XX:MaxRAMPercentage=50.0</jvmFlag>
+                            <jvmFlag>-XX:InitialRAMPercentage=20.0</jvmFlag>
 
                             <jvmFlag>-XX:+UseG1GC</jvmFlag>
                             <jvmFlag>-XX:MaxGCPauseMillis=100</jvmFlag>
