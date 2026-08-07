@@ -18,7 +18,7 @@
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
         <velocity.version>2.4.1</velocity.version>
-        <liquibase.version>4.33.0</liquibase.version>
+        <liquibase.version>5.0.3</liquibase.version>
         <commons-cli.version>1.11.0</commons-cli.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -321,7 +321,7 @@
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
-                <version>3.5.1</version>
+                <version>3.5.2</version>
                 <configuration>
                     <from>
 <!--                        <image>openjdk:8-jre-alpine</image>-->
@@ -342,7 +342,7 @@
 
                             <!-- 容器资源感知与内存动态配比，防止 K8s OOM Killed -->
                             <jvmFlag>-XX:+UseContainerSupport</jvmFlag>
-                            <jvmFlag>-XX:MaxRAMPercentage=60.0</jvmFlag>
+                            <jvmFlag>-XX:MaxRAMPercentage=50.0</jvmFlag>
                             <jvmFlag>-XX:InitialRAMPercentage=20.0</jvmFlag>
 
                             <!-- 分层编译优化：在容器环境中，限制 C1 编译器层级，能减少大量启动时的 CPU 占用，缩短启动时间 -->
