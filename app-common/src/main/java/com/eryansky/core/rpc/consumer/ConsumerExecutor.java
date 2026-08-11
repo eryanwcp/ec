@@ -40,7 +40,7 @@ public class ConsumerExecutor {
                     byte[] decryptedData = RPCUtils.decryptData(requestEncrypt, encryptRequestKey.getKey(), data);
                     return (T) SerializerFactory.getSerializer(serializer).deserialize(decryptedData);
                 }
-                log.warn("RPC请求成功，但返回的数据为空: {}", url);
+                log.debug("RPC请求成功，但返回的数据为空: {}", url);
                 return null; // 避免原代码中数据为空时，再次发起危险的二次 POST 请求
             } else {
                 // 非加密请求处理
