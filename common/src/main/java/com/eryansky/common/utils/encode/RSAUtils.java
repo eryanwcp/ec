@@ -233,7 +233,7 @@ public class RSAUtils {
             System.out.println("公钥：" + EncodeUtils.base64Encode(publicKey));
             System.out.println("私钥：" + EncodeUtils.base64Encode(privateKey));
 
-            System.out.println("默认公钥：" + RSAUtils.getDefaultBase64PublicKey());
+            System.out.println("默认公钥：" + getDefaultBase64PublicKey());
 
             String base64EncodeKey = Cryptos.getBase64EncodeKey();
             System.out.println(base64EncodeKey);

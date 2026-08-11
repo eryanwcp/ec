@@ -14,6 +14,7 @@ import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.encrypt.anotation.DecryptRequestBody;
 import com.eryansky.encrypt.anotation.EncryptResponseBody;
+import com.eryansky.encrypt.config.EncryptProvider;
 import com.eryansky.encrypt.util.EncryptUtils;
 import com.eryansky.modules.sys.mapper.Config;
 import com.eryansky.modules.sys.mapper.Log;
@@ -58,10 +59,9 @@ public class SystemEncryptController extends SimpleController {
 //        String key = Sm4Utils.generateHexKeyString();//hex编码
         String key = Cryptos.getBase64EncodeKey();//AES base64编码
         //RSA公钥
-//        data.put("publicKey", EncryptProvider.publicKeyBase64());
-        data.put("publicKey", RSAUtils.getDefaultBase64PublicKey());
+        data.put("publicKey", EncryptProvider.publicKeyBase64());
         //RSA加密密钥 RSA对密钥加密
-        data.put("requestKey", RSAUtils.encryptBase64String(key,RSAUtils.getDefaultBase64PublicKey()));
+        data.put("requestKey", RSAUtils.encryptBase64String(key,EncryptProvider.privateKeyBase64()));
 
         //加密后的示例数据 模拟前端数据加密
         Map<String,Object> dataMap = Maps.newHashMap();

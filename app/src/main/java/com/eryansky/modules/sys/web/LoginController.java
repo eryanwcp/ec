@@ -23,6 +23,7 @@ import com.eryansky.common.web.utils.CookieUtils;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.security.annotation.PrepareOauth2;
 import com.eryansky.core.web.annotation.MobileValue;
+import com.eryansky.encrypt.config.EncryptProvider;
 import com.eryansky.modules.sys.service.ResourceService;
 import com.eryansky.modules.sys.service.UserPasswordService;
 import com.eryansky.modules.sys.service.UserService;
@@ -89,7 +90,7 @@ public class LoginController extends SimpleController {
         modelAndView.addObject("isMobile", UserAgentUtils.isMobile(request));
         String randomSecurityToken = Identities.randomBase62(64);
         modelAndView.addObject("securityToken", randomSecurityToken);
-        modelAndView.addObject("publicKey", RSAUtils.getDefaultBase64PublicKey());
+        modelAndView.addObject("publicKey", EncryptProvider.publicKeyBase64());
         WebUtils.setSessionAttribute(request, "securityToken", randomSecurityToken);
         return modelAndView;
     }
@@ -156,7 +157,7 @@ public class LoginController extends SimpleController {
     @ResponseBody
     public Result prepareLogin(HttpServletRequest request){
         String randomSecurityToken = Identities.randomBase62(64);
-        String publicKey = RSAUtils.getDefaultBase64PublicKey();
+        String publicKey = EncryptProvider.publicKeyBase64();
         Map<String,Object> data = Maps.newHashMap();
         data.put("securityToken:",randomSecurityToken);
         data.put("publicKey",publicKey);
@@ -171,7 +172,7 @@ public class LoginController extends SimpleController {
     @GetMapping(value = "getPublicKey")
     @ResponseBody
     public Result RSAKey(){
-        String publicKey = RSAUtils.getDefaultBase64PublicKey();
+        String publicKey = EncryptProvider.publicKeyBase64();
         return Result.successResult().setObj(publicKey);
     }
 
@@ -223,7 +224,7 @@ public class LoginController extends SimpleController {
         String originPassword = password;
         String _password = password;
         if ("RSA".equals(encrypt)) {
-            originPassword = RSAUtils.decryptBase64String(_password);
+            originPassword = RSAUtils.decryptBase64String(_password,EncryptProvider.privateKeyBase64());
         }
         if (!"true".equals(encrypt)) {
             _password = Encrypt.e(originPassword);
