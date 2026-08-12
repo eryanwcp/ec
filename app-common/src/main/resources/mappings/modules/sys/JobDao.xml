@@ -16,9 +16,9 @@
 			FROM_UNIXTIME(b.next_fire_time/1000,'%Y-%m-%d %H:%i:%S') AS 'nextFireTime',
 			FROM_UNIXTIME(b.prev_fire_time/1000,'%Y-%m-%d %H:%i:%S') AS 'prevFireTime'
 		FROM
-			qrtz_job_details a
-		INNER JOIN qrtz_triggers b ON a.job_name = b.job_name AND a.job_group = b.job_group
-		INNER JOIN qrtz_cron_triggers c ON b.trigger_name = c.trigger_name AND b.trigger_group = c.trigger_group
+			${sysPrefix}qrtz_job_details a
+		INNER JOIN ${sysPrefix}qrtz_triggers b ON a.job_name = b.job_name AND a.job_group = b.job_group
+		INNER JOIN ${sysPrefix}qrtz_cron_triggers c ON b.trigger_name = c.trigger_name AND b.trigger_group = c.trigger_group
 		WHERE 1=1
 		<if test="jobName !=null and jobName !=''" >
 			and a.job_name = #{jobName}

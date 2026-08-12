@@ -41,13 +41,13 @@
     </sql>
 
     <sql id="organJoins">
-        LEFT JOIN t_sys_organ p ON p.id = a.parent_id
+        LEFT JOIN ${sysPrefix}t_sys_organ p ON p.id = a.parent_id
     </sql>
 
     <select id="get" resultType="Organ">
         SELECT
         <include refid="organColumns"/>
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
         <include refid="organJoins"/>
         WHERE a.id = #{id}
     </select>
@@ -55,7 +55,7 @@
     <select id="findByIds" resultType="Organ">
         SELECT
         <include refid="organColumns"/>
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
         <include refid="organJoins"/>
         <where>
             <if test="ids != null and ids.size() !=0">
@@ -71,7 +71,7 @@
     <select id="findByCodes" resultType="Organ">
         SELECT
         <include refid="organColumns"/>
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
         <include refid="organJoins"/>
         <where>
             a.status = '0'
@@ -88,7 +88,7 @@
     <select id="findBySysCodes" resultType="Organ">
         SELECT
         <include refid="organColumns"/>
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
         <include refid="organJoins"/>
         <where>
             a.status = '0'
@@ -105,7 +105,7 @@
     <select id="getByCode" resultType="Organ">
         SELECT
         <include refid="organColumns"/>
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
         <include refid="organJoins"/>
         <where>
             <if test="status != null and status !=''">
@@ -118,7 +118,7 @@
     <select id="getByIdOrCode" resultType="Organ">
         SELECT
         <include refid="organColumns"/>
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
         <include refid="organJoins"/>
         <where>
             <if test="status != null and status !=''">
@@ -131,7 +131,7 @@
     <select id="getDeleteByIdOrCode" resultType="Organ">
         SELECT
         <include refid="organColumns"/>
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
         <include refid="organJoins"/>
         <where>
             <if test="status != null and status !=''">
@@ -144,7 +144,7 @@
     <select id="getBySysCode" resultType="Organ">
         SELECT
         <include refid="organColumns"/>
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
         <include refid="organJoins"/>
         <where>
             a.sys_code = #{sysCode}
@@ -158,7 +158,7 @@
     <select id="getByBizCode" resultType="Organ">
         SELECT
         <include refid="organColumns"/>
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
         <include refid="organJoins"/>
         <where>
             a.biz_code = #{bizCode}
@@ -171,7 +171,7 @@
     <select id="findList" resultType="Organ">
         SELECT
         <include refid="organColumns"/>
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
         <include refid="organJoins"/>
         <where>
             a.status = #{status}
@@ -189,7 +189,7 @@
     <select id="findAllList" resultType="Organ" useCache="false">
         SELECT
         <include refid="organColumns"/>
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
         <include refid="organJoins"/>
         <where>
             <if test="status != null and status !=''">
@@ -217,7 +217,7 @@
     <select id="findOwnerAndChild" resultType="Organ">
         SELECT
         <include refid="organColumns"/>
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
         <include refid="organJoins"/>
         WHERE
         a.status = '0'
@@ -236,7 +236,7 @@
     <select id="findOwnerAndChildIds" resultType="java.lang.String">
         SELECT
         a.id
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
         WHERE
         a.status = '0'
         <if test="id != null and id !=''">
@@ -255,7 +255,7 @@
     <select id="findOwnerAndChilds" resultType="Organ" useCache="false">
         SELECT
         <include refid="organColumns"/>
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
         <include refid="organJoins"/>
         WHERE
         a.status = #{status}
@@ -281,7 +281,7 @@
     <select id="findOwnerAndChildsIds" resultType="java.lang.String">
         SELECT
         a.id
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
         WHERE
         a.status = '0'
         <if test="id != null and id !=''">
@@ -306,7 +306,7 @@
     <select id="findChild" resultType="Organ" useCache="false">
         SELECT
         <include refid="organColumns"/>
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
         <include refid="organJoins"/>
         <where>
             <if test="status != null and status.size() !=0">
@@ -337,7 +337,7 @@
     <select id="findChildCount" resultType="java.lang.Integer">
         SELECT
         count(*)
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
         <where>
             a.status = #{status}
             AND a.parent_id = #{parentId}
@@ -353,7 +353,7 @@
     <select id="findChildIds" resultType="java.lang.String">
         SELECT
         a.id
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
         <where>
             <if test="status != null and status.size() !=0">
                 AND a.status IN
@@ -382,7 +382,7 @@
     <select id="findChilds" resultType="Organ">
         SELECT
         <include refid="organColumns"/>
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
         <include refid="organJoins"/>
         <where>
             a.status = '0'
@@ -409,7 +409,7 @@
     <select id="findChildsIds" resultType="java.lang.String">
         SELECT
         a.id
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
         <where>
             a.status = '0'
             <if test="id != null and id !=''">
@@ -434,13 +434,13 @@
 
     <select id="getMaxSort" resultType="java.lang.Integer">
         SELECT max(a.sort)
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
     </select>
 
     <select id="findCustomQuery" resultType="Organ">
         SELECT
         <include refid="organColumns"/>
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
         <include refid="organJoins"/>
         <where>
             <if test="status != null and status !=''">
@@ -462,7 +462,7 @@
     <select id="findWithInclude" resultType="Organ">
         SELECT
         <include refid="organColumns"/>
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
         <include refid="organJoins"/>
         <where>
             <if test="query != null and query !=''">
@@ -499,7 +499,7 @@
         a.id,
         a.parent_id AS "parent.id",
         a.parent_ids
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
         WHERE a.status = #{STATUS_NORMAL}
         AND a.parent_ids LIKE #{parentIds}
         ORDER BY a.sort ASC
@@ -508,7 +508,7 @@
     <select id="findOrgansByIds" resultType="Organ">
         SELECT
         <include refid="organColumns"/>
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
         <include refid="organJoins"/>
         <where>
             <choose>
@@ -526,8 +526,8 @@
     <select id="findOrganUserIds" resultType="java.lang.String">
         SELECT
         a.id
-        FROM t_sys_user a
-        INNER JOIN t_sys_user_organ ur ON ur.user_id = a.id
+        FROM ${sysPrefix}t_sys_user a
+        INNER JOIN ${sysPrefix}t_sys_user_organ ur ON ur.user_id = a.id
         <where>
             a.status = '0'
             AND ur.organ_id = #{organId}
@@ -539,9 +539,9 @@
     <select id="findOrgansByUserId" resultType="Organ">
         SELECT
         <include refid="organColumns"/>
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
         <include refid="organJoins"/>
-        INNER JOIN t_sys_user_organ uo ON uo.organ_id = a.id
+        INNER JOIN ${sysPrefix}t_sys_user_organ uo ON uo.organ_id = a.id
         <where>
             a.status = '0'
             AND uo.user_id = #{userId}
@@ -552,8 +552,8 @@
     <select id="findOrganIdsByUserId" resultType="java.lang.String">
         SELECT
         a.id
-        FROM t_sys_organ a
-        INNER JOIN t_sys_user_organ uo ON uo.organ_id = a.id
+        FROM ${sysPrefix}t_sys_organ a
+        INNER JOIN ${sysPrefix}t_sys_user_organ uo ON uo.organ_id = a.id
         <where>
             a.status = '0'
             AND uo.user_id = #{userId}
@@ -564,9 +564,9 @@
     <select id="findAssociationOrgansByPostId" resultType="Organ">
         SELECT
         <include refid="organColumns"/>
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
         <include refid="organJoins"/>
-        INNER JOIN t_sys_post_organ po ON po.organ_id = a.id
+        INNER JOIN ${sysPrefix}t_sys_post_organ po ON po.organ_id = a.id
         <where>
             a.status = '0'
             AND po.post_id = #{postId}
@@ -578,8 +578,8 @@
     <select id="findAssociationOrganIdsByPostId" resultType="java.lang.String">
         SELECT
         a.id
-        FROM t_sys_organ a
-        INNER JOIN t_sys_post_organ po ON po.organ_id = a.id
+        FROM ${sysPrefix}t_sys_organ a
+        INNER JOIN ${sysPrefix}t_sys_post_organ po ON po.organ_id = a.id
         <where>
             a.status = '0'
             AND po.post_id = #{postId}
@@ -588,7 +588,7 @@
     </select>
 
     <insert id="insert">
-        INSERT INTO t_sys_organ(
+        INSERT INTO ${sysPrefix}t_sys_organ(
         id,
         status,
         version,
@@ -645,7 +645,7 @@
         )
     </insert>
     <insert id="insertBatch">
-        INSERT INTO t_sys_organ(
+        INSERT INTO ${sysPrefix}t_sys_organ(
         id,
         status,
         version,
@@ -703,7 +703,7 @@
     </insert>
 
     <update id="update">
-        UPDATE t_sys_organ SET
+        UPDATE ${sysPrefix}t_sys_organ SET
         status = #{status},
         version = version +1,
         update_user = #{updateUser},
@@ -731,14 +731,14 @@
     </update>
 
     <update id="updateParentIds">
-        UPDATE t_sys_organ SET
+        UPDATE ${sysPrefix}t_sys_organ SET
         parent_id = #{parent.id},
         parent_ids = #{parentIds}
         WHERE id = #{id}
     </update>
 
     <delete id="delete">
-        UPDATE t_sys_organ SET
+        UPDATE ${sysPrefix}t_sys_organ SET
         status = #{STATUS_DELETE},
         version = version +1,
         update_user = #{updateUser},
@@ -747,7 +747,7 @@
     </delete>
 
     <delete id="deleteOwnerAndChilds">
-        UPDATE t_sys_organ SET
+        UPDATE ${sysPrefix}t_sys_organ SET
         status = #{STATUS_DELETE},
         version = version +1,
         update_user = #{updateUser},
@@ -763,15 +763,15 @@
 
 
     <delete id="clear">
-        DELETE FROM t_sys_organ
+        DELETE FROM ${sysPrefix}t_sys_organ
         WHERE id = #{id}
     </delete>
 
     <delete id="clearAll">
-        DELETE FROM t_sys_organ
+        DELETE FROM ${sysPrefix}t_sys_organ
     </delete>
 
-    <!--t_sys_organ_extend-->
+    <!--${sysPrefix}t_sys_organ_extend-->
     <sql id="organExtendColumns">
         a.id AS "id",
         a.create_user AS "createUser",
@@ -811,7 +811,7 @@
     </sql>
 
     <sql id="organExtendJoins">
-        LEFT JOIN t_sys_organ_extend p ON p.id = a.parent_id
+        LEFT JOIN ${sysPrefix}t_sys_organ_extend p ON p.id = a.parent_id
     </sql>
 
     <select id="getOrganExtendByOrganId" resultType="OrganExtend">
@@ -820,7 +820,7 @@
             p.code AS "parentCode",
             p.biz_code AS "parentBizCode",
             p.name AS "parentName"
-        FROM t_sys_organ_extend a
+        FROM ${sysPrefix}t_sys_organ_extend a
         <include refid="organExtendJoins"/>
         WHERE a.id = #{id}
     </select>
@@ -831,7 +831,7 @@
         p.code AS "parentCode",
         p.biz_code AS "parentBizCode",
         p.name AS "parentName"
-        FROM t_sys_organ_extend a
+        FROM ${sysPrefix}t_sys_organ_extend a
         <include refid="organExtendJoins"/>
         WHERE a.code = #{code} AND a.status = #{status}
     </select>
@@ -842,7 +842,7 @@
         p.code AS "parentCode",
         p.biz_code AS "parentBizCode",
         p.name AS "parentName"
-        FROM t_sys_organ_extend a
+        FROM ${sysPrefix}t_sys_organ_extend a
         <include refid="organExtendJoins"/>
         WHERE a.biz_code = #{bizCode} AND a.status = #{status}
     </select>
@@ -850,16 +850,16 @@
     <select id="getCompanyByOrganId" resultType="OrganExtend">
         SELECT
         <include refid="organExtendColumns"/>
-        FROM t_sys_organ_extend e
-        LEFT JOIN t_sys_organ_extend a ON a.id = e.company_id
+        FROM ${sysPrefix}t_sys_organ_extend e
+        LEFT JOIN ${sysPrefix}t_sys_organ_extend a ON a.id = e.company_id
         WHERE e.id = #{id}
     </select>
 
     <select id="getHomeCompanyByOrganId" resultType="OrganExtend">
         SELECT
         <include refid="organExtendColumns"/>
-        FROM t_sys_organ_extend e
-        LEFT JOIN t_sys_organ_extend a ON a.id = e.home_company_id
+        FROM ${sysPrefix}t_sys_organ_extend e
+        LEFT JOIN ${sysPrefix}t_sys_organ_extend a ON a.id = e.home_company_id
         WHERE e.id = #{id}
     </select>
 
@@ -870,9 +870,9 @@
         p.code AS "parentCode",
         p.biz_code AS "parentBizCode",
         p.name AS "parentName"
-        FROM t_sys_organ_extend a
+        FROM ${sysPrefix}t_sys_organ_extend a
         <include refid="organExtendJoins"/>
-        WHERE a.id = (SELECT u.default_organ_id FROM t_sys_user u WHERE u.id = #{userId})
+        WHERE a.id = (SELECT u.default_organ_id FROM ${sysPrefix}t_sys_user u WHERE u.id = #{userId})
     </select>
 
     <select id="findOrganExtendByUserLoginName" resultType="OrganExtend">
@@ -881,11 +881,11 @@
         p.code AS "parentCode",
         p.biz_code AS "parentBizCode",
         p.name AS "parentName"
-        FROM t_sys_organ_extend a
+        FROM ${sysPrefix}t_sys_organ_extend a
         <include refid="organExtendJoins"/>
         WHERE a.id IN (
             SELECT u.default_organ_id
-            FROM t_sys_user u
+            FROM ${sysPrefix}t_sys_user u
             <where>
                 <if test="status != null and status !=''">
                     AND u.status = #{status}
@@ -898,17 +898,17 @@
     <select id="getCompanyByUserId" resultType="OrganExtend">
         SELECT
         <include refid="organExtendColumns"/>
-        FROM t_sys_organ_extend a
-        INNER JOIN t_sys_organ_extend e ON a.id = e.company_id
-        WHERE e.id = (SELECT u.default_organ_id FROM t_sys_user u WHERE u.id = #{userId})
+        FROM ${sysPrefix}t_sys_organ_extend a
+        INNER JOIN ${sysPrefix}t_sys_organ_extend e ON a.id = e.company_id
+        WHERE e.id = (SELECT u.default_organ_id FROM ${sysPrefix}t_sys_user u WHERE u.id = #{userId})
     </select>
 
     <select id="getHomeCompanyByUserId" resultType="OrganExtend">
         SELECT
         <include refid="organExtendColumns"/>
-        FROM t_sys_organ_extend a
-        INNER JOIN t_sys_organ_extend e ON a.id = e.home_company_id
-        WHERE e.id = (SELECT u.default_organ_id FROM t_sys_user u WHERE u.id = #{userId})
+        FROM ${sysPrefix}t_sys_organ_extend a
+        INNER JOIN ${sysPrefix}t_sys_organ_extend e ON a.id = e.home_company_id
+        WHERE e.id = (SELECT u.default_organ_id FROM ${sysPrefix}t_sys_user u WHERE u.id = #{userId})
     </select>
 
     <select id="findOrganExtends" resultType="OrganExtend">
@@ -917,7 +917,7 @@
         p.code AS "parentCode",
         p.biz_code AS "parentBizCode",
         p.name AS "parentName"
-        FROM t_sys_organ_extend a
+        FROM ${sysPrefix}t_sys_organ_extend a
         <include refid="organExtendJoins"/>
         <where>
             a.status = #{status}
@@ -934,7 +934,7 @@
     <select id="findDepartmentOrganExtendsByCompanyId" resultType="OrganExtend">
         SELECT
         <include refid="organExtendColumns"/>
-        FROM t_sys_organ_extend a
+        FROM ${sysPrefix}t_sys_organ_extend a
         WHERE a.status = '0' AND a.company_id = #{companyId} AND a.type = '1'
         ORDER BY a.sort ASC
     </select>
@@ -943,7 +943,7 @@
     <select id="findDepartmentOrganIdsByCompanyId" resultType="java.lang.String">
         SELECT
         a.id
-        FROM t_sys_organ_extend a
+        FROM ${sysPrefix}t_sys_organ_extend a
         WHERE a.status = '0' AND a.company_id = #{companyId} AND a.type = '1'
         ORDER BY a.sort ASC
     </select>
@@ -952,7 +952,7 @@
     <select id="findDepartmentAndGroupOrganExtendsByCompanyId" resultType="OrganExtend">
         SELECT
         <include refid="organExtendColumns"/>
-        FROM t_sys_organ_extend a
+        FROM ${sysPrefix}t_sys_organ_extend a
         WHERE a.status = '0' AND a.company_id = #{companyId} AND a.type IN ('1','2')
         ORDER BY a.sort ASC
     </select>
@@ -960,7 +960,7 @@
     <select id="findDepartmentAndGroupOrganIdsByCompanyId" resultType="java.lang.String">
         SELECT
         a.id
-        FROM t_sys_organ_extend a
+        FROM ${sysPrefix}t_sys_organ_extend a
         WHERE a.status = '0' AND a.company_id = #{companyId} AND a.type IN ('1','2')
         ORDER BY a.sort ASC
     </select>
@@ -969,7 +969,7 @@
     <select id="findByWhereSQL" resultType="Organ">
         SELECT
         <include refid="organColumns"/>
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
         <include refid="organJoins"/>
         <where>
             ${whereSQL}
@@ -981,7 +981,7 @@
     <select id="findBySql" resultType="Organ">
         SELECT
         <include refid="organColumns"/>
-        FROM t_sys_organ a
+        FROM ${sysPrefix}t_sys_organ a
         <include refid="organJoins"/>
         ${sql}
     </select>

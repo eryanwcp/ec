@@ -4,7 +4,7 @@
 
 	<!--organ表同步到扩展表-->
 	<insert id="insertToOrganExtend">
-		INSERT INTO t_sys_organ_extend (
+		INSERT INTO ${sysPrefix}t_sys_organ_extend (
 		id,
 		status,
 		version,
@@ -79,7 +79,7 @@
 		#{homeCompanyCode},
 		#{homeCompanyBizCode},
 		#{treeLevel}
-		FROM t_sys_organ
+		FROM ${sysPrefix}t_sys_organ
 		<where>
 			id = #{id}
 		</where>
@@ -88,7 +88,7 @@
 
 	<!--	存储过程 批量处理-->
 	<insert id="insertToOrganExtendByFunction">
-		INSERT INTO t_sys_organ_extend (
+		INSERT INTO ${sysPrefix}t_sys_organ_extend (
 		id,
 		status,
 		version,
@@ -163,9 +163,9 @@
 				 getOrganHomeCompanyCode(a.id),
 				 getOrganHomeCompanyBizCode(a.id),
 				 (length(a.parent_ids) - length(replace(a.parent_ids,',','')))
-		FROM t_sys_organ a
-		LEFT JOIN t_sys_organ p ON p.id = a.parent_id
-		LEFT JOIN t_sys_area ar ON ar.id = a.area_id
+		FROM ${sysPrefix}t_sys_organ a
+		LEFT JOIN ${sysPrefix}t_sys_organ p ON p.id = a.parent_id
+		LEFT JOIN ${sysPrefix}t_sys_area ar ON ar.id = a.area_id
 		<where>
 			<if test="id != null and id != ''">
 				AND a.id = #{id}
@@ -176,7 +176,7 @@
 	<!--删除organ扩展表数据-->
 	<delete id="deleteOrganExtend">
 		/*TDDL:FORBID_EXECUTE_DML_ALL=FALSE*/
-		DELETE FROM t_sys_organ_extend
+		DELETE FROM ${sysPrefix}t_sys_organ_extend
 		<where>
 			<if test="id != null and id != ''">
 				AND id = #{id}
