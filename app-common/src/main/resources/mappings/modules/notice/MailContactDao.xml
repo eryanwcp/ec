@@ -20,16 +20,16 @@
     <select id="get" resultType="MailContact">
         SELECT
         <include refid="contactColumns"/>
-        FROM t_notice_mail_contact a
+        FROM ${noticePrefix}t_notice_mail_contact a
         WHERE a.id = #{id}
     </select>
 
     <select id="checkExist" resultType="MailContact">
         SELECT
         <include refid="contactColumns"/>
-        FROM t_notice_mail_contact a
+        FROM ${noticePrefix}t_notice_mail_contact a
         <if test="contactGroupId != null and contactGroupId !=''">
-            JOIN t_notice_contact_group_object cgo ON cgo.object_id = a.id
+            JOIN ${noticePrefix}t_notice_contact_group_object cgo ON cgo.object_id = a.id
         </if>
         <where>
             a.status = #{status}
@@ -48,7 +48,7 @@
     <select id="findList" resultType="MailContact">
         SELECT
         <include refid="contactColumns"/>
-        FROM t_notice_mail_contact a
+        FROM ${noticePrefix}t_notice_mail_contact a
         <where>
             a.status = #{status}
         </where>
@@ -66,7 +66,7 @@
     <select id="findByUserId" resultType="MailContact">
         SELECT
         <include refid="contactColumns"/>
-        FROM t_notice_mail_contact a
+        FROM ${noticePrefix}t_notice_mail_contact a
         <where>
             a.status = #{status}
             AND a.user_id = #{userId}
@@ -84,8 +84,8 @@
     <select id="findByContactGroupId" resultType="MailContact">
         SELECT
         <include refid="contactColumns"/>
-        FROM t_notice_mail_contact a
-        JOIN t_notice_contact_group_object cgo ON cgo.object_id = a.id
+        FROM ${noticePrefix}t_notice_mail_contact a
+        JOIN ${noticePrefix}t_notice_contact_group_object cgo ON cgo.object_id = a.id
         <where>
             a.status = #{status}
             AND cgo.contact_group_id = #{contactGroupId}
@@ -103,7 +103,7 @@
     <select id="findByUserIdWithInclude" resultType="MailContact">
         SELECT
         <include refid="contactColumns"/>
-        FROM t_notice_mail_contact a
+        FROM ${noticePrefix}t_notice_mail_contact a
         <where>
             a.status = #{status}
             AND a.user_id = #{userId}
@@ -170,7 +170,7 @@
     <select id="findAllList" resultType="MailContact">
         SELECT
         <include refid="contactColumns"/>
-        FROM t_notice_mail_contact a
+        FROM ${noticePrefix}t_notice_mail_contact a
         <where>
         </where>
         <choose>
@@ -184,7 +184,7 @@
     </select>
 
     <insert id="insert">
-        INSERT INTO t_notice_mail_contact(
+        INSERT INTO ${noticePrefix}t_notice_mail_contact(
         id,
         status,
         version,
@@ -213,7 +213,7 @@
         )
     </insert>
     <insert id="insertBatch">
-        INSERT INTO t_notice_mail_contact(
+        INSERT INTO ${noticePrefix}t_notice_mail_contact(
         id,
         status,
         version,
@@ -243,7 +243,7 @@
     </insert>
 
     <update id="update">
-        UPDATE t_notice_mail_contact SET
+        UPDATE ${noticePrefix}t_notice_mail_contact SET
         status = #{status},
         version = version +1,
         update_user = #{updateUser},
@@ -257,7 +257,7 @@
     </update>
 
     <update id="delete">
-        UPDATE t_notice_mail_contact SET
+        UPDATE ${noticePrefix}t_notice_mail_contact SET
         status = #{STATUS_DELETE},
         version = version +1,
         update_user = #{updateUser},
@@ -266,11 +266,11 @@
     </update>
 
     <delete id="clear">
-        DELETE FROM t_notice_mail_contact WHERE id = #{id}
+        DELETE FROM ${noticePrefix}t_notice_mail_contact WHERE id = #{id}
     </delete>
 
     <delete id="clearAll">
-        DELETE FROM t_notice_mail_contact
+        DELETE FROM ${noticePrefix}t_notice_mail_contact
     </delete>
 
 </mapper>

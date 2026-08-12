@@ -39,7 +39,6 @@ import javax.sql.DataSource;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-// import java.util.Properties;
 
 /**
  * DB configuration for data source, MyBatis and transaction management.
@@ -51,7 +50,18 @@ public class DBConfigurer {
 
     private static final Logger logger = LoggerFactory.getLogger(DBConfigurer.class);
 
+    private static volatile Map<String, Object> mybatisMap;
     public static final String TX_MANAGER_NAME = "transactionManager";
+
+    public static Map<String, Object> getMybatisMap() {
+        return mybatisMap == null ? Collections.emptyMap() : mybatisMap;
+    }
+
+    public static String getMybatisProperty(String key) {
+        Map<String, Object> map = getMybatisMap();
+        Object value = map.get(key);
+        return value == null ? "" : String.valueOf(value);
+    }
 
     // 默认包配置
     private static final String DEFAULT_TYPE_ALIASES = "com.eryansky.modules.sys.mapper,com.eryansky.modules.disk.mapper,com.eryansky.modules.notice.mapper";
@@ -112,10 +122,26 @@ public class DBConfigurer {
             sqlSessionFactoryBean.setMapperLocations(merged);
         }
 
-        String mybatisProperties = environment.getProperty("spring.dataSource.mybatis.properties");
-        Map<String, Object> map = JsonMapper.getInstance().toMap(mybatisProperties);
-        sqlSessionFactoryBean.setConfigurationProperties(AppUtils.mapToProperties(map));
+        mybatisMap = mybatisProperties(environment);
+        sqlSessionFactoryBean.setConfigurationProperties(AppUtils.mapToProperties(mybatisMap));
         return sqlSessionFactoryBean.getObject();
+    }
+
+
+    private Map<String, Object> mybatisProperties(Environment environment) {
+        String mybatisProperties = environment.getProperty("spring.dataSource.mybatis.properties");
+        Map<String, Object> map;
+        if (StringUtils.isNotBlank(mybatisProperties)) {
+            Map<String, Object> parsed = JsonMapper.getInstance().toMap(mybatisProperties);
+            map = (parsed != null) ? new HashMap<>(parsed) : new HashMap<>();
+        } else {
+            map = new HashMap<>();
+        }
+        // Ensure expected keys exist without overwriting provided values
+        map.putIfAbsent("sysPrefix", "");
+        map.putIfAbsent("diskPrefix", "");
+        map.putIfAbsent("noticePrefix", "");
+        return map;
     }
 
     @Bean

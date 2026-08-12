@@ -1,4 +1,19 @@
-﻿2026-06-07
+﻿2026-08-12
+4.3.20260624.04
+1、支持数据库表前缀匹配
+系统模块sys：sysPrefix
+文件相关表disk：diskPrefix
+通知消息相关notice：noticePrefix
+
+#默认为空或不配置application-*.properties
+spring.dataSource.mybatis.properties=
+spring.quartz.properties.org.quartz.jobStore.tablePrefix = QRTZ_
+
+#指定数据库前缀配置方案application-*.properties
+spring.dataSource.mybatis.properties={sysPrefix:'ec.',diskPrefix:'ec.',noticePrefix:'ec.'}
+spring.quartz.properties.org.quartz.jobStore.tablePrefix = ec.QRTZ_
+
+2026-06-07
 4.3.20260421.03
 1、jquery-validate由1.19.3升级到1.21.1
 

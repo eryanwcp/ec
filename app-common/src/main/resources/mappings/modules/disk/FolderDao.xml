@@ -26,13 +26,13 @@
     </sql>
 
     <sql id="folderJoins">
-        LEFT JOIN t_disk_folder p ON p.id = a.parent_id
+        LEFT JOIN ${diskPrefix}t_disk_folder p ON p.id = a.parent_id
     </sql>
 
     <select id="get" resultType="Folder">
         SELECT
         <include refid="folderColumns"/>
-        FROM t_disk_folder a
+        FROM ${diskPrefix}t_disk_folder a
         <include refid="folderJoins"/>
         WHERE a.id = #{id}
     </select>
@@ -40,7 +40,7 @@
     <select id="findList" resultType="Folder">
         SELECT
         <include refid="folderColumns"/>
-        FROM t_disk_folder a
+        FROM ${diskPrefix}t_disk_folder a
         <include refid="folderJoins"/>
         <where>
             a.status = #{status}
@@ -58,7 +58,7 @@
     <select id="findAllList" resultType="Folder">
         SELECT
         <include refid="folderColumns"/>
-        FROM t_disk_folder a
+        FROM ${diskPrefix}t_disk_folder a
         <include refid="folderJoins"/>
         <where>
         </where>
@@ -85,7 +85,7 @@
         a.id,
         a.parent_id AS "parent.id",
         a.parent_ids
-        FROM t_disk_folder a
+        FROM ${diskPrefix}t_disk_folder a
         WHERE a.status = #{STATUS_NORMAL}
         AND a.parent_ids LIKE #{parentIds}
         ORDER BY a.sort ASC
@@ -94,7 +94,7 @@
     <select id="findChild" resultType="Folder">
         SELECT
         <include refid="folderColumns"/>
-        FROM t_disk_folder a
+        FROM ${diskPrefix}t_disk_folder a
         <include refid="folderJoins"/>
         <where>
             a.status = #{status}
@@ -114,7 +114,7 @@
     <select id="findChilds" resultType="Folder">
         SELECT
         <include refid="folderColumns"/>
-        FROM t_disk_folder a
+        FROM ${diskPrefix}t_disk_folder a
         <include refid="folderJoins"/>
         <where>
             a.status = #{status}
@@ -138,7 +138,7 @@
     <select id="findChildsIds" resultType="java.lang.String">
         SELECT
         a.id
-        FROM t_disk_folder a
+        FROM ${diskPrefix}t_disk_folder a
         <where>
             a.status = #{status}
             <if test="type != null and type !=''">
@@ -161,7 +161,7 @@
     <select id="findFolders" resultType="Folder">
         SELECT
         <include refid="folderColumns"/>
-        FROM t_disk_folder a
+        FROM ${diskPrefix}t_disk_folder a
         <include refid="folderJoins"/>
         <where>
             a.status = #{status}
@@ -199,7 +199,7 @@
     <select id="findNormalTypeAndSystemFoldersByUserId" resultType="Folder">
         SELECT
         <include refid="folderColumns"/>
-        FROM t_disk_folder a
+        FROM ${diskPrefix}t_disk_folder a
         <include refid="folderJoins"/>
         <where>
             a.status = #{status}
@@ -215,7 +215,7 @@
     <select id="findFoldersByUserId" resultType="Folder">
         SELECT
         <include refid="folderColumns"/>
-        FROM t_disk_folder a
+        FROM ${diskPrefix}t_disk_folder a
         <include refid="folderJoins"/>
         <where>
             a.status = #{status}
@@ -237,7 +237,7 @@
 
 
     <insert id="insert">
-        INSERT INTO t_disk_folder(
+        INSERT INTO ${diskPrefix}t_disk_folder(
         id,
         status,
         version,
@@ -279,7 +279,7 @@
     </insert>
 
     <insert id="insertBatch">
-        INSERT INTO t_disk_folder(
+        INSERT INTO ${diskPrefix}t_disk_folder(
         id,
         status,
         version,
@@ -321,7 +321,7 @@
     </insert>
 
     <update id="update">
-        UPDATE t_disk_folder SET
+        UPDATE ${diskPrefix}t_disk_folder SET
         status = #{status},
         version = version +1,
         update_user = #{updateUser},
@@ -341,7 +341,7 @@
     </update>
 
     <delete id="delete">
-        UPDATE t_disk_folder SET
+        UPDATE ${diskPrefix}t_disk_folder SET
         status = #{STATUS_DELETE},
         version = version +1,
         update_user = #{updateUser},
@@ -351,7 +351,7 @@
 
 
     <delete id="deleteCascadeByFolderId">
-        UPDATE t_disk_folder SET
+        UPDATE ${diskPrefix}t_disk_folder SET
         status = #{STATUS_DELETE},
         version = version +1,
         update_user = #{updateUser},
@@ -367,12 +367,12 @@
     </delete>
 
     <delete id="clear">
-        DELETE FROM t_disk_folder
+        DELETE FROM ${diskPrefix}t_disk_folder
         WHERE id = #{id}
     </delete>
 
     <delete id="clearAll">
-        DELETE FROM t_disk_folder
+        DELETE FROM ${diskPrefix}t_disk_folder
     </delete>
 
 </mapper>

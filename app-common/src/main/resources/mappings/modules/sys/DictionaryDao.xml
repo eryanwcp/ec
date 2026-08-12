@@ -20,13 +20,13 @@
 	</sql>
 	
 	<sql id="sysDictionaryJoins">
-		LEFT JOIN t_sys_dictionary d ON d.code = a.group_id
+		LEFT JOIN ${sysPrefix}t_sys_dictionary d ON d.code = a.group_id
 	</sql>
     
 	<select id="get" resultType="Dictionary">
 		SELECT 
 			<include refid="sysDictionaryColumns"/>
-		FROM t_sys_dictionary a
+		FROM ${sysPrefix}t_sys_dictionary a
 		<include refid="sysDictionaryJoins"/>
 		WHERE a.id = #{id}
 	</select>
@@ -34,7 +34,7 @@
 	<select id="getByCode" resultType="Dictionary" >
 		SELECT
 		<include refid="sysDictionaryColumns"/>
-		FROM t_sys_dictionary a
+		FROM ${sysPrefix}t_sys_dictionary a
 		<include refid="sysDictionaryJoins"/>
 		WHERE a.status = #{STATUS_NORMAL}
 		<if test="code != null and code != ''">
@@ -45,7 +45,7 @@
 	<select id="getBy" resultType="Dictionary">
 		SELECT
 		<include refid="sysDictionaryColumns"/>
-		FROM t_sys_dictionary a
+		FROM ${sysPrefix}t_sys_dictionary a
 		<include refid="sysDictionaryJoins"/>
 		WHERE a.status = #{STATUS_NORMAL}
 		<if test="name != null and name != ''">
@@ -59,7 +59,7 @@
 	<select id="findParents" resultType="Dictionary">
 		SELECT
 		<include refid="sysDictionaryColumns"/>
-		FROM t_sys_dictionary a
+		FROM ${sysPrefix}t_sys_dictionary a
 		<include refid="sysDictionaryJoins"/>
 		WHERE a.status = #{STATUS_NORMAL}
 			AND (a.group_id IS NULL OR a.group_id  = '')
@@ -69,7 +69,7 @@
 	<select id="findChilds" resultType="Dictionary">
 		SELECT
 		<include refid="sysDictionaryColumns"/>
-		FROM t_sys_dictionary a
+		FROM ${sysPrefix}t_sys_dictionary a
 		<include refid="sysDictionaryJoins"/>
 		WHERE a.status = #{STATUS_NORMAL}
 			AND a.group_id = #{id}
@@ -80,7 +80,7 @@
 	<select id="getMaxSort" resultType="int">
 		SELECT
 		 MAX(a.order_no)
-		FROM t_sys_dictionary a
+		FROM ${sysPrefix}t_sys_dictionary a
 		WHERE a.status = #{STATUS_NORMAL}
 	</select>
 
@@ -89,7 +89,7 @@
 	<select id="findList" resultType="Dictionary">
 		SELECT 
 			<include refid="sysDictionaryColumns"/>
-		FROM t_sys_dictionary a
+		FROM ${sysPrefix}t_sys_dictionary a
 		<include refid="sysDictionaryJoins"/>
 		<where>
 			a.status = #{STATUS_NORMAL}
@@ -116,7 +116,7 @@
 	<select id="findAllList" resultType="Dictionary">
 		SELECT 
 			<include refid="sysDictionaryColumns"/>
-		FROM t_sys_dictionary a
+		FROM ${sysPrefix}t_sys_dictionary a
 		<include refid="sysDictionaryJoins"/>
 		<where>
 			a.status = #{STATUS_NORMAL}
@@ -143,7 +143,7 @@
 	<select id="findByWhereSQL" resultType="Dictionary">
 		SELECT
 		<include refid="sysDictionaryColumns"/>
-		FROM t_sys_dictionary a
+		FROM ${sysPrefix}t_sys_dictionary a
 		<where>
 			${whereSQL}
 		</where>
@@ -154,12 +154,12 @@
 	<select id="findBySql" resultType="Dictionary">
 		SELECT
 		<include refid="sysDictionaryColumns"/>
-		FROM t_sys_dictionary a
+		FROM ${sysPrefix}t_sys_dictionary a
 		${sql}
 	</select>
 	
 	<insert id="insert">
-		INSERT INTO t_sys_dictionary(
+		INSERT INTO ${sysPrefix}t_sys_dictionary(
 			id,
 			status,
 			version,
@@ -188,7 +188,7 @@
 		)
 	</insert>
 	<insert id="insertBatch">
-		INSERT INTO t_sys_dictionary(
+		INSERT INTO ${sysPrefix}t_sys_dictionary(
 			id,
 			status,
 			version,
@@ -218,7 +218,7 @@
 	</insert>
 
 	<update id="update">
-		UPDATE t_sys_dictionary SET
+		UPDATE ${sysPrefix}t_sys_dictionary SET
 			status = #{status},
 			version = version +1,
 			update_user = #{updateUser},
@@ -232,17 +232,17 @@
 	</update>
 	
 	<update id="delete">
-		UPDATE t_sys_dictionary SET
+		UPDATE ${sysPrefix}t_sys_dictionary SET
 		status = #{STATUS_DELETE}
 		WHERE id = #{id}
 	</update>
 
 	<delete id="clear">
-		DELETE FROM t_sys_dictionary
+		DELETE FROM ${sysPrefix}t_sys_dictionary
 		WHERE id = #{id}
 	</delete>
 
 	<delete id="clearAll">
-		DELETE FROM t_sys_dictionary
+		DELETE FROM ${sysPrefix}t_sys_dictionary
 	</delete>
 </mapper>

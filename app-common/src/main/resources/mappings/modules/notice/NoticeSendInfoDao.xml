@@ -10,20 +10,20 @@
 	</sql>
 
 	<sql id="noticeJoins">
-	JOIN t_notice n ON n.id = a.notice_id
+	JOIN ${noticePrefix}t_notice n ON n.id = a.notice_id
 	</sql>
 
 	<select id="get" resultType="NoticeSendInfo">
 		SELECT
 		<include refid="noticeSendInfoColumns"/>
-		FROM t_notice_send_info a
+		FROM ${noticePrefix}t_notice_send_info a
 		WHERE a.id = #{id}
 	</select>
 
 	<select id="findList" resultType="NoticeSendInfo">
 		SELECT
 		<include refid="noticeSendInfoColumns"/>
-		FROM t_notice_send_info a
+		FROM ${noticePrefix}t_notice_send_info a
 		<include refid="noticeJoins"/>
 		<where>
 			n.status = #{STATUS_NORMAL}
@@ -62,7 +62,7 @@
 	<select id="findQueryList" resultType="NoticeSendInfo">
 		SELECT
 		<include refid="noticeSendInfoColumns"/>
-		FROM t_notice_send_info a
+		FROM ${noticePrefix}t_notice_send_info a
 		<where>
 			<if test="notice != null and notice.id != null and notice.id != ''">
 				AND a.notice_id  = #{notice.id}
@@ -78,7 +78,7 @@
 	<select id="findObjectIdsByNoticeId" resultType="java.lang.String">
 		SELECT
 		a.receive_object_id
-		FROM t_notice_send_info a
+		FROM ${noticePrefix}t_notice_send_info a
 		<where>
 			a.notice_id  = #{noticeId}
 			<if test="receiveObjectType != null and receiveObjectType != ''">
@@ -90,7 +90,7 @@
 	<select id="findAllList" resultType="NoticeSendInfo">
 		SELECT
 		<include refid="noticeSendInfoColumns"/>
-		FROM t_notice_send_info a
+		FROM ${noticePrefix}t_notice_send_info a
 		<include refid="noticeJoins"/>
 		<where>
 			n.status = #{STATUS_NORMAL}
@@ -111,7 +111,7 @@
 	</select>
 
 	<insert id="insert">
-		INSERT INTO t_notice_send_info(
+		INSERT INTO ${noticePrefix}t_notice_send_info(
 		id,
 		notice_id,
 		receive_object_type,
@@ -125,7 +125,7 @@
 	</insert>
 
 	<insert id="insertBatch">
-		INSERT INTO t_notice_send_info(
+		INSERT INTO ${noticePrefix}t_notice_send_info(
 		id,
 		notice_id,
 		receive_object_type,
@@ -139,7 +139,7 @@
 	</insert>
 
 	<update id="update">
-		UPDATE t_notice_send_info SET
+		UPDATE ${noticePrefix}t_notice_send_info SET
 		notice_id = #{noticeId},
 		receive_object_type = #{receiveObjectType},
 		receive_object_id = #{receiveObjectId}
@@ -147,12 +147,12 @@
 	</update>
 
 	<delete id="delete">
-		DELETE FROM t_notice_send_info
+		DELETE FROM ${noticePrefix}t_notice_send_info
 		WHERE id = #{id}
 	</delete>
 
 	<delete id="deleteByNoticeId">
-		DELETE FROM t_notice_send_info
+		DELETE FROM ${noticePrefix}t_notice_send_info
 		WHERE notice_id = #{noticeId}
 	</delete>
 </mapper>

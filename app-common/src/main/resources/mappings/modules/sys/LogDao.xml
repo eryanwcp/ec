@@ -35,7 +35,7 @@
     <select id="get" resultType="Log">
         SELECT
         <include refid="sysLogColumns"/>
-        FROM t_sys_log a
+        FROM ${sysPrefix}t_sys_log a
         WHERE a.id = #{id}
     </select>
 
@@ -109,7 +109,7 @@
     <select id="findQueryList" resultType="Log">
         SELECT
         <include refid="sysLogColumns"/>
-        FROM t_sys_log a
+        FROM ${sysPrefix}t_sys_log a
         <where>
             a.status = '0'
             <if test="query != null and query != ''">
@@ -184,6 +184,7 @@
                     AND a.create_time <![CDATA[<=]]> #{endTime}
                 </when>
             </choose>
+            ${sqlMap.dsf}
         </where>
         <choose>
             <when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
@@ -198,7 +199,7 @@
     <select id="findAllList" resultType="Log">
         SELECT
         <include refid="sysLogColumns"/>
-        FROM t_sys_log a
+        FROM ${sysPrefix}t_sys_log a
         <where>
             a.status = #{STATUS_NORMAL}
         </where>
@@ -217,7 +218,7 @@
         SELECT
         count(*)
         FROM
-        t_sys_log a
+        ${sysPrefix}t_sys_log a
         WHERE
         a.status = '0'
         AND a.title LIKE
@@ -260,7 +261,7 @@
         </choose>
         count(*) AS "count"
         FROM
-        t_sys_log a
+        ${sysPrefix}t_sys_log a
         WHERE
         a.status = '0'
         AND a.title LIKE
@@ -307,7 +308,7 @@
         TRIM('"' FROM JSON_EXTRACT(extend_attr,'$.userName')) AS "userName",
         count(*) AS "count"
         FROM
-        t_sys_log a
+        ${sysPrefix}t_sys_log a
         WHERE
         a.status = '0'
         AND a.title LIKE
@@ -365,12 +366,12 @@
         a.title AS "module",
         count(*) AS "moduleCount"
         FROM
-        t_sys_log a
-        LEFT JOIN t_sys_user u ON u.id = a.user_id
-        LEFT JOIN t_sys_organ_extend o ON o.id = u.default_organ_id
+        ${sysPrefix}t_sys_log a
+        LEFT JOIN ${sysPrefix}t_sys_user u ON u.id = a.user_id
+        LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = u.default_organ_id
         <if test="postCode != null and postCode !=''">
-            LEFT JOIN t_sys_user_post up ON up.user_id = u.id
-            LEFT JOIN t_sys_post p ON p.id = up.post_id
+            LEFT JOIN ${sysPrefix}t_sys_user_post up ON up.user_id = u.id
+            LEFT JOIN ${sysPrefix}t_sys_post p ON p.id = up.post_id
         </if>
         WHERE
         a.status = '0'
@@ -429,7 +430,7 @@
     <select id="findByWhereSQL" resultType="Log">
         SELECT
         <include refid="sysLogColumns"/>
-        FROM t_sys_log a
+        FROM ${sysPrefix}t_sys_log a
         <where>
             ${whereSQL}
         </where>
@@ -439,12 +440,12 @@
     <select id="findBySql" resultType="Log">
         SELECT
         <include refid="sysLogColumns"/>
-        FROM t_sys_log a
+        FROM ${sysPrefix}t_sys_log a
         ${sql}
     </select>
 
     <insert id="insert">
-		INSERT INTO t_sys_log(
+		INSERT INTO ${sysPrefix}t_sys_log(
 		id,
 		status,
 		version,
@@ -491,7 +492,7 @@
 		)
 	</insert>
     <insert id="insertBatch">
-		INSERT INTO t_sys_log(
+		INSERT INTO ${sysPrefix}t_sys_log(
 		id,
 		status,
 		version,
@@ -539,7 +540,7 @@
 	</insert>
 
     <update id="update">
-		UPDATE t_sys_log SET
+		UPDATE ${sysPrefix}t_sys_log SET
 		status = #{status},
 		version = version +1,
 		update_user = #{updateUser},
@@ -560,22 +561,22 @@
 	</update>
 
     <update id="delete">
-		UPDATE t_sys_log SET
+		UPDATE ${sysPrefix}t_sys_log SET
 		status = #{STATUS_DELETE}
 		WHERE id = #{id}
 	</update>
 
 	<delete id="clear">
-		DELETE FROM t_sys_log
+		DELETE FROM ${sysPrefix}t_sys_log
 		WHERE id = #{id}
 	</delete>
 
 	<delete id="clearAll">
-		DELETE FROM t_sys_log
+		DELETE FROM ${sysPrefix}t_sys_log
 	</delete>
 
     <delete id="clearInvalidLog" >
-        DELETE FROM t_sys_log
+        DELETE FROM ${sysPrefix}t_sys_log
         <where>
             <if test="createTime != null ">
                 create_time <![CDATA[<]]> #{createTime}
@@ -584,7 +585,7 @@
     </delete>
 
     <delete id="clearHistoryLog" >
-        DELETE FROM t_sys_log_history
+        DELETE FROM ${sysPrefix}t_sys_log_history
         <where>
             <if test="createTime != null ">
                 create_time <![CDATA[<]]> #{createTime}
@@ -594,7 +595,7 @@
 
 
 	<insert id="insertToHistory">
-		INSERT INTO t_sys_log_history(
+		INSERT INTO ${sysPrefix}t_sys_log_history(
 		id,
 		status,
 		version,
@@ -637,7 +638,7 @@
 		remark,
 		exception,
         extend_attr
-		FROM t_sys_log
+		FROM ${sysPrefix}t_sys_log
 		<where>
 			<if test="createTime != null ">
 				create_time <![CDATA[<]]> #{createTime}

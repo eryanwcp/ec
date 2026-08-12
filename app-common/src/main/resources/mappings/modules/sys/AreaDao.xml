@@ -31,13 +31,13 @@
 	</sql>
 
 	<sql id="areaJoins">
-		LEFT JOIN t_sys_area p ON p.id = a.parent_id
+		LEFT JOIN ${sysPrefix}t_sys_area p ON p.id = a.parent_id
 	</sql>
 
 	<select id="get" resultType="Area">
 		SELECT
 		<include refid="areaColumns"/>
-		FROM t_sys_area a
+		FROM ${sysPrefix}t_sys_area a
 		<include refid="areaJoins"/>
 		WHERE a.id = #{id}
 	</select>
@@ -45,7 +45,7 @@
 	<select id="getByCode" resultType="Area">
 		SELECT
 		<include refid="areaColumns"/>
-		FROM t_sys_area a
+		FROM ${sysPrefix}t_sys_area a
 		<include refid="areaJoins"/>
 		WHERE a.code = #{code} AND a.status = '0'
 	</select>
@@ -53,7 +53,7 @@
 	<select id="getByBizCode" resultType="Area">
 		SELECT
 		<include refid="areaColumns"/>
-		FROM t_sys_area a
+		FROM ${sysPrefix}t_sys_area a
 		<include refid="areaJoins"/>
 		WHERE a.biz_code = #{bizCode} AND a.status = '0'
 	</select>
@@ -61,7 +61,7 @@
 	<select id="findList" resultType="Area">
 		SELECT
 		<include refid="areaColumns"/>
-		FROM t_sys_area a
+		FROM ${sysPrefix}t_sys_area a
 		<include refid="areaJoins"/>
 		WHERE a.status = #{STATUS_NORMAL}
 		ORDER BY a.code
@@ -70,7 +70,7 @@
 	<select id="findAllList" resultType="Area">
 		SELECT
 		<include refid="areaColumns"/>
-		FROM t_sys_area a
+		FROM ${sysPrefix}t_sys_area a
 		<include refid="areaJoins"/>
 		WHERE a.status = #{STATUS_NORMAL}
 		ORDER BY a.code
@@ -90,7 +90,7 @@
 		a.id,
 		a.parent_id AS "parent.id",
 		a.parent_ids
-		FROM t_sys_area a
+		FROM ${sysPrefix}t_sys_area a
 		WHERE a.status = #{STATUS_NORMAL}
 		AND a.parent_ids LIKE #{parentIds}
 		ORDER BY a.code
@@ -99,7 +99,7 @@
 	<select id="findByCodes" resultType="Area">
 		SELECT
 		<include refid="areaColumns"/>
-		FROM t_sys_area a
+		FROM ${sysPrefix}t_sys_area a
 		<include refid="areaJoins"/>
 		<where>
 			a.status = #{status}
@@ -120,7 +120,7 @@
 	<select id="findByParentId" resultType="Area">
 		SELECT
 		<include refid="areaColumns"/>
-		FROM t_sys_area a
+		FROM ${sysPrefix}t_sys_area a
 		<include refid="areaJoins"/>
 		<where>
 			a.status = '0'
@@ -141,7 +141,7 @@
 	<select id="findOwnAndChild" resultType="Area">
 		SELECT
 		<include refid="areaColumns"/>
-		FROM t_sys_area a
+		FROM ${sysPrefix}t_sys_area a
 		<include refid="areaJoins"/>
 		WHERE
 		a.status = '0'
@@ -162,7 +162,7 @@
 	<select id="findChild" resultType="Area">
 		SELECT
 		<include refid="areaColumns"/>
-		FROM t_sys_area a
+		FROM ${sysPrefix}t_sys_area a
 		<include refid="areaJoins"/>
 		<where>
 			<if test="types != null and types.size() !=0">
@@ -190,7 +190,7 @@
 	<select id="findAreaUp" resultType="Area">
 		SELECT
 		<include refid="areaColumns"/>
-		FROM t_sys_area a
+		FROM ${sysPrefix}t_sys_area a
 		<include refid="areaJoins"/>
 		WHERE
 		a.status = #{STATUS_NORMAL}
@@ -200,7 +200,7 @@
 	<select id="findAreaDown" resultType="Area">
 		SELECT
 		<include refid="areaColumns"/>
-		FROM t_sys_area a
+		FROM ${sysPrefix}t_sys_area a
 		<include refid="areaJoins"/>
 		<where>
 			a.status = '0'
@@ -221,7 +221,7 @@
 	</select>
 
 	<insert id="insert">
-		INSERT INTO t_sys_area(
+		INSERT INTO ${sysPrefix}t_sys_area(
 		id,
 		status,
 		version,
@@ -261,7 +261,7 @@
 	</insert>
 
 	<insert id="insertBatch">
-		INSERT INTO t_sys_area(
+		INSERT INTO ${sysPrefix}t_sys_area(
 		id,
 		status,
 		version,
@@ -301,7 +301,7 @@
 	</insert>
 
 	<update id="update">
-		UPDATE t_sys_area SET
+		UPDATE ${sysPrefix}t_sys_area SET
 		status = #{status},
 		version = version +1,
 		update_user = #{updateUser},
@@ -320,14 +320,14 @@
 	</update>
 
 	<update id="updateParentIds">
-		UPDATE t_sys_area SET
+		UPDATE ${sysPrefix}t_sys_area SET
 		parent_id = #{parent.id},
 		parent_ids = #{parentIds}
 		WHERE id = #{id}
 	</update>
 
 	<update id="delete">
-		UPDATE t_sys_area SET
+		UPDATE ${sysPrefix}t_sys_area SET
 		status = #{STATUS_DELETE},
 		version = version +1,
 		update_user = #{updateUser},
@@ -336,7 +336,7 @@
 	</update>
 
 	<delete id="deleteOwnerAndChilds">
-		UPDATE t_sys_area SET
+		UPDATE ${sysPrefix}t_sys_area SET
 		status = #{STATUS_DELETE},
 		version = version +1,
 		update_user = #{updateUser},
@@ -351,12 +351,12 @@
 	</delete>
 
 	<delete id="clear">
-		DELETE FROM t_sys_area
+		DELETE FROM ${sysPrefix}t_sys_area
 		WHERE id = #{id}
 	</delete>
 
 	<delete id="clearAll">
-		DELETE FROM t_sys_area
+		DELETE FROM ${sysPrefix}t_sys_area
 	</delete>
 
 </mapper>

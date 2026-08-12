@@ -25,21 +25,21 @@
 	</sql>
 	
 	<sql id="noticeMessageJoins">
-		LEFT JOIN t_sys_user u ON u.id = a.sender
-		LEFT JOIN t_sys_organ_extend o ON o.id = a.organ_id
+		LEFT JOIN ${sysPrefix}t_sys_user u ON u.id = a.sender
+		LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = a.organ_id
 	</sql>
     
 	<select id="get" resultType="Message">
 		SELECT 
 			<include refid="noticeMessageColumns"/>
-		FROM t_notice_message a
+		FROM ${noticePrefix}t_notice_message a
 		WHERE a.id = #{id}
 	</select>
 	
 	<select id="findList" resultType="Message">
 		SELECT 
 			<include refid="noticeMessageColumns"/>
-		FROM t_notice_message a
+		FROM ${noticePrefix}t_notice_message a
 		<include refid="noticeMessageJoins"/>
 		<where>
 			a.status = #{status}
@@ -97,7 +97,7 @@
 	<select id="findQueryList" resultType="Message">
 		SELECT
 		<include refid="noticeMessageColumns"/>
-		FROM t_notice_message a
+		FROM ${noticePrefix}t_notice_message a
 		<include refid="noticeMessageJoins"/>
 		<where>
 			a.status = #{status}
@@ -172,7 +172,7 @@
 	<select id="findAllList" resultType="Message">
 		SELECT 
 			<include refid="noticeMessageColumns"/>
-		FROM t_notice_message a
+		FROM ${noticePrefix}t_notice_message a
 		<where>
 			a.status = #{STATUS_NORMAL}
 			<if test="organId != null and organId != ''">
@@ -199,7 +199,7 @@
 	</select>
 	
 	<insert id="insert">
-		INSERT INTO t_notice_message(
+		INSERT INTO ${noticePrefix}t_notice_message(
 			id,
 			status,
 			version,
@@ -242,7 +242,7 @@
 		)
 	</insert>
 	<insert id="insertBatch">
-		INSERT INTO t_notice_message(
+		INSERT INTO ${noticePrefix}t_notice_message(
 			id,
 			status,
 			version,
@@ -286,7 +286,7 @@
 	</insert>
 
 	<update id="update">
-		UPDATE t_notice_message SET
+		UPDATE ${noticePrefix}t_notice_message SET
 			status = #{status},
 			version = version +1,
 			update_user = #{updateUser},
@@ -307,7 +307,7 @@
 	</update>
 	
 	<update id="delete">
-		UPDATE t_notice_message SET
+		UPDATE ${noticePrefix}t_notice_message SET
 		status = #{STATUS_DELETE},
 		version = version +1,
         update_user = #{updateUser},
@@ -316,12 +316,12 @@
 	</update>
 
 	<delete id="clear">
-		DELETE FROM t_notice_message
+		DELETE FROM ${noticePrefix}t_notice_message
 		WHERE id = #{id}
 	</delete>
 
 	<delete id="clearAll">
-		DELETE FROM t_notice_message
+		DELETE FROM ${noticePrefix}t_notice_message
 	</delete>
 
 </mapper>
