@@ -20,22 +20,22 @@
     <select id="get" resultType="Post">
         SELECT
         <include refid="postColumns"/>
-        FROM t_sys_post a
+        FROM ${sysPrefix}t_sys_post a
         WHERE a.id = #{id}
     </select>
 
     <select id="getByCode" resultType="Post">
         SELECT
         <include refid="postColumns"/>
-        FROM t_sys_post a
+        FROM ${sysPrefix}t_sys_post a
         WHERE a.status = '0' AND a.code = #{code}
     </select>
 
     <select id="findPost" resultType="Post">
         SELECT DISTINCT
         <include refid="postColumns"/>
-        FROM t_sys_post a
-        LEFT JOIN t_sys_post_organ po ON po.post_id = a.id
+        FROM ${sysPrefix}t_sys_post a
+        LEFT JOIN ${sysPrefix}t_sys_post_organ po ON po.post_id = a.id
         <where>
             a.status = '0'
             AND a.code = #{code}
@@ -50,7 +50,7 @@
     <select id="findList" resultType="Post">
         SELECT
         <include refid="postColumns"/>
-        FROM t_sys_post a
+        FROM ${sysPrefix}t_sys_post a
         <where>
             a.status = #{status}
         </where>
@@ -67,7 +67,7 @@
     <select id="findAllList" resultType="Post">
         SELECT
         <include refid="postColumns"/>
-        FROM t_sys_post a
+        FROM ${sysPrefix}t_sys_post a
         <where>
         </where>
         <choose>
@@ -91,8 +91,8 @@
     <select id="findQuery" resultType="Post">
         SELECT DISTINCT
         <include refid="postColumns"/>
-        FROM t_sys_post a
-        LEFT JOIN t_sys_post_organ po ON po.post_id = a.id
+        FROM ${sysPrefix}t_sys_post a
+        LEFT JOIN ${sysPrefix}t_sys_post_organ po ON po.post_id = a.id
         <where>
             a.status = #{status}
             <if test="organId != null and organId !=''">
@@ -131,8 +131,8 @@
     <select id="findPostsByOrganId" resultType="Post">
         SELECT DISTINCT
         <include refid="postColumns"/>
-        FROM t_sys_post a
-        LEFT JOIN t_sys_post_organ po ON po.post_id = a.id
+        FROM ${sysPrefix}t_sys_post a
+        LEFT JOIN ${sysPrefix}t_sys_post_organ po ON po.post_id = a.id
         <where>
             a.status = '0'
             AND (a.organ_id = #{organId} OR po.organ_id = #{organId})
@@ -143,8 +143,8 @@
     <select id="findPostsByOrganIds" resultType="Post">
         SELECT DISTINCT
         <include refid="postColumns"/>
-        FROM t_sys_post a
-        LEFT JOIN t_sys_post_organ po ON po.post_id = a.id
+        FROM ${sysPrefix}t_sys_post a
+        LEFT JOIN ${sysPrefix}t_sys_post_organ po ON po.post_id = a.id
         <where>
             a.status = '0'
             AND (a.organ_id IN <foreach collection="organIds" open="(" separator="," close=")" item="item">#{item}</foreach>
@@ -156,8 +156,8 @@
     <select id="findPostsByUserId" resultType="Post">
         SELECT
         <include refid="postColumns"/>
-        FROM t_sys_post a
-        INNER JOIN t_sys_user_post up ON up.post_id = a.id
+        FROM ${sysPrefix}t_sys_post a
+        INNER JOIN ${sysPrefix}t_sys_user_post up ON up.post_id = a.id
         <where>
             a.status = #{status}
             AND up.user_id = #{userId}
@@ -170,8 +170,8 @@
     <select id="findPostIdsByUserId" resultType="java.lang.String">
         SELECT
         a.id
-        FROM t_sys_post a
-        INNER JOIN t_sys_user_post up ON up.post_id = a.id
+        FROM ${sysPrefix}t_sys_post a
+        INNER JOIN ${sysPrefix}t_sys_user_post up ON up.post_id = a.id
         <where>
             a.status = #{status}
             AND up.user_id = #{userId}
@@ -185,7 +185,7 @@
     <select id="findByWhereSQL" resultType="Post">
         SELECT
         <include refid="postColumns"/>
-        FROM t_sys_post a
+        FROM ${sysPrefix}t_sys_post a
         <where>
             ${whereSQL}
         </where>
@@ -196,12 +196,12 @@
     <select id="findBySql" resultType="Post">
         SELECT
         <include refid="postColumns"/>
-        FROM t_sys_post a
+        FROM ${sysPrefix}t_sys_post a
         ${sql}
     </select>
 
     <insert id="insert">
-        INSERT INTO t_sys_post(
+        INSERT INTO ${sysPrefix}t_sys_post(
         id,
         status,
         version,
@@ -231,7 +231,7 @@
     </insert>
 
     <insert id="insertBatch">
-        INSERT INTO t_sys_post(
+        INSERT INTO ${sysPrefix}t_sys_post(
         id,
         status,
         version,
@@ -261,7 +261,7 @@
     </insert>
 
     <update id="update">
-        UPDATE t_sys_post SET
+        UPDATE ${sysPrefix}t_sys_post SET
         status = #{status},
         version = version +1,
         update_user = #{updateUser},
@@ -275,7 +275,7 @@
     </update>
 
     <delete id="delete">
-        UPDATE t_sys_post SET
+        UPDATE ${sysPrefix}t_sys_post SET
         status = #{STATUS_DELETE},
         version = version +1,
         update_user = #{updateUser},
@@ -284,22 +284,22 @@
     </delete>
 
     <delete id="clear">
-        DELETE FROM t_sys_post
+        DELETE FROM ${sysPrefix}t_sys_post
         WHERE id = #{id}
     </delete>
 
     <delete id="clearAll">
-        DELETE FROM t_sys_post
+        DELETE FROM ${sysPrefix}t_sys_post
     </delete>
 
 
     <!--岗位机构-->
     <delete id="deletePostOrgansByPostId">
-        DELETE FROM t_sys_post_organ WHERE post_id = #{id}
+        DELETE FROM ${sysPrefix}t_sys_post_organ WHERE post_id = #{id}
     </delete>
 
     <insert id="insertPostOrgans">
-        INSERT INTO t_sys_post_organ(post_id, organ_id) VALUES
+        INSERT INTO ${sysPrefix}t_sys_post_organ(post_id, organ_id) VALUES
         <foreach item="item" collection="ids" separator=",">
             (#{id}, #{item})
         </foreach>
@@ -309,26 +309,26 @@
 
     <!--岗位用户-->
     <delete id="deletePostUsersByPostId">
-        DELETE FROM t_sys_user_post WHERE post_id = #{id}
+        DELETE FROM ${sysPrefix}t_sys_user_post WHERE post_id = #{id}
     </delete>
 
     <delete id="deletePostUsersByPostIdAndOrganId">
-        DELETE FROM t_sys_user_post WHERE post_id = #{id} AND organ_id = #{organId}
+        DELETE FROM ${sysPrefix}t_sys_user_post WHERE post_id = #{id} AND organ_id = #{organId}
     </delete>
 
     <delete id="deletePostUsersByPostIdAndUserId">
-        DELETE FROM t_sys_user_post WHERE post_id = #{id} AND user_id = #{userId}
+        DELETE FROM ${sysPrefix}t_sys_user_post WHERE post_id = #{id} AND user_id = #{userId}
     </delete>
 
     <delete id="deletePostUsersByPostIdAndOrganIdAndUserIds">
-        DELETE FROM t_sys_user_post WHERE post_id = #{id} AND organ_id = #{organId} AND user_id IN
+        DELETE FROM ${sysPrefix}t_sys_user_post WHERE post_id = #{id} AND organ_id = #{organId} AND user_id IN
         <foreach item="item" collection="ids" open="(" separator="," close=")">
             #{item}
         </foreach>
     </delete>
 
     <insert id="insertPostUsers">
-        INSERT INTO t_sys_user_post(post_id, user_id,organ_id) VALUES
+        INSERT INTO ${sysPrefix}t_sys_user_post(post_id, user_id,organ_id) VALUES
         <foreach item="item" collection="ids" separator=",">
             (#{id}, #{item},#{organId})
         </foreach>

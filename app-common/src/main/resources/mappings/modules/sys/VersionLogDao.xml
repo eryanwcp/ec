@@ -32,7 +32,7 @@
 	<select id="get" resultType="VersionLog">
 		SELECT
 		<include refid="sysVersionLogColumns"/>
-		FROM t_sys_version_log a
+		FROM ${sysPrefix}t_sys_version_log a
 		<include refid="sysVersionLogJoins"/>
 		WHERE a.id = #{id}
 	</select>
@@ -41,7 +41,7 @@
 	<select id="getByVersionCode" resultType="VersionLog">
 		SELECT
 		<include refid="sysVersionLogColumns"/>
-		FROM t_sys_version_log a
+		FROM ${sysPrefix}t_sys_version_log a
 		<include refid="sysVersionLogJoins"/>
 		WHERE
 		a.status = #{status}
@@ -60,7 +60,7 @@
 	<select id="getByVersionName" resultType="VersionLog">
 		SELECT
 		<include refid="sysVersionLogColumns"/>
-		FROM t_sys_version_log a
+		FROM ${sysPrefix}t_sys_version_log a
 		<include refid="sysVersionLogJoins"/>
 		WHERE
 		a.status = #{status}
@@ -79,7 +79,7 @@
 	<select id="getLatestVersionLog" resultType="VersionLog">
 		SELECT
 		<include refid="sysVersionLogColumns"/>
-		FROM t_sys_version_log a
+		FROM ${sysPrefix}t_sys_version_log a
 		<include refid="sysVersionLogJoins"/>
 		<where>
 			a.status = #{status}
@@ -93,7 +93,7 @@
 			<if test="isShelf != null and isShelf !=''">
 				AND a.is_shelf = #{isShelf}
 			</if>
-			AND a.version_code = (SELECT MAX(CAST(c.version_code AS signed)) FROM t_sys_version_log c WHERE c.version_log_type = #{versionLogType} AND c.status = #{status}
+			AND a.version_code = (SELECT MAX(CAST(c.version_code AS signed)) FROM ${sysPrefix}t_sys_version_log c WHERE c.version_log_type = #{versionLogType} AND c.status = #{status}
 			<if test="app != null and app !=''">
 				AND c.app = #{app}
 			</if>
@@ -112,7 +112,7 @@
 	<select id="findList" resultType="VersionLog">
 		SELECT
 		<include refid="sysVersionLogColumns"/>
-		FROM t_sys_version_log a
+		FROM ${sysPrefix}t_sys_version_log a
 		<include refid="sysVersionLogJoins"/>
 		<where>
 			a.status = #{status}
@@ -136,7 +136,7 @@
 	<select id="findQueryList" resultType="VersionLog">
 		SELECT
 		<include refid="sysVersionLogColumns"/>
-		FROM t_sys_version_log a
+		FROM ${sysPrefix}t_sys_version_log a
 		<include refid="sysVersionLogJoins"/>
 		<where>
 			a.status = #{status}
@@ -199,7 +199,7 @@
 	<select id="findAllList" resultType="VersionLog">
 		SELECT
 		<include refid="sysVersionLogColumns"/>
-		FROM t_sys_version_log a
+		FROM ${sysPrefix}t_sys_version_log a
 		<include refid="sysVersionLogJoins"/>
 		<where>
 			a.status = #{status}
@@ -223,7 +223,7 @@
 	</select>
 
 	<insert id="insert">
-		INSERT INTO t_sys_version_log(
+		INSERT INTO ${sysPrefix}t_sys_version_log(
         id,
         status,
         version,
@@ -262,7 +262,7 @@
         )
 	</insert>
 	<insert id="insertBatch">
-		INSERT INTO t_sys_version_log(
+		INSERT INTO ${sysPrefix}t_sys_version_log(
         id,
         status,
         version,
@@ -302,7 +302,7 @@
 	</insert>
 
 	<update id="update">
-		UPDATE t_sys_version_log SET
+		UPDATE ${sysPrefix}t_sys_version_log SET
         status = #{status},
         version = version +1,
         update_user = #{updateUser},
@@ -321,7 +321,7 @@
 	</update>
 
 	<update id="delete">
-		 UPDATE t_sys_version_log SET
+		 UPDATE ${sysPrefix}t_sys_version_log SET
         status = #{STATUS_DELETE},
         version = version +1,
         update_user = #{updateUser},
@@ -330,12 +330,12 @@
 	</update>
 
 	<delete id="clear">
-		DELETE FROM t_sys_version_log
+		DELETE FROM ${sysPrefix}t_sys_version_log
 		WHERE id = #{id}
 	</delete>
 
 	<delete id="clearAll">
-		DELETE FROM t_sys_version_log
+		DELETE FROM ${sysPrefix}t_sys_version_log
 	</delete>
 
 

@@ -23,21 +23,21 @@
     <select id="get" resultType="Role">
         SELECT
         <include refid="roleColumns"/>
-        FROM t_sys_role a
+        FROM ${sysPrefix}t_sys_role a
         WHERE a.id = #{id}
     </select>
 
     <select id="getByCode" resultType="Role">
         SELECT
         <include refid="roleColumns"/>
-        FROM t_sys_role a
+        FROM ${sysPrefix}t_sys_role a
         WHERE a.status = '0' AND a.code = #{code}
     </select>
 
     <select id="findList" resultType="Role">
         SELECT
         <include refid="roleColumns"/>
-        FROM t_sys_role a
+        FROM ${sysPrefix}t_sys_role a
         <where>
             a.status = #{status}
             <if test="query != null and query !=''">
@@ -72,7 +72,7 @@
     <select id="findAllList" resultType="Role">
         SELECT
         <include refid="roleColumns"/>
-        FROM t_sys_role a
+        FROM ${sysPrefix}t_sys_role a
         <where>
         </where>
         <choose>
@@ -96,7 +96,7 @@
     <select id="findRolesByIds" resultType="Role">
         SELECT
         <include refid="roleColumns"/>
-        FROM t_sys_role a
+        FROM ${sysPrefix}t_sys_role a
         <where>
             a.id IN <foreach collection="ids" item="item" open="(" separator="," close=")">#{item}</foreach>
         </where>
@@ -105,7 +105,7 @@
     <select id="findRolesByOrganId" resultType="Role">
         SELECT
         <include refid="roleColumns"/>
-        FROM t_sys_role a
+        FROM ${sysPrefix}t_sys_role a
         <where>
             a.status = '0'
             AND a.organ_id = #{organId}
@@ -115,8 +115,8 @@
     <select id="findRolesByResourceId" resultType="Role">
         SELECT
         <include refid="roleColumns"/>
-        FROM t_sys_role a
-        INNER JOIN t_sys_role_resource rr ON rr.role_id = a.id
+        FROM ${sysPrefix}t_sys_role a
+        INNER JOIN ${sysPrefix}t_sys_role_resource rr ON rr.role_id = a.id
         <where>
             a.status = #{status}
             AND rr.resource_id = #{resourceId}
@@ -127,8 +127,8 @@
     <select id="findRolesByUserId" resultType="Role">
         SELECT
         <include refid="roleColumns"/>
-        FROM t_sys_role a
-        INNER JOIN t_sys_user_role ur ON ur.role_id = a.id
+        FROM ${sysPrefix}t_sys_role a
+        INNER JOIN ${sysPrefix}t_sys_user_role ur ON ur.role_id = a.id
         <where>
             a.status = '0'
             AND ur.user_id = #{userId}
@@ -139,8 +139,8 @@
     <select id="findRoleIdsByUserId" resultType="java.lang.String">
         SELECT
         a.id
-        FROM t_sys_role a
-        INNER JOIN t_sys_user_role ur ON ur.role_id = a.id
+        FROM ${sysPrefix}t_sys_role a
+        INNER JOIN ${sysPrefix}t_sys_user_role ur ON ur.role_id = a.id
         <where>
             a.status = '0'
             AND ur.user_id = #{userId}
@@ -151,17 +151,17 @@
     <select id="findOrganRolesAndSystemNormalRoles" resultType="Role">
         SELECT
         <include refid="roleColumns"/>
-        FROM t_sys_role a
+        FROM ${sysPrefix}t_sys_role a
         <where>
             a.status = '0'
-            AND (a.organ_id = #{organId} OR a.id IN (SELECT role_id FROM t_sys_role_organ WHERE organ_id = #{organId} ) OR (a.is_system = #{isSystem} AND a.role_type = #{roleType}))
+            AND (a.organ_id = #{organId} OR a.id IN (SELECT role_id FROM ${sysPrefix}t_sys_role_organ WHERE organ_id = #{organId} ) OR (a.is_system = #{isSystem} AND a.role_type = #{roleType}))
         </where>
     </select>
 
     <select id="findByWhereSQL" resultType="Role">
         SELECT
         <include refid="roleColumns"/>
-        FROM t_sys_role a
+        FROM ${sysPrefix}t_sys_role a
         <where>
             ${whereSQL}
         </where>
@@ -171,12 +171,12 @@
     <select id="findBySql" resultType="Role">
         SELECT
         <include refid="roleColumns"/>
-        FROM t_sys_role a
+        FROM ${sysPrefix}t_sys_role a
         ${sql}
     </select>
 
     <insert id="insert">
-        INSERT INTO t_sys_role(
+        INSERT INTO ${sysPrefix}t_sys_role(
         id,
         status,
         version,
@@ -212,7 +212,7 @@
     </insert>
 
     <insert id="insertBatch">
-        INSERT INTO t_sys_role(
+        INSERT INTO ${sysPrefix}t_sys_role(
         id,
         status,
         version,
@@ -248,7 +248,7 @@
     </insert>
 
     <update id="update">
-        UPDATE t_sys_role SET
+        UPDATE ${sysPrefix}t_sys_role SET
         status = #{status},
         version = version +1,
         update_user = #{updateUser},
@@ -265,7 +265,7 @@
     </update>
 
     <delete id="delete">
-        UPDATE t_sys_role SET
+        UPDATE ${sysPrefix}t_sys_role SET
         status = #{STATUS_DELETE},
         version = version +1,
         update_user = #{updateUser},
@@ -274,22 +274,22 @@
     </delete>
 
     <delete id="clear">
-        DELETE FROM t_sys_role
+        DELETE FROM ${sysPrefix}t_sys_role
         WHERE id = #{id}
     </delete>
 
     <delete id="clearAll">
-        DELETE FROM t_sys_role
+        DELETE FROM ${sysPrefix}t_sys_role
     </delete>
 
 
     <!--角色机构-->
     <delete id="deleteRoleOrgansByRoleId">
-        DELETE FROM t_sys_role_organ WHERE role_id = #{id}
+        DELETE FROM ${sysPrefix}t_sys_role_organ WHERE role_id = #{id}
     </delete>
 
     <insert id="insertRoleOrgans">
-        INSERT INTO t_sys_role_organ(role_id, organ_id) VALUES
+        INSERT INTO ${sysPrefix}t_sys_role_organ(role_id, organ_id) VALUES
         <foreach item="item" collection="ids" separator=",">
             (#{id}, #{item})
         </foreach>
@@ -297,7 +297,7 @@
 
     <select id="findRoleOrganIds" resultType="java.lang.String">
         SELECT a.organ_id
-        FROM t_sys_role_organ a
+        FROM ${sysPrefix}t_sys_role_organ a
         WHERE a.role_id = #{id}
     </select>
     <!--角色机构-->
@@ -305,11 +305,11 @@
 
     <!--角色机构（数据权限）-->
     <delete id="deleteRoleDataOrgansByRoleId">
-        DELETE FROM t_sys_role_data_organ WHERE role_id = #{id}
+        DELETE FROM ${sysPrefix}t_sys_role_data_organ WHERE role_id = #{id}
     </delete>
 
     <insert id="insertRoleDataOrgans">
-        INSERT INTO t_sys_role_data_organ(role_id, organ_id) VALUES
+        INSERT INTO ${sysPrefix}t_sys_role_data_organ(role_id, organ_id) VALUES
         <foreach item="item" collection="ids" separator=",">
             (#{id}, #{item})
         </foreach>
@@ -317,7 +317,7 @@
 
     <select id="findRoleDataOrganIds" resultType="java.lang.String">
         SELECT a.organ_id
-        FROM t_sys_role_data_organ a
+        FROM ${sysPrefix}t_sys_role_data_organ a
         WHERE a.role_id = #{id}
     </select>
     <!--角色机构（数据权限）-->
@@ -325,18 +325,18 @@
 
     <!--角色用户-->
     <delete id="deleteRoleUsersByRoleId">
-        DELETE FROM t_sys_user_role WHERE role_id = #{id}
+        DELETE FROM ${sysPrefix}t_sys_user_role WHERE role_id = #{id}
     </delete>
 
     <delete id="deleteRoleUsersByRoleIdANDUserIds">
-        DELETE FROM t_sys_user_role WHERE role_id = #{id} AND user_id IN
+        DELETE FROM ${sysPrefix}t_sys_user_role WHERE role_id = #{id} AND user_id IN
         <foreach item="item" collection="ids" open="(" separator="," close=")">
           #{item}
         </foreach>
     </delete>
 
     <insert id="insertRoleUsers">
-        INSERT INTO t_sys_user_role(role_id, user_id) VALUES
+        INSERT INTO ${sysPrefix}t_sys_user_role(role_id, user_id) VALUES
         <foreach item="item" collection="ids" separator=",">
             (#{id}, #{item})
         </foreach>
@@ -346,11 +346,11 @@
 
     <!--角色资源-->
     <delete id="deleteRoleResourcesByRoleId">
-        DELETE FROM t_sys_role_resource WHERE role_id = #{id}
+        DELETE FROM ${sysPrefix}t_sys_role_resource WHERE role_id = #{id}
     </delete>
 
     <insert id="insertRoleResources">
-        INSERT INTO t_sys_role_resource(role_id, resource_id) VALUES
+        INSERT INTO ${sysPrefix}t_sys_role_resource(role_id, resource_id) VALUES
         <foreach item="item" collection="ids" separator=",">
             (#{id}, #{item})
         </foreach>
@@ -358,7 +358,7 @@
 
 
     <delete id="deleteRoleResourceByResourceIdAndRoleId">
-        DELETE FROM t_sys_role_resource WHERE resource_id = #{resourceId} AND role_id = #{roleId}
+        DELETE FROM ${sysPrefix}t_sys_role_resource WHERE resource_id = #{resourceId} AND role_id = #{roleId}
     </delete>
     <!--角色资源-->
 

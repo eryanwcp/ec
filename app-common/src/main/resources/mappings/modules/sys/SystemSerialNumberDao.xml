@@ -24,7 +24,7 @@
 	<select id="get" resultType="SystemSerialNumber">
 		SELECT
 		<include refid="systemSerialNumberColumns"/>
-		FROM t_sys_serial_number a
+		FROM ${sysPrefix}t_sys_serial_number a
 		WHERE a.id = #{id}
 	</select>
 
@@ -32,7 +32,7 @@
 	<select id="getByCode" resultType="SystemSerialNumber">
 		SELECT
 		<include refid="systemSerialNumberColumns"/>
-		FROM t_sys_serial_number a
+		FROM ${sysPrefix}t_sys_serial_number a
 		<where>
 			a.status = #{STATUS_NORMAL}
 			AND a.module_code = #{moduleCode}
@@ -45,7 +45,7 @@
 	<select id="findList" resultType="SystemSerialNumber">
 		SELECT
 		<include refid="systemSerialNumberColumns"/>
-		FROM t_sys_serial_number a
+		FROM ${sysPrefix}t_sys_serial_number a
 		<where>
 			a.status = #{STATUS_NORMAL}
 			<if test="app != null and app !=''">
@@ -74,7 +74,7 @@
 	<select id="findAllList" resultType="SystemSerialNumber">
 		SELECT
 		<include refid="systemSerialNumberColumns"/>
-		FROM t_sys_serial_number a
+		FROM ${sysPrefix}t_sys_serial_number a
 		WHERE a.status = #{STATUS_NORMAL}
 	</select>
 
@@ -87,7 +87,7 @@
 	</select>
 
 	<insert id="insert">
-		INSERT INTO t_sys_serial_number(
+		INSERT INTO ${sysPrefix}t_sys_serial_number(
 		id,
 		status,
 		version,
@@ -124,7 +124,7 @@
 		)
 	</insert>
 	<insert id="insertBatch">
-		INSERT INTO t_sys_serial_number(
+		INSERT INTO ${sysPrefix}t_sys_serial_number(
 		id,
 		status,
 		version,
@@ -162,7 +162,7 @@
 	</insert>
 
 	<update id="update">
-		UPDATE t_sys_serial_number SET
+		UPDATE ${sysPrefix}t_sys_serial_number SET
 		status = #{status},
 		version = version +1,
 		update_user = #{updateUser},
@@ -180,7 +180,7 @@
 	</update>
 
 	<update id="updateByVersion">
-		UPDATE t_sys_serial_number SET
+		UPDATE ${sysPrefix}t_sys_serial_number SET
 		version = version +1,
 		update_user = #{updateUser},
 		update_time = #{updateTime},
@@ -189,7 +189,7 @@
 	</update>
 
 	<update id="updateSerialNumber">
-		UPDATE t_sys_serial_number SET
+		UPDATE ${sysPrefix}t_sys_serial_number SET
 		version = #{version},
 		update_user = #{updateUser},
 		update_time = #{updateTime},
@@ -198,18 +198,18 @@
 	</update>
 
 	<update id="delete">
-		UPDATE t_sys_serial_number SET
+		UPDATE ${sysPrefix}t_sys_serial_number SET
 		status = #{STATUS_DELETE}
 		WHERE id = #{id}
 	</update>
 
 	<delete id="clear">
-		DELETE FROM t_sys_serial_number
+		DELETE FROM ${sysPrefix}t_sys_serial_number
 		WHERE id = #{id}
 	</delete>
 
 	<delete id="clearAll">
-		DELETE FROM t_sys_serial_number
+		DELETE FROM ${sysPrefix}t_sys_serial_number
 	</delete>
 
 </mapper>

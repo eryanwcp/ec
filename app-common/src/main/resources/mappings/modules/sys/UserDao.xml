@@ -41,14 +41,14 @@
     <select id="get" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
+        FROM ${sysPrefix}t_sys_user a
         WHERE a.id = #{id}
     </select>
 
     <select id="findByIds" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
+        FROM ${sysPrefix}t_sys_user a
         <where>
             <if test="ids != null and ids.size() !=0">
                 AND a.id IN
@@ -63,7 +63,7 @@
     <select id="findByLoginNames" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
+        FROM ${sysPrefix}t_sys_user a
         <where>
             a.status = '0'
             <if test="loginNames != null and loginNames.size() !=0">
@@ -80,7 +80,7 @@
     <select id="findByMobiles" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
+        FROM ${sysPrefix}t_sys_user a
         <where>
             a.status = '0'
             <if test="mobiles != null and mobiles.size() !=0">
@@ -96,7 +96,7 @@
     <select id="findByCodes" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
+        FROM ${sysPrefix}t_sys_user a
         <where>
             a.status = '0'
             <if test="codes != null and codes.size() !=0">
@@ -112,7 +112,7 @@
     <select id="findByLoginName" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
+        FROM ${sysPrefix}t_sys_user a
         <where>
             a.login_name = #{loginName}
             <if test="status != null and status !=''">
@@ -124,7 +124,7 @@
     <select id="getUserByMobile" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
+        FROM ${sysPrefix}t_sys_user a
         <where>
             a.mobile = #{mobile}
             <if test="status != null and status !=''">
@@ -137,7 +137,7 @@
     <select id="getUserByIdOrMobile" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
+        FROM ${sysPrefix}t_sys_user a
         <where>
             (a.id = #{idOrMobile} OR a.login_name = #{idOrMobile} OR a.mobile = #{idOrMobile})
             <if test="status != null and status !=''">
@@ -149,7 +149,7 @@
     <select id="getUserByIdOrLoginName" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
+        FROM ${sysPrefix}t_sys_user a
         <where>
             (a.id = #{id} OR a.login_name = #{loginName})
             <if test="status != null and status !=''">
@@ -162,7 +162,7 @@
     <select id="getUserByLoginNameOrMobile" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
+        FROM ${sysPrefix}t_sys_user a
         <where>
             (a.login_name = #{loginNameOrMobile} OR a.mobile = #{loginNameOrMobile})
             <if test="status != null and status !=''">
@@ -174,7 +174,7 @@
     <select id="getUserByBizCode" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
+        FROM ${sysPrefix}t_sys_user a
         <where>
             a.biz_code = #{bizCode}
             <if test="status != null and status !=''">
@@ -186,7 +186,7 @@
     <select id="findByCode" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
+        FROM ${sysPrefix}t_sys_user a
         <where>
             <if test="status != null and status !=''">
                 AND a.status = #{status}
@@ -199,8 +199,8 @@
     <select id="findByName" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
-        LEFT JOIN t_sys_organ_extend o ON o.id = a.default_organ_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = a.default_organ_id
         <where>
             <if test="status != null and status !=''">
                 AND a.status = #{status}
@@ -218,7 +218,7 @@
     <select id="findByLoginNameOrCode" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
+        FROM ${sysPrefix}t_sys_user a
         <where>
             a.status = #{status}
             <choose>
@@ -241,7 +241,7 @@
     <select id="findByLoginNameOrMobile" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
+        FROM ${sysPrefix}t_sys_user a
         <where>
             <if test="status != null and status !=''">
                 AND a.status = #{status}
@@ -266,7 +266,7 @@
     <select id="findByLoginNameOrCodeOrMobile" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
+        FROM ${sysPrefix}t_sys_user a
         <where>
             <if test="status != null and status !=''">
                 AND a.status = #{status}
@@ -304,9 +304,9 @@
     <select id="findByPasswords" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
+        FROM ${sysPrefix}t_sys_user a
         <if test="parentOrganId != null and parentOrganId !=''">
-            LEFT JOIN t_sys_organ_extend o ON o.id = a.default_organ_id
+            LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = a.default_organ_id
         </if>
         <where>
             <if test="status != null and status !=''">
@@ -361,7 +361,7 @@
     <select id="findLoginUser" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
+        FROM ${sysPrefix}t_sys_user a
         WHERE a.status = '0'
         <choose>
             <when test="loginName != null and loginName != '' and mobile != null and mobile != ''">
@@ -398,7 +398,7 @@
     <select id="findList" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
+        FROM ${sysPrefix}t_sys_user a
         <where>
             a.status = #{status}
             <if test="query != null and query !=''">
@@ -431,7 +431,7 @@
     <select id="findAllList" resultType="User" useCache="false">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
+        FROM ${sysPrefix}t_sys_user a
         <where>
             <if test="status != null and status !=''">
                 AND a.status = #{status}
@@ -461,9 +461,9 @@
     <select id="findQuery" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
-        LEFT JOIN t_sys_user_organ uo ON uo.user_id = a.id
-        LEFT JOIN t_sys_organ o ON o.id = uo.organ_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_user_organ uo ON uo.user_id = a.id
+        LEFT JOIN ${sysPrefix}t_sys_organ o ON o.id = uo.organ_id
         <where>
             a.status <![CDATA[ <> ]]> '1'
             AND (o.id = #{organId}  OR o.parent_ids LIKE
@@ -508,7 +508,7 @@
     <select id="findAllNormalUserIds" resultType="java.lang.String">
         SELECT
         a.id
-        FROM t_sys_user a
+        FROM ${sysPrefix}t_sys_user a
         <where>
             AND a.status = '0'
         </where>
@@ -521,9 +521,9 @@
          o.name AS "defaultOrganName",
          o.company_id AS "companyId",
          o.home_company_id AS "homeCompanyId"
-        FROM t_sys_user a
-        LEFT JOIN t_sys_user_organ uo ON uo.user_id = a.id
-        LEFT JOIN t_sys_organ_extend o ON o.id = uo.organ_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_user_organ uo ON uo.user_id = a.id
+        LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = uo.organ_id
         <where>
             AND a.status = '0'
             <if test="query != null and query !=''">
@@ -558,9 +558,9 @@
         o.name AS "defaultOrganName",
         o.company_id AS "companyId",
         o.home_company_id AS "homeCompanyId"
-        FROM t_sys_user a
-        LEFT JOIN t_sys_user_organ uo ON uo.user_id = a.id
-        LEFT JOIN t_sys_organ_extend o ON o.id = uo.organ_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_user_organ uo ON uo.user_id = a.id
+        LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = uo.organ_id
         <where>
             AND a.status = '0'
             <if test="userIds != null and userIds.size() !=0">
@@ -576,7 +576,7 @@
     <select id="findUsersByIds" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
+        FROM ${sysPrefix}t_sys_user a
         <where>
             a.id IN <foreach collection="ids" item="item" open="(" separator="," close=")">#{item}</foreach>
         </where>
@@ -587,9 +587,9 @@
     <select id="findUsersByOrgan" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
-        LEFT JOIN t_sys_user_organ uo ON uo.user_id = a.id
-        LEFT JOIN t_sys_organ_extend o ON o.id = uo.organ_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_user_organ uo ON uo.user_id = a.id
+        LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = uo.organ_id
         <where>
             a.status = #{status}
             AND (o.id = #{organId}  OR o.parent_ids LIKE
@@ -630,9 +630,9 @@
     <select id="findUsersByOrganIds" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
-        LEFT JOIN t_sys_user_organ uo ON uo.user_id = a.id
-        LEFT JOIN t_sys_organ_extend o ON o.id = uo.organ_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_user_organ uo ON uo.user_id = a.id
+        LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = uo.organ_id
         <where>
             a.status = #{status}
             AND o.id IN <foreach collection="organIds" item="item" open="(" separator="," close=")">#{item}</foreach>
@@ -643,9 +643,9 @@
     <select id="findUsersIdsByOrganIds" resultType="java.lang.String">
         SELECT
         a.id
-        FROM t_sys_user a
-        LEFT JOIN t_sys_user_organ uo ON uo.user_id = a.id
-        LEFT JOIN t_sys_organ_extend o ON o.id = uo.organ_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_user_organ uo ON uo.user_id = a.id
+        LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = uo.organ_id
         <where>
             a.status = #{status}
             AND o.id IN <foreach collection="organIds" item="item" open="(" separator="," close=")">#{item}</foreach>
@@ -656,9 +656,9 @@
     <select id="findUsersLoginNamesByOrganIds" resultType="java.lang.String">
         SELECT
         a.login_name
-        FROM t_sys_user a
-        LEFT JOIN t_sys_user_organ uo ON uo.user_id = a.id
-        LEFT JOIN t_sys_organ_extend o ON o.id = uo.organ_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_user_organ uo ON uo.user_id = a.id
+        LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = uo.organ_id
         <where>
             a.status = #{status}
             AND o.id IN <foreach collection="organIds" item="item" open="(" separator="," close=")">#{item}</foreach>
@@ -672,9 +672,9 @@
         o.name AS "defaultOrganName",
         o.company_id AS "companyId",
         o.home_company_id AS "homeCompanyId"
-        FROM t_sys_user a
-        LEFT JOIN t_sys_user_organ uo ON uo.user_id = a.id
-        LEFT JOIN t_sys_organ_extend o ON o.id = uo.organ_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_user_organ uo ON uo.user_id = a.id
+        LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = uo.organ_id
         <where>
             a.status = #{status}
             AND (o.id = #{organId} OR o.parent_ids LIKE
@@ -705,9 +705,9 @@
     <select id="findOwnerAndChildsUsersIds" resultType="java.lang.String">
         SELECT
         a.id
-        FROM t_sys_user a
-        LEFT JOIN t_sys_user_organ uo ON uo.user_id = a.id
-        LEFT JOIN t_sys_organ_extend o ON o.id = uo.organ_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_user_organ uo ON uo.user_id = a.id
+        LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = uo.organ_id
         <where>
             a.status = #{status}
             AND (o.id = #{organId}  OR o.parent_ids LIKE
@@ -738,9 +738,9 @@
     <select id="findOrganUsersByOrganId" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
-        LEFT JOIN t_sys_user_organ uo ON uo.user_id = a.id
-        LEFT JOIN t_sys_organ_extend o ON o.id = uo.organ_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_user_organ uo ON uo.user_id = a.id
+        LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = uo.organ_id
         <where>
             AND a.status = '0'
             AND o.id = #{organId}
@@ -751,9 +751,9 @@
     <select id="findOrganUsersByOrganCode" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
-        LEFT JOIN t_sys_user_organ uo ON uo.user_id = a.id
-        LEFT JOIN t_sys_organ_extend o ON o.id = uo.organ_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_user_organ uo ON uo.user_id = a.id
+        LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = uo.organ_id
         <where>
             AND a.status = '0' AND o.status = '0'
             AND o.code = #{organCode}
@@ -765,7 +765,7 @@
     <select id="findOrganUserCount" resultType="java.lang.Integer">
         SELECT
         count(*)
-        FROM t_sys_user a
+        FROM ${sysPrefix}t_sys_user a
         <where>
             AND a.status = '0'
             AND a.default_organ_id = #{organId}
@@ -775,9 +775,9 @@
     <select id="findOrganUserIds" resultType="java.lang.String">
         SELECT
         a.id
-        FROM t_sys_user a
-        LEFT JOIN t_sys_user_organ uo ON uo.user_id = a.id
-        LEFT JOIN t_sys_organ_extend o ON o.id = uo.organ_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_user_organ uo ON uo.user_id = a.id
+        LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = uo.organ_id
         <where>
             AND a.status = '0'
             AND o.id = #{organId}
@@ -788,8 +788,8 @@
     <select id="findOrganDefaultUsers" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
-        LEFT JOIN t_sys_organ_extend o ON o.id = a.default_organ_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = a.default_organ_id
         <where>
             AND a.status = '0'
             AND o.id = #{organId}
@@ -800,8 +800,8 @@
     <select id="findOrganDefaultUserIds" resultType="java.lang.String">
         SELECT
         a.id
-        FROM t_sys_user a
-        LEFT JOIN t_sys_organ_extend o ON o.id = a.default_organ_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = a.default_organ_id
         <where>
             AND a.status = '0'
             AND o.id = #{organId}
@@ -812,9 +812,9 @@
     <select id="findUsersByCompanyId" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
-        LEFT JOIN t_sys_user_organ uo ON uo.user_id = a.id
-        LEFT JOIN t_sys_organ_extend o ON o.id = uo.organ_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_user_organ uo ON uo.user_id = a.id
+        LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = uo.organ_id
         <where>
             a.status = #{status}
             AND o.company_id = #{companyId}
@@ -831,9 +831,9 @@
     <select id="findUserIdsByCompanyId" resultType="java.lang.String">
         SELECT
         a.id
-        FROM t_sys_user a
-        LEFT JOIN t_sys_user_organ uo ON uo.user_id = a.id
-        LEFT JOIN t_sys_organ_extend o ON o.id = uo.organ_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_user_organ uo ON uo.user_id = a.id
+        LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = uo.organ_id
         <where>
             a.status = #{status}
             AND o.company_id = #{companyId}
@@ -850,9 +850,9 @@
     <select id="findUsersByHomeCompanyId" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
-        LEFT JOIN t_sys_user_organ uo ON uo.user_id = a.id
-        LEFT JOIN t_sys_organ_extend o ON o.id = uo.organ_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_user_organ uo ON uo.user_id = a.id
+        LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = uo.organ_id
         <where>
             a.status = #{status}
             AND o.home_company_id = #{homeCompanyId}
@@ -869,9 +869,9 @@
     <select id="findUserIdsByHomeCompanyId" resultType="java.lang.String">
         SELECT
         a.id
-        FROM t_sys_user a
-        LEFT JOIN t_sys_user_organ uo ON uo.user_id = a.id
-        LEFT JOIN t_sys_organ_extend o ON o.id = uo.organ_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_user_organ uo ON uo.user_id = a.id
+        LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = uo.organ_id
         <where>
             a.status = #{status}
             AND o.home_company_id = #{homeCompanyId}
@@ -888,9 +888,9 @@
     <select id="findUsersByRoleId" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
-        LEFT JOIN t_sys_user_role ur ON ur.user_id = a.id
-        LEFT JOIN t_sys_role r ON r.id = ur.role_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_user_role ur ON ur.user_id = a.id
+        LEFT JOIN ${sysPrefix}t_sys_role r ON r.id = ur.role_id
         <where>
             a.status = #{status}
             AND r.id = #{roleId}
@@ -901,9 +901,9 @@
     <select id="findUsersByRoleCode" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
-        LEFT JOIN t_sys_user_role ur ON ur.user_id = a.id
-        LEFT JOIN t_sys_role r ON r.id = ur.role_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_user_role ur ON ur.user_id = a.id
+        LEFT JOIN ${sysPrefix}t_sys_role r ON r.id = ur.role_id
         <where>
             a.status = #{status}
             AND r.status = #{status}
@@ -915,9 +915,9 @@
     <select id="findUserIdsByRoleId" resultType="java.lang.String">
         SELECT
         a.id
-        FROM t_sys_user a
-        LEFT JOIN t_sys_user_role ur ON ur.user_id = a.id
-        LEFT JOIN t_sys_role r ON r.id = ur.role_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_user_role ur ON ur.user_id = a.id
+        LEFT JOIN ${sysPrefix}t_sys_role r ON r.id = ur.role_id
         <where>
             a.status = #{status}
             AND r.id = #{roleId}
@@ -928,10 +928,10 @@
     <select id="findUsersByRole" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
-        LEFT JOIN t_sys_organ_extend o ON o.id = a.default_organ_id
-        LEFT JOIN t_sys_user_role ur ON ur.user_id = a.id
-        LEFT JOIN t_sys_role r ON r.id = ur.role_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = a.default_organ_id
+        LEFT JOIN ${sysPrefix}t_sys_user_role ur ON ur.user_id = a.id
+        LEFT JOIN ${sysPrefix}t_sys_role r ON r.id = ur.role_id
         <where>
             a.status = #{status}
             AND r.id = #{roleId}
@@ -968,10 +968,10 @@
     <select id="findUsersByPost" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
-        LEFT JOIN t_sys_organ_extend o ON o.id = a.default_organ_id
-        LEFT JOIN t_sys_user_post up ON up.user_id = a.id
-        LEFT JOIN t_sys_post p ON p.id = up.post_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = a.default_organ_id
+        LEFT JOIN ${sysPrefix}t_sys_user_post up ON up.user_id = a.id
+        LEFT JOIN ${sysPrefix}t_sys_post p ON p.id = up.post_id
         <where>
             a.status = #{status}
             <if test="postId != null and postId !=''">
@@ -1012,9 +1012,9 @@
     <select id="findUserIdsByPost" resultType="java.lang.String">
         SELECT
         a.id
-        FROM t_sys_user a
-        LEFT JOIN t_sys_user_post up ON up.user_id = a.id
-        LEFT JOIN t_sys_post p ON p.id = up.post_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_user_post up ON up.user_id = a.id
+        LEFT JOIN ${sysPrefix}t_sys_post p ON p.id = up.post_id
         <where>
             a.status = #{status}
             <if test="postId != null and postId !=''">
@@ -1030,12 +1030,12 @@
     <select id="findListByPostAndOrgan" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
-        LEFT JOIN t_sys_user_post up ON up.user_id = a.id
-        LEFT JOIN t_sys_post p ON p.id = up.post_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_user_post up ON up.user_id = a.id
+        LEFT JOIN ${sysPrefix}t_sys_post p ON p.id = up.post_id
         <if test="organCode != null or companyId != null or companyCode != null or homeCompanyId != null or homeCompanyCode != null">
-            LEFT JOIN t_sys_user_organ uo ON uo.user_id = a.id
-            LEFT JOIN t_sys_organ_extend o ON o.id = uo.organ_id
+            LEFT JOIN ${sysPrefix}t_sys_user_organ uo ON uo.user_id = a.id
+            LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = uo.organ_id
         </if>
         <where>
             a.status = #{status}
@@ -1077,12 +1077,12 @@
     <select id="findUserIdsByPostAndOrgan" resultType="java.lang.String">
         SELECT
         DISTINCT a.id
-        FROM t_sys_user a
-        LEFT JOIN t_sys_user_post up ON up.user_id = a.id
-        LEFT JOIN t_sys_post p ON p.id = up.post_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_user_post up ON up.user_id = a.id
+        LEFT JOIN ${sysPrefix}t_sys_post p ON p.id = up.post_id
         <if test="organCode != null or companyId != null or companyCode != null or homeCompanyId != null or homeCompanyCode != null">
-            LEFT JOIN t_sys_user_organ uo ON uo.user_id = a.id
-            LEFT JOIN t_sys_organ_extend o ON o.id = uo.organ_id
+            LEFT JOIN ${sysPrefix}t_sys_user_organ uo ON uo.user_id = a.id
+            LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = uo.organ_id
         </if>
         <where>
             a.status = #{status}
@@ -1125,11 +1125,11 @@
     <select id="findOwnerAndChildsByPostAndOrgan" resultType="User">
         SELECT
         DISTINCT <include refid="userColumns"/>
-        FROM t_sys_user a
-        LEFT JOIN t_sys_user_post up ON up.user_id = a.id
-        LEFT JOIN t_sys_post p ON p.id = up.post_id
-        LEFT JOIN t_sys_user_organ uo ON uo.user_id = a.id
-        LEFT JOIN t_sys_organ_extend o ON o.id = uo.organ_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_user_post up ON up.user_id = a.id
+        LEFT JOIN ${sysPrefix}t_sys_post p ON p.id = up.post_id
+        LEFT JOIN ${sysPrefix}t_sys_user_organ uo ON uo.user_id = a.id
+        LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = uo.organ_id
         <where>
             a.status = #{status}
             <if test="postId != null and postId !=''">
@@ -1154,12 +1154,12 @@
     <select id="findUserLoginNamesByPostAndOrgan" resultType="java.lang.String">
         SELECT
         a.login_name
-        FROM t_sys_user a
-        LEFT JOIN t_sys_user_post up ON up.user_id = a.id
-        LEFT JOIN t_sys_post p ON p.id = up.post_id
+        FROM ${sysPrefix}t_sys_user a
+        LEFT JOIN ${sysPrefix}t_sys_user_post up ON up.user_id = a.id
+        LEFT JOIN ${sysPrefix}t_sys_post p ON p.id = up.post_id
         <if test="organCode != null and organCode !=''">
-            LEFT JOIN t_sys_user_organ uo ON uo.user_id = a.id
-            LEFT JOIN t_sys_organ_extend o ON o.id = uo.organ_id
+            LEFT JOIN ${sysPrefix}t_sys_user_organ uo ON uo.user_id = a.id
+            LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = uo.organ_id
         </if>
         <where>
             a.status = #{status}
@@ -1182,7 +1182,7 @@
 
     <select id="getMaxSort" resultType="java.lang.Integer">
         SELECT max(a.sort)
-        FROM t_sys_user a
+        FROM ${sysPrefix}t_sys_user a
         WHERE a.status = '0'
     </select>
 
@@ -1191,7 +1191,7 @@
     <select id="findByWhereSQL" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
+        FROM ${sysPrefix}t_sys_user a
         <where>
             ${whereSQL}
         </where>
@@ -1202,13 +1202,13 @@
     <select id="findBySql" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
+        FROM ${sysPrefix}t_sys_user a
         ${sql}
     </select>
 
 
     <insert id="insert">
-        INSERT INTO t_sys_user(
+        INSERT INTO ${sysPrefix}t_sys_user(
         id,
         status,
         version,
@@ -1273,7 +1273,7 @@
 
 
     <insert id="insertBatch">
-        INSERT INTO t_sys_user(
+        INSERT INTO ${sysPrefix}t_sys_user(
             id,
             status,
             version,
@@ -1337,7 +1337,7 @@
     </insert>
 
     <update id="update">
-        UPDATE t_sys_user SET
+        UPDATE ${sysPrefix}t_sys_user SET
         status = #{status},
         version = version +1,
         update_user = #{updateUser},
@@ -1369,7 +1369,7 @@
 
 
     <update id="updatePassword">
-        UPDATE t_sys_user SET
+        UPDATE ${sysPrefix}t_sys_user SET
         status = #{status},
         version = version +1,
         update_user = #{updateUser},
@@ -1389,7 +1389,7 @@
     </update>
 
     <delete id="delete">
-        UPDATE t_sys_user SET
+        UPDATE ${sysPrefix}t_sys_user SET
         status = #{STATUS_DELETE},
         version = version +1,
         update_user = #{updateUser},
@@ -1398,21 +1398,21 @@
     </delete>
 
     <delete id="clear">
-        DELETE FROM t_sys_user
+        DELETE FROM ${sysPrefix}t_sys_user
         WHERE id = #{id}
     </delete>
 
     <delete id="clearAll">
-        DELETE FROM t_sys_user
+        DELETE FROM ${sysPrefix}t_sys_user
     </delete>
 
     <!--用户机构-->
     <delete id="deleteUserOrgansByUserId">
-        DELETE FROM t_sys_user_organ WHERE user_id = #{id}
+        DELETE FROM ${sysPrefix}t_sys_user_organ WHERE user_id = #{id}
     </delete>
 
     <insert id="insertUserOrgans">
-        INSERT INTO t_sys_user_organ(user_id, organ_id) VALUES
+        INSERT INTO ${sysPrefix}t_sys_user_organ(user_id, organ_id) VALUES
         <foreach item="item" collection="ids" separator=",">
             (#{id}, #{item})
         </foreach>
@@ -1421,16 +1421,16 @@
 
     <!--用户岗位-->
     <delete id="deleteUserPostsByUserId">
-        DELETE FROM t_sys_user_post WHERE user_id = #{id}
+        DELETE FROM ${sysPrefix}t_sys_user_post WHERE user_id = #{id}
     </delete>
 
     <delete id="deleteUserPostsByUserIdAndOrganId">
-        DELETE FROM t_sys_user_post WHERE user_id = #{id} AND organ_id = #{organId}
+        DELETE FROM ${sysPrefix}t_sys_user_post WHERE user_id = #{id} AND organ_id = #{organId}
     </delete>
 
 
     <delete id="deleteNotInUserOrgansPostsByUserId">
-        DELETE FROM t_sys_user_post WHERE user_id = #{id} AND organ_id NOT IN
+        DELETE FROM ${sysPrefix}t_sys_user_post WHERE user_id = #{id} AND organ_id NOT IN
         <foreach collection="ids" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
@@ -1438,7 +1438,7 @@
 
 
     <insert id="insertUserPosts">
-        INSERT INTO t_sys_user_post(user_id, post_id,organ_id) VALUES
+        INSERT INTO ${sysPrefix}t_sys_user_post(user_id, post_id,organ_id) VALUES
         <foreach item="item" collection="ids" separator=",">
             (#{id}, #{item},#{organId})
         </foreach>
@@ -1448,11 +1448,11 @@
 
     <!--用户角色-->
     <delete id="deleteUserRolesByUserId">
-        DELETE FROM t_sys_user_role WHERE user_id = #{id}
+        DELETE FROM ${sysPrefix}t_sys_user_role WHERE user_id = #{id}
     </delete>
 
     <insert id="insertUserRoles">
-        INSERT INTO t_sys_user_role(user_id, role_id) VALUES
+        INSERT INTO ${sysPrefix}t_sys_user_role(user_id, role_id) VALUES
         <foreach item="item" collection="ids" separator=",">
             (#{id}, #{item})
         </foreach>
@@ -1462,11 +1462,11 @@
 
     <!--用户资源-->
     <delete id="deleteUserResourcesByUserId">
-        DELETE FROM t_sys_user_resource WHERE user_id = #{id}
+        DELETE FROM ${sysPrefix}t_sys_user_resource WHERE user_id = #{id}
     </delete>
 
     <insert id="insertUserResources">
-        INSERT INTO t_sys_user_resource(user_id, resource_id) VALUES
+        INSERT INTO ${sysPrefix}t_sys_user_resource(user_id, resource_id) VALUES
         <foreach item="item" collection="ids" separator=",">
             (#{id}, #{item})
         </foreach>
@@ -1475,15 +1475,15 @@
     <select id="findUsersByResourceId" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
+        FROM ${sysPrefix}t_sys_user a
         <where>
             a.status = #{status}
-            AND  a.id IN ( SELECT user_id FROM t_sys_user_resource WHERE resource_id = #{resourceId})
+            AND  a.id IN ( SELECT user_id FROM ${sysPrefix}t_sys_user_resource WHERE resource_id = #{resourceId})
         </where>
     </select>
 
     <delete id="deleteUserResourceByResourceIdAndUserId">
-        DELETE FROM t_sys_user_resource WHERE resource_id = #{resourceId} AND user_id = #{userId}
+        DELETE FROM ${sysPrefix}t_sys_user_resource WHERE resource_id = #{resourceId} AND user_id = #{userId}
     </delete>
     <!--用户资源-->
 </mapper>

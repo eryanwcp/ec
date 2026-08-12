@@ -51,14 +51,14 @@
     <select id="get" resultType="ContactGroup">
         SELECT
         <include refid="contactGroupColumns"/>
-        FROM t_notice_contact_group a
+        FROM ${noticePrefix}t_notice_contact_group a
         WHERE a.id = #{id}
     </select>
 
     <select id="checkExist" resultType="ContactGroup">
         SELECT
         <include refid="contactGroupColumns"/>
-        FROM t_notice_contact_group a
+        FROM ${noticePrefix}t_notice_contact_group a
         <where>
             a.status = #{status}
             AND a.user_id = #{userId}
@@ -76,13 +76,13 @@
 
     <select id="getMaxSort" resultType="java.lang.Integer">
         SELECT max(a.sort)
-        FROM t_notice_contact_group a
+        FROM ${noticePrefix}t_notice_contact_group a
     </select>
 
     <select id="findList" resultType="ContactGroup">
         SELECT
         <include refid="contactGroupColumns"/>
-        FROM t_notice_contact_group a
+        FROM ${noticePrefix}t_notice_contact_group a
         <where>
             a.status = #{status}
         </where>
@@ -99,7 +99,7 @@
     <select id="findAllList" resultType="ContactGroup">
         SELECT
         <include refid="contactGroupColumns"/>
-        FROM t_notice_contact_group a
+        FROM ${noticePrefix}t_notice_contact_group a
         <where>
         </where>
         <choose>
@@ -115,7 +115,7 @@
     <select id="findUserContactGroups" resultType="ContactGroup">
         SELECT
         <include refid="contactGroupColumns"/>
-        FROM t_notice_contact_group a
+        FROM ${noticePrefix}t_notice_contact_group a
         <where>
             a.status = #{status}
             <if test="userId != null and userId !=''">
@@ -147,9 +147,9 @@
     <select id="findContactGroupUsers" resultType="User">
         SELECT
         <include refid="userColumns"/>
-        FROM t_sys_user a
-        JOIN t_notice_contact_group_object cgo ON cgo.object_id = a.id
-        JOIN t_notice_contact_group cg ON cg.id = cgo.contact_group_id
+        FROM ${sysPrefix}t_sys_user a
+        JOIN ${noticePrefix}t_notice_contact_group_object cgo ON cgo.object_id = a.id
+        JOIN ${noticePrefix}t_notice_contact_group cg ON cg.id = cgo.contact_group_id
         <where>
             a.status = #{status}
             <if test="contactGroupId != null and contactGroupId !=''">
@@ -189,7 +189,7 @@
     </select>
 
     <insert id="insert">
-        INSERT INTO t_notice_contact_group(
+        INSERT INTO ${noticePrefix}t_notice_contact_group(
         id,
         status,
         version,
@@ -222,7 +222,7 @@
         )
     </insert>
     <insert id="insertBatch">
-        INSERT INTO t_notice_contact_group(
+        INSERT INTO ${noticePrefix}t_notice_contact_group(
         id,
         status,
         version,
@@ -256,7 +256,7 @@
     </insert>
 
     <update id="update">
-        UPDATE t_notice_contact_group SET
+        UPDATE ${noticePrefix}t_notice_contact_group SET
         status = #{status},
         version = version +1,
         update_user = #{updateUser},
@@ -272,7 +272,7 @@
     </update>
 
     <update id="delete">
-        UPDATE t_notice_contact_group SET
+        UPDATE ${noticePrefix}t_notice_contact_group SET
         status = #{STATUS_DELETE},
         version = version +1,
         update_user = #{updateUser},
@@ -281,23 +281,23 @@
     </update>
 
     <delete id="clear">
-        DELETE FROM t_notice_contact_group WHERE id = #{id}
+        DELETE FROM ${noticePrefix}t_notice_contact_group WHERE id = #{id}
     </delete>
 
     <delete id="clearAll">
-        DELETE FROM t_notice_contact_group
+        DELETE FROM ${noticePrefix}t_notice_contact_group
     </delete>
 
 
     <!--分组对象-->
     <select id="findObjectIdsByContactGroupId" resultType="java.lang.String">
 		SELECT a.object_id
-		FROM t_notice_contact_group_object a
+		FROM ${noticePrefix}t_notice_contact_group_object a
 		WHERE a.contact_group_id = #{contactGroupId}
 	</select>
 
     <delete id="deleteContactGroupObjects">
-        DELETE FROM t_notice_contact_group_object
+        DELETE FROM ${noticePrefix}t_notice_contact_group_object
         <where>
             <if test="id != null and id !=''">
                 AND contact_group_id = #{id}
@@ -309,7 +309,7 @@
     </delete>
 
     <insert id="insertContactGroupObjects">
-        INSERT INTO t_notice_contact_group_object(contact_group_id, object_id) VALUES
+        INSERT INTO ${noticePrefix}t_notice_contact_group_object(contact_group_id, object_id) VALUES
         <foreach item="item" collection="ids" separator=",">
             (#{id}, #{item})
         </foreach>
