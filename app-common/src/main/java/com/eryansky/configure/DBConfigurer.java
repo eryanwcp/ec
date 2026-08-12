@@ -39,6 +39,9 @@ import javax.sql.DataSource;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * DB configuration for data source, MyBatis and transaction management.
@@ -53,14 +56,52 @@ public class DBConfigurer {
     private static volatile Map<String, Object> mybatisMap;
     public static final String TX_MANAGER_NAME = "transactionManager";
 
+    /**
+     * 获取 MyBatis 配置映射表（只读视图）
+     */
     public static Map<String, Object> getMybatisMap() {
         return mybatisMap == null ? Collections.emptyMap() : mybatisMap;
     }
 
+    /**
+     * 获取 MyBatis 配置项的值
+     * @param key 配置项键名
+     * @return 配置项的值，不存在则返回空串
+     */
     public static String getMybatisProperty(String key) {
-        Map<String, Object> map = getMybatisMap();
-        Object value = map.get(key);
-        return value == null ? "" : String.valueOf(value);
+        return getProperty(key, StringUtils.EMPTY);
+    }
+
+    /**
+     * 获取 MyBatis 配置项的值，支持自定义默认值
+     * @param key 配置项键名
+     * @param defaultValue 默认值
+     * @return 配置项的值
+     */
+    public static String getProperty(String key, String defaultValue) {
+        Object value = getMybatisMap().get(key);
+        return value == null ? defaultValue : String.valueOf(value);
+    }
+
+    /**
+     * 获取指定类型的 MyBatis 配置项值
+     * @param key 配置项键名
+     * @param type 目标类型
+     * @return 转换后的值，不存在则返回 null
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T getProperty(String key, Class<T> type) {
+        Object value = getMybatisMap().get(key);
+        if (value == null) {
+            return null;
+        }
+        try {
+            return (T) value;
+        } catch (ClassCastException e) {
+            logger.warn("MyBatis property {} is not of type {}. Actual type: {}",
+                key, type.getName(), value.getClass().getName());
+            return null;
+        }
     }
 
     // 默认包配置
@@ -71,7 +112,6 @@ public class DBConfigurer {
     @Bean(name = "dataSource")
     @ConfigurationProperties("spring.datasource.druid")
     @Primary
-    @Lazy
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE) // 标记为基础设施 Bean
     public DataSource dataSource(){
         return DruidDataSourceBuilder.create().build();
@@ -97,29 +137,18 @@ public class DBConfigurer {
         sqlSessionFactoryBean.setVfs(SpringBootVFS.class);
 
         String typeAliasesPackage = environment.getProperty("spring.dataSource.mybatis.typeAliasesPackage");
-        StringBuilder typeAliases = new StringBuilder(DEFAULT_TYPE_ALIASES);
-        if (StringUtils.isNotBlank(typeAliasesPackage)) {
-            typeAliases.append(typeAliasesPackage.startsWith(",") ? typeAliasesPackage : "," + typeAliasesPackage);
-        }
-        sqlSessionFactoryBean.setTypeAliasesPackage(typeAliases.toString());
+        sqlSessionFactoryBean.setTypeAliasesPackage(mergePackages(DEFAULT_TYPE_ALIASES, typeAliasesPackage));
 
         Resource[] defaultResource = resolver.getResources("classpath*:mappings/modules/**/*Dao.xml");
         String mapperLocations = environment.getProperty("spring.dataSource.mybatis.mapperLocations");
         if (StringUtils.isBlank(mapperLocations)) {
             sqlSessionFactoryBean.setMapperLocations(defaultResource);
         } else {
-            // collect resources from configured locations and merge with defaults
-            Resource[] merged = defaultResource;
-            String[] paths = StringUtils.split(mapperLocations, ",");
-            if (paths != null) {
-                for (String path : paths) {
-                    Resource[] resources = resolver.getResources(path);
-                    if (resources.length > 0) {
-                        merged = ArrayUtils.concatAll(merged, resources);
-                    }
-                }
+            List<Resource> allResources = new ArrayList<>(Arrays.asList(defaultResource));
+            for (String path : StringUtils.split(mapperLocations, ",")) {
+                allResources.addAll(Arrays.asList(resolver.getResources(path)));
             }
-            sqlSessionFactoryBean.setMapperLocations(merged);
+            sqlSessionFactoryBean.setMapperLocations(allResources.toArray(new Resource[0]));
         }
 
         mybatisMap = mybatisProperties(environment);
@@ -141,18 +170,21 @@ public class DBConfigurer {
         map.putIfAbsent("sysPrefix", "");
         map.putIfAbsent("diskPrefix", "");
         map.putIfAbsent("noticePrefix", "");
-        return map;
+        return Collections.unmodifiableMap(map);
+    }
+
+    private String mergePackages(String defaultPkg, String customPkg) {
+        if (StringUtils.isBlank(customPkg)) {
+            return defaultPkg;
+        }
+        return defaultPkg + (customPkg.startsWith(",") ? "" : ",") + customPkg;
     }
 
     @Bean
     public MapperScannerConfigurer mapperScannerConfigurer(Environment environment) {
         MapperScannerConfigurer cfg = new MapperScannerConfigurer();
         String basePackage = environment.getProperty("spring.dataSource.mybatis.basePackage");
-        StringBuilder base = new StringBuilder(DEFAULT_BASE_PACKAGE);
-        if (StringUtils.isNotBlank(basePackage)) {
-            base.append(basePackage.startsWith(",") ? basePackage : "," + basePackage);
-        }
-        cfg.setBasePackage(base.toString());
+        cfg.setBasePackage(mergePackages(DEFAULT_BASE_PACKAGE, basePackage));
         cfg.setSqlSessionFactoryBeanName("sqlSessionFactory");
         cfg.setAnnotationClass(MyBatisDao.class);
         return cfg;
@@ -202,16 +234,12 @@ public class DBConfigurer {
     public Advisor txAdviceAdvisor(@Qualifier("txAdvice") TransactionInterceptor txAdvice,
                                    @Value("${spring.dataSource.aopPointcutExpression}") String aopPointcutExpression) {
         AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
-        StringBuilder sb = new StringBuilder();
-        sb.append("(");
-        sb.append(AOP_POINTCUT_EXPRESSION);
-        if(StringUtils.isNotBlank(aopPointcutExpression)){
-            sb.append(aopPointcutExpression.startsWith("||") ? aopPointcutExpression : " || " + aopPointcutExpression);
-        }
-        sb.append(" && !@annotation(org.springframework.transaction.annotation.Transactional)");
-        sb.append(")");
-        pointcut.setExpression(sb.toString());
-        logger.debug("aop expression:{}", sb);
+        String expression = "(" + AOP_POINTCUT_EXPRESSION +
+            (StringUtils.isNotBlank(aopPointcutExpression) ?
+                (aopPointcutExpression.startsWith("||") ? aopPointcutExpression : " || " + aopPointcutExpression) : "") +
+            " && !@annotation(org.springframework.transaction.annotation.Transactional))";
+        pointcut.setExpression(expression);
+        logger.debug("aop expression:{}", expression);
         return new DefaultPointcutAdvisor(pointcut, txAdvice);
     }
 }
