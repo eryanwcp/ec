@@ -4,6 +4,7 @@
 系统模块sys：sysPrefix
 文件相关表disk：diskPrefix
 通知消息相关notice：noticePrefix
+匹配quartz相关表
 
 #默认为空或不配置application-*.properties
 spring.dataSource.mybatis.properties=
