@@ -1,11 +1,12 @@
 /**
- * Copyright (c) 2012-2024 https://www.eryansky.com
+ * Copyright (c) 2012-2026 https://www.eryansky.com
  * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.eryansky.core.orm.mybatis.service;
 
 import com.eryansky.common.utils.StringUtils;
+import com.eryansky.configure.DBConfigurer;
 import com.eryansky.core.orm.mybatis.entity.BaseEntity;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.modules.sys._enum.DataScope;
@@ -45,6 +46,7 @@ public abstract class BaseService {
         // 进行权限过滤，多个角色权限范围之间为或者关系。
         List<String> dataScope = Lists.newArrayList();
 
+        String sysPrefix = DBConfigurer.getMybatisProperty("sysPrefix");
         // 超级管理员，跳过权限过滤
         if (user != null && !user.getId().equals(User.SUPERUSER_ID)) {
             boolean isDataScopeAll = false;
@@ -83,7 +85,7 @@ public abstract class BaseService {
                             OrganExtend organExtend = OrganUtils.getOrganExtendByUserId(user.getId());
                             sqlString.append(" OR " + oa + ".id = '" + organExtend.getId() + "'");
                         } else if (DataScope.CUSTOM.getValue().equals(r.getDataScope())) {
-                            sqlString.append(" OR EXISTS (SELECT 1 FROM t_sys_role_data_organ WHERE role_id = '" + r.getId() + "'");
+                            sqlString.append(" OR EXISTS (SELECT 1 FROM "+sysPrefix+"t_sys_role_data_organ WHERE role_id = '" + r.getId() + "'");
                             sqlString.append(" AND organ_id = " + oa + ".id)");
                         }
                         dataScope.add(r.getDataScope());
@@ -150,44 +152,44 @@ public abstract class BaseService {
             }
         }
         String dataScopeString = String.valueOf(dataScopeInteger);
-
+        String sysPrefix = DBConfigurer.getMybatisProperty("sysPrefix");
         // 生成部门权限SQL语句
         for (String where : StringUtils.split(officeWheres, ",")) {
             if (DataScope.HOME_COMPANY_AND_CHILD.getValue().equals(dataScopeString)) {
-                sqlString.append(" AND EXISTS (SELECT 1 FROM t_sys_organ");
+                sqlString.append(" AND EXISTS (SELECT 1 FROM "+sysPrefix+"t_sys_organ");
                 OrganExtend company = OrganUtils.getHomeCompanyByUserId(user.getId());
                 sqlString.append(" WHERE (id = '" + company.getId() + "'");
                 sqlString.append(" OR parent_ids LIKE '" + company.getParentIds() + company.getId() + ",%')");
                 sqlString.append(" AND " + where + ")");
             } else if (DataScope.HOME_COMPANY.getValue().equals(dataScopeString)) {
-                sqlString.append(" AND EXISTS (SELECT 1 FROM t_sys_organ_extend");
+                sqlString.append(" AND EXISTS (SELECT 1 FROM "+sysPrefix+"t_sys_organ_extend");
                 OrganExtend company = OrganUtils.getHomeCompanyByUserId(user.getId());
                 sqlString.append(" WHERE home_company_id = '" + company.getId() + "'");
                 sqlString.append(" AND " + where + ")");
             }else if (DataScope.COMPANY_AND_CHILD.getValue().equals(dataScopeString)) {
-                sqlString.append(" AND EXISTS (SELECT 1 FROM t_sys_organ");
+                sqlString.append(" AND EXISTS (SELECT 1 FROM "+sysPrefix+"t_sys_organ");
                 OrganExtend company = OrganUtils.getCompanyOrganExtendByOrganId(user.getId());
                 sqlString.append(" WHERE (id = '" + company.getId() + "'");
                 sqlString.append(" OR parent_ids LIKE '" + company.getParentIds() + company.getId() + ",%')");
                 sqlString.append(" AND " + where + ")");
             } else if (DataScope.COMPANY.getValue().equals(dataScopeString)) {
-                sqlString.append(" AND EXISTS (SELECT 1 FROM t_sys_organ_extend");
+                sqlString.append(" AND EXISTS (SELECT 1 FROM "+sysPrefix+"t_sys_organ_extend");
                 OrganExtend company = OrganUtils.getCompanyByUserId(user.getId());
                 sqlString.append(" WHERE company_id = '" + company.getId() + "'");
                 sqlString.append(" AND " + where + ")");
             } else if (DataScope.OFFICE_AND_CHILD.getValue().equals(dataScopeString)) {
-                sqlString.append(" AND EXISTS (SELECT 1 FROM t_sys_organ");
+                sqlString.append(" AND EXISTS (SELECT 1 FROM "+sysPrefix+"t_sys_organ");
                 OrganExtend organExtend = OrganUtils.getOrganExtendByUserId(user.getId());
                 sqlString.append(" WHERE (id = '" + organExtend.getId() + "'");
                 sqlString.append(" OR parent_ids LIKE '" + organExtend.getParentIds() + organExtend.getId() + ",%')");
                 sqlString.append(" AND " + where + ")");
             } else if (DataScope.OFFICE.getValue().equals(dataScopeString)) {
-                sqlString.append(" AND EXISTS (SELECT 1 FROM t_sys_organ");
+                sqlString.append(" AND EXISTS (SELECT 1 FROM "+sysPrefix+"t_sys_organ");
                 OrganExtend organExtend = OrganUtils.getOrganExtendByUserId(user.getId());
                 sqlString.append(" WHERE id = '" + organExtend.getId() + "'");
                 sqlString.append(" AND " + where + ")");
             } else if (DataScope.CUSTOM.getValue().equals(dataScopeString)) {
-                sqlString.append(" AND EXISTS (SELECT 1 FROM t_sys_role_data_organ ro123456, t_sys_organ o123456");
+                sqlString.append(" AND EXISTS (SELECT 1 FROM "+sysPrefix+"t_sys_role_data_organ ro123456, "+sysPrefix+"t_sys_organ o123456");
                 sqlString.append(" WHERE ro123456.organ_id = o123456.id");
                 sqlString.append(" AND ro123456.role_id = '" + roleId + "'");
                 sqlString.append(" AND o123456." + where + ")");
@@ -196,7 +198,7 @@ public abstract class BaseService {
         // 生成个人权限SQL语句
         for (String where : StringUtils.split(userWheres, ",")) {
             if (DataScope.SELF.getValue().equals(dataScopeString)) {
-                sqlString.append(" AND EXISTS (SELECT 1 FROM t_sys_user");
+                sqlString.append(" AND EXISTS (SELECT 1 FROM "+sysPrefix+"t_sys_user");
                 sqlString.append(" WHERE id='" + user.getId() + "'");
                 sqlString.append(" AND " + where + ")");
             }

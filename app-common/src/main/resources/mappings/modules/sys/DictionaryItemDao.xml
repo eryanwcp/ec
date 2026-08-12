@@ -24,14 +24,14 @@
 	</sql>
 	
 	<sql id="sysDictionaryItemJoins">
-		LEFT JOIN t_sys_dictionary_item p ON p.id = a.parent_id
-		JOIN t_sys_dictionary d ON d.id = a.dictionary_id
+		LEFT JOIN ${sysPrefix}t_sys_dictionary_item p ON p.id = a.parent_id
+		JOIN ${sysPrefix}t_sys_dictionary d ON d.id = a.dictionary_id
 	</sql>
     
 	<select id="get" resultType="DictionaryItem">
 		SELECT 
 			<include refid="sysDictionaryItemColumns"/>
-		FROM t_sys_dictionary_item a
+		FROM ${sysPrefix}t_sys_dictionary_item a
 		<include refid="sysDictionaryItemJoins"/>
 		WHERE a.id = #{id}
 	</select>
@@ -39,7 +39,7 @@
 	<select id="getByCode" resultType="DictionaryItem">
 		SELECT
 		<include refid="sysDictionaryItemColumns"/>
-		FROM t_sys_dictionary_item a
+		FROM ${sysPrefix}t_sys_dictionary_item a
 		<include refid="sysDictionaryItemJoins"/>
 		WHERE a.status = #{STATUS_NORMAL}
 		<if test="dictionary != null and dictionary.id != null and dictionary.id != ''">
@@ -53,7 +53,7 @@
 	<select id="findByDictionary" resultType="DictionaryItem">
 		SELECT
 		<include refid="sysDictionaryItemColumns"/>
-		FROM t_sys_dictionary_item a
+		FROM ${sysPrefix}t_sys_dictionary_item a
 		<include refid="sysDictionaryItemJoins"/>
 		WHERE a.status = #{STATUS_NORMAL}
 		<if test="dictionary != null and dictionary.id != null and dictionary.id != ''">
@@ -68,7 +68,7 @@
 	<select id="findParentsByDictionary" resultType="DictionaryItem">
 		SELECT
 		<include refid="sysDictionaryItemColumns"/>
-		FROM t_sys_dictionary_item a
+		FROM ${sysPrefix}t_sys_dictionary_item a
 		<include refid="sysDictionaryItemJoins"/>
 		WHERE a.status = #{STATUS_NORMAL}
 		<if test="dictionary != null and dictionary.id != null and dictionary.id != ''">
@@ -80,7 +80,7 @@
 	<select id="getByDictionaryItem" resultType="DictionaryItem">
 		SELECT
 		<include refid="sysDictionaryItemColumns"/>
-		FROM t_sys_dictionary_item a
+		FROM ${sysPrefix}t_sys_dictionary_item a
 		<include refid="sysDictionaryItemJoins"/>
 		WHERE a.status = #{STATUS_NORMAL}
 		<if test="dictionary != null and dictionary.code != null and dictionary.code != ''">
@@ -98,14 +98,14 @@
 	<select id="getMaxSort" resultType="int">
 		SELECT
 		MAX(a.order_no)
-		FROM t_sys_dictionary_item a
+		FROM ${sysPrefix}t_sys_dictionary_item a
 		WHERE a.status = #{STATUS_NORMAL}
 	</select>
 
 	<select id="findChilds" resultType="DictionaryItem">
 		SELECT
 		<include refid="sysDictionaryItemColumns"/>
-		FROM t_sys_dictionary_item a
+		FROM ${sysPrefix}t_sys_dictionary_item a
 		<include refid="sysDictionaryItemJoins"/>
 		WHERE a.status = #{STATUS_NORMAL}
 		AND a.parent_id = #{id}
@@ -115,7 +115,7 @@
 	<select id="findList" resultType="DictionaryItem">
 		SELECT
 		<include refid="sysDictionaryItemColumns"/>
-		FROM t_sys_dictionary_item a
+		FROM ${sysPrefix}t_sys_dictionary_item a
 		<include refid="sysDictionaryItemJoins"/>
 		<where>
 			a.status = #{STATUS_NORMAL}
@@ -154,7 +154,7 @@
 	<select id="findAllList" resultType="DictionaryItem">
 		SELECT 
 			<include refid="sysDictionaryItemColumns"/>
-		FROM t_sys_dictionary_item a
+		FROM ${sysPrefix}t_sys_dictionary_item a
 		<include refid="sysDictionaryItemJoins"/>
 		<where>
 			a.status = #{STATUS_NORMAL}
@@ -181,7 +181,7 @@
 	<select id="findByWhereSQL" resultType="DictionaryItem">
 		SELECT
 		<include refid="sysDictionaryItemColumns"/>
-		FROM t_sys_dictionary_item a
+		FROM ${sysPrefix}t_sys_dictionary_item a
 		<where>
 			${whereSQL}
 		</where>
@@ -192,12 +192,12 @@
 	<select id="findBySql" resultType="DictionaryItem">
 		SELECT
 		<include refid="sysDictionaryItemColumns"/>
-		FROM t_sys_dictionary_item a
+		FROM ${sysPrefix}t_sys_dictionary_item a
 		${sql}
 	</select>
 	
 	<insert id="insert">
-		INSERT INTO t_sys_dictionary_item(
+		INSERT INTO ${sysPrefix}t_sys_dictionary_item(
 			id,
 			status,
 			version,
@@ -230,7 +230,7 @@
 		)
 	</insert>
 	<insert id="insertBatch">
-		INSERT INTO t_sys_dictionary_item(
+		INSERT INTO ${sysPrefix}t_sys_dictionary_item(
 			id,
 			status,
 			version,
@@ -264,7 +264,7 @@
 	</insert>
 
 	<update id="update">
-		UPDATE t_sys_dictionary_item SET
+		UPDATE ${sysPrefix}t_sys_dictionary_item SET
 			status = #{status},
 			version = version +1,
 			update_user = #{updateUser},
@@ -280,18 +280,18 @@
 	</update>
 	
 	<update id="delete">
-		UPDATE t_sys_dictionary_item SET
+		UPDATE ${sysPrefix}t_sys_dictionary_item SET
 			status = #{STATUS_DELETE}
 		WHERE id = #{id}
 	</update>
 
 	<delete id="clear">
-		DELETE FROM t_sys_dictionary_item
+		DELETE FROM ${sysPrefix}t_sys_dictionary_item
 		WHERE id = #{id}
 	</delete>
 
 	<delete id="clearAll">
-		DELETE FROM t_sys_dictionary_item
+		DELETE FROM ${sysPrefix}t_sys_dictionary_item
 	</delete>
 
 </mapper>

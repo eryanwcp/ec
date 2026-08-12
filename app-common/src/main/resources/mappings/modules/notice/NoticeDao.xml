@@ -30,21 +30,21 @@
 	</sql>
 
 	<sql id="noticeJoins">
-		LEFT JOIN t_sys_user u ON u.id = a.user_id
-		LEFT JOIN t_sys_organ_extend o ON o.id = a.organ_id
+		LEFT JOIN ${sysPrefix}t_sys_user u ON u.id = a.user_id
+		LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = a.organ_id
 	</sql>
 
 	<select id="get" resultType="Notice">
 		SELECT
 		<include refid="noticeColumns"/>
-		FROM t_notice a
+		FROM ${noticePrefix}t_notice a
 		WHERE a.id = #{id}
 	</select>
 
 	<select id="findList" resultType="Notice">
 		SELECT
 		<include refid="noticeColumns"/>
-		FROM t_notice a
+		FROM ${noticePrefix}t_notice a
 		<include refid="noticeJoins"/>
 		<where>
 			a.status = #{STATUS_NORMAL}
@@ -86,7 +86,7 @@
 	<select id="findAllList" resultType="Notice">
 		SELECT
 		<include refid="noticeColumns"/>
-		FROM t_notice a
+		FROM ${noticePrefix}t_notice a
 		<where>
 			a.status = #{STATUS_NORMAL}
 		</where>
@@ -113,7 +113,7 @@
 	<select id="findQueryList" resultType="Notice">
 		SELECT
 		<include refid="noticeColumns"/>
-		FROM t_notice a
+		FROM ${noticePrefix}t_notice a
 		<include refid="noticeJoins"/>
 		<where>
 			a.status = #{status}
@@ -169,7 +169,7 @@
 	</select>
 
 	<insert id="insert">
-		INSERT INTO t_notice(
+		INSERT INTO ${noticePrefix}t_notice(
 		id,
 		status,
 		version,
@@ -222,7 +222,7 @@
 		)
 	</insert>
 	<insert id="insertBatch">
-		INSERT INTO t_notice(
+		INSERT INTO ${noticePrefix}t_notice(
 		id,
 		status,
 		version,
@@ -276,7 +276,7 @@
 	</insert>
 
 	<update id="update">
-		UPDATE t_notice SET
+		UPDATE ${noticePrefix}t_notice SET
 		status = #{status},
 		version = version +1,
 		update_user = #{updateUser},
@@ -302,7 +302,7 @@
 	</update>
 
 	<update id="delete">
-		UPDATE t_notice SET
+		UPDATE ${noticePrefix}t_notice SET
 		status = #{STATUS_DELETE},
 		version = version +1,
         update_user = #{updateUser},
@@ -311,24 +311,24 @@
 	</update>
 
 	<delete id="clear">
-		DELETE FROM t_notice
+		DELETE FROM ${noticePrefix}t_notice
 		WHERE id = #{id}
 	</delete>
 
 	<delete id="clearAll">
-		DELETE FROM t_notice
+		DELETE FROM ${noticePrefix}t_notice
 	</delete>
 
 
 	<!--通知附件-->
 	<select id="findFileIdsByNoticeId" resultType="java.lang.String">
 		SELECT a.file_id
-		FROM t_notice_file a
+		FROM ${noticePrefix}t_notice_file a
 		WHERE a.notice_id = #{noticeId}
 	</select>
 
 	<delete id="deleteNoticeFiles">
-		DELETE FROM t_notice_file
+		DELETE FROM ${noticePrefix}t_notice_file
 		<where>
 			<if test="id != null and id !=''">
 				AND notice_id = #{id}
@@ -340,7 +340,7 @@
 	</delete>
 
 	<insert id="insertNoticeFiles">
-		INSERT INTO t_notice_file(notice_id, file_id) VALUES
+		INSERT INTO ${noticePrefix}t_notice_file(notice_id, file_id) VALUES
 		<foreach item="item" collection="ids" separator=",">
 			(#{id}, #{item})
 		</foreach>
