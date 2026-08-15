@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012-2024 https://www.eryansky.com
+ * Copyright (c) 2012-2026 https://www.eryansky.com
  * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -13,7 +13,6 @@ import com.eryansky.core.orm.mybatis.service.TreeService;
 import com.eryansky.modules.sys.dao.AreaDao;
 import com.eryansky.modules.sys.mapper.Area;
 import com.eryansky.utils.AppConstants;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
