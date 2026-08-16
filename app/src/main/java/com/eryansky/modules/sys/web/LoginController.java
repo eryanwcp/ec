@@ -314,6 +314,7 @@ public class LoginController extends SimpleController {
                     //TODO 按clientId约定的密钥加密ssoToken 此处用默认密码
                     String encryptSsoToken = Sm4Utils.encrypt(AppConstants.getSSOSecretKey(),ssoToken);
                     resultUrl = AppUtils.appendParaToUrl(redirectUri,"sso_token",encryptSsoToken);
+                    request.getSession().setAttribute("sso_user", ssoToken);
                 } catch (Exception e) {
                     logger.error(e.getMessage(),e);
                 }
