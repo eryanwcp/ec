@@ -11,6 +11,7 @@ import com.eryansky.core.web.interceptor.MobileInterceptor;
 import com.eryansky.modules.disk.extend.DISKManager;
 import com.eryansky.modules.disk.extend.IFileManager;
 import com.eryansky.utils.AppConstants;
+import com.eryansky.utils.AppUtils;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.collect.Lists;
 import org.apache.http.HttpEntityEnclosingRequest;
@@ -137,8 +138,9 @@ public class MvcConfigurer implements WebMvcConfigurer {
         AuthorityInterceptor authorityInterceptor = new AuthorityInterceptor();
         String redirectURL = "/jump.jsp";
         //开启SSO单点登录
-        if(AppConstants.getIsSSOEnable()){
-            redirectURL = AppConstants.getSSOLoginUrl();
+        if (AppConstants.getIsSSOEnable()) {
+            redirectURL = AppUtils.appendParaToUrlBuilder(AppConstants.getSSOLoginUrl(), "client_id", AppConstants.getSSOClientId())
+                    .append("redirect_uri", AppConstants.getSSOCallbackUrl()).toString();
         }
 
         authorityInterceptor.setRedirectURL(redirectURL);
