@@ -8,27 +8,27 @@ EC 是一个基于 **Spring Boot 3** 构建的企业级应用开发基础平台�
 
 ## 核心特性
 
-*   **系统管理**: 支持组织管理、账号管理、角色管理、资源管理、岗位管理、数据字典等基础系统管理。
-*   **企业级权限体系**: 自定义权限体系，仿Shiro注解，提供了基于注解 (`@RequiresPermissions`, `@RequiresRoles`) 的声明式权限控制，支持数据权限过滤和会话管理。
-*   **灵活的实体模型**: 提供基础数据实体 (`BaseEntity`, `DataEntity`, `TreeEntity`, `PTreeEntity`)，简化 CRUD 和树形结构开发。
+*   **系统管理**: 支持组织管理、用户管理、角色管理、资源管理、岗位管理、数据字典等基础系统管理。
 *   **云盘管理模块**: 包含文件上传、下载、预览及 FTP 远程存储管理，支持文件检索和批量操作。
 *   **消息通知系统**: 内置系统消息与公告通知管理，支持多种消息接收对象（用户、组织、群组）和通知渠道。
-*   **RPC 远程调用**: 自研轻量级 RPC 框架 (`EnableRPCServer`, `EnableRPCClients`)，支持服务端与消费端的快速集成与加密通信。
-*   **常用工具集**: 内置 Word/Excel 处理、CSV 导出、公式处理器等办公常用组件。
 *   **系统监控**: 服务期基本信息监控、日志控制台、缓存管理、会话管理等。
+*   **企业级权限体系**: 自定义权限体系，仿Shiro注解，提供了基于注解 (`@RequiresPermissions`, `@RequiresRoles`) 的声明式权限控制，支持数据权限过滤和会话管理。
 *   **定时任务管理**: 基于 Quartz 的分布式任务调度，支持任务监听与自动化清理（如日志清理、缓存清理）。
+*   **RPC远程调用**: 自研轻量级 RPC 框架 (`EnableRPCServer`, `EnableRPCClients`)，支持服务端与消费端的快速集成与加密通信。
+*   **常用工具集**: 内置序列号生成器、 Word/Excel 处理、CSV 导出、公式处理器等办公常用组件。
 
 ## 技术栈
 
-*   **核心框架**: Spring Boot 3.x
+*   **核心框架**: Spring Boot 3.x 
 *   **安全框架**: 自定安全框架，类 Shiro
 *   **ORM**: MyBatis
 *   **数据库**: MariaDB / MySQL
-*   **缓存**: 二级缓存J2Cache扩展，Redis (可选)
+*   **缓存**: 二级缓存J2Cache扩展，Caffeine + Redis (可选)
 *   **视图模板**: Thymeleaf + SiteMesh + Shiro Dialect
 *   **构建工具**: Maven
 *   **容器化**: Docker (支持 Jib 打包)
-
+*   **部署架构**: 支持多节点集群部署（多节点依赖Redis）
+* 
 ## 环境要求
 
 *   JDK 17+
@@ -38,7 +38,7 @@ EC 是一个基于 **Spring Boot 3** 构建的企业级应用开发基础平台�
 ## 快速开始
 
 ### 1. 配置文件
-请在 `application.properties` 或对应配置文件中配置数据库连接信息以及 Redis 连接（如果启用）。
+请在 `application.properties` 对应不同环境配置文件中配置数据库连接信息以及 Redis 连接（如果启用）等。
 
 ### 2. Docker 部署 (推荐)
 
