@@ -36,7 +36,7 @@ EC 是一个基于 **Spring Boot 3** 构建的企业级应用开发基础平台�
 ## 快速开始
 
 ### 1. 配置文件
-请在 `application.yml` 或对应配置文件中配置数据库连接信息以及 Redis 连接（如果启用）。
+请在 `application.properties` 或对应配置文件中配置数据库连接信息以及 Redis 连接（如果启用）。
 
 ### 2. Docker 部署 (推荐)
 
