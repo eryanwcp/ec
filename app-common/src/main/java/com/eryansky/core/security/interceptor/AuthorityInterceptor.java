@@ -21,6 +21,7 @@ import com.eryansky.core.security._enum.Logical;
 import com.eryansky.core.security.annotation.RequiresPermissions;
 import com.eryansky.core.security.annotation.RequiresRoles;
 import com.eryansky.core.security.annotation.RequiresUser;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -317,7 +318,7 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
                         WebUtils.renderJson(response, r);
                     }else{
                         //返回校验不通过页面
-                        response.sendRedirect(request.getContextPath()+redirectURL);
+                        response.sendRedirect((Strings.CS.startsWith(redirectURL, "http") ? "" : request.getContextPath()) + redirectURL);
                     }
 
                 }

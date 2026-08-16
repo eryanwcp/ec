@@ -60,6 +60,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
+import javax.annotation.Resource;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
 import java.io.InterruptedIOException;
@@ -72,8 +73,11 @@ import static com.fasterxml.jackson.core.JsonParser.Feature.INCLUDE_SOURCE_IN_LO
 @Configuration
 public class MvcConfigurer implements WebMvcConfigurer {
 
+    public static final String MEDIA_TYPE_SECURE_MSGPACK = "application/x-secure-msgpack";
+    public static final String MEDIA_TYPE_MSGPACK = "application/x-msgpack";
+
     @Lazy
-    @Autowired
+    @Resource
     private RequestMappingHandlerAdapter requestMappingHandlerAdapter;
 
     @Override
@@ -131,7 +135,13 @@ public class MvcConfigurer implements WebMvcConfigurer {
 
         List<String> authExcludePathList = AppConstants.getAuthExcludePathList();
         AuthorityInterceptor authorityInterceptor = new AuthorityInterceptor();
-        authorityInterceptor.setRedirectURL("/jump.jsp");
+        String redirectURL = "/jump.jsp";
+        //开启SSO单点登录
+        if(AppConstants.getIsSSOEnable()){
+            redirectURL = AppConstants.getSSOServerUrl();
+        }
+
+        authorityInterceptor.setRedirectURL(redirectURL);
         registry.addInterceptor(authorityInterceptor).addPathPatterns("/**")
                 .excludePathPatterns(Collections3.aggregate(dList, authExcludePathList))
                 .order(Ordered.HIGHEST_PRECEDENCE + 200);

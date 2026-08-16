@@ -16,6 +16,8 @@ import com.eryansky.common.utils.UserAgentUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.encode.Encrypt;
 import com.eryansky.common.utils.encode.RSAUtils;
+import com.eryansky.common.utils.encode.Sm4Utils;
+import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.servlet.ValidateCodeServlet;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
@@ -82,7 +84,9 @@ public class LoginController extends SimpleController {
     @Mobile(value = MobileValue.ALL)
     @RequiresUser(required = false)
     @GetMapping(value = {"welcome", ""})
-    public ModelAndView welcome(HttpServletRequest request) {
+    public ModelAndView welcome(HttpServletRequest request,
+                                @RequestParam(value = "client_id",required = false) String clientId,
+                                @RequestParam(value = "redirect_uri",required = false) String redirectUri) {
         ModelAndView modelAndView = new ModelAndView("login");
         String loginName = CookieUtils.getCookie(SpringMVCHolder.getRequest(), "loginName");
         boolean isValidateCodeLogin = isValidateCodeLogin(loginName, false, false);
@@ -91,6 +95,8 @@ public class LoginController extends SimpleController {
         String randomSecurityToken = Identities.randomBase62(64);
         modelAndView.addObject("securityToken", randomSecurityToken);
         modelAndView.addObject("publicKey", EncryptProvider.publicKeyBase64());
+        modelAndView.addObject("clientId", clientId);
+        modelAndView.addObject("redirectUri", redirectUri);
         WebUtils.setSessionAttribute(request, "securityToken", randomSecurityToken);
         return modelAndView;
     }
@@ -191,7 +197,9 @@ public class LoginController extends SimpleController {
     @RequiresUser(required = false)
     @ResponseBody
     @PostMapping(value = {"login"})
-    public Result login(@RequestParam(required = true) String loginName,
+    public Result login(@RequestParam(value = "client_id",required = false) String clientId,
+                        @RequestParam(value = "redirect_uri",required = false) String redirectUri,
+                        @RequestParam(required = true) String loginName,
                         @RequestParam(required = true) String password,
                         @RequestParam(defaultValue = "true") String encrypt,
                         @RequestParam(name = "_csrf_token",required = true) String csrfToken,
@@ -224,7 +232,7 @@ public class LoginController extends SimpleController {
         String originPassword = password;
         String _password = password;
         if ("RSA".equals(encrypt)) {
-            originPassword = RSAUtils.decryptBase64String(_password,EncryptProvider.publicKeyBase64());
+            originPassword = RSAUtils.decryptBase64String(_password,EncryptProvider.privateKeyBase64());
         }
         if (!"true".equals(encrypt)) {
             _password = Encrypt.e(originPassword);
@@ -288,12 +296,27 @@ public class LoginController extends SimpleController {
 
             //设置调整URL 如果session中包含未被授权的URL 则跳转到该页面
 //            String resultUrl = request.getContextPath()+ AppConstants.getAdminPath()  + "/login/index?theme=" + theme;
-            String resultUrl = request.getContextPath() + AppConstants.getAdminPath();
-            Object unAuthorityUrl = request.getSession().getAttribute(SecurityConstants.SESSION_UNAUTHORITY_URL);
-            if (unAuthorityUrl != null) {
-                resultUrl = unAuthorityUrl.toString();
-                //清空未被授权的URL
-                request.getSession().setAttribute(SecurityConstants.SESSION_UNAUTHORITY_URL, null);
+//            String resultUrl = request.getContextPath() + AppConstants.getAppHomePage();
+            String resultUrl = request.getContextPath() + (isMobile ? AppConstants.getMobilePath() : AppConstants.getAdminPath());
+            if (StringUtils.isNotBlank(redirectUri)) {
+
+
+                Map<String,Object> payload = Maps.newHashMap();
+                payload.put("userId", user.getId());
+                payload.put("username", user.getLoginName());
+                payload.put("mobile", user.getMobile());
+                payload.put("iss", "ec");
+                payload.put("clientId", clientId);
+                payload.put("iat", System.currentTimeMillis());
+                payload.put("exp", System.currentTimeMillis() + 10 * 60 * 1000L);
+                String ssoToken = JsonMapper.toJsonString(payload);
+                try {
+                    //TODO 按clientId约定的密钥加密ssoToken 此处用默认密码
+                    String encryptSsoToken = Sm4Utils.encrypt(AppConstants.getSSOSecretKey(),ssoToken);
+                    resultUrl = AppUtils.appendParaToUrl(redirectUri,"sso_token",encryptSsoToken);
+                } catch (Exception e) {
+                    logger.error(e.getMessage(),e);
+                }
             }
             //返回
             Map<String, Object> data = Maps.newHashMap();
@@ -305,6 +328,8 @@ public class LoginController extends SimpleController {
 
         return result;
     }
+
+
 
 
     /**
