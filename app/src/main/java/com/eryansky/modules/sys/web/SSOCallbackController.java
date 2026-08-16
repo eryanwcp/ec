@@ -48,10 +48,10 @@ public class SSOCallbackController {
         try {
             json = Sm4Utils.decrypt(secretKey, token);
         } catch (Exception e) {
-//            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token 非法或已被篡改");
-            //降级为未加密
-            json = token;
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token 非法或已被篡改");
             return;
+            // 降级为未加密 安全逻辑漏洞
+//            json = token;
         }
 
         // 2. 解析字段
@@ -62,7 +62,20 @@ public class SSOCallbackController {
         }
 
         // 3. 有效时间校验
-        long exp = Long.parseLong(String.valueOf(payload.get("exp")));
+        Object expObj = payload.get("exp");
+        if (expObj == null) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token 缺失过期时间字段");
+            return;
+        }
+
+        long exp;
+        try {
+            exp = Long.parseLong(String.valueOf(expObj));
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token 过期时间格式错误");
+            return;
+        }
+
         if (System.currentTimeMillis() > exp) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token 已过期");
             return;
