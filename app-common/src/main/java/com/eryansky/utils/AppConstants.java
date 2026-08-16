@@ -922,6 +922,7 @@ public class AppConstants extends SysConstants {
 
     /**
      * SSO单点登录密钥 密钥16字节 hex加密密钥
+     * 参考方法可自动生成密钥 {@link Sm4Utils#generateHexKeyString}
      * @return
      */
     public static String getSSOSecretKey() {
