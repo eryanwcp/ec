@@ -913,7 +913,7 @@ public class AppConstants extends SysConstants {
 
 
     /**
-     * SSO单点登录密钥
+     * SSO单点登录密钥 密钥16字节 hex加密密钥
      * @return
      */
     public static String getSSOSecretKey() {
