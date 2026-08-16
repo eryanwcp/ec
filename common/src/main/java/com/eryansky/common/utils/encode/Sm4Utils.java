@@ -7,6 +7,7 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 import java.security.AlgorithmParameters;
 import java.security.Key;
 import java.security.SecureRandom;
@@ -351,6 +352,7 @@ public final class Sm4Utils {
             String key = Sm4Utils.generateHexKeyString();
             System.out.println("==========生成key==========");
             System.out.println(key);
+            System.out.println(Hex.toHexString("ecececececececec".getBytes(StandardCharsets.UTF_8)));
             String cipher = Sm4Utils.encryptEcb(key, paramStr);
             System.out.println("==========加密串==========");
             System.out.println(cipher);
