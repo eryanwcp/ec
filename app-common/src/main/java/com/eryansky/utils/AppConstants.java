@@ -12,7 +12,6 @@ import com.eryansky.common.utils.SysConstants;
 import com.eryansky.common.utils.io.FileUtils;
 import com.eryansky.common.utils.io.PropertiesLoader;
 import com.eryansky.core.rpc.utils.SerializerFactory;
-import com.eryansky.j2cache.util.SerializationUtils;
 import com.eryansky.modules.sys.service.ConfigService;
 
 import java.io.File;
@@ -903,6 +902,15 @@ public class AppConstants extends SysConstants {
     }
 
     /**
+     * SSO单点登录 客户端标识
+     * @return
+     */
+    public static String getSSOClientId() {
+        String code = "system.sso.clientId";
+        return getAppConfig(code, "");
+    }
+
+    /**
      * SSO单点登录页面
      * @return
      */
@@ -927,6 +935,16 @@ public class AppConstants extends SysConstants {
      */
     public static String getSSOIssUser() {
         String code = "system.sso.issuer";
+        return getAppConfig(code, "");
+    }
+
+
+    /**
+     * SSO单点登录 回调地址
+     * @return
+     */
+    public static String getSSOCallbackUrl() {
+        String code = "system.sso.callbackUrl";
         return getAppConfig(code, "");
     }
 
