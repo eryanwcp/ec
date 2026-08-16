@@ -2,8 +2,12 @@ package com.eryansky.modules.sys.web;
 
 import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.utils.mapper.JsonMapper;
+import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
+import com.eryansky.core.security.annotation.PrepareOauth2;
+import com.eryansky.core.security.annotation.RequiresUser;
+import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.service.UserService;
 import com.eryansky.utils.AppConstants;
@@ -39,6 +43,9 @@ public class SSOCallbackController {
     /**
      * SSO 回调入口
      */
+    @PrepareOauth2(enable = false)
+    @RequiresUser(required = false)
+    @Logging(value = "单点登录-自动回调",data = "#token",logType = LogType.access)
     @GetMapping("/sso/callback")
     public void callback(@RequestParam("sso_token") String token,
                          HttpServletRequest request, HttpServletResponse response) throws Exception {
