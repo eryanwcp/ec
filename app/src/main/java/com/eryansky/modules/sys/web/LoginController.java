@@ -298,9 +298,7 @@ public class LoginController extends SimpleController {
 //            String resultUrl = request.getContextPath()+ AppConstants.getAdminPath()  + "/login/index?theme=" + theme;
 //            String resultUrl = request.getContextPath() + AppConstants.getAppHomePage();
             String resultUrl = request.getContextPath() + (isMobile ? AppConstants.getMobilePath() : AppConstants.getAdminPath());
-            if (StringUtils.isNotBlank(redirectUri)) {
-
-
+            if (StringUtils.isNotBlank(redirectUri) && StringUtils.isNotBlank(clientId)) {
                 Map<String,Object> payload = Maps.newHashMap();
                 payload.put("userId", user.getId());
                 payload.put("username", user.getLoginName());
@@ -314,6 +312,7 @@ public class LoginController extends SimpleController {
                     //TODO 按clientId约定的密钥加密ssoToken 此处用默认密码
                     String encryptSsoToken = Sm4Utils.encrypt(AppConstants.getSSOSecretKey(),ssoToken);
                     resultUrl = AppUtils.appendParaToUrl(redirectUri,"sso_token",encryptSsoToken);
+                    request.getSession().setAttribute("sso_user_"+clientId, ssoToken);
                 } catch (Exception e) {
                     logger.error(e.getMessage(),e);
                 }
