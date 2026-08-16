@@ -891,4 +891,43 @@ public class AppConstants extends SysConstants {
         return Collections.emptyList();
     }
 
+
+    /**
+     * 是否启用SSO单点登录
+     * @return
+     */
+    public static boolean getIsSSOEnable() {
+        String code = "system.sso.enable";
+        String value = getAppConfig(code, "false");
+        return "true".equals(value) || "1".equals(value);
+    }
+
+    /**
+     * SSO单点登录页面
+     * @return
+     */
+    public static String getSSOServerUrl() {
+        String code = "system.sso.serverUrl";
+        return getAppConfig(code, "");
+    }
+
+
+    /**
+     * SSO单点登录密钥
+     * @return
+     */
+    public static String getSSOSecretKey() {
+        String code = "system.sso.secretKey";
+        return getAppConfig(code, "");
+    }
+
+    /**
+     * SSO单点登录签名用户
+     * @return
+     */
+    public static String getSSOIssUser() {
+        String code = "system.sso.issuer";
+        return getAppConfig(code, "");
+    }
+
 }

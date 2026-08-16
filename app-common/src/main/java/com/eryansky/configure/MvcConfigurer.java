@@ -110,7 +110,13 @@ public class MvcConfigurer implements WebMvcConfigurer {
 
         List<String> authExcludePathList = AppConstants.getAuthExcludePathList();
         AuthorityInterceptor authorityInterceptor = new AuthorityInterceptor();
-        authorityInterceptor.setRedirectURL("/jump.jsp");
+        String redirectURL = "/jump.jsp";
+        //开启SSO单点登录
+        if(AppConstants.getIsSSOEnable()){
+            redirectURL = AppConstants.getSSOServerUrl();
+        }
+
+        authorityInterceptor.setRedirectURL(redirectURL);
         registry.addInterceptor(authorityInterceptor).addPathPatterns("/**")
                 .excludePathPatterns(Collections3.aggregate(dList, authExcludePathList))
                 .order(Ordered.HIGHEST_PRECEDENCE + 200);

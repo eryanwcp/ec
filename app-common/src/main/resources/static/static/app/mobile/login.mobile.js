@@ -75,7 +75,14 @@ function login() {
     $.ajax({
         url: ctxAdmin + '/login/login',
         type: 'post',
-        data: {loginName: $loginName.val(), password: _password,encrypt:"RSA", checkDevice: false},
+        data: {
+            client_id: $("#client_id").val(),
+            redirect_uri: $("#redirect_uri").val(),
+            loginName: $loginName.val(),
+            password: _password,
+            encrypt: "RSA",
+            checkDevice: false
+        },
         traditional: true,
         async: false,
         dataType: 'json',

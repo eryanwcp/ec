@@ -43,6 +43,8 @@
             <img src="${ctxStatic}/img/logo.png" style="position: absolute;top:10px;left:10px;"/>
             <div class="title"><h1>${fns:getAppFullName()}</h1></div>
             <form class="loginform" role="form">
+                <input type="hidden" id="client_id" name="client_id" value="${clientId}"/>
+                <input type="hidden" id="redirect_uri" name="redirect_uri" value="${redirectUri}"/>
                 <div class="inputoutdiv"><input type="text" id="loginName" placeholder="账号"><img src="${ctxStatic}/img/mobile/user.png"/></div>
                 <div class="inputoutdiv"><input type="password" id="password" placeholder="密码"><img src="${ctxStatic}/img/mobile/lock.png"/></div>
                 <div class="checkboxclass"><input type="checkbox" id="rememberMe" style="border: none;"><label for="rememberMe" style="float: left;position: absolute;left:25px;color: #ffffff;border:none;">记住密码</label></div>
