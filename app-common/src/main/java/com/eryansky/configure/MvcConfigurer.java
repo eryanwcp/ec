@@ -114,7 +114,7 @@ public class MvcConfigurer implements WebMvcConfigurer {
         String redirectURL = "/jump.jsp";
         //开启SSO单点登录
         if (AppConstants.getIsSSOEnable()) {
-            redirectURL = AppUtils.appendParaToUrlBuilder(AppConstants.getSSOLoginUrl(), "client_id", AppConstants.getSSOClientId())
+            redirectURL = AppUtils.appendParaToUrlBuilder(AppConstants.getSSOIssuerUri(), "client_id", AppConstants.getSSOClientId())
                     .append("redirect_uri", AppConstants.getSSOCallbackUrl()).toString();
         }
 
