@@ -906,8 +906,8 @@ public class AppConstants extends SysConstants {
      * SSO单点登录页面
      * @return
      */
-    public static String getSSOServerUrl() {
-        String code = "system.sso.serverUrl";
+    public static String getSSOLoginUrl() {
+        String code = "system.sso.loginUrl";
         return getAppConfig(code, "");
     }
 
