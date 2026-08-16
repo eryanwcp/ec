@@ -27,8 +27,8 @@ public class SSOCallbackController {
     /**
      * SSO服务器给客户端分配的那把密钥，两边要一致
      */
-    @Value("${system.sso.secretKey:ecececececececececececececececec}")
-    private String secretKey;
+    @Value("${system.sso.clientSecret:65636563656365636563656365636563}")
+    private String clientSecret;
 
     /**
      * 期望的签发者
@@ -53,7 +53,7 @@ public class SSOCallbackController {
         // 1. 解密。解不出来说明不是用我们这把密钥签发的，或内容被改过
         String json;
         try {
-            json = Sm4Utils.decrypt(secretKey, token);
+            json = Sm4Utils.decrypt(clientSecret, token);
         } catch (Exception e) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token 非法或已被篡改");
             return;

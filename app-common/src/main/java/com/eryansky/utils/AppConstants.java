@@ -902,6 +902,24 @@ public class AppConstants extends SysConstants {
     }
 
     /**
+     * SSO单点登录签名者
+     * @return
+     */
+    public static String getSSOIssuer() {
+        String code = "system.sso.issuer";
+        return getAppConfig(code, "");
+    }
+
+    /**
+     * SSO单点登录页面
+     * @return
+     */
+    public static String getSSOIssuerUri() {
+        String code = "system.sso.issuerUri";
+        return getAppConfig(code, "");
+    }
+
+    /**
      * SSO单点登录 客户端标识
      * @return
      */
@@ -911,34 +929,14 @@ public class AppConstants extends SysConstants {
     }
 
     /**
-     * SSO单点登录页面
-     * @return
-     */
-    public static String getSSOLoginUrl() {
-        String code = "system.sso.loginUrl";
-        return getAppConfig(code, "");
-    }
-
-
-    /**
      * SSO单点登录密钥 密钥16字节 hex加密密钥
      * 参考方法可自动生成密钥 {@link Sm4Utils#generateHexKeyString}
      * @return
      */
-    public static String getSSOSecretKey() {
-        String code = "system.sso.secretKey";
+    public static String getSSOClientSecret() {
+        String code = "system.sso.clientSecret";
         return getAppConfig(code, "");
     }
-
-    /**
-     * SSO单点登录签名用户
-     * @return
-     */
-    public static String getSSOIssUser() {
-        String code = "system.sso.issuer";
-        return getAppConfig(code, "");
-    }
-
 
     /**
      * SSO单点登录 回调地址

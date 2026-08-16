@@ -26,6 +26,7 @@ import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.security.annotation.PrepareOauth2;
 import com.eryansky.core.web.annotation.MobileValue;
 import com.eryansky.encrypt.config.EncryptProvider;
+import org.bouncycastle.util.encoders.Hex;
 import com.eryansky.modules.sys.service.ResourceService;
 import com.eryansky.modules.sys.service.UserPasswordService;
 import com.eryansky.modules.sys.service.UserService;
@@ -34,7 +35,6 @@ import com.eryansky.modules.sys.vo.PasswordTip;
 import com.eryansky.utils.AppUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.eryansky.core.security.SecurityConstants;
 import com.eryansky.core.security.SecurityType;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
@@ -53,6 +53,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -310,7 +312,8 @@ public class LoginController extends SimpleController {
                 String ssoToken = JsonMapper.toJsonString(payload);
                 try {
                     //TODO 按clientId约定的密钥加密ssoToken 此处用默认密码
-                    String encryptSsoToken = Sm4Utils.encrypt(AppConstants.getSSOSecretKey(),ssoToken);
+//                    String encryptSsoToken = Sm4Utils.encrypt(AppConstants.getSSOClientSecret(),ssoToken);
+                    String encryptSsoToken = Sm4Utils.encrypt(Hex.toHexString(EncryptProvider.sm4Key().getBytes(StandardCharsets.UTF_8)),ssoToken);
                     resultUrl = AppUtils.appendParaToUrl(redirectUri,"sso_token",encryptSsoToken);
                     request.getSession().setAttribute("sso_user_"+clientId, ssoToken);
                 } catch (Exception e) {
