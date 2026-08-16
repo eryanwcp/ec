@@ -28,7 +28,7 @@ public class SSOCallbackController {
     /**
      * SSO服务器给客户端分配的那把密钥，两边要一致
      */
-    @Value("${system.sso.clientSecret:ecececececececececececececececec}")
+    @Value("${system.sso.clientSecret:65636563656365636563656365636563}")
     private String clientSecret;
 
     /**
