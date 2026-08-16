@@ -10,6 +10,7 @@ import com.eryansky.common.orm._enum.StatusState;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.UserAgentUtils;
 import com.eryansky.common.utils.collections.Collections3;
+import com.eryansky.common.utils.encode.EncodeUtils;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.common.web.utils.WebUtils;
@@ -143,20 +144,59 @@ public class AppUtils {
      * @param url
      * @param paraKey
      * @param paraValue
-     * @return
+     * @return UrlBuilder for chaining
      */
     public static String appendParaToUrl(String url, String paraKey, String paraValue) {
-        if (StringUtils.isEmpty(url)) {
+        return appendParaToUrlBuilder(url,paraKey, paraValue).toString();
+    }
+
+    /**
+     * append a key and value pair to url
+     *
+     * @param url
+     * @param paraKey
+     * @param paraValue
+     * @return UrlBuilder for chaining
+     */
+    public static UrlBuilder appendParaToUrlBuilder(String url, String paraKey, String paraValue) {
+        return new UrlBuilder(url).append(paraKey, paraValue);
+    }
+
+    /**
+     * URL 构建器，支持链式调用
+     */
+    public static class UrlBuilder {
+        private String url;
+
+        public UrlBuilder(String url) {
+            this.url = url;
+        }
+
+        public UrlBuilder append(String key, String value) {
+            if (StringUtils.isEmpty(url)) {
+                return this;
+            }
+
+            StringBuilder sb = new StringBuilder(url);
+            if (!url.contains(URL_AND_PARA_SEPARATOR)) {
+                sb.append(URL_AND_PARA_SEPARATOR);
+            } else {
+                sb.append(PARAMETERS_SEPARATOR);
+            }
+//            sb.append(key).append(EQUAL_SIGN).append(value);
+            sb.append(key).append(EQUAL_SIGN).append(EncodeUtils.urlEncode(value));
+            this.url = sb.toString();
+            return this;
+        }
+
+        @Override
+        public String toString() {
             return url;
         }
 
-        StringBuilder sb = new StringBuilder(url);
-        if (!url.contains(URL_AND_PARA_SEPARATOR)) {
-            sb.append(URL_AND_PARA_SEPARATOR);
-        } else {
-            sb.append(PARAMETERS_SEPARATOR);
+        public String build() {
+            return url;
         }
-        return sb.append(paraKey).append(EQUAL_SIGN).append(paraValue).toString();
     }
 
     /**

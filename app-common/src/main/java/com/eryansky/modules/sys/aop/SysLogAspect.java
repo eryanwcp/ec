@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2012-2026 https://www.eryansky.com
- * <p>
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.eryansky.modules.sys.aop;
@@ -34,9 +34,7 @@ import org.springframework.stereotype.Component;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 使用AspectJ实现登录登出日志AOP
@@ -68,12 +66,19 @@ public class SysLogAspect {
      */
     @Before(value = "sysLogAspect()&&@annotation(logging)")
     public void recordLog(JoinPoint joinPoint, Logging logging) throws Throwable {
-        Log log = new Log();
-        Long start = System.currentTimeMillis();
-        log.setStartTime(start);
+        // 快速检查是否需要记录日志，避免后续昂贵的 SpEL 解析和对象创建
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         Method method = methodSignature.getMethod();
         Object[] args = joinPoint.getArgs();
+
+        String loggingValue = SpringUtils.parseSpel(logging.logging(), method, args);
+        if(!Boolean.parseBoolean(loggingValue)){
+            return;
+        }
+
+        Log log = new Log();
+        log.setStartTime(System.currentTimeMillis());
+
         String methodName = joinPoint.getSignature().getName();
         String className = joinPoint.getTarget().getClass().getSimpleName();
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
@@ -86,27 +91,33 @@ public class SysLogAspect {
         // 执行方法所消耗的时间
         try {
             log.setType(logging.logType().getValue());
-
             log.setModule(className + "-" + methodName);
-            log.setIp(null != request ? IpUtils.getIpAddr0(request) : (null != sessionInfo ? sessionInfo.getIp():StringUtils.EMPTY));
+
+            // 优化 IP 获取逻辑：优先使用 request，其次使用 session
+            String ip = (request != null) ? IpUtils.getIpAddr0(request) :
+                        (sessionInfo != null ? sessionInfo.getIp() : StringUtils.EMPTY);
+            log.setIp(ip);
+
             log.setTitle(SpringUtils.parseSpel(logging.value(), method, args));
-            log.setAction(null != request ? request.getMethod():StringUtils.EMPTY);
+            log.setAction(null != request ? request.getMethod() : StringUtils.EMPTY);
+
             ExtendAttr extendAttr = new ExtendAttr();
             if(null != sessionInfo){
                 log.setUserAgent(sessionInfo.getUserAgent());
                 log.setDeviceType(sessionInfo.getDeviceType());
                 log.setBrowserType(sessionInfo.getBrowserType());
                 log.setUserId(sessionInfo.getUserId());
-                extendAttr.put("userType",sessionInfo.getUserType());
-                extendAttr.put("userName",sessionInfo.getName());
-                extendAttr.put("userLoginName",sessionInfo.getLoginName());
-                extendAttr.put("userMobile",sessionInfo.getMobile());
-            }else {
+                extendAttr.put("userType", sessionInfo.getUserType());
+                extendAttr.put("userName", sessionInfo.getName());
+                extendAttr.put("userLoginName", sessionInfo.getLoginName());
+                extendAttr.put("userMobile", sessionInfo.getMobile());
+            } else {
                 String userLoginName = null;
                 if(null != request){
                     log.setUserAgent(UserAgentUtils.getHTTPUserAgent(request));
                     log.setDeviceType(UserAgentUtils.getDeviceType(request).toString());
                     log.setBrowserType(UserAgentUtils.getBrowser(request).getName());
+
                     Map<String, List<String>> headers = WebUtils.getHeaders(request);
                     userLoginName = Collections3.getFirst(headers.get("appCode"));
                     if(StringUtils.isBlank(userLoginName)){
@@ -116,56 +127,45 @@ public class SysLogAspect {
                         userLoginName = request.getParameter("appCode");
                     }
                     if(StringUtils.isBlank(userLoginName)){
-                        String access_token = Collections3.getFirst(headers.get("access_token"));;
+                        String access_token = Collections3.getFirst(headers.get("access_token"));
                         if(StringUtils.isNotBlank(access_token)){
                             try {
                                 userLoginName = JWTUtils.getUsername(access_token);
                             } catch (Exception e) {
-                                logger.error(e.getMessage());
+                                logger.error("JWT parse failed: {}", e.getMessage());
                             }
                         }
-
                     }
-
-
                 }
-                extendAttr.put("userType","S");//自定义 系统
-                log.setUserId(StringUtils.isNotBlank(userLoginName) ? userLoginName:User.SUPERUSER_ID);
-                extendAttr.put("userName",StringUtils.isNotBlank(userLoginName) ? userLoginName:"系统");
+                extendAttr.put("userType", "S"); // 系统
+                log.setUserId(StringUtils.isNotBlank(userLoginName) ? userLoginName : User.SUPERUSER_ID);
+                extendAttr.put("userName", StringUtils.isNotBlank(userLoginName) ? userLoginName : "系统");
                 extendAttr.put("userLoginName", userLoginName);
             }
 
             if(StringUtils.isNotBlank(logging.data())){
-                extendAttr.put("requestData",SpringUtils.parseSpel(logging.data(), method, args));
-            }else{
-                extendAttr.put("requestData", null != request ? JsonMapper.toJsonString(request.getParameterMap()):null);
+                extendAttr.put("requestData", SpringUtils.parseSpel(logging.data(), method, args));
+            } else if(null != request){
+                extendAttr.put("requestData", JsonMapper.toJsonString(request.getParameterMap()));
             }
 
             if(logging.requestHeaders() && null != request){
-                extendAttr.put("requestHeaders",JsonMapper.toJsonString(WebUtils.getHeaders(request)));
+                extendAttr.put("requestHeaders", JsonMapper.toJsonString(WebUtils.getHeaders(request)));
             }
 
             log.setExtendAttr(extendAttr);
             if(StringUtils.isNotBlank(logging.remark())){
                 log.setRemark(SpringUtils.parseSpel(logging.remark(), method, args));
             }
-            log.setOperTime(Calendar.getInstance().getTime());
-            //将当前实体保存到threadLocal
+            log.setOperTime(new Date());
             sysLogThreadLocal.set(log);
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("Error building SysLog: {}", e.getMessage());
         }
-
     }
 
-    /**
-     * 返回通知
-     *
-     * @param ret
-     */
     @AfterReturning(returning = "ret", pointcut = "sysLogAspect()")
     public void doAfterReturning(Object ret) {
-        //得到当前线程的log对象
         Log log = sysLogThreadLocal.get();
         if(null == log){
             return;
@@ -175,17 +175,10 @@ public class SysLogAspect {
         log.setActionTime(String.valueOf(opTime));
         log.setEndTime(end);
         log.prePersist();
-        // 发布事件
         SpringContextHolder.publishEvent(new SysLogEvent(log));
-        //移除当前log实体
         sysLogThreadLocal.remove();
     }
 
-    /**
-     * 异常通知
-     *
-     * @param e
-     */
     @AfterThrowing(pointcut = "sysLogAspect()", throwing = "e")
     public void doAfterThrowable(Throwable e) {
         Log log = sysLogThreadLocal.get();
@@ -195,15 +188,10 @@ public class SysLogAspect {
         long end = System.currentTimeMillis();
         long opTime = end - log.getStartTime();
         log.setActionTime(String.valueOf(opTime));
-        // 异常
         log.setType(LogType.exception.getValue());
         log.setException(Exceptions.getStackTraceAsString(new Exception(e)));
         log.prePersist();
-        // 发布事件
         SpringContextHolder.publishEvent(new SysLogEvent(log));
-        //移除当前log实体
         sysLogThreadLocal.remove();
     }
-
-
 }

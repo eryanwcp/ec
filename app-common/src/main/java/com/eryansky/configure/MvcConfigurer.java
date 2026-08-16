@@ -10,6 +10,7 @@ import com.eryansky.core.web.interceptor.MobileInterceptor;
 import com.eryansky.modules.disk.extend.DISKManager;
 import com.eryansky.modules.disk.extend.IFileManager;
 import com.eryansky.utils.AppConstants;
+import com.eryansky.utils.AppUtils;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.collect.Lists;
 import jakarta.annotation.Resource;
@@ -110,7 +111,14 @@ public class MvcConfigurer implements WebMvcConfigurer {
 
         List<String> authExcludePathList = AppConstants.getAuthExcludePathList();
         AuthorityInterceptor authorityInterceptor = new AuthorityInterceptor();
-        authorityInterceptor.setRedirectURL("/jump.jsp");
+        String redirectURL = "/jump.jsp";
+        //开启SSO单点登录
+        if (AppConstants.getIsSSOEnable()) {
+            redirectURL = AppUtils.appendParaToUrlBuilder(AppConstants.getSSOIssuerUri(), "client_id", AppConstants.getSSOClientId())
+                    .append("redirect_uri", AppConstants.getSSOCallbackUrl()).toString();
+        }
+
+        authorityInterceptor.setRedirectURL(redirectURL);
         registry.addInterceptor(authorityInterceptor).addPathPatterns("/**")
                 .excludePathPatterns(Collections3.aggregate(dList, authExcludePathList))
                 .order(Ordered.HIGHEST_PRECEDENCE + 200);

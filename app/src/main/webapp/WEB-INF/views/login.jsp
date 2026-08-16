@@ -91,6 +91,8 @@
         <form id="loginForm" action="${ctxAdmin}/login/login?theme=${cookie.themeType.value}" class="form login-form" method="post" >
             <legend><span style="color:#08c;">${fns:getAppFullName()}</span></legend>
             <input type="hidden" name="_csrf_token" value="${securityToken}"/>
+            <input type="hidden" id="client_id" name="client_id" value="${clientId}"/>
+            <input type="hidden" id="redirect_uri" name="redirect_uri" value="${redirectUri}"/>
             <div class="body">
                 <div class="control-group">
                     <%--<label for="loginName" class="control-label">用户名</label>--%>

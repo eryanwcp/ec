@@ -92,7 +92,7 @@ public class ApplicationTests {
 
 
     @Test
-    public void generateSerialNumberByModelCode() {
+    public void generateSerialNumberByModuleCode() {
         String moduleCode = "A01";
         Map<String, String> params0 = Maps.newHashMap();
         params0.put("param1", "");
@@ -101,7 +101,7 @@ public class ApplicationTests {
         for (int i = 1; i < 10; i++) {
             int finalI = i;
             new Thread(() -> {
-                System.out.println(Thread.currentThread().getName() + " 0-" + finalI + " " + SystemSerialNumberUtils.generateSerialNumberByModelCode(moduleCode, customCategory0, params0));
+                System.out.println(Thread.currentThread().getName() + " 0-" + finalI + " " + SystemSerialNumberUtils.generateSerialNumberByModuleCode(moduleCode, customCategory0, params0));
             }).start();
         }
 
@@ -112,7 +112,7 @@ public class ApplicationTests {
         for (int i = 1; i < 10; i++) {
             int finalI = i;
             new Thread(() -> {
-                System.out.println(Thread.currentThread().getName() + " 1-" + finalI + " " + SystemSerialNumberUtils.generateSerialNumberByModelCode(moduleCode, customCategory1, params1));
+                System.out.println(Thread.currentThread().getName() + " 1-" + finalI + " " + SystemSerialNumberUtils.generateSerialNumberByModuleCode(moduleCode, customCategory1, params1));
             }).start();
         }
         Map<String, String> params2 = Maps.newHashMap();
@@ -122,7 +122,7 @@ public class ApplicationTests {
         for (int i = 1; i < 10; i++) {
             int finalI = i;
             new Thread(() -> {
-                System.out.println(Thread.currentThread().getName() + " 2-" + finalI + " " + SystemSerialNumberUtils.generateSerialNumberByModelCode(moduleCode, customCategory2, params2));
+                System.out.println(Thread.currentThread().getName() + " 2-" + finalI + " " + SystemSerialNumberUtils.generateSerialNumberByModuleCode(moduleCode, customCategory2, params2));
             }).start();
         }
 
