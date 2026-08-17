@@ -1,93 +1,80 @@
-
-
-# EC (企业级应用平台)
+**EC (企业级应用平台)**
 
 ## 简介
 
-EC 是一个基于 **Spring Boot 3** 构建的企业级应用开发基础平台，15年以上长期维护经验。该项目整合了企业日常办公所需的核心功能模块，包括用户与组织管理、细粒度权限控制（RBAC）、云盘文件管理、消息通知系统、RPC 远程调用、单点登录以及丰富的基础开发辅助工具。
+EC 是一个基于 **Spring Boot 3** 构建的企业级应用开发基础平台，具备 15 年以上长期维护沉淀。项目整合了企业日常办公与系统运维的核心功能模块，包含组织与用户管理、细粒度权限控制（RBAC）、单点登录（SSO）、云盘文件管理、消息通知系统、自研 RPC 远程调用以及丰富的基础开发工具集。
 
 ## 核心特性
 
-*   **系统管理**: 支持组织管理、用户管理、角色管理、资源管理、岗位管理、数据字典等基础系统管理。
-*   **云盘管理模块**: 包含文件上传、下载、预览及 FTP 远程存储管理，支持文件检索和批量操作。
-*   **消息通知系统**: 内置系统消息与公告通知管理，支持多种消息接收对象（用户、组织、群组）和通知渠道。
-*   **系统监控**: 服务期基本信息监控、日志控制台、缓存管理、会话管理等。
-*   **企业级权限体系**: 自定义权限体系，仿Shiro注解，提供了基于注解 (`@RequiresPermissions`, `@RequiresRoles`) 的声明式权限控制，支持数据权限过滤和会话管理。
-*   **定时任务管理**: 基于 Quartz 的分布式任务调度，支持任务监听与自动化清理（如日志清理、缓存清理）。
-*   **RPC远程调用**: 自研轻量级 RPC 框架 (`EnableRPCServer`, `EnableRPCClients`)，支持服务端与消费端的快速集成与加密通信。
-*   **常用工具集**: 内置序列号生成器、 Word/Excel 处理、CSV 导出、公式处理器等办公常用组件。
+* **系统管理**：支持组织结构、用户、角色、资源（菜单/按钮）、岗位及数据字典等基础管理。
+* **企业级权限与认证**：
+* **单点登录 (SSO)**：内置 SSO 认证中心与客户端集成能力。
+* **声明式权限**：采用自定义仿 Shiro 体系，支持 `@RequiresPermissions` 和 `@RequiresRoles` 注解控制、数据权限过滤及全局会话管理。
+
+
+* **自研轻量级 RPC**：提供 `@EnableRPCServer` 与 `@EnableRPCClients` 开箱即用集成，支持服务端与消费端加密通信。
+* **云盘管理**：提供文件上传下载、在线预览、FTP 远程存储管理，支持批量操作与文件检索。
+* **消息与通知**：内置系统消息与公告推送，支持按用户、组织、群组等维度多渠道精准投递。
+* **任务调度与监控**：基于 Quartz 的分布式任务调度，支持任务监听与自动化清理（如日志、缓存清理）；提供服务端基础指标监控、日志控制台及缓存管理。
+* **办公辅助工具集**：内置流水号生成器、Word/Excel/CSV 处理、公式计算引擎等常用组件。
 
 ## 技术栈
 
-*   **核心框架**: Spring Boot 3.x 
-*   **安全框架**: 自定安全框架，类 Shiro
-*   **ORM**: MyBatis
-*   **数据库**: MariaDB / MySQL
-*   **缓存**: 二级缓存J2Cache扩展，Caffeine + Redis (可选)
-*   **视图模板**: Thymeleaf + SiteMesh + Shiro Dialect
-*   **构建工具**: Maven
-*   **容器化**: Docker (支持 Jib 打包)
-*   **部署架构**: 支持多节点集群部署（多节点依赖Redis）
-* 
+* **核心框架**：Spring Boot 3.x (JDK 17+)
+* **安全/权限**：自研类 Shiro 安全框架 + 单点登录 (SSO)
+* **持久层/数据库**：MyBatis，支持 MariaDB 10.x / MySQL 8.x
+* **二级缓存**：J2Cache 扩展（支持 Caffeine 本地缓存 + Redis 集中式缓存）
+* **视图模板**：Thymeleaf + SiteMesh + Shiro Dialect
+* **服务通信与接口**：自研 RPC 框架，SpringDoc OpenAPI (Swagger UI)
+* **容器化与部署**：Maven + Jib 插件打包，支持多节点集群部署（依赖 Redis 处理 Session 及缓存）
+
+## 模块结构
+
+```text
+ec
+├── app                     # 业务主服务入口与应用配置
+├── app-common              # 公共核心模块（数据库配置、Web拦截器、SSO/权限/会话控制、RPC服务端/客户端实现、业务基础代码）
+├── client-common           # 客户端通用 SDK & SSO 单点登录客户端组件
+├── encrypt-spring-boot-starter # 数据/通信加密扩展 starter
+├── fastweixin              # 微信接口对接扩展模块
+├── j2cache                 # J2Cache 核心缓存库
+└── j2cache-spring-boot-starter # J2Cache Spring Boot Starter 集成包
+
+```
+
 ## 环境要求
 
-*   JDK 17+
-*   MariaDB 10.x / MySQL 8.x
-*   Redis (可选，用于缓存和 Session 管理)
+* JDK 17+
+* Maven 3.8+
+* MariaDB 10.x / MySQL 8.x
+* Redis（可选，集群部署、Session 共享与二级缓存时需要）
 
 ## 快速开始
 
-### 1. 配置文件
-请在 `application.properties` 对应不同环境配置文件中配置数据库连接信息以及 Redis 连接（如果启用）等。
+**1. 修改配置**
+在 `app/src/main/resources/` 下对应环境的配置文件中更新数据库连接信息及 Redis 连接参数等，数据库脚本初始化。
 
-### 2. Docker 部署 (推荐)
-
-项目支持使用 Jib 进行 Docker 镜像构建。
-
-**Docker 本地部署 (构建镜像):**
-```bash
-mvn clean compile com.google.cloud.tools:jib-maven-plugin:3.5.2:dockerBuild -P docker
-mvn clean compile com.google.cloud.tools:jib-maven-plugin:3.5.2:dockerBuild -P docker -DsendCredentialsOverHttp=true
-```
-
-**Docker 打包 (生成 Tar 包):**
-```bash
-mvn package com.google.cloud.tools:jib-maven-plugin:3.5.2:buildTar -P docker
-mvn package com.google.cloud.tools:jib-maven-plugin:3.5.2:buildTar -P docker -DsendCredentialsOverHttp=true
-```
-
-**Docker 发布 (推送到仓库):**
-```bash
-mvn package com.google.cloud.tools:jib-maven-plugin:3.5.2:build -P docker
-mvn package com.google.cloud.tools:jib-maven-plugin:3.5.2:build -P docker -DsendCredentialsOverHttp=true
-```
-
-**加载离线镜像:**
-```bash
-# Linux
-docker load < jib-image.tar
-# Windows
-docker load -i jib-image.tar
-```
-
-### 3. 本地运行
-在 IDE 中直接运行 Application 主类即可启动服务。
-
-## 模块说明
-
-项目主要包含以下核心模块：
-
-*   **app-common**: 公共核心模块。
-    *   **配置类**: 数据库配置 (`DBConfigurer`)、Web配置 (`MvcConfigurer`)、Quartz配置等。
-    *   **安全模块**: 权限拦截器 (`AuthorityInterceptor`)、会话管理 (`SessionInfo`)、Shiro方言等。
-    *   **RPC 框架**: 远程调用服务端与客户端的核心实现。
-    *   **业务服务**: 包含系统管理 (`sys`)、通知消息 (`notice`)、云盘 (`disk`) 等基础服务代码。
-
-## 接口文档
-
-项目集成了 **SpringDoc OpenAPI**，启动后可通过以下地址访问 Swagger UI：
+**2. 本地启动**
+在 IDE 中直接运行 `app` 模块下的主启动类即可。启动后可访问 Swagger UI 查看接口文档：
 `http://{host}:{port}/swagger-ui.html`
 
----
+**3. Docker 镜像构建 (基于 Jib)**
 
-*本项目结构清晰，功能完善，适用于快速搭建企业级内部管理系统。*
+```bash
+# 本地 Docker 环境构建镜像
+mvn clean compile com.google.cloud.tools:jib-maven-plugin:3.5.2:dockerBuild -P docker
+
+# 生成离线 Tar 镜像包
+mvn package com.google.cloud.tools:jib-maven-plugin:3.5.2:buildTar -P docker
+
+# 推送镜像至远程仓库
+mvn package com.google.cloud.tools:jib-maven-plugin:3.5.2:build -P docker
+
+#可选配置
+-DsendCredentialsOverHttp=true
+
+# 加载离线镜像
+docker load < jib-image.tar  # Linux
+docker load -i jib-image.tar # Windows
+
+```
