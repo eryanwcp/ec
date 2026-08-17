@@ -10,6 +10,7 @@ import com.eryansky.common.exception.SystemException;
 import com.eryansky.common.model.*;
 import com.eryansky.common.orm.Page;
 import com.eryansky.common.orm._enum.StatusState;
+import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.common.utils.Identities;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.UserAgentUtils;
@@ -305,7 +306,7 @@ public class LoginController extends SimpleController {
                 payload.put("userId", user.getId());
                 payload.put("username", user.getLoginName());
                 payload.put("mobile", user.getMobile());
-                payload.put("iss", "ec");
+                payload.put("iss", SpringContextHolder.getApplicationContext().getId());
                 payload.put("clientId", clientId);
                 payload.put("iat", System.currentTimeMillis());
                 payload.put("exp", System.currentTimeMillis() + 10 * 60 * 1000L);
