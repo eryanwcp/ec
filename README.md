@@ -24,7 +24,7 @@ EC 是一个基于 **Spring Boot 3** 构建的企业级应用开发基础平台�
 * **持久层/数据库**：MyBatis，支持 MariaDB 10.x / MySQL 8.x
 * **二级缓存**：J2Cache 扩展（支持 Caffeine 本地缓存 + Redis 集中式缓存）
 * **视图模板**：Thymeleaf + SiteMesh + Shiro Dialect
-* **服务通信与接口**：自研 RPC 框架，SpringDoc OpenAPI (Swagger UI)
+* **服务通信与接口**：自研 RPC 框架
 * **容器化与部署**：Maven + Jib 插件打包，支持多节点集群部署（依赖 Redis 处理 Session 及缓存）
 
 ## 模块结构
@@ -58,9 +58,6 @@ application-*.properties、config-*.properties、j2cache-*.properties、logback-
 
 **2. 本地启动**
 在 IDE 中直接运行 `app` 模块下的主启动类即可。
-
-启动后可访问 Swagger UI 查看接口文档：
-`http://{host}:{port}/swagger-ui.html`
 
 **3. Docker 镜像构建 (基于 Jib)**
 
