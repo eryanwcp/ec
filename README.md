@@ -15,7 +15,7 @@ EC 是一个基于 **Spring Boot 3** 构建的企业级应用开发基础平台�
 * **消息与通知**：内置系统消息与公告推送，支持按用户、组织、群组等维度多渠道精准投递。
 * **自研轻量级 RPC**：提供 `@EnableRPCServer` 与 `@EnableRPCClients` 开箱即用集成，支持服务端与消费端加密通信。
 * **任务调度与监控**：基于 Quartz 的分布式任务调度，支持任务监听与自动化清理（如日志、缓存清理）；提供服务端基础指标监控、日志控制台及缓存管理。
-* **办公辅助工具集**：内置流水号生成器、Word/Excel/CSV 处理、公式计算引擎等常用组件。
+* **办公辅助工具集**：内置流水号生成器、Word/Excel/CSV 处理、公式计算引擎、数据加解密、数据脱敏等常用组件。
 
 ## 技术栈
 
@@ -37,7 +37,8 @@ ec
 ├── encrypt-spring-boot-starter # 数据/通信加密扩展 starter
 ├── fastweixin              # 微信接口对接扩展模块
 ├── j2cache                 # J2Cache 核心缓存库
-└── j2cache-spring-boot-starter # J2Cache Spring Boot Starter 集成包
+├── j2cache-spring-boot-starter # J2Cache Spring Boot Starter 集成包
+└── common # 通用工具包
 
 ```
 
