@@ -47,7 +47,7 @@
 </head>
 <body >
     <h3 class="newstitle">${model.title}</h3>
-    <h4 class="newstime">${model.publishOrganName}${model.publishUserName}<fmt:formatDate value="${model.publishTime}" pattern='yyyy-MM-dd HH:mm' /></h4>
+    <h4 class="newstime">${model.publishOrganName} ${model.publishUserName} <fmt:formatDate value="${model.publishTime}" pattern='yyyy-MM-dd HH:mm' /></h4>
     <div id="content">${model.content}</div>
     <c:if test="${not empty files}">
         <div id="notice_files" style="float: left;width:100%;border-top:1px solid #D2D2D2;padding-top:10px;margin-top:10px;">
