@@ -21,6 +21,7 @@ import com.eryansky.modules.notice.dao.NoticeReceiveInfoDao;
 import com.eryansky.modules.notice.mapper.Notice;
 import com.eryansky.modules.notice.mapper.NoticeReceiveInfo;
 import com.eryansky.modules.notice.vo.NoticeQueryVo;
+import com.eryansky.modules.notice.vo.NoticeReceiveInfoSimpleVo;
 import com.eryansky.modules.sys._enum.YesOrNo;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -110,6 +111,42 @@ public class NoticeReceiveInfoService extends CrudService<NoticeReceiveInfoDao, 
         parameter.put("dbName", entity.getDbName());
         page.autoResult(dao.findQueryList(parameter));
 
+        return page;
+    }
+
+
+    /**
+     * 我的通知 分页查询.
+     *
+     * @param page
+     * @param userId        用户ID
+     * @param noticeQueryVo 查询条件
+     * @return
+     * @throws SystemException
+     * @throws ServiceException
+     * @throws DaoException
+     */
+    public Page<NoticeReceiveInfoSimpleVo> findReadNoticePageByUserId(Page<NoticeReceiveInfoSimpleVo> page, NoticeReceiveInfo entity, String userId, NoticeQueryVo noticeQueryVo) {
+        Assert.notNull(userId, "参数[userId]为空!");
+        Parameter parameter = new Parameter();
+        parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
+        parameter.put("bizMode", NoticeMode.Effective.getValue());
+        parameter.put("userId", userId);
+        if (null != noticeQueryVo) {
+            parameter.put("isTop", noticeQueryVo.getIsTop());
+            parameter.put("type", noticeQueryVo.getType());
+            parameter.put("isRead", noticeQueryVo.getIsRead());
+
+            if (noticeQueryVo.getStartTime() != null) {
+                parameter.put("startTime", DateUtils.format(noticeQueryVo.getStartTime(), DateUtils.DATE_TIME_FORMAT));
+            }
+            if (noticeQueryVo.getEndTime() != null) {
+                parameter.put("endTime", DateUtils.format(noticeQueryVo.getEndTime(), DateUtils.DATE_TIME_FORMAT));
+            }
+        }
+        parameter.put(BaseInterceptor.PAGE, page);
+        parameter.put("dbName", entity.getDbName());
+        page.autoResult(dao.findQueryListByUserId(parameter));
         return page;
     }
 

@@ -8,6 +8,7 @@ package com.eryansky.modules.notice.web.mobile;
 import com.eryansky.common.model.Datagrid;
 import com.eryansky.common.model.Result;
 import com.eryansky.common.orm.Page;
+import com.eryansky.common.orm._enum.GenericEnumUtils;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SimpleController;
@@ -17,12 +18,17 @@ import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
 import com.eryansky.core.web.annotation.Mobile;
+import com.eryansky.modules.disk.utils.DiskUtils;
+import com.eryansky.modules.notice._enum.NoticeReadMode;
 import com.eryansky.modules.notice.mapper.Notice;
 import com.eryansky.modules.notice.mapper.NoticeReceiveInfo;
 import com.eryansky.modules.notice.service.NoticeReceiveInfoService;
 import com.eryansky.modules.notice.service.NoticeService;
+import com.eryansky.modules.notice.utils.NoticeUtils;
 import com.eryansky.modules.notice.vo.NoticeQueryVo;
+import com.eryansky.modules.notice.vo.NoticeReceiveInfoSimpleVo;
 import com.eryansky.modules.sys._enum.LogType;
+import com.eryansky.modules.sys.utils.DictionaryUtils;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -83,17 +89,19 @@ public class NoticeMobileController extends SimpleController {
      */
     @PostMapping(value = "noticeData")
     @ResponseBody
-    public String noticeData(HttpServletRequest request, HttpServletResponse response,
+    public Page<NoticeReceiveInfoSimpleVo> noticeData(HttpServletRequest request, HttpServletResponse response,
                              NoticeQueryVo noticeQueryVo) {
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
-        Page<NoticeReceiveInfo> page = new Page<>(request,response);
+        Page<NoticeReceiveInfoSimpleVo> page = new Page<>(request,response);
         if (sessionInfo != null) {
-            page = noticeReceiveInfoService.findReadNoticePage(page, new NoticeReceiveInfo(), sessionInfo.getUserId(), noticeQueryVo);
+            page = noticeReceiveInfoService.findReadNoticePageByUserId(page, new NoticeReceiveInfo(), sessionInfo.getUserId(), noticeQueryVo);
+            page.getResult().forEach(noticeReceiveInfo -> {
+                noticeReceiveInfo.setHeadImageUrl(DiskUtils.getFileUrl(noticeReceiveInfo.getHeadImage()));
+                noticeReceiveInfo.setTypeView(DictionaryUtils.getDictionaryNameByDV(NoticeUtils.DIC_NOTICE, noticeReceiveInfo.getType(), noticeReceiveInfo.getType()));
+                noticeReceiveInfo.setIsReadView(GenericEnumUtils.getDescriptionByValue(NoticeReadMode.class, noticeReceiveInfo.getType(), noticeReceiveInfo.getType()));
+            });
         }
-        String json = JsonMapper.getInstance().toJson(Result.successResult().setObj(page), NoticeReceiveInfo.class,
-                new String[]{"id", "noticeId","title", "type", "typeView", "isTop", "headImageUrl", "isRead",
-                        "isReadView", "publishTime"});
-        return renderString(response,json, WebUtils.JSON_TYPE);
+        return page;
     }
 
 

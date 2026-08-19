@@ -9,6 +9,7 @@ import com.eryansky.common.orm.model.Parameter;
 import com.eryansky.common.orm.mybatis.MyBatisDao;
 import com.eryansky.common.orm.persistence.CrudDao;
 import com.eryansky.modules.notice.mapper.NoticeReceiveInfo;
+import com.eryansky.modules.notice.vo.NoticeReceiveInfoSimpleVo;
 
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,8 @@ public interface NoticeReceiveInfoDao extends CrudDao<NoticeReceiveInfo> {
     int deleteByNoticeId(Parameter parameter);
 
     List<NoticeReceiveInfo> findQueryList(Parameter parameter);
+
+    List<NoticeReceiveInfoSimpleVo> findQueryListByUserId(Parameter parameter);
 
     NoticeReceiveInfo getUserNotice(NoticeReceiveInfo noticeReceiveInfo);
 
