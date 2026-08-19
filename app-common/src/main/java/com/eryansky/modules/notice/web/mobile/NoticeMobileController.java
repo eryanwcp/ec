@@ -75,7 +75,7 @@ public class NoticeMobileController extends SimpleController {
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         Page<NoticeReceiveInfo> page = new Page<>(SpringMVCHolder.getRequest());
         if (sessionInfo != null) {
-            page = noticeReceiveInfoService.findReadNoticePage(page, new NoticeReceiveInfo(), sessionInfo.getUserId(), null);
+            page = noticeReceiveInfoService.findReadNoticePage(page,  sessionInfo.getUserId(), null);
         }
         Datagrid dg = new Datagrid(page.getTotalCount(), page.getResult());
         String json = JsonMapper.getInstance().toJson(dg, NoticeReceiveInfo.class,
@@ -95,11 +95,7 @@ public class NoticeMobileController extends SimpleController {
         Page<NoticeReceiveInfoSimpleVo> page = new Page<>(request, response);
         if (sessionInfo != null) {
             page = noticeReceiveInfoService.findReadNoticePageByUserId(page, sessionInfo.getUserId(), noticeQueryVo);
-            page.getResult().forEach(noticeReceiveInfo -> {
-                noticeReceiveInfo.setHeadImageUrl(DiskUtils.getFileUrl(noticeReceiveInfo.getHeadImage()));
-                noticeReceiveInfo.setTypeView(DictionaryUtils.getDictionaryNameByDV(NoticeUtils.DIC_NOTICE, noticeReceiveInfo.getType(), noticeReceiveInfo.getType()));
-                noticeReceiveInfo.setIsReadView(GenericEnumUtils.getDescriptionByValue(NoticeReadMode.class, noticeReceiveInfo.getType(), noticeReceiveInfo.getType()));
-            });
+
         }
         return page;
     }

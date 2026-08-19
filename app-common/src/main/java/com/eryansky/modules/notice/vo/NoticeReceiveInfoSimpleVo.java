@@ -7,10 +7,9 @@ package com.eryansky.modules.notice.vo;
 
 import com.eryansky.core.orm.mybatis.entity.BaseEntity;
 import com.eryansky.modules.notice._enum.NoticeReadMode;
-import com.eryansky.modules.notice.mapper.NoticeReceiveInfo;
 import com.eryansky.modules.sys._enum.YesOrNo;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -20,6 +19,17 @@ import java.util.Date;
  * @date 2026-08-15
  */
 public class NoticeReceiveInfoSimpleVo extends BaseEntity<NoticeReceiveInfoSimpleVo> {
+
+    /**
+     * 是否已读 默认值：否 {@link NoticeReadMode}
+     */
+    private String isRead;
+    /**
+     * 是否已读 默认值：否 {@link NoticeReadMode}
+     */
+    private String isReadView;
+    private String isReply;
+    private String isReplyView;
 
     private String appId;
 
@@ -31,6 +41,7 @@ public class NoticeReceiveInfoSimpleVo extends BaseEntity<NoticeReceiveInfoSimpl
     private String noticeId;
     private String type;
     private String typeView;
+    private String title;
     private String headImage;
     private String headImageUrl;
 
@@ -38,18 +49,49 @@ public class NoticeReceiveInfoSimpleVo extends BaseEntity<NoticeReceiveInfoSimpl
      * 是否置顶 ${@link YesOrNo}
      */
     private String isTop;
-    /**
-     * 是否已读 默认值：否 {@link NoticeReadMode}
-     */
-    private String isRead;
-    /**
-     * 是否已读 默认值：否 {@link NoticeReadMode}
-     */
-    private String isReadView;
+
+
+    private String publishUserId;
+    private String publishUserName;
+    private String isNeedReply;
+    private String isNeedReplyView;
+
 
     private Date publishTime;
 
     public NoticeReceiveInfoSimpleVo() {
+    }
+
+    public String getIsRead() {
+        return isRead;
+    }
+
+    public void setIsRead(String isRead) {
+        this.isRead = isRead;
+    }
+
+    public String getIsReadView() {
+        return isReadView;
+    }
+
+    public void setIsReadView(String isReadView) {
+        this.isReadView = isReadView;
+    }
+
+    public String getIsReply() {
+        return isReply;
+    }
+
+    public void setIsReply(String isReply) {
+        this.isReply = isReply;
+    }
+
+    public String getIsReplyView() {
+        return isReplyView;
+    }
+
+    public void setIsReplyView(String isReplyView) {
+        this.isReplyView = isReplyView;
     }
 
     public String getAppId() {
@@ -68,23 +110,6 @@ public class NoticeReceiveInfoSimpleVo extends BaseEntity<NoticeReceiveInfoSimpl
         this.userId = userId;
     }
 
-
-    public String getIsRead() {
-        return isRead;
-    }
-
-    public void setIsRead(String isRead) {
-        this.isRead = isRead;
-    }
-
-    public String getIsReadView() {
-        return isReadView;
-    }
-
-    public void setIsReadView(String isReadView) {
-        this.isReadView = isReadView;
-    }
-
     public String getNoticeId() {
         return noticeId;
     }
@@ -93,12 +118,12 @@ public class NoticeReceiveInfoSimpleVo extends BaseEntity<NoticeReceiveInfoSimpl
         this.noticeId = noticeId;
     }
 
-    public String getId() {
-        return id;
+    public String getTitle() {
+        return title;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getType() {
@@ -117,6 +142,14 @@ public class NoticeReceiveInfoSimpleVo extends BaseEntity<NoticeReceiveInfoSimpl
         this.typeView = typeView;
     }
 
+    public String getHeadImage() {
+        return headImage;
+    }
+
+    public void setHeadImage(String headImage) {
+        this.headImage = headImage;
+    }
+
     public String getHeadImageUrl() {
         return headImageUrl;
     }
@@ -133,20 +166,44 @@ public class NoticeReceiveInfoSimpleVo extends BaseEntity<NoticeReceiveInfoSimpl
         this.isTop = isTop;
     }
 
+    public String getPublishUserId() {
+        return publishUserId;
+    }
 
+    public void setPublishUserId(String publishUserId) {
+        this.publishUserId = publishUserId;
+    }
+
+    public String getPublishUserName() {
+        return publishUserName;
+    }
+
+    public void setPublishUserName(String publishUserName) {
+        this.publishUserName = publishUserName;
+    }
+
+    public String getIsNeedReply() {
+        return isNeedReply;
+    }
+
+    public void setIsNeedReply(String isNeedReply) {
+        this.isNeedReply = isNeedReply;
+    }
+
+    public String getIsNeedReplyView() {
+        return isNeedReplyView;
+    }
+
+    public void setIsNeedReplyView(String isNeedReplyView) {
+        this.isNeedReplyView = isNeedReplyView;
+    }
+
+    @JsonFormat(pattern = DATE_TIME_FORMAT, timezone = TIMEZONE)
     public Date getPublishTime() {
         return publishTime;
     }
 
     public void setPublishTime(Date publishTime) {
         this.publishTime = publishTime;
-    }
-
-    public String getHeadImage() {
-        return headImage;
-    }
-
-    public void setHeadImage(String headImage) {
-        this.headImage = headImage;
     }
 }

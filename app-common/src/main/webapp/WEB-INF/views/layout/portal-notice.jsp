@@ -27,7 +27,7 @@
             <tr>
                 <td>
                     <c:choose>
-                        <c:when test="${noticeReceiveInfo.isRead == 1}">
+                        <c:when test="${noticeReceiveInfo.isRead eq '1'}">
                             <span id="notice_icon_${noticeReceiveInfo.id}" title="已读"
                                   class="tree-icon tree-file eu-icon-star_gray"></span>
                         </c:when>
@@ -46,7 +46,7 @@
                     </a>
                 </td>
                 <td align="right" class="portal-time">
-                    <fmt:formatDate value="${noticeScope.publishTime }" pattern="MM-dd HH:mm"/>
+                    <fmt:formatDate value="${noticeReceiveInfo.publishTime}" pattern="MM-dd HH:mm"/>
                 </td>
             </tr>
         </c:forEach>

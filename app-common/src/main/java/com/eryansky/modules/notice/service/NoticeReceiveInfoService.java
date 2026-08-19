@@ -9,20 +9,24 @@ import com.eryansky.common.exception.DaoException;
 import com.eryansky.common.exception.ServiceException;
 import com.eryansky.common.exception.SystemException;
 import com.eryansky.common.orm.Page;
+import com.eryansky.common.orm._enum.GenericEnumUtils;
 import com.eryansky.common.orm.model.Parameter;
 import com.eryansky.common.orm.mybatis.interceptor.BaseInterceptor;
 import com.eryansky.common.utils.DateUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
 import com.eryansky.core.orm.mybatis.service.CrudService;
+import com.eryansky.modules.disk.utils.DiskUtils;
 import com.eryansky.modules.notice._enum.NoticeMode;
 import com.eryansky.modules.notice._enum.NoticeReadMode;
 import com.eryansky.modules.notice.dao.NoticeReceiveInfoDao;
 import com.eryansky.modules.notice.mapper.Notice;
 import com.eryansky.modules.notice.mapper.NoticeReceiveInfo;
+import com.eryansky.modules.notice.utils.NoticeUtils;
 import com.eryansky.modules.notice.vo.NoticeQueryVo;
 import com.eryansky.modules.notice.vo.NoticeReceiveInfoSimpleVo;
 import com.eryansky.modules.sys._enum.YesOrNo;
+import com.eryansky.modules.sys.utils.DictionaryUtils;
 import com.eryansky.utils.AppConstants;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -65,7 +69,7 @@ public class NoticeReceiveInfoService extends CrudService<NoticeReceiveInfoDao, 
         noticeQueryVo.setIsReply(isReply);
         noticeQueryVo.setStartTime(startTime);
         noticeQueryVo.setEndTime(endTime);
-        return findReadNoticePage(page, new NoticeReceiveInfo(), userId, noticeQueryVo);
+        return findReadNoticePage(page, userId, noticeQueryVo);
     }
 
     /**
@@ -79,7 +83,7 @@ public class NoticeReceiveInfoService extends CrudService<NoticeReceiveInfoDao, 
      * @throws ServiceException
      * @throws DaoException
      */
-    public Page<NoticeReceiveInfo> findReadNoticePage(Page<NoticeReceiveInfo> page, NoticeReceiveInfo entity, String userId, NoticeQueryVo noticeQueryVo) {
+    public Page<NoticeReceiveInfo> findReadNoticePage(Page<NoticeReceiveInfo> page,String userId, NoticeQueryVo noticeQueryVo) {
         Assert.notNull(userId, "参数[userId]为空!");
         Parameter parameter = new Parameter();
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
@@ -107,9 +111,8 @@ public class NoticeReceiveInfoService extends CrudService<NoticeReceiveInfoDao, 
             }
         }
 
-        entity.setEntityPage(page);
         parameter.put(BaseInterceptor.PAGE, page);
-        parameter.put(BaseInterceptor.DB_NAME, entity.getDbName());
+        parameter.put(BaseInterceptor.DB_NAME,  AppConstants.getJdbcType());
         page.autoResult(dao.findQueryList(parameter));
 
         return page;
@@ -148,6 +151,13 @@ public class NoticeReceiveInfoService extends CrudService<NoticeReceiveInfoDao, 
         parameter.put(BaseInterceptor.PAGE, page);
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
         page.autoResult(dao.findQueryListByUserId(parameter));
+        page.getResult().forEach(noticeReceiveInfo -> {
+            noticeReceiveInfo.setHeadImageUrl(DiskUtils.getFileUrl(noticeReceiveInfo.getHeadImage()));
+            noticeReceiveInfo.setTypeView(DictionaryUtils.getDictionaryNameByDV(NoticeUtils.DIC_NOTICE, noticeReceiveInfo.getType(), noticeReceiveInfo.getType()));
+            noticeReceiveInfo.setIsReadView(GenericEnumUtils.getDescriptionByValue(NoticeReadMode.class, noticeReceiveInfo.getType(), noticeReceiveInfo.getType()));
+            noticeReceiveInfo.setIsReplyView(GenericEnumUtils.getDescriptionByValue(YesOrNo.class, noticeReceiveInfo.getIsReply(), noticeReceiveInfo.getIsReply()));
+            noticeReceiveInfo.setIsNeedReplyView(GenericEnumUtils.getDescriptionByValue(YesOrNo.class, noticeReceiveInfo.getIsNeedReply(), noticeReceiveInfo.getIsNeedReply()));
+        });
         return page;
     }
 

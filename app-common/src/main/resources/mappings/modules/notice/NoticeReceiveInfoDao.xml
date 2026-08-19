@@ -78,10 +78,14 @@
 		n.title AS "title",
 		n.type AS "type",
 		n.is_top AS "isTop",
-		n.head_image AS "headImage"
+		n.head_image AS "headImage",
+		n.publish_time AS "publishTime",
+		n.is_reply AS "isNeedReply",
+		n.user_id AS "publishUserId",
+		u.name AS "publishUserName"
 		FROM ${noticePrefix}t_notice_receive_info a
 		<include refid="noticeJoins"/>
-		LEFT JOIN ${sysPrefix}t_sys_user u ON u.id = a.user_id
+		LEFT JOIN ${sysPrefix}t_sys_user u ON u.id = n.user_id
 		<where>
 			n.status = #{status}
 			AND a.user_id = #{userId}

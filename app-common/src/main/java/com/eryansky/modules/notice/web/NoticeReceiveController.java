@@ -33,6 +33,7 @@ import com.eryansky.modules.notice.service.NoticeReceiveInfoService;
 import com.eryansky.modules.notice.task.MessageTask;
 import com.eryansky.modules.notice.utils.MessageUtils;
 import com.eryansky.modules.notice.vo.NoticeQueryVo;
+import com.eryansky.modules.notice.vo.NoticeReceiveInfoSimpleVo;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys._enum.YesOrNo;
 import com.eryansky.utils.AppConstants;
@@ -110,15 +111,13 @@ public class NoticeReceiveController extends SimpleController {
      */
     @PostMapping(value = {"readInfoDatagrid"})
     @ResponseBody
-    public String noticeReadDatagrid(NoticeQueryVo noticeQueryVo) {
+    public Datagrid<NoticeReceiveInfoSimpleVo> noticeReadDatagrid(NoticeQueryVo noticeQueryVo) {
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
-        Page<NoticeReceiveInfo> page = new Page<>(SpringMVCHolder.getRequest());
+        Page<NoticeReceiveInfoSimpleVo> page = new Page<>(SpringMVCHolder.getRequest());
         noticeQueryVo.syncEndTime();
-        page = noticeReceiveInfoService.findReadNoticePage(page, new NoticeReceiveInfo(), sessionInfo.getUserId(), noticeQueryVo);
-        Datagrid<NoticeReceiveInfo> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
-        String json = JsonMapper.getInstance().toJson(dg, Notice.class,
-                new String[]{"id", "noticeId", "title", "type", "typeView", "publishUserName", "publishTime", "isReadView", "isNeedReply", "isNeedReplyView", "isReply", "isReplyView"});
-        return json;
+        page = noticeReceiveInfoService.findReadNoticePageByUserId(page, sessionInfo.getUserId(), noticeQueryVo);
+        Datagrid<NoticeReceiveInfoSimpleVo> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
+        return dg;
     }
 
     /**
