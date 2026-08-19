@@ -53,6 +53,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -65,13 +66,13 @@ import java.util.*;
 @RequestMapping(value = "${adminPath}/notice")
 public class NoticeController extends SimpleController {
 
-    @Autowired
+    @Resource
     private NoticeService noticeService;
-    @Autowired
+    @Resource
     private NoticeReceiveInfoService noticeReceiveInfoService;
-    @Autowired
+    @Resource
     private NoticeSendInfoService noticeSendInfoService;
-    @Autowired
+    @Resource
     private UserService userService;
 
     /**

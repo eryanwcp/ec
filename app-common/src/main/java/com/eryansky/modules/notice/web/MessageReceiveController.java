@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012-2024 https://www.eryansky.com
+ * Copyright (c) 2012-2026 https://www.eryansky.com
  * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -22,7 +22,7 @@ import com.eryansky.modules.notice.task.MessageTask;
 import com.eryansky.modules.notice.utils.MessageUtils;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys._enum.YesOrNo;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -41,9 +41,9 @@ import javax.servlet.http.HttpServletResponse;
 @RequestMapping(value = "${adminPath}/notice/messageReceive")
 public class MessageReceiveController extends SimpleController {
 
-    @Autowired
+    @Resource
     private MessageReceiveService messageReceiveService;
-    @Autowired
+    @Resource
     private MessageTask messageTask;
 
     @ModelAttribute("model")

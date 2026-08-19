@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012-2024 https://www.eryansky.com
+ * Copyright (c) 2012-2026 https://www.eryansky.com
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -29,7 +29,7 @@ import com.eryansky.modules.notice.mapper.ContactGroup;
 import com.eryansky.modules.notice.mapper.MailContact;
 import com.eryansky.modules.notice.service.ContactGroupService;
 import com.eryansky.modules.notice.service.MailContactService;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -45,13 +45,13 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping(value = "${adminPath}/notice/mailContact")
 public class MailContactController extends SimpleController {
-    @Autowired
+    @Resource
     private MailContactService contactService;
-    @Autowired
+    @Resource
     private ContactGroupService contactGroupService;
-    @Autowired
+    @Resource
     private UserService userService;
-    @Autowired
+    @Resource
     private OrganService organService;
 
     @ModelAttribute("model")

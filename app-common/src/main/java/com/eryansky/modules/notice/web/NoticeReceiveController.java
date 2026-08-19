@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012-2024 https://www.eryansky.com
+ * Copyright (c) 2012-2026 https://www.eryansky.com
  * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -33,18 +33,19 @@ import com.eryansky.modules.notice.service.NoticeReceiveInfoService;
 import com.eryansky.modules.notice.task.MessageTask;
 import com.eryansky.modules.notice.utils.MessageUtils;
 import com.eryansky.modules.notice.vo.NoticeQueryVo;
+import com.eryansky.modules.notice.vo.NoticeReceiveInfoSimpleVo;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys._enum.YesOrNo;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Lists;
 import org.apache.commons.fileupload.FileUploadBase;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -63,7 +64,7 @@ import java.util.List;
 @RequestMapping(value = "${adminPath}/notice/noticeReceiveInfo")
 public class NoticeReceiveController extends SimpleController {
 
-    @Autowired
+    @Resource
     private NoticeReceiveInfoService noticeReceiveInfoService;
 
     @ModelAttribute("model")
@@ -92,7 +93,7 @@ public class NoticeReceiveController extends SimpleController {
     public String list(NoticeReceiveInfo model, HttpServletRequest request, HttpServletResponse response, Model uiModel) {
         Page<NoticeReceiveInfo> page = new Page<>(request, response);
         if (WebUtils.isAjaxRequest(request)) {
-            SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
+//            SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
             return renderString(response, Result.successResult().setObj(page));
         }
 
@@ -110,15 +111,13 @@ public class NoticeReceiveController extends SimpleController {
      */
     @PostMapping(value = {"readInfoDatagrid"})
     @ResponseBody
-    public String noticeReadDatagrid(NoticeQueryVo noticeQueryVo) {
+    public Datagrid<NoticeReceiveInfoSimpleVo> noticeReadDatagrid(NoticeQueryVo noticeQueryVo) {
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
-        Page<NoticeReceiveInfo> page = new Page<>(SpringMVCHolder.getRequest());
+        Page<NoticeReceiveInfoSimpleVo> page = new Page<>(SpringMVCHolder.getRequest());
         noticeQueryVo.syncEndTime();
-        page = noticeReceiveInfoService.findReadNoticePage(page, new NoticeReceiveInfo(), sessionInfo.getUserId(), noticeQueryVo);
-        Datagrid<NoticeReceiveInfo> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
-        String json = JsonMapper.getInstance().toJson(dg, Notice.class,
-                new String[]{"id", "noticeId", "title", "type", "typeView", "publishUserName", "publishTime", "isReadView", "isNeedReply", "isNeedReplyView", "isReply", "isReplyView"});
-        return json;
+        page = noticeReceiveInfoService.findReadNoticePageByUserId(page, sessionInfo.getUserId(), noticeQueryVo);
+        Datagrid<NoticeReceiveInfoSimpleVo> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
+        return dg;
     }
 
     /**
@@ -205,7 +204,7 @@ public class NoticeReceiveController extends SimpleController {
     @GetMapping(value = {"replyInput"})
     public ModelAndView replyInput(@ModelAttribute("model") NoticeReceiveInfo model) {
         ModelAndView modelAndView = new ModelAndView("modules/notice/notice-reply-input");
-        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
+//        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         String[] fs = StringUtils.split(model.getReplyFileIds(), ",");
         modelAndView.addObject("files", null == fs ? Collections.emptyList() : DiskUtils.findFilesByIds(Lists.newArrayList(fs)));
         modelAndView.addObject("fileIds", null == fs ? Collections.emptyList() : Lists.newArrayList(fs));
@@ -226,7 +225,7 @@ public class NoticeReceiveController extends SimpleController {
     @ResponseBody
     public Result replySave(@ModelAttribute("model") NoticeReceiveInfo model,
                             @RequestParam(value = "fileIds", required = false) List<String> fileIds) {
-        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
+//        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         model.setIsReply(YesOrNo.YES.getValue());
         model.setReplyTime(Calendar.getInstance().getTime());
         model.setReplyFileIds(Collections3.convertToString(fileIds, ","));
