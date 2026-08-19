@@ -23,6 +23,7 @@ import com.eryansky.modules.notice.mapper.NoticeReceiveInfo;
 import com.eryansky.modules.notice.vo.NoticeQueryVo;
 import com.eryansky.modules.notice.vo.NoticeReceiveInfoSimpleVo;
 import com.eryansky.modules.sys._enum.YesOrNo;
+import com.eryansky.utils.AppConstants;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -126,7 +127,7 @@ public class NoticeReceiveInfoService extends CrudService<NoticeReceiveInfoDao, 
      * @throws ServiceException
      * @throws DaoException
      */
-    public Page<NoticeReceiveInfoSimpleVo> findReadNoticePageByUserId(Page<NoticeReceiveInfoSimpleVo> page, NoticeReceiveInfo entity, String userId, NoticeQueryVo noticeQueryVo) {
+    public Page<NoticeReceiveInfoSimpleVo> findReadNoticePageByUserId(Page<NoticeReceiveInfoSimpleVo> page, String userId, NoticeQueryVo noticeQueryVo) {
         Assert.notNull(userId, "参数[userId]为空!");
         Parameter parameter = new Parameter();
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
@@ -145,7 +146,7 @@ public class NoticeReceiveInfoService extends CrudService<NoticeReceiveInfoDao, 
             }
         }
         parameter.put(BaseInterceptor.PAGE, page);
-        parameter.put(BaseInterceptor.DB_NAME, entity.getDbName());
+        parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
         page.autoResult(dao.findQueryListByUserId(parameter));
         return page;
     }

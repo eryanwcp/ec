@@ -90,11 +90,11 @@ public class NoticeMobileController extends SimpleController {
     @PostMapping(value = "noticeData")
     @ResponseBody
     public Page<NoticeReceiveInfoSimpleVo> noticeData(HttpServletRequest request, HttpServletResponse response,
-                             NoticeQueryVo noticeQueryVo) {
+                                                      NoticeQueryVo noticeQueryVo) {
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
-        Page<NoticeReceiveInfoSimpleVo> page = new Page<>(request,response);
+        Page<NoticeReceiveInfoSimpleVo> page = new Page<>(request, response);
         if (sessionInfo != null) {
-            page = noticeReceiveInfoService.findReadNoticePageByUserId(page, new NoticeReceiveInfo(), sessionInfo.getUserId(), noticeQueryVo);
+            page = noticeReceiveInfoService.findReadNoticePageByUserId(page, sessionInfo.getUserId(), noticeQueryVo);
             page.getResult().forEach(noticeReceiveInfo -> {
                 noticeReceiveInfo.setHeadImageUrl(DiskUtils.getFileUrl(noticeReceiveInfo.getHeadImage()));
                 noticeReceiveInfo.setTypeView(DictionaryUtils.getDictionaryNameByDV(NoticeUtils.DIC_NOTICE, noticeReceiveInfo.getType(), noticeReceiveInfo.getType()));
