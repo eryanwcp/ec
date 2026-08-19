@@ -89,15 +89,16 @@ public class NoticeMobileController extends SimpleController {
      */
     @PostMapping(value = "noticeData")
     @ResponseBody
-    public Page<NoticeReceiveInfoSimpleVo> noticeData(HttpServletRequest request, HttpServletResponse response,
-                                                      NoticeQueryVo noticeQueryVo) {
+    public String noticeData(HttpServletRequest request, HttpServletResponse response,
+                             NoticeQueryVo noticeQueryVo) {
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         Page<NoticeReceiveInfoSimpleVo> page = new Page<>(request, response);
         if (sessionInfo != null) {
             page = noticeReceiveInfoService.findReadNoticePageByUserId(page, sessionInfo.getUserId(), noticeQueryVo);
 
         }
-        return page;
+        String json = JsonMapper.getInstance().toJson(Result.successResult().setObj(page));
+        return renderString(response,json, WebUtils.JSON_TYPE);
     }
 
 
