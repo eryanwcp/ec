@@ -108,7 +108,7 @@ public class NoticeReceiveInfoService extends CrudService<NoticeReceiveInfoDao, 
 
         entity.setEntityPage(page);
         parameter.put(BaseInterceptor.PAGE, page);
-        parameter.put("dbName", entity.getDbName());
+        parameter.put(BaseInterceptor.DB_NAME, entity.getDbName());
         page.autoResult(dao.findQueryList(parameter));
 
         return page;
@@ -145,7 +145,7 @@ public class NoticeReceiveInfoService extends CrudService<NoticeReceiveInfoDao, 
             }
         }
         parameter.put(BaseInterceptor.PAGE, page);
-        parameter.put("dbName", entity.getDbName());
+        parameter.put(BaseInterceptor.DB_NAME, entity.getDbName());
         page.autoResult(dao.findQueryListByUserId(parameter));
         return page;
     }
