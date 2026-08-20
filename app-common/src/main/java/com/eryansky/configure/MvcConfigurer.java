@@ -1,11 +1,11 @@
 package com.eryansky.configure;
 
 import com.eryansky.common.utils.collections.Collections3;
-import com.eryansky.common.utils.jackson.XssDefaultJsonDeserializer;
-import com.eryansky.common.utils.jackson.XssDefaultJsonSerializer;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.core.dialect.dialect.ShiroDialect;
 import com.eryansky.core.security.interceptor.*;
+import com.eryansky.core.security.xss.XssJsonDeserializer;
+import com.eryansky.core.security.xss.XssJsonSerializer;
 import com.eryansky.core.web.interceptor.MobileInterceptor;
 import com.eryansky.modules.disk.extend.DISKManager;
 import com.eryansky.modules.disk.extend.IFileManager;
@@ -83,7 +83,7 @@ public class MvcConfigurer implements WebMvcConfigurer {
                 .addPathPatterns("/**")
                 .order(Ordered.HIGHEST_PRECEDENCE + 90);
 
-        if (Boolean.TRUE.equals(AppConstants.isLimitUrlEnable())) {
+        if (AppConstants.isLimitUrlEnable()) {
             registry.addInterceptor(new UrlLimitInterceptor())
                     .addPathPatterns("/**")
                     .order(Ordered.HIGHEST_PRECEDENCE + 90);
@@ -102,7 +102,7 @@ public class MvcConfigurer implements WebMvcConfigurer {
 
         List<String> dList = Lists.newArrayList("/jump.jsp", "/index.html", "/web/**", "/mweb/**", "/assets/**", "/icons/**", "/static/**", "/**/*.css", "/**/*.js", "/**/*.png", "/**/*.ico", "/**/*.json", "favicon**", "/userfiles/**", "/servlet/**", "/error/**", "/api/**", "/rest/**");
 
-        if (Boolean.TRUE.equals(AppConstants.isOauth2Enable())) {
+        if (AppConstants.isOauth2Enable()) {
             List<String> cList = AppConstants.getOauth2ExcludePathList();
             registry.addInterceptor(new AuthorityOauth2Interceptor()).addPathPatterns("/**")
                     .excludePathPatterns(Collections3.aggregate(dList, cList))
@@ -164,9 +164,9 @@ public class MvcConfigurer implements WebMvcConfigurer {
 
         SimpleModule module = new SimpleModule();
         // XSS反序列化
-        module.addDeserializer(String.class, new XssDefaultJsonDeserializer());
+        module.addDeserializer(String.class, new XssJsonDeserializer());
         // XSS序列化
-        module.addSerializer(String.class, new XssDefaultJsonSerializer());
+        module.addSerializer(String.class, new XssJsonSerializer());
 
         //序列换成json时,将所有的long变成string 因为js中得数字类型不能包含所有的java long值
 //      module.addSerializer(Long.class, ToStringSerializer.instance);

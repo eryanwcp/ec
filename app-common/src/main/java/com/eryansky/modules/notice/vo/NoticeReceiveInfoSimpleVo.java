@@ -6,6 +6,7 @@
 package com.eryansky.modules.notice.vo;
 
 import com.eryansky.core.orm.mybatis.entity.BaseEntity;
+import com.eryansky.core.security.xss.XSSConfig;
 import com.eryansky.modules.notice._enum.NoticeReadMode;
 import com.eryansky.modules.sys._enum.YesOrNo;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -41,6 +42,7 @@ public class NoticeReceiveInfoSimpleVo extends BaseEntity<NoticeReceiveInfoSimpl
     private String noticeId;
     private String type;
     private String typeView;
+    @XSSConfig
     private String title;
     private String headImage;
     private String headImageUrl;
