@@ -25,12 +25,11 @@ import com.eryansky.modules.notice.mapper.NoticeReceiveInfo;
 import com.eryansky.modules.notice.service.NoticeReceiveInfoService;
 import com.eryansky.modules.notice.service.NoticeService;
 import com.eryansky.utils.AppConstants;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -46,13 +45,13 @@ import java.util.Map;
 @RequestMapping(value = "${adminPath}/portal")
 public class PortalController extends SimpleController {
 
-    @Autowired
+    @Resource
     private UserService userService;
-    @Autowired
+    @Resource
     private NoticeService noticeService;
-    @Autowired
+    @Resource
     private NoticeReceiveInfoService noticeReceiveInfoService;
-    @Autowired
+    @Resource
     private UserPasswordService userPasswordService;
 
 
@@ -89,7 +88,7 @@ public class PortalController extends SimpleController {
         // 当前登录用户
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         long noticeReceiveInfos = 0;
-        Page<NoticeReceiveInfo> page = new Page<>(request);
+        Page<NoticeReceiveInfoSimpleVo> page = new Page<>(request);
         page = noticeReceiveInfoService.findUserUnreadNotices(page, sessionInfo.getLoginName());
         if (Collections3.isNotEmpty(page.getResult())) {
             noticeReceiveInfos = page.getTotalCount();
@@ -144,7 +143,7 @@ public class PortalController extends SimpleController {
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         if (sessionInfo != null) {
             Page<NoticeReceiveInfoSimpleVo> page = new Page<>(SpringMVCHolder.getRequest());
-            page = noticeReceiveInfoService.findReadNoticePageByUserId(page,  sessionInfo.getUserId(), null);
+            page = noticeReceiveInfoService.findNoticePageByUserId(page,  sessionInfo.getUserId(), null);
             modelAnView.addObject("page", page);
 
         }
