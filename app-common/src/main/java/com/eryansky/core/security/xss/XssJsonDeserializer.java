@@ -20,7 +20,7 @@ public class XssJsonDeserializer extends JsonDeserializer<String> implements Con
 
     // 预创建静态常量实例，彻底避免动态 new 对象
     private static final XssJsonDeserializer DEFAULT_INSTANCE = new XssJsonDeserializer(false);
-    private static final XssJsonDeserializer SKIP_DESERIALIZE_INSTANCE = new XssJsonDeserializer(true);
+    private static final XssJsonDeserializer DESERIALIZE_INSTANCE_SKIP = new XssJsonDeserializer(true);
 
     // Request 属性缓存 Key 与空注解占位符
     private static final String CONTROLLER_XSS_IGNORE_CACHE_KEY = "XSS_IGNORE_CONTROLLER_DESER_CACHE";
@@ -71,7 +71,7 @@ public class XssJsonDeserializer extends JsonDeserializer<String> implements Con
 
         // 3. 根据注解中的 deserializer 配置匹配预设单例
         if (xssIgnore != null && !xssIgnore.deserializer()) {
-            return SKIP_DESERIALIZE_INSTANCE;
+            return DESERIALIZE_INSTANCE_SKIP;
         }
 
         return DEFAULT_INSTANCE;
