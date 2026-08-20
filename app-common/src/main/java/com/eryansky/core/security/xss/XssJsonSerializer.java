@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
-import jakarta.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerMapping;
 
@@ -15,9 +15,10 @@ import java.io.IOException;
 
 public class XssJsonSerializer extends JsonSerializer<String> implements ContextualSerializer {
 
-    private XssIgnore xssIgnore;
+    private final XssIgnore xssIgnore;
 
     public XssJsonSerializer() {
+        this.xssIgnore = null;
     }
 
     public XssJsonSerializer(XssIgnore xssIgnore) {
@@ -58,10 +59,16 @@ public class XssJsonSerializer extends JsonSerializer<String> implements Context
     }
 
     private XssIgnore isControllerAnnotated(SerializerProvider prov) {
-        HttpServletRequest request = SpringMVCHolder.getRequest();
+        HttpServletRequest request = null;
+        try {
+            request = SpringMVCHolder.getRequest();
+        } catch (Exception e) {
+            return null;
+        }
         try {
             Object handler = request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE);
-            if (handler instanceof HandlerMethod handlerMethod) {
+            if (handler instanceof HandlerMethod) {
+                HandlerMethod handlerMethod = (HandlerMethod) handler;
                 XssIgnore xssIgnore = handlerMethod.getMethodAnnotation(XssIgnore.class);
                 if (xssIgnore != null) {
                     return xssIgnore;

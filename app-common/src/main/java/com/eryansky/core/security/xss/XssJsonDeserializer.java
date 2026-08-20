@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
-import jakarta.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.HtmlUtils;
@@ -15,9 +15,10 @@ import java.io.IOException;
 
 public class XssJsonDeserializer extends JsonDeserializer<String> implements ContextualDeserializer {
 
-    private XssIgnore xssIgnore;
+    private final XssIgnore xssIgnore;
 
     public XssJsonDeserializer() {
+        this.xssIgnore = null;
     }
 
     public XssJsonDeserializer(XssIgnore xssIgnore) {
@@ -62,10 +63,16 @@ public class XssJsonDeserializer extends JsonDeserializer<String> implements Con
      * 查找当前请求对应的 Controller 或 HandlerMethod 上是否有注解
      */
     private XssIgnore isControllerAnnotated(DeserializationContext ctxt) {
-        HttpServletRequest request = SpringMVCHolder.getRequest();
+        HttpServletRequest request = null;
+        try {
+            request = SpringMVCHolder.getRequest();
+        } catch (Exception e) {
+            return null;
+        }
         try {
             Object handler = request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE);
-            if (handler instanceof HandlerMethod handlerMethod) {
+            if (handler instanceof HandlerMethod) {
+                HandlerMethod handlerMethod = (HandlerMethod) handler;
                 XssIgnore xssIgnore = handlerMethod.getMethodAnnotation(XssIgnore.class);
                 if (xssIgnore != null) {
                     return xssIgnore;
