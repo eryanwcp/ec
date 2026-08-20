@@ -154,7 +154,7 @@ public class NoticeReceiveInfoService extends CrudService<NoticeReceiveInfoDao, 
         page.getResult().forEach(noticeReceiveInfo -> {
             noticeReceiveInfo.setHeadImageUrl(DiskUtils.getFileUrl(noticeReceiveInfo.getHeadImage()));
             noticeReceiveInfo.setTypeView(DictionaryUtils.getDictionaryNameByDV(NoticeUtils.DIC_NOTICE, noticeReceiveInfo.getType(), noticeReceiveInfo.getType()));
-            noticeReceiveInfo.setIsReadView(GenericEnumUtils.getDescriptionByValue(NoticeReadMode.class, noticeReceiveInfo.getType(), noticeReceiveInfo.getType()));
+            noticeReceiveInfo.setIsReadView(GenericEnumUtils.getDescriptionByValue(NoticeReadMode.class, noticeReceiveInfo.getIsRead(), noticeReceiveInfo.getIsRead()));
             noticeReceiveInfo.setIsReplyView(GenericEnumUtils.getDescriptionByValue(YesOrNo.class, noticeReceiveInfo.getIsReply(), noticeReceiveInfo.getIsReply()));
             noticeReceiveInfo.setIsNeedReplyView(GenericEnumUtils.getDescriptionByValue(YesOrNo.class, noticeReceiveInfo.getIsNeedReply(), noticeReceiveInfo.getIsNeedReply()));
         });
