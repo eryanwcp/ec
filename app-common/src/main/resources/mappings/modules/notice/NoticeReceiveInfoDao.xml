@@ -180,63 +180,8 @@
 		<where>
 			n.status = #{status}
 			AND a.notice_id = #{noticeId}
-			<if test="isRead != null and isRead != ''">
-				AND a.is_read = #{isRead}
-			</if>
-			<if test="isReply != null and isReply != ''">
-				AND a.is_reply = #{isReply}
-			</if>
-			<choose>
-				<when test="types != null and types.size() != 0">
-					AND n.type IN
-					<foreach collection="types" item="item" index="index" open="(" close=")" separator=",">
-						#{item,jdbcType=VARCHAR}
-					</foreach>
-				</when>
-				<when test="type != null and type != ''">
-					AND n.type = #{type}
-				</when>
-				<otherwise></otherwise>
-			</choose>
-			<if test="isTop != null and isTop != ''">
-				AND n.is_top = #{isTop}
-			</if>
-
-			<if test="bizMode != null and bizMode !=''">
-				AND n.biz_mode = #{bizMode}
-			</if>
-
-			<if test="title != null and title != ''">
-				AND n.title LIKE
-				<choose>
-					<when test="dbName == 'db2'">'%'||#{title}||'%'</when>
-					<when test="dbName == 'mysql'">CONCAT('%', #{title}, '%')</when>
-					<when test="dbName == 'oracle'">'%'||#{title}||'%'</when>
-					<otherwise>'%'+#{title}+'%'</otherwise>
-				</choose>
-			</if>
-			<if test="content != null and content != ''">
-				AND n.content LIKE
-				<choose>
-					<when test="dbName == 'db2'">'%'||#{content}||'%'</when>
-					<when test="dbName == 'mysql'">CONCAT('%', #{content}, '%')</when>
-					<when test="dbName == 'oracle'">'%'||#{content}||'%'</when>
-					<otherwise>'%'+#{content}+'%'</otherwise>
-				</choose>
-			</if>
-			<choose>
-				<when test="startTime != null and endTime != null">
-					AND n.publish_time BETWEEN #{startTime} AND #{endTime}
-				</when>
-				<when test="startTime != null and endTime == null">
-					AND n.publish_time <![CDATA[>=]]> #{startTime}
-				</when>
-				<when test="startTime == null and endTime != null">
-					AND n.publish_time <![CDATA[<=]]> #{endTime}
-				</when>
-			</choose>
 		</where>
-		ORDER BY n.is_top DESC,oc.code ASC,o.code ASC,n.publish_time DESC
+		ORDER BY n.is_top DESC,oc.code ASC,o.code ASC,u.sort ASC
 	</select>
 
 
