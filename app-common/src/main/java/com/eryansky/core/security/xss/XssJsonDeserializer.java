@@ -15,13 +15,13 @@ import java.io.IOException;
 
 public class XssJsonDeserializer extends JsonDeserializer<String> implements ContextualDeserializer {
 
-    private XSSConfig xssConfig;
+    private XssIgnore xssIgnore;
 
     public XssJsonDeserializer() {
     }
 
-    public XssJsonDeserializer(XSSConfig xssConfig) {
-        this.xssConfig = xssConfig;
+    public XssJsonDeserializer(XssIgnore xssIgnore) {
+        this.xssIgnore = xssIgnore;
     }
 
     @Override
@@ -31,7 +31,7 @@ public class XssJsonDeserializer extends JsonDeserializer<String> implements Con
             return null;
         }
 
-        if ((xssConfig != null && !xssConfig.deserializer()) || XssWhiteListMatcher.isWhitelisted()) {
+        if ((xssIgnore != null && !xssIgnore.deserializer()) || XssWhiteListMatcher.isWhitelisted()) {
             return value;
         }
 
@@ -41,18 +41,18 @@ public class XssJsonDeserializer extends JsonDeserializer<String> implements Con
     @Override
     public JsonDeserializer<?> createContextual(DeserializationContext ctxt, BeanProperty property) {
         if (property != null) {
-            XSSConfig xssConfig = property.getAnnotation(XSSConfig.class);
-            if (xssConfig == null) {
-                xssConfig = property.getContextAnnotation(XSSConfig.class);
+            XssIgnore xssIgnore = property.getAnnotation(XssIgnore.class);
+            if (xssIgnore == null) {
+                xssIgnore = property.getContextAnnotation(XssIgnore.class);
             }
-            if (xssConfig != null) {
-                return new XssJsonDeserializer(xssConfig);
+            if (xssIgnore != null) {
+                return new XssJsonDeserializer(xssIgnore);
             }
         }
 
-        XSSConfig xssConfig = isControllerAnnotated(ctxt);
-        if (xssConfig != null) {
-            return new XssJsonDeserializer(xssConfig);
+        XssIgnore xssIgnore = isControllerAnnotated(ctxt);
+        if (xssIgnore != null) {
+            return new XssJsonDeserializer(xssIgnore);
         }
 
         return this;
@@ -61,16 +61,16 @@ public class XssJsonDeserializer extends JsonDeserializer<String> implements Con
     /**
      * 查找当前请求对应的 Controller 或 HandlerMethod 上是否有注解
      */
-    private XSSConfig isControllerAnnotated(DeserializationContext ctxt) {
+    private XssIgnore isControllerAnnotated(DeserializationContext ctxt) {
         HttpServletRequest request = SpringMVCHolder.getRequest();
         try {
             Object handler = request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE);
             if (handler instanceof HandlerMethod handlerMethod) {
-                XSSConfig xssConfig = handlerMethod.getMethodAnnotation(XSSConfig.class);
-                if (xssConfig != null) {
-                    return xssConfig;
+                XssIgnore xssIgnore = handlerMethod.getMethodAnnotation(XssIgnore.class);
+                if (xssIgnore != null) {
+                    return xssIgnore;
                 }
-                return handlerMethod.getBeanType().getAnnotation(XSSConfig.class);
+                return handlerMethod.getBeanType().getAnnotation(XssIgnore.class);
             }
         } catch (Exception ignored) {
             // 解析失败时降级走默认过滤逻辑

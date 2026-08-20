@@ -10,19 +10,18 @@ import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerMapping;
-import org.springframework.web.util.HtmlUtils;
 
 import java.io.IOException;
 
 public class XssJsonSerializer extends JsonSerializer<String> implements ContextualSerializer {
 
-    private XSSConfig xssConfig;
+    private XssIgnore xssIgnore;
 
     public XssJsonSerializer() {
     }
 
-    public XssJsonSerializer(XSSConfig xssConfig) {
-        this.xssConfig = xssConfig;
+    public XssJsonSerializer(XssIgnore xssIgnore) {
+        this.xssIgnore = xssIgnore;
     }
 
     @Override
@@ -32,7 +31,7 @@ public class XssJsonSerializer extends JsonSerializer<String> implements Context
             return;
         }
 
-        if ((xssConfig != null && !xssConfig.serializer()) || XssWhiteListMatcher.isWhitelisted()) {
+        if ((xssIgnore != null && !xssIgnore.serializer()) || XssWhiteListMatcher.isWhitelisted()) {
             gen.writeString(value);
         } else {
             gen.writeString(EncodeUtils.htmlEscape(value));
@@ -42,32 +41,32 @@ public class XssJsonSerializer extends JsonSerializer<String> implements Context
     @Override
     public JsonSerializer<?> createContextual(SerializerProvider prov, BeanProperty property) {
         if (property != null) {
-            XSSConfig xssConfig = property.getAnnotation(XSSConfig.class);
-            if (xssConfig == null) {
-                xssConfig = property.getContextAnnotation(XSSConfig.class);
+            XssIgnore xssIgnore = property.getAnnotation(XssIgnore.class);
+            if (xssIgnore == null) {
+                xssIgnore = property.getContextAnnotation(XssIgnore.class);
             }
-            if (xssConfig != null) {
-                return new XssJsonSerializer(xssConfig);
+            if (xssIgnore != null) {
+                return new XssJsonSerializer(xssIgnore);
             }
         }
-        XSSConfig xssConfig = isControllerAnnotated(prov);
-        if (xssConfig != null) {
-            return new XssJsonSerializer(xssConfig);
+        XssIgnore xssIgnore = isControllerAnnotated(prov);
+        if (xssIgnore != null) {
+            return new XssJsonSerializer(xssIgnore);
         }
 
         return this;
     }
 
-    private XSSConfig isControllerAnnotated(SerializerProvider prov) {
+    private XssIgnore isControllerAnnotated(SerializerProvider prov) {
         HttpServletRequest request = SpringMVCHolder.getRequest();
         try {
             Object handler = request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE);
             if (handler instanceof HandlerMethod handlerMethod) {
-                XSSConfig xssConfig = handlerMethod.getMethodAnnotation(XSSConfig.class);
-                if (xssConfig != null) {
-                    return xssConfig;
+                XssIgnore xssIgnore = handlerMethod.getMethodAnnotation(XssIgnore.class);
+                if (xssIgnore != null) {
+                    return xssIgnore;
                 }
-                return handlerMethod.getBeanType().getAnnotation(XSSConfig.class);
+                return handlerMethod.getBeanType().getAnnotation(XssIgnore.class);
             }
         } catch (Exception ignored) {
             // 解析失败时降级走默认过滤逻辑
