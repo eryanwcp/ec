@@ -15,9 +15,10 @@ import java.io.IOException;
 
 public class XssJsonDeserializer extends JsonDeserializer<String> implements ContextualDeserializer {
 
-    private XssIgnore xssIgnore;
+    private final XssIgnore xssIgnore;
 
     public XssJsonDeserializer() {
+        this.xssIgnore = null;
     }
 
     public XssJsonDeserializer(XssIgnore xssIgnore) {
@@ -62,7 +63,12 @@ public class XssJsonDeserializer extends JsonDeserializer<String> implements Con
      * 查找当前请求对应的 Controller 或 HandlerMethod 上是否有注解
      */
     private XssIgnore isControllerAnnotated(DeserializationContext ctxt) {
-        HttpServletRequest request = SpringMVCHolder.getRequest();
+        HttpServletRequest request = null;
+        try {
+            request = SpringMVCHolder.getRequest();
+        } catch (Exception e) {
+            return null;
+        }
         try {
             Object handler = request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE);
             if (handler instanceof HandlerMethod handlerMethod) {

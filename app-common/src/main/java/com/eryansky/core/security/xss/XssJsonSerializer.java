@@ -15,9 +15,10 @@ import java.io.IOException;
 
 public class XssJsonSerializer extends JsonSerializer<String> implements ContextualSerializer {
 
-    private XssIgnore xssIgnore;
+    private final XssIgnore xssIgnore;
 
     public XssJsonSerializer() {
+        this.xssIgnore = null;
     }
 
     public XssJsonSerializer(XssIgnore xssIgnore) {
@@ -58,7 +59,12 @@ public class XssJsonSerializer extends JsonSerializer<String> implements Context
     }
 
     private XssIgnore isControllerAnnotated(SerializerProvider prov) {
-        HttpServletRequest request = SpringMVCHolder.getRequest();
+        HttpServletRequest request = null;
+        try {
+            request = SpringMVCHolder.getRequest();
+        } catch (Exception e) {
+            return null;
+        }
         try {
             Object handler = request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE);
             if (handler instanceof HandlerMethod handlerMethod) {
