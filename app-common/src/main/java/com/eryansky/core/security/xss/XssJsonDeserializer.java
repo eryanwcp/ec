@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.HtmlUtils;
@@ -103,8 +104,10 @@ public class XssJsonDeserializer extends JsonDeserializer<String> implements Con
             if (handler instanceof HandlerMethod handlerMethod) {
                 // 优先取 HandlerMethod 方法注解，其次取 Controller 类注解
                 xssIgnore = handlerMethod.getMethodAnnotation(XssIgnore.class);
+//                xssIgnore = AnnotatedElementUtils.findMergedAnnotation(handlerMethod.getMethod(), XssIgnore.class);
                 if (xssIgnore == null) {
                     xssIgnore = handlerMethod.getBeanType().getAnnotation(XssIgnore.class);
+//                    xssIgnore = AnnotatedElementUtils.findMergedAnnotation(handlerMethod.getBeanType(), XssIgnore.class);
                 }
             }
         } catch (Exception ignored) {
