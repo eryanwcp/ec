@@ -8,27 +8,18 @@ package com.eryansky.modules.notice.web.mobile;
 import com.eryansky.common.model.Datagrid;
 import com.eryansky.common.model.Result;
 import com.eryansky.common.orm.Page;
-import com.eryansky.common.orm._enum.GenericEnumUtils;
 import com.eryansky.common.utils.StringUtils;
-import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SimpleController;
-import com.eryansky.common.web.springmvc.SpringMVCHolder;
-import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
 import com.eryansky.core.web.annotation.Mobile;
-import com.eryansky.modules.disk.utils.DiskUtils;
-import com.eryansky.modules.notice._enum.NoticeReadMode;
 import com.eryansky.modules.notice.mapper.Notice;
-import com.eryansky.modules.notice.mapper.NoticeReceiveInfo;
 import com.eryansky.modules.notice.service.NoticeReceiveInfoService;
 import com.eryansky.modules.notice.service.NoticeService;
-import com.eryansky.modules.notice.utils.NoticeUtils;
 import com.eryansky.modules.notice.vo.NoticeQueryVo;
 import com.eryansky.modules.notice.vo.NoticeReceiveInfoSimpleVo;
 import com.eryansky.modules.sys._enum.LogType;
-import com.eryansky.modules.sys.utils.DictionaryUtils;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -71,23 +62,20 @@ public class NoticeMobileController extends SimpleController {
      */
     @PostMapping(value = "noticePage")
     @ResponseBody
-    public String noticePage() {
+    public Datagrid noticePage(HttpServletRequest request, HttpServletResponse response,
+                               NoticeQueryVo noticeQueryVo) {
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
-        Page<NoticeReceiveInfo> page = new Page<>(SpringMVCHolder.getRequest());
+        Page<NoticeReceiveInfoSimpleVo> page = new Page<>(request, response);
         if (sessionInfo != null) {
-            page = noticeReceiveInfoService.findReadNoticePage(page,  sessionInfo.getUserId(), null);
+            page = noticeReceiveInfoService.findNoticePageByUserId(page, sessionInfo.getUserId(), noticeQueryVo);
         }
         Datagrid dg = new Datagrid(page.getTotalCount(), page.getResult());
-        String json = JsonMapper.getInstance().toJson(dg, NoticeReceiveInfo.class,
-                new String[]{"id", "noticeId","title", "type", "typeView", "isTop", "headImageUrl", "isRead",
-                        "isReadView", "publishTime"});
-        return json;
+        return dg;
     }
 
     /**
      * @return
      */
-    @Logging(value = "我的通知",logType = LogType.access)
     @PostMapping(value = "noticeData")
     @ResponseBody
     public Result noticeData(HttpServletRequest request, HttpServletResponse response,
@@ -95,7 +83,7 @@ public class NoticeMobileController extends SimpleController {
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         Page<NoticeReceiveInfoSimpleVo> page = new Page<>(request, response);
         if (sessionInfo != null) {
-            page = noticeReceiveInfoService.findReadNoticePageByUserId(page, sessionInfo.getUserId(), noticeQueryVo);
+            page = noticeReceiveInfoService.findNoticePageByUserId(page, sessionInfo.getUserId(), noticeQueryVo);
         }
         return Result.successResult().setObj(page);
     }

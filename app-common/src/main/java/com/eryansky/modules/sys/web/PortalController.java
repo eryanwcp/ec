@@ -142,7 +142,7 @@ public class PortalController extends SimpleController {
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         if (sessionInfo != null) {
             Page<NoticeReceiveInfoSimpleVo> page = new Page<>(SpringMVCHolder.getRequest());
-            page = noticeReceiveInfoService.findReadNoticePageByUserId(page,  sessionInfo.getUserId(), null);
+            page = noticeReceiveInfoService.findNoticePageByUserId(page,  sessionInfo.getUserId(), null);
             modelAnView.addObject("page", page);
 
         }
