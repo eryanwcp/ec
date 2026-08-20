@@ -123,7 +123,7 @@ public class NoticeReceiveController extends SimpleController {
     @ResponseBody
     public Datagrid<NoticeReceiveInfoSimpleVo> readInfoDatagrid(@PathVariable String id) {
         Page<NoticeReceiveInfoSimpleVo> page = new Page<>(SpringMVCHolder.getRequest());
-        page = noticeReceiveInfoService.findNoticeReceiveInfosByNoticeId(page, id);
+        page = noticeReceiveInfoService.findNoticeReceiveInfoPageByNoticeId(page, id);
         Datagrid<NoticeReceiveInfoSimpleVo> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
         return dg;
     }

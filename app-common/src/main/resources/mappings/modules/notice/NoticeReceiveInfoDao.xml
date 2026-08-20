@@ -175,8 +175,8 @@
 		FROM ${noticePrefix}t_notice_receive_info a
 		<include refid="noticeJoins"/>
 		LEFT JOIN ${sysPrefix}t_sys_user u ON u.id = a.user_id
-		LEFT JOIN ${sysPrefix}t_sys_organ_extent o ON o.id = u.default_organ_id
-		LEFT JOIN ${sysPrefix}t_sys_organ_extent oc ON oc.id = o.company_id
+		LEFT JOIN ${sysPrefix}t_sys_organ_extend o ON o.id = u.default_organ_id
+		LEFT JOIN ${sysPrefix}t_sys_organ_extend oc ON oc.id = o.company_id
 		<where>
 			n.status = #{status}
 			AND a.notice_id = #{noticeId}

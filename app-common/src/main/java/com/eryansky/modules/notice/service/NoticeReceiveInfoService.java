@@ -163,7 +163,7 @@ public class NoticeReceiveInfoService extends CrudService<NoticeReceiveInfoDao, 
      * @param noticeId
      * @return
      */
-    public Page<NoticeReceiveInfoSimpleVo> findNoticeReceiveInfosByNoticeId(Page<NoticeReceiveInfoSimpleVo> page, String noticeId) {
+    public Page<NoticeReceiveInfoSimpleVo> findNoticeReceiveInfoPageByNoticeId(Page<NoticeReceiveInfoSimpleVo> page, String noticeId) {
         Parameter parameter = new Parameter();
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put(BaseInterceptor.PAGE, page);
