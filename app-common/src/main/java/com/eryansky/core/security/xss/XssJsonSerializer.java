@@ -21,7 +21,6 @@ public class XssJsonSerializer extends JsonSerializer<String> implements Context
     // 预创建静态常量实例，避免频繁 new 对象
     private static final XssJsonSerializer DEFAULT_INSTANCE = new XssJsonSerializer(false);
     private static final XssJsonSerializer SKIP_SERIALIZE_INSTANCE = new XssJsonSerializer(true);
-    private static final XssJsonSerializer ENABLE_SERIALIZE_INSTANCE = new XssJsonSerializer(false);
 
     // 缓存 Key 与空占位符（避免无注解时重复解析反射）
     private static final String CONTROLLER_XSS_IGNORE_CACHE_KEY = "XSS_IGNORE_CONTROLLER_ATTRIBUTE_CACHE";
@@ -71,8 +70,8 @@ public class XssJsonSerializer extends JsonSerializer<String> implements Context
         }
 
         // 3. 根据注解配置匹配预创建的单例对象
-        if (xssIgnore != null) {
-            return !xssIgnore.serializer() ? SKIP_SERIALIZE_INSTANCE : ENABLE_SERIALIZE_INSTANCE;
+        if (xssIgnore != null && !xssIgnore.serializer()) {
+            return SKIP_SERIALIZE_INSTANCE;
         }
 
         return DEFAULT_INSTANCE;
