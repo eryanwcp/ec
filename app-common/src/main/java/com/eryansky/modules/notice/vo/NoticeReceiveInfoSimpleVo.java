@@ -59,6 +59,10 @@ public class NoticeReceiveInfoSimpleVo extends BaseEntity<NoticeReceiveInfoSimpl
 
     private Date publishTime;
 
+    private String userName;
+    private String organName;
+    private String companyName;
+
     public NoticeReceiveInfoSimpleVo() {
     }
 

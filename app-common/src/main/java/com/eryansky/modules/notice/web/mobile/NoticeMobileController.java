@@ -62,14 +62,14 @@ public class NoticeMobileController extends SimpleController {
      */
     @PostMapping(value = "noticePage")
     @ResponseBody
-    public Datagrid noticePage(HttpServletRequest request, HttpServletResponse response,
+    public Datagrid<NoticeReceiveInfoSimpleVo> noticePage(HttpServletRequest request, HttpServletResponse response,
                                NoticeQueryVo noticeQueryVo) {
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         Page<NoticeReceiveInfoSimpleVo> page = new Page<>(request, response);
         if (sessionInfo != null) {
             page = noticeReceiveInfoService.findNoticePageByUserId(page, sessionInfo.getUserId(), noticeQueryVo);
         }
-        Datagrid dg = new Datagrid(page.getTotalCount(), page.getResult());
+        Datagrid<NoticeReceiveInfoSimpleVo> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
         return dg;
     }
 
