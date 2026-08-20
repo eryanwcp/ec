@@ -67,6 +67,9 @@
 		    m.content AS "content",
 		    m.content AS "message.content",
 		    u.name AS "senderName",
+			m.category AS "category",
+			m.title AS "title",
+			m.url AS "url",
 		    m.send_time AS "sendTime",
 		    m.send_time AS "message.sendTime"
 		FROM ${noticePrefix}t_notice_message_receive a
