@@ -87,6 +87,7 @@ public class NoticeMobileController extends SimpleController {
     /**
      * @return
      */
+    @Logging(value = "我的通知",logType = LogType.access)
     @PostMapping(value = "noticeData")
     @ResponseBody
     public Result noticeData(HttpServletRequest request, HttpServletResponse response,
