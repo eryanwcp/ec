@@ -6,9 +6,11 @@
 package com.eryansky.configure;
 
 import com.eryansky.common.utils.ObjectUtils;
+import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.io.PropertiesLoader;
 import com.eryansky.common.utils.mapper.JsonMapper;
+import com.eryansky.core.security.xss.XssWhiteListMatcher;
 import com.eryansky.j2cache.util.ForySerializer;
 import com.eryansky.modules.disk.utils.DiskUtils;
 import com.eryansky.modules.sys.mapper.Config;
@@ -116,6 +118,11 @@ public class DefaultConfigurer {
      */
     @EventListener(ApplicationReadyEvent.class)
     public void onReady() {
+        //XSS配置文件配置
+        String xssBlackListURL = AppConstants.getXssBlackListURL();
+        if(StringUtils.isNotBlank(xssBlackListURL)){
+            XssWhiteListMatcher.addWhiteList(xssBlackListURL.split(";"));
+        }
         // 动态配置序列化安全策略
         checkSerializerTypeCheck();
 
