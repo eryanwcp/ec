@@ -300,11 +300,6 @@ public class NoticeController extends SimpleController {
         return JsonMapper.getInstance().toJson(list, User.class, new String[]{"id", "name", "defaultOrganName"});
     }
 
-    @Override
-    protected void initBinder(WebDataBinder binder) {
-        super.defaultWebDataBinder(binder);
-    }
-
     /**
      * 保存
      *
