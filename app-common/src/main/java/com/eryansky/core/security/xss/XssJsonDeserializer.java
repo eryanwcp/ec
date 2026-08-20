@@ -13,18 +13,29 @@ import org.springframework.web.util.HtmlUtils;
 
 import java.io.IOException;
 
+/**
+ * XSS JSON 反序列化器（结合静态常量单例与 Controller 级注解 Request 缓存）
+ */
 public class XssJsonDeserializer extends JsonDeserializer<String> implements ContextualDeserializer {
 
-    private static final XssJsonDeserializer DEFAULT_INSTANCE = new XssJsonDeserializer();
+    // 预创建静态常量实例，彻底避免动态 new 对象
+    private static final XssJsonDeserializer DEFAULT_INSTANCE = new XssJsonDeserializer(false);
+    private static final XssJsonDeserializer SKIP_DESERIALIZE_INSTANCE = new XssJsonDeserializer(true);
+    private static final XssJsonDeserializer ENABLE_DESERIALIZE_INSTANCE = new XssJsonDeserializer(false);
 
-    private final XssIgnore xssIgnore;
+    // Request 属性缓存 Key 与空注解占位符
+    private static final String CONTROLLER_XSS_IGNORE_CACHE_KEY = "XSS_IGNORE_CONTROLLER_DESER_CACHE";
+    private static final Object NULL_HOLDER = new Object();
+
+    // 是否跳过 XSS 反序列化（反转义）
+    private final boolean skipDeserialize;
 
     public XssJsonDeserializer() {
-        this.xssIgnore = null;
+        this(false);
     }
 
-    public XssJsonDeserializer(XssIgnore xssIgnore) {
-        this.xssIgnore = xssIgnore;
+    public XssJsonDeserializer(boolean skipDeserialize) {
+        this.skipDeserialize = skipDeserialize;
     }
 
     @Override
@@ -34,7 +45,8 @@ public class XssJsonDeserializer extends JsonDeserializer<String> implements Con
             return null;
         }
 
-        if ((xssIgnore != null && !xssIgnore.deserializer()) || XssWhiteListMatcher.isWhitelisted()) {
+        // 如果配置了跳过反序列化，或者命中全局白名单，直接返回原字符串
+        if (skipDeserialize || XssWhiteListMatcher.isWhitelisted()) {
             return value;
         }
 
@@ -43,46 +55,65 @@ public class XssJsonDeserializer extends JsonDeserializer<String> implements Con
 
     @Override
     public JsonDeserializer<?> createContextual(DeserializationContext ctxt, BeanProperty property) {
+        XssIgnore xssIgnore = null;
+
+        // 1. 优先读取 Bean 字段/属性或 setter 参数上的 @XssIgnore
         if (property != null) {
-            XssIgnore xssIgnore = property.getAnnotation(XssIgnore.class);
+            xssIgnore = property.getAnnotation(XssIgnore.class);
             if (xssIgnore == null) {
                 xssIgnore = property.getContextAnnotation(XssIgnore.class);
             }
-            if (xssIgnore != null) {
-                return new XssJsonDeserializer(xssIgnore);
-            }
         }
 
-        XssIgnore xssIgnore = isControllerAnnotated(ctxt);
+        // 2. 字段未配置，检查 Controller 类或方法上是否有 @XssIgnore（带有 Request 缓存）
+        if (xssIgnore == null) {
+            xssIgnore = isControllerAnnotated(ctxt);
+        }
+
+        // 3. 根据注解中的 deserializer 配置匹配预设单例
         if (xssIgnore != null) {
-            return new XssJsonDeserializer(xssIgnore);
+            return !xssIgnore.deserializer() ? SKIP_DESERIALIZE_INSTANCE : ENABLE_DESERIALIZE_INSTANCE;
         }
 
         return DEFAULT_INSTANCE;
     }
 
     /**
-     * 查找当前请求对应的 Controller 或 HandlerMethod 上是否有注解
+     * 查找当前请求对应的 Controller 或 HandlerMethod 上是否有注解（包含 Request 属性缓存）
      */
     private XssIgnore isControllerAnnotated(DeserializationContext ctxt) {
-        HttpServletRequest request = null;
+        HttpServletRequest request;
         try {
             request = SpringMVCHolder.getRequest();
+            if (request == null) {
+                return null;
+            }
         } catch (Exception e) {
             return null;
         }
+
+        // 尝试从 Request 属性中直接获取缓存结果
+        Object cached = request.getAttribute(CONTROLLER_XSS_IGNORE_CACHE_KEY);
+        if (cached != null) {
+            return cached == NULL_HOLDER ? null : (XssIgnore) cached;
+        }
+
+        XssIgnore xssIgnore = null;
         try {
             Object handler = request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE);
             if (handler instanceof HandlerMethod handlerMethod) {
-                XssIgnore xssIgnore = handlerMethod.getMethodAnnotation(XssIgnore.class);
-                if (xssIgnore != null) {
-                    return xssIgnore;
+                // 优先取 HandlerMethod 方法注解，其次取 Controller 类注解
+                xssIgnore = handlerMethod.getMethodAnnotation(XssIgnore.class);
+                if (xssIgnore == null) {
+                    xssIgnore = handlerMethod.getBeanType().getAnnotation(XssIgnore.class);
                 }
-                return handlerMethod.getBeanType().getAnnotation(XssIgnore.class);
             }
         } catch (Exception ignored) {
-            // 解析失败时降级走默认过滤逻辑
+            // 解析失败降级
         }
-        return null;
+
+        // 将解析到的结果（或 NULL_HOLDER）写入 Request 属性，供本次请求后续字段共享
+        request.setAttribute(CONTROLLER_XSS_IGNORE_CACHE_KEY, xssIgnore != null ? xssIgnore : NULL_HOLDER);
+        return xssIgnore;
     }
 }
