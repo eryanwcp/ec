@@ -59,6 +59,10 @@ public class NoticeReceiveInfoSimpleVo extends BaseEntity<NoticeReceiveInfoSimpl
 
     private Date publishTime;
 
+    private String userName;
+    private String organName;
+    private String companyName;
+
     public NoticeReceiveInfoSimpleVo() {
     }
 
@@ -205,5 +209,29 @@ public class NoticeReceiveInfoSimpleVo extends BaseEntity<NoticeReceiveInfoSimpl
 
     public void setPublishTime(Date publishTime) {
         this.publishTime = publishTime;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getOrganName() {
+        return organName;
+    }
+
+    public void setOrganName(String organName) {
+        this.organName = organName;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
 }

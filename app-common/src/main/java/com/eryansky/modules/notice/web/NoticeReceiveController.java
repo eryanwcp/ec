@@ -11,7 +11,6 @@ import com.eryansky.common.model.Result;
 import com.eryansky.common.orm.Page;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
-import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.common.web.utils.WebUtils;
@@ -25,13 +24,8 @@ import com.eryansky.core.web.upload.exception.FileNameLengthLimitExceededExcepti
 import com.eryansky.core.web.upload.exception.InvalidExtensionException;
 import com.eryansky.modules.disk.mapper.File;
 import com.eryansky.modules.disk.utils.DiskUtils;
-import com.eryansky.modules.notice.mapper.MessageReceive;
-import com.eryansky.modules.notice.mapper.Notice;
 import com.eryansky.modules.notice.mapper.NoticeReceiveInfo;
-import com.eryansky.modules.notice.service.MessageReceiveService;
 import com.eryansky.modules.notice.service.NoticeReceiveInfoService;
-import com.eryansky.modules.notice.task.MessageTask;
-import com.eryansky.modules.notice.utils.MessageUtils;
 import com.eryansky.modules.notice.vo.NoticeQueryVo;
 import com.eryansky.modules.notice.vo.NoticeReceiveInfoSimpleVo;
 import com.eryansky.modules.sys._enum.LogType;
@@ -50,7 +44,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -115,7 +108,7 @@ public class NoticeReceiveController extends SimpleController {
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         Page<NoticeReceiveInfoSimpleVo> page = new Page<>(SpringMVCHolder.getRequest());
         noticeQueryVo.syncEndTime();
-        page = noticeReceiveInfoService.findReadNoticePageByUserId(page, sessionInfo.getUserId(), noticeQueryVo);
+        page = noticeReceiveInfoService.findNoticePageByUserId(page, sessionInfo.getUserId(), noticeQueryVo);
         Datagrid<NoticeReceiveInfoSimpleVo> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
         return dg;
     }
@@ -128,13 +121,11 @@ public class NoticeReceiveController extends SimpleController {
      */
     @PostMapping(value = {"readInfoDatagrid/{id}"})
     @ResponseBody
-    public String readInfoDatagrid(@PathVariable String id) {
-        Page<NoticeReceiveInfo> page = new Page<>(SpringMVCHolder.getRequest());
-        page = noticeReceiveInfoService.findNoticeReceiveInfosByNoticeId(page, id);
-        Datagrid<NoticeReceiveInfo> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
-        String json = JsonMapper.getInstance().toJson(dg, NoticeReceiveInfo.class,
-                new String[]{"id", "userName","companyName", "organName", "isRead", "isReadView", "readTime", "isReply", "isReplyView", "replyTime", "replyContent", "replyFileIds"});
-        return json;
+    public Datagrid<NoticeReceiveInfoSimpleVo> readInfoDatagrid(@PathVariable String id) {
+        Page<NoticeReceiveInfoSimpleVo> page = new Page<>(SpringMVCHolder.getRequest());
+        page = noticeReceiveInfoService.findNoticeReceiveInfoPageByNoticeId(page, id);
+        Datagrid<NoticeReceiveInfoSimpleVo> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
+        return dg;
     }
 
 

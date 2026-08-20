@@ -14,10 +14,12 @@ import com.eryansky.modules.notice._enum.MessageMode;
 import com.eryansky.modules.notice.dao.MessageReceiveDao;
 import com.eryansky.modules.notice.mapper.Message;
 import com.eryansky.modules.notice.mapper.MessageReceive;
+import com.eryansky.modules.notice.vo.MessageReceiveSimpleVo;
 import com.eryansky.modules.sys._enum.YesOrNo;
 //import com.eryansky.modules.weixin.utils.WeixinUtils;
 import com.eryansky.modules.sys.mapper.VersionLog;
 import com.eryansky.utils.AppConstants;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
@@ -30,7 +32,6 @@ import java.util.Map;
  */
 @Service
 public class MessageReceiveService extends CrudService<MessageReceiveDao, MessageReceive> {
-
 
     /**
      * 根据消息ID删除
@@ -59,7 +60,7 @@ public class MessageReceiveService extends CrudService<MessageReceiveDao, Messag
      * @param isRead
      * @return
      */
-    public Page<MessageReceive> findUserPage(Page<MessageReceive> page, String userId, String isRead) {
+    public Page<MessageReceiveSimpleVo> findUserPage(Page<MessageReceiveSimpleVo> page, String userId, String isRead) {
         return findUserPage(page, VersionLog.DEFAULT_ID, userId, isRead, null, null);
     }
 
@@ -74,7 +75,7 @@ public class MessageReceiveService extends CrudService<MessageReceiveDao, Messag
      * @param params
      * @return
      */
-    public Page<MessageReceive> findUserPage(Page<MessageReceive> page, String appId, String userId, String isRead, String isSend, Map<String, Object> params) {
+    public Page<MessageReceiveSimpleVo> findUserPage(Page<MessageReceiveSimpleVo> page, String appId, String userId, String isRead, String isSend, Map<String, Object> params) {
         Parameter parameter = new Parameter();
         parameter.put(BaseInterceptor.PAGE, page);
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
@@ -98,7 +99,7 @@ public class MessageReceiveService extends CrudService<MessageReceiveDao, Messag
      * @param userId
      * @return
      */
-    public List<MessageReceive> findUnSendByUserId(String userId) {
+    public List<MessageReceiveSimpleVo> findUnSendByUserId(String userId) {
         Parameter parameter = new Parameter();
         parameter.put(Message.FIELD_STATUS, Message.STATUS_NORMAL);
         parameter.put("bizMode", MessageMode.Published.getValue());
@@ -210,8 +211,8 @@ public class MessageReceiveService extends CrudService<MessageReceiveDao, Messag
      * @param userId
      */
     public void reSendByUserId(String userId) {
-        List<MessageReceive> list = findUnSendByUserId(userId);
-        for (MessageReceive messageReceive : list) {
+        List<MessageReceiveSimpleVo> list = findUnSendByUserId(userId);
+        for (MessageReceiveSimpleVo messageReceive : list) {
             reSendByMessageReceive(messageReceive);
         }
     }
@@ -221,8 +222,8 @@ public class MessageReceiveService extends CrudService<MessageReceiveDao, Messag
      *
      * @param messageReceive
      */
-    private void reSendByMessageReceive(MessageReceive messageReceive) {
-//        Message message = messageReceive.getMessage();
+    private void reSendByMessageReceive(MessageReceiveSimpleVo messageReceive) {
+//        Message message = messageService.get(messageReceive.getMessageId());
 //        boolean flag = WeixinUtils.sendTextMsg(messageReceive.getUserId(), message.getContent(), message.getUrl());
 //        messageReceive.setIsSend(flag ? YesOrNo.YES.getValue() : YesOrNo.NO.getValue());
 //        save(messageReceive);
@@ -249,24 +250,9 @@ public class MessageReceiveService extends CrudService<MessageReceiveDao, Messag
      * @return
      */
     public List<MessageReceive> findByMessageId(String messageId) {
-        return findByMessageId(messageId, null, null);
-    }
-
-
-    /**
-     * 根据消息ID查找
-     *
-     * @param messageId 消息ID
-     * @param isRead    是否阅读 {@link YesOrNo}
-     * @param isSend    消是否发送成功 {@link YesOrNo}
-     * @return
-     */
-    public List<MessageReceive> findByMessageId(String messageId, String isRead, String isSend) {
         Parameter parameter = new Parameter();
         parameter.put(Message.FIELD_STATUS, Message.STATUS_NORMAL);
         parameter.put("messageId", messageId);
-        parameter.put("isRead", isRead);
-        parameter.put("isSend", isSend);
         return dao.findByMessageId(parameter);
     }
 
