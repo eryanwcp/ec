@@ -15,6 +15,8 @@ import java.io.IOException;
 
 public class XssJsonSerializer extends JsonSerializer<String> implements ContextualSerializer {
 
+    private static final XssJsonSerializer DEFAULT_INSTANCE = new XssJsonSerializer();
+
     private final XssIgnore xssIgnore;
 
     public XssJsonSerializer() {
@@ -55,7 +57,7 @@ public class XssJsonSerializer extends JsonSerializer<String> implements Context
             return new XssJsonSerializer(xssIgnore);
         }
 
-        return this;
+        return DEFAULT_INSTANCE;
     }
 
     private XssIgnore isControllerAnnotated(SerializerProvider prov) {

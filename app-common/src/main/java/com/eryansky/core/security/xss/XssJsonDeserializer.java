@@ -15,6 +15,8 @@ import java.io.IOException;
 
 public class XssJsonDeserializer extends JsonDeserializer<String> implements ContextualDeserializer {
 
+    private static final XssJsonDeserializer DEFAULT_INSTANCE = new XssJsonDeserializer();
+
     private final XssIgnore xssIgnore;
 
     public XssJsonDeserializer() {
@@ -56,7 +58,7 @@ public class XssJsonDeserializer extends JsonDeserializer<String> implements Con
             return new XssJsonDeserializer(xssIgnore);
         }
 
-        return this;
+        return DEFAULT_INSTANCE;
     }
 
     /**
