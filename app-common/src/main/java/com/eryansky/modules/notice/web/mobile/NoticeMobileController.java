@@ -69,8 +69,7 @@ public class NoticeMobileController extends SimpleController {
         if (sessionInfo != null) {
             page = noticeReceiveInfoService.findNoticePageByUserId(page, sessionInfo.getUserId(), noticeQueryVo);
         }
-        Datagrid<NoticeReceiveInfoSimpleVo> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
-        return dg;
+        return new Datagrid<>(page.getTotalCount(), page.getResult());
     }
 
     /**

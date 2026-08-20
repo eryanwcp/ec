@@ -7,6 +7,7 @@ import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
+import com.eryansky.core.security.xss.UrlContextHolder;
 import com.eryansky.utils.AppConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,7 @@ public class UrlLimitInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) throws Exception {
+        UrlContextHolder.setUri(request.getRequestURI());
         if (!AppConstants.isLimitUrlEnable()) {
             return true;
         }
@@ -51,7 +53,7 @@ public class UrlLimitInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) throws Exception {
-
+        UrlContextHolder.clear();
     }
 
     /**

@@ -109,8 +109,7 @@ public class NoticeReceiveController extends SimpleController {
         Page<NoticeReceiveInfoSimpleVo> page = new Page<>(SpringMVCHolder.getRequest());
         noticeQueryVo.syncEndTime();
         page = noticeReceiveInfoService.findNoticePageByUserId(page, sessionInfo.getUserId(), noticeQueryVo);
-        Datagrid<NoticeReceiveInfoSimpleVo> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
-        return dg;
+        return new Datagrid<>(page.getTotalCount(), page.getResult());
     }
 
     /**
@@ -124,8 +123,7 @@ public class NoticeReceiveController extends SimpleController {
     public Datagrid<NoticeReceiveInfoSimpleVo> readInfoDatagrid(@PathVariable String id) {
         Page<NoticeReceiveInfoSimpleVo> page = new Page<>(SpringMVCHolder.getRequest());
         page = noticeReceiveInfoService.findNoticeReceiveInfoPageByNoticeId(page, id);
-        Datagrid<NoticeReceiveInfoSimpleVo> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
-        return dg;
+        return new Datagrid<>(page.getTotalCount(), page.getResult());
     }
 
 

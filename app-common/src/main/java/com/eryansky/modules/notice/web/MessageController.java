@@ -55,7 +55,7 @@ import java.util.List;
 public class MessageController extends SimpleController {
 
     @Resource
-    private SystemMessageAPI apiWebService;
+    private SystemMessageAPI systemMessageAPI;
     @Resource
     private MessageService messageService;
     @Resource
@@ -281,7 +281,7 @@ public class MessageController extends SimpleController {
     @PostMapping(value = {"api/sendMessage"})
     @ResponseBody
     public WSResult sendMessage(String paramJson) {
-        return apiWebService.sendMessage(paramJson);
+        return systemMessageAPI.sendMessage(paramJson);
     }
 
     /**
