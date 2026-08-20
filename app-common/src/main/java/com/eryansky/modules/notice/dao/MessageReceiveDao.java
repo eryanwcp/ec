@@ -11,6 +11,7 @@ import com.eryansky.common.orm.mybatis.MyBatisDao;
 import com.eryansky.common.orm.persistence.CrudDao;
 import com.eryansky.modules.notice._enum.MessageMode;
 import com.eryansky.modules.notice.mapper.MessageReceive;
+import com.eryansky.modules.notice.vo.MessageReceiveSimpleVo;
 
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,7 @@ public interface MessageReceiveDao extends CrudDao<MessageReceive> {
      *                  userId 用户ID
      * @return
      */
-    List<MessageReceive> findUserList(Parameter parameter);
+    List<MessageReceiveSimpleVo> findUserList(Parameter parameter);
 
     List<MessageReceive> findByMessageId(Parameter parameter);
 

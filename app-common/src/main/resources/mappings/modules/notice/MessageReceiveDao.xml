@@ -60,11 +60,18 @@
 	</select>
 
 	<!--用户消息-->
-	<select id="findUserList" resultType="MessageReceive">
+	<select id="findUserList" resultType="com.eryansky.modules.notice.vo.MessageReceiveSimpleVo">
 		SELECT
-		<include refid="messageReceiveColumns"/>
+		<include refid="messageReceiveColumns"/>,
+		    m.app_id AS "appId",
+		    m.content AS "content",
+		    m.content AS "message.content",
+		    u.name AS "senderName",
+		    m.send_time AS "sendTime",
+		    m.send_time AS "message.sendTime"
 		FROM ${noticePrefix}t_notice_message_receive a
 		<include refid="messageReceiveJoins"/>
+		LEFT JOIN ${sysPrefix}t_sys_user u ON u.id = m.sender
 		<where>
 			m.status = #{status}
 			AND m.biz_mode = #{bizMode}
@@ -104,12 +111,6 @@
 		FROM ${noticePrefix}t_notice_message_receive a
 		<where>
 			a.message_id = #{messageId}
-			<if test="isRead != null and isRead != ''">
-				AND a.is_read = #{isRead}
-			</if>
-			<if test="isSend != null and isSend != ''">
-				AND a.is_send = #{isSend}
-			</if>
 		</where>
 	</select>
 

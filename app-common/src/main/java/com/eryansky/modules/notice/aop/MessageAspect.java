@@ -13,6 +13,7 @@ import com.eryansky.modules.notice.mapper.Notice;
 import com.eryansky.modules.notice.service.MessageReceiveService;
 import com.eryansky.modules.notice.service.MessageSenderService;
 import com.eryansky.modules.notice.utils.NoticeUtils;
+import com.eryansky.modules.notice.vo.MessageReceiveSimpleVo;
 import com.eryansky.modules.sys._enum.YesOrNo;
 import jakarta.annotation.Resource;
 import org.aspectj.lang.JoinPoint;

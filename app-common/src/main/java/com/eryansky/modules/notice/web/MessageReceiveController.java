@@ -20,6 +20,7 @@ import com.eryansky.modules.notice.mapper.MessageReceive;
 import com.eryansky.modules.notice.service.MessageReceiveService;
 import com.eryansky.modules.notice.task.MessageTask;
 import com.eryansky.modules.notice.utils.MessageUtils;
+import com.eryansky.modules.notice.vo.MessageReceiveSimpleVo;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys._enum.YesOrNo;
 import jakarta.annotation.Resource;
@@ -70,7 +71,7 @@ public class MessageReceiveController extends SimpleController {
     @Logging(logType = LogType.access, value = "消息中心", logging = "!#isAjax")
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"", "list"})
     public String list(MessageReceive model, HttpServletRequest request, HttpServletResponse response, Model uiModel) {
-        Page<MessageReceive> page = new Page<>(request, response);
+        Page<MessageReceiveSimpleVo> page = new Page<>(request, response);
         if (WebUtils.isAjaxRequest(request)) {
             SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
             page = MessageUtils.findUserMessages(sessionInfo.getUserId(),page.getPageNo(), page.getPageSize(),null, model.getIsRead(),null);
