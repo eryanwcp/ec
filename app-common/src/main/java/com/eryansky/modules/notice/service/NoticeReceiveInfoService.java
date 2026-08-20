@@ -90,16 +90,8 @@ public class NoticeReceiveInfoService extends CrudService<NoticeReceiveInfoDao, 
         return page;
     }
 
-    public Page<NoticeReceiveInfo> findUserUnreadNotices(Page<NoticeReceiveInfo> page, String userId) {
-        NoticeReceiveInfo noticeReceiveInfo = new NoticeReceiveInfo();
-        noticeReceiveInfo.setUserId(userId);
-        noticeReceiveInfo.setIsRead(NoticeReadMode.unreaded.getValue());
-        Notice notice = new Notice();
-        notice.setBizMode(NoticeMode.Effective.getValue());
-        noticeReceiveInfo.setNotice(notice);
-        noticeReceiveInfo.setEntityPage(page);
-        page.autoResult(dao.findUserUnreadNotices(noticeReceiveInfo));
-        return page;
+    public Page<NoticeReceiveInfoSimpleVo> findUserUnreadNotices(Page<NoticeReceiveInfoSimpleVo> page, String userId) {
+        return findNoticePageByUserId(page, userId, new NoticeQueryVo().setIsRead(NoticeReadMode.unreaded.getValue()));
     }
 
     /**

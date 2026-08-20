@@ -29,8 +29,6 @@ public interface NoticeReceiveInfoDao extends CrudDao<NoticeReceiveInfo> {
 
     NoticeReceiveInfo getUserNotice(NoticeReceiveInfo noticeReceiveInfo);
 
-    List<NoticeReceiveInfo> findUserUnreadNotices(NoticeReceiveInfo noticeReceiveInfo);
-
     /**
      * 更新用户阅读状态
      *

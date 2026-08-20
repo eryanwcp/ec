@@ -262,30 +262,6 @@
 		${selectStatement}
 	</select>
 
-	<select id="findUserUnreadNotices" resultType="NoticeReceiveInfo">
-		SELECT
-		<include refid="noticeReceiveInfoColumns"/>
-		FROM ${noticePrefix}t_notice_receive_info a
-		<include refid="noticeJoins"/>
-		<where>
-			n.status = #{notice.STATUS_NORMAL}
-			<if test="notice != null and notice.bizMode != null">
-				AND n.biz_mode = #{notice.bizMode}
-			</if>
-			<if test="userId != null and userId != ''">
-				AND a.user_id = #{userId}
-			</if>
-			<if test="isRead != null">
-				AND a.is_read = #{isRead}
-			</if>
-		</where>
-		<choose>
-			<when test="entityPage !=null and entityPage.orderBy != null and entityPage.orderBy != ''">
-				ORDER BY ${entityPage.orderBy} ${entityPage.order}
-			</when>
-		</choose>
-	</select>
-
 	<insert id="insert">
 		INSERT INTO ${noticePrefix}t_notice_receive_info(
 		id,

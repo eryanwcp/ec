@@ -21,6 +21,7 @@ import com.eryansky.core.web.annotation.MobileValue;
 import com.eryansky.core.web.upload.FileUploadUtils;
 import com.eryansky.modules.disk.mapper.File;
 import com.eryansky.modules.notice.utils.NoticeConstants;
+import com.eryansky.modules.notice.vo.NoticeReceiveInfoSimpleVo;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys.service.UserService;
 import com.eryansky.utils.AppConstants;
@@ -538,7 +539,7 @@ public class NoticeController extends SimpleController {
         Result result = null;
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         long noticeScopes = 0;
-        Page<NoticeReceiveInfo> page = new Page<>(request);
+        Page<NoticeReceiveInfoSimpleVo> page = new Page<>(request);
         page = noticeReceiveInfoService.findUserUnreadNotices(page, sessionInfo.getUserId());
         if (Collections3.isNotEmpty(page.getResult())) {
             noticeScopes = page.getTotalCount();
@@ -556,15 +557,11 @@ public class NoticeController extends SimpleController {
      */
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"myUnreadNotice"})
     @ResponseBody
-    public String myUnreadNotice(HttpServletRequest request, HttpServletResponse response) {
-        Result result = null;
+    public Result myUnreadNotice(HttpServletRequest request, HttpServletResponse response) {
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
-        Page<NoticeReceiveInfo> page = new Page<>(request);
+        Page<NoticeReceiveInfoSimpleVo> page = new Page<>(request);
         page = noticeReceiveInfoService.findUserUnreadNotices(page, sessionInfo.getUserId());
-        result = Result.successResult().setObj(page.getResult());
-        String json = JsonMapper.getInstance().toJson(result, NoticeReceiveInfo.class,
-                new String[]{"noticeId", "title"});
-        return json;
+        return Result.successResult().setObj(page.getResult());
     }
 
     /**
