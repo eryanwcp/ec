@@ -236,7 +236,7 @@
 				</when>
 			</choose>
 		</where>
-		ORDER BY n.is_top DESC,oc.code ASC,o.code, ASC,n.publish_time DESC
+		ORDER BY n.is_top DESC,oc.code ASC,o.code ASC,n.publish_time DESC
 	</select>
 
 
