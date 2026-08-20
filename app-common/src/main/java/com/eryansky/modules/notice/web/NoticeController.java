@@ -15,6 +15,7 @@ import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
+import com.eryansky.common.web.springmvc.StringSanitizeEditor;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.web.annotation.MobileValue;
@@ -298,6 +299,13 @@ public class NoticeController extends SimpleController {
             list = userService.findWithInclude(includeIds, query);
         }
         return JsonMapper.getInstance().toJson(list, User.class, new String[]{"id", "name", "defaultOrganName"});
+    }
+
+    @Override
+    protected void initBinder(WebDataBinder binder) {
+        super.defaultWebDataBinder(binder);
+        super.setAllowedFields(binder);
+        binder.registerCustomEditor(String.class, new StringSanitizeEditor(true, Safelist.relaxed()));
     }
 
     /**

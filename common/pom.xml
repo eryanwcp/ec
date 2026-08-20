@@ -38,6 +38,7 @@
         <guava.version>33.6.0-jre</guava.version>
         <dozer.version>6.5.2</dozer.version>
         <freemarker.version>2.3.34</freemarker.version>
+        <jsoup.version>1.23.1</jsoup.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -275,6 +276,11 @@
             <scope>compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>${jsoup.version}</version>
+        </dependency>
     </dependencies>
 
 
