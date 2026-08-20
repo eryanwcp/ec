@@ -23,13 +23,11 @@ public interface NoticeReceiveInfoDao extends CrudDao<NoticeReceiveInfo> {
 
     int deleteByNoticeId(Parameter parameter);
 
-    List<NoticeReceiveInfo> findQueryList(Parameter parameter);
-
     List<NoticeReceiveInfoSimpleVo> findQueryListByUserId(Parameter parameter);
 
-    NoticeReceiveInfo getUserNotice(NoticeReceiveInfo noticeReceiveInfo);
+    List<NoticeReceiveInfoSimpleVo> findQueryListByNoticeId(Parameter parameter);
 
-    List<NoticeReceiveInfo> findUserUnreadNotices(NoticeReceiveInfo noticeReceiveInfo);
+    NoticeReceiveInfo getUserNotice(NoticeReceiveInfo noticeReceiveInfo);
 
     /**
      * 更新用户阅读状态
