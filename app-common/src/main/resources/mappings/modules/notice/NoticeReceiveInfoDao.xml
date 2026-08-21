@@ -64,16 +64,7 @@
 
 	<select id="findQueryListByUserId" resultType="com.eryansky.modules.notice.vo.NoticeReceiveInfoSimpleVo">
 		SELECT
-		a.id AS "id",
-		a.notice_id AS "noticeId",
-		a.user_id AS "userId",
-		a.is_send AS "isSend",
-		a.is_read AS "isRead",
-		a.read_time AS "readTime",
-		a.is_reply AS "isReply",
-		a.reply_time AS "replyTime",
-		a.reply_content AS "replyContent",
-		a.reply_file_ids AS "replyFileIds",
+		<include refid="noticeReceiveInfoColumns"/>,
 		n.app_id AS "appId",
 		n.title AS "title",
 		n.type AS "type",
@@ -151,16 +142,7 @@
 
 	<select id="findQueryListByNoticeId" resultType="com.eryansky.modules.notice.vo.NoticeReceiveInfoSimpleVo">
 		SELECT
-		a.id AS "id",
-		a.notice_id AS "noticeId",
-		a.user_id AS "userId",
-		a.is_send AS "isSend",
-		a.is_read AS "isRead",
-		a.read_time AS "readTime",
-		a.is_reply AS "isReply",
-		a.reply_time AS "replyTime",
-		a.reply_content AS "replyContent",
-		a.reply_file_ids AS "replyFileIds",
+		<include refid="noticeReceiveInfoColumns"/>,
 		n.app_id AS "appId",
 		n.title AS "title",
 		n.type AS "type",
