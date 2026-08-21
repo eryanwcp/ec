@@ -90,6 +90,14 @@ public final class ShiroFacade {
         return !hasRole(roleName);
     }
 
+    public static boolean isAdmin() {
+        return SecurityUtils.isCurrentUserAdmin();
+    }
+
+    public static boolean lacksAdmin() {
+        return !isAdmin();
+    }
+
     public static boolean hasAnyRoles(final Collection<String> roles) {
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         if (sessionInfo != null) {
