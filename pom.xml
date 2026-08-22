@@ -130,8 +130,13 @@
 <!--        <dependency>-->
 <!--            <groupId>nz.net.ultraq.thymeleaf</groupId>-->
 <!--            <artifactId>thymeleaf-layout-dialect</artifactId>-->
-<!--            <version>3.4.0</version>-->
 <!--            <version>4.0.1</version>-->
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.thymeleaf</groupId>-->
+<!--                    <artifactId>thymeleaf</artifactId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
 <!--        </dependency>-->
 
         <dependency>
