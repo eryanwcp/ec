@@ -17,8 +17,8 @@
     <th:block th:replace="~{include/mobile_select_area :: mobile_select_area}"></th:block>
     <th:block th:replace="~{include/dialog :: dialog}"></th:block>
 
-    <script type="text/javascript" charset="utf-8" th:src="@{/static/mobile/map_module.min.js}"></script>
-    <link rel="stylesheet" type="text/css" th:href="@{/static/app/mobile/mobile.min.css}" />
+    <script type="text/javascript" charset="utf-8" th:src="${ctxStatic} + '/mobile/map_module.min.js?_='+${sysInitTime}"></script>
+    <link rel="stylesheet" type="text/css" th:href="${ctxStatic} + '/app/mobile/mobile.min.css?_='+${sysInitTime}" />
 
     <!-- SiteMesh head 写入注入点 -->
     <sitemesh:write property="head"/>

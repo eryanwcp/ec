@@ -25,11 +25,11 @@
     <script type="text/javascript" th:src="@{/static/js/easyui/jquery.easyui.mine.min.js}" charset="utf-8"></script>
     <script type="text/javascript" th:src="@{/static/js/easyui/locale/easyui-lang-zh_CN.js}" charset="utf-8"></script>
 
-    <link rel="stylesheet" type="text/css" href="${ctxStatic}/js/easyui/extend/my97/my97.min.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/static/js/easyui/extend/my97/my97.min.css}" />
     <script type="text/javascript" th:src="@{/static/js/easyui/extend/my97/jquery.easyui.my97.min.js}" charset="utf-8"></script>
-    <link rel="stylesheet" type="text/css" href="${ctxStatic}/js/easyui/extend/icon/eu-icon.min.css}" />
-    <script type="text/javascript" th:src="@{/static/js/easyui/extend/js/easyui-extend.min.js}" charset="utf-8"></script>
-    <script type="text/javascript" th:src="@{/static/js/easyui/extend/js/validatebox-extend.min.js}" charset="utf-8"></script>
+    <link rel="stylesheet" type="text/css" th:href="${ctxStatic} + '/js/easyui/extend/icon/eu-icon.min.css?_='+${sysInitTime}" />
+    <script type="text/javascript" th:src="${ctxStatic} + '/js/easyui/extend/js/easyui-extend.min.js?_='+${sysInitTime}" charset="utf-8"></script>
+    <script type="text/javascript" th:src="${ctxStatic} + '/js/easyui/extend/js/validatebox-extend.min.js?_='+${sysInitTime}" charset="utf-8"></script>
     
     <!-- SiteMesh head 写入注入点 -->
     <sitemesh:write property="head"/>
