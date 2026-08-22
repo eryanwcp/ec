@@ -14,6 +14,7 @@ import com.eryansky.utils.AppUtils;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.collect.Lists;
 import jakarta.annotation.Resource;
+//import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
@@ -197,7 +198,6 @@ public class MvcConfigurer implements WebMvcConfigurer {
         return new DISKManager();
     }
 
-//
 //   @Bean
 //   public LayoutDialect layoutDialect() {
 //      return new LayoutDialect();
