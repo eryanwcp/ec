@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
+<html lang="zh-cmn-Hans" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.eryansky.com/thymeleaf/shiro"
       xmlns:sitemesh="http://www.opensymphony.com/sitemesh/decorator">
 <head>
     <title>系统监控-系统日志</title>
@@ -36,7 +37,7 @@
                 cache: false,
                 dataType: 'json',
                 beforeSend: function (jqXHR, settings) {
-                    $("#content").html("<div style='padding: 10px 30px;text-align:center;font-size: 16px;'><img src='" + ctxStatic + "/js/easyui/themes/bootstrap/images/loading.gif' />数据加载中...</div>");
+                    $("#list").html("<div style='padding: 10px 30px;text-align:center;font-size: 16px;'><img src='" + ctxStatic + "/js/easyui/themes/bootstrap/images/loading.gif' />数据加载中...</div>");
                 },
                 success: function (data) {
                     if (data.code === 1) {
@@ -81,8 +82,8 @@
 </ul>
 
 <form id="searchForm" method="post" class="breadcrumb form-search">
-    <input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
-    <input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
+    <input id="pageNo" name="pageNo" type="hidden" th:value="${page.pageNo}"/>
+    <input id="pageSize" name="pageSize" type="hidden" th:value="${page.pageSize}"/>
     <select id="fileName" name="fileName">
         <option th:each="item : ${fileNames}"
                 th:value="${item}"
