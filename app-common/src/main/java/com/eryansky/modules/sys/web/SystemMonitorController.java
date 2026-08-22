@@ -35,6 +35,7 @@ import com.eryansky.modules.sys.vo.SessionVo;
 import com.eryansky.utils.*;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import jakarta.annotation.Resource;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -47,12 +48,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
@@ -66,7 +63,7 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "${adminPath}/sys/systemMonitor")
 public class SystemMonitorController extends SimpleController {
 
-    @jakarta.annotation.Resource(name = "defaultAsyncExecutor")
+    @Resource(name = "defaultAsyncExecutor")
     private Executor asyncExecutor;
 
     /**
@@ -424,7 +421,7 @@ public class SystemMonitorController extends SimpleController {
         uiModel.addAttribute("page", page);
         uiModel.addAttribute("fileNames", fileNames);
         uiModel.addAttribute("fileName", file.getName());
-        return "modules/sys/systemMonitor-log";
+        return "modules/sys/systemMonitor-log.html";
     }
 
     /**
