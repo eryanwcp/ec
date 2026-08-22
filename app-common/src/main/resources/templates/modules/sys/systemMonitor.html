@@ -27,7 +27,6 @@
                 cache: false,
                 dataType: 'json',
                 beforeSend: function (jqXHR, settings) {
-                    /* 使用 JS 拼接路径，利用全局变量 ctxStatic */
                     $("#systemInfo_div").html("<div style='padding: 10px 30px;text-align:center;font-size: 16px;'><img src='" + ctxStatic + "/js/easyui/themes/bootstrap/images/loading.gif' />数据加载中...</div>");
                 },
                 success: function (data) {
