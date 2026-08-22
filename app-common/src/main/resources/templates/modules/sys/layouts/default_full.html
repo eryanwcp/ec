@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]><html class="ie ie6 ie-lte9 ie-lte8 ie-lte7 no-js"><![endif]-->
+<!--[if IE 7]><html class="ie ie7 ie-lte9 ie-lte8 ie-lte7 no-js"><![endif]-->
+<!--[if IE 8]><html class="ie ie8 ie-lte9 ie-lte8 no-js"><![endif]-->
+<!--[if IE 9]><html class="ie9 ie-lte9 no-js"><![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html class="no-js"> <!--<![endif]-->
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sitemesh="http://www.opensymphony.com/sitemesh/decorator"
+      class="no-js">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="renderer" content="webkit"/>
+
+    <title th:text="${T(com.eryansky.utils.AppConstants).getAppName()}">
+        <sitemesh:write property="title"/>
+    </title>
+
+    <th:block th:replace="~{modules/sys/include/head :: head}"></th:block>
+
+    <th:block th:replace="~{include/dialog :: dialog}"></th:block>
+
+    <link id="easyuiTheme" rel="stylesheet" type="text/css" th:href="@{/static/js/easyui/themes/bootstrap/easyui.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/static/js/easyui/extend/icon/easyui-icon.min.css}" />
+    <script type="text/javascript" th:src="@{/static/js/easyui/jquery.easyui.mine.min.js}" charset="utf-8"></script>
+    <script type="text/javascript" th:src="@{/static/js/easyui/locale/easyui-lang-zh_CN.js}" charset="utf-8"></script>
+
+    <link rel="stylesheet" type="text/css" href="${ctxStatic}/js/easyui/extend/my97/my97.min.css}" />
+    <script type="text/javascript" th:src="@{/static/js/easyui/extend/my97/jquery.easyui.my97.min.js}" charset="utf-8"></script>
+    <link rel="stylesheet" type="text/css" href="${ctxStatic}/js/easyui/extend/icon/eu-icon.min.css}" />
+    <script type="text/javascript" th:src="@{/static/js/easyui/extend/js/easyui-extend.min.js}" charset="utf-8"></script>
+    <script type="text/javascript" th:src="@{/static/js/easyui/extend/js/validatebox-extend.min.js}" charset="utf-8"></script>
+    
+    <!-- SiteMesh head 写入注入点 -->
+    <sitemesh:write property="head"/>
+</head>
+<body>
+<!-- SiteMesh body 写入注入点 -->
+<sitemesh:write property="body"/>
+</body>
+</html>

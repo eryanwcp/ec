@@ -27,24 +27,24 @@ public class DefaultDecoratorController extends SimpleController {
 
     @RequestMapping(value = {"default"},method = {RequestMethod.GET,RequestMethod.POST})
     public ModelAndView _default(HttpServletRequest request) {
-        ModelAndView modelAndView = new ModelAndView("modules/sys/layouts/default");
+        ModelAndView modelAndView = new ModelAndView("modules/sys/layouts/default.html");
         return modelAndView;
     }
 
     @RequestMapping(value = {"default_sys"},method = {RequestMethod.GET,RequestMethod.POST})
     public ModelAndView default_sys(HttpServletRequest request) {
-        ModelAndView modelAndView = new ModelAndView("modules/sys/layouts/default");
+        ModelAndView modelAndView = new ModelAndView("modules/sys/layouts/default.html");
         return modelAndView;
     }
 
     @RequestMapping(value = {"default_full"},method = {RequestMethod.GET,RequestMethod.POST})
     public ModelAndView default_full(HttpServletRequest request) {
-        ModelAndView modelAndView = new ModelAndView("modules/sys/layouts/default_full");
+        ModelAndView modelAndView = new ModelAndView("modules/sys/layouts/default_full.html");
         return modelAndView;
     }
     @RequestMapping(value = {"default_mobile"},method = {RequestMethod.GET,RequestMethod.POST})
     public ModelAndView default_mobile(HttpServletRequest request) {
-        ModelAndView modelAndView = new ModelAndView("modules/sys/layouts/default_mobile");
+        ModelAndView modelAndView = new ModelAndView("modules/sys/layouts/default_mobile.html");
         return modelAndView;
     }
 }

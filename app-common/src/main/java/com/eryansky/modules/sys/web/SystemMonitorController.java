@@ -87,7 +87,7 @@ public class SystemMonitorController extends SimpleController {
                 return renderString(response, Result.errorResult().setMsg(e.getMessage()));
             }
         }
-        return "modules/sys/systemMonitor";
+        return "modules/sys/systemMonitor.html";
     }
 
     /**

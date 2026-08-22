@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:fragment="head">
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+        <meta http-equiv="Cache-Control" content="no-store"/>
+        <meta http-equiv="Pragma" content="no-cache"/>
+        <meta http-equiv="Expires" content="0"/>
+        <meta name="author" content="Eryan"/>
+        <link rel="shortcut icon" th:href="@{/static/img/favicon.ico}"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <meta name="renderer" content="webkit"/>
+
+        <!-- 全局 JS 变量注入 -->
+        <script type="text/javascript" th:inline="javascript">
+            /*<![CDATA[*/
+            var ctx = /*[[${ctx}]]*/ '';
+            var ctxAdmin = /*[[${ctxAdmin}]]*/ '';
+            var ctxFront = /*[[${ctxFront}]]*/ '';
+            var ctxMobile = /*[[${ctxMobile}]]*/ '';
+            var ctxStatic = /*[[${ctxStatic}]]*/ '';
+            var appURL = /*[[${appURL}]]*/ '';
+            /*]]>*/
+        </script>
+
+        <!-- 基础脚本与样式库 -->
+        <script th:src="@{/static/js/jquery/jquery-1.12.4.min.js}" type="text/javascript"></script>
+        <script th:src="@{/static/js/jquery/jquery-migrate-1.4.1.min.js}" type="text/javascript"></script>
+        <script th:src="@{/static/js/jquery/jquery-extend.min.js}" type="text/javascript"></script>
+
+        <!-- 表单校验表单项 -->
+        <link th:href="@{/static/js/jquery-validation/dist/extend/jquery-validate-extend.min.css}" type="text/css"
+              rel="stylesheet"/>
+        <script th:src="@{/static/js/jquery-validation/dist/jquery.validate.min.js}" type="text/javascript"></script>
+        <script th:src="@{/static/js/jquery-validation/dist/extend/jquery-validate-extend-methods.min.js}"
+                type="text/javascript"></script>
+
+        <!-- Bootstrap 基础 -->
+        <link th:href="@{/static/js/bootstrap/2.3.2/css/bootstrap.min.css}" type="text/css" rel="stylesheet"/>
+        <link th:href="@{/static/js/bootstrap/2.3.2/css/bootstrap-responsive.css}" type="text/css" rel="stylesheet"/>
+        <script th:src="@{/static/js/bootstrap/2.3.2/js/bootstrap.min.js}" type="text/javascript"></script>
+        <!--[if lte IE 6]>
+        <link th:src="@{/static/js/bootstrap/bsie/css/bootstrap-ie6.min.css}" type="text/css" rel="stylesheet"/>
+        <script th:src="@{/static/js/bootstrap/bsie/js/bootstrap-ie.min.js}" type="text/javascript"></script><![endif]-->
+
+
+        <!-- Select2 & Common组件 -->
+        <link th:href="@{/static/js/select2/select2.min.css}" type="text/css" rel="stylesheet"/>
+        <script th:src="@{/static/js/select2/select2.full.min.js}" type="text/javascript"></script>
+        <script th:src="@{/static/js/select2/i18n/zh-CN.js}" type="text/javascript"></script>
+        <link th:href="@{/static/js/common/common.min.css}" type="text/css" rel="stylesheet"/>
+        <script th:src="@{/static/js/common/common.min.js}" type="text/javascript"></script>
+        <script th:src="@{/static/js/common/mustache.js}" type="text/javascript"></script>
+
+        <!-- Vue 与 日期控件 -->
+        <script th:src="@{/static/js/vue/dist/vue.min.js}" type="text/javascript"></script>
+        <script th:src="@{/static/js/My97DatePicker/WdatePicker.js}" type="text/javascript"></script>
+
+        <link th:src="@{/static/js/fancyBox/source/jquery.fancybox.css}" type="text/css" rel="stylesheet"/>
+        <script th:src="@{/static/js/fancyBox/source/jquery.fancybox.js}" type="text/javascript"></script>
+        <script th:src="@{/static/js/bootstrap/dropdown/bootstrap-hover-dropdown.js}" type="text/javascript"></script>
+        <!--[if lt IE 7 ]>
+        <script th:src="@{/static/js/dd_belatedpng.js}"></script>
+        <script> DD_belatedPNG.fix('img, .png_bg'); //fix any <img> or .png_bg background-images </script> <![endif]-->
+        <script type="text/javascript">
+            try {
+                var token = /*[[${sessionInfo.token}]]*/ '';
+                $.ajaxSetup({headers: {'Authorization': 'Bearer ' + token}});
+            } catch (e) {
+                console.log(e);
+            }
+        </script>
+    </th:block>
+</head>
+<body>
+</body>
+</html>
