@@ -2,10 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sitemesh="http://www.opensymphony.com/sitemesh/decorator">
 <head>
-<!--    <title>系统监控</title>-->
+    <title>系统监控</title>
     <!-- 装饰器配置 (沿用 SiteMesh) -->
     <meta name="decorator" content="default_sys"/>
-
     <style type="text/css">
         pre {
             white-space: pre-wrap;       /* css-3 */
@@ -15,14 +14,12 @@
             word-wrap: break-word;       /* Internet Explorer 5.5+ */
         }
     </style>
-
     <script type="text/javascript" th:inline="javascript">
         /*<![CDATA[*/
         $(function () {
             reLoad();
             window.setInterval('reLoad()', 60 * 1000);
         });
-
         function reLoad() {
             $.ajax({
                 url: ctxAdmin + '/sys/systemMonitor',
