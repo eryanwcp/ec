@@ -63,13 +63,15 @@
         <!--[if lt IE 7 ]>
         <script th:src="@{/static/js/dd_belatedpng.js}"></script>
         <script> DD_belatedPNG.fix('img, .png_bg'); //fix any <img> or .png_bg background-images </script> <![endif]-->
-        <script type="text/javascript">
+        <script type="text/javascript" th:inline="javascript">
+            /*<![CDATA[*/
             try {
                 var token = /*[[${sessionInfo.token}]]*/ '';
                 $.ajaxSetup({headers: {'Authorization': 'Bearer ' + token}});
             } catch (e) {
                 console.log(e);
             }
+            /*]]>*/
         </script>
     </th:block>
 </head>

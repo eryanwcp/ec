@@ -227,7 +227,7 @@ public class SystemMonitorController extends SimpleController {
 
         uiModel.addAttribute("region", region);
         uiModel.addAttribute("page", page);
-        return "modules/sys/systemMonitor-sessionCache";
+        return "modules/sys/systemMonitor-sessionCache.html";
     }
 
     private List<SessionVo> toSessionVo(List<String> keys) {

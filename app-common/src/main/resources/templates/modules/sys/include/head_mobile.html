@@ -65,13 +65,15 @@
         <script> DD_belatedPNG.fix('img, .png_bg'); //fix any <img> or .png_bg background-images </script> <![endif]-->
         <link th:href="@{/static/js/toastr/toastr.min.css}" type="text/css" rel="stylesheet" />
         <script th:src="@{/static/js/toastr/toastr.min.js}" type="text/javascript"></script>
-        <script type="text/javascript">
+        <script type="text/javascript" th:inline="javascript">
+            /*<![CDATA[*/
             try {
                 var token = /*[[${sessionInfo.token}]]*/ '';
                 $.ajaxSetup({headers: {'Authorization': 'Bearer ' + token}});
             } catch (e) {
                 console.log(e);
             }
+            /*]]>*/
         </script>
     </th:block>
 </head>
