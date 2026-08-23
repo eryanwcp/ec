@@ -102,7 +102,7 @@ public class SystemSerialNumberController extends SimpleController {
             return renderString(response, page);
         }
         uiModel.addAttribute("page", page);
-        return "modules/sys/systemSerialNumberList";
+        return "modules/sys/systemSerialNumberList.html";
     }
 
 
@@ -111,7 +111,7 @@ public class SystemSerialNumberController extends SimpleController {
     public String form(@ModelAttribute("model") SystemSerialNumber model, Model uiModel) {
         uiModel.addAttribute("model", model);
         uiModel.addAttribute("resetTypes", ResetType.values());
-        return "modules/sys/systemSerialNumberForm";
+        return "modules/sys/systemSerialNumberForm.html";
     }
 
     @Override
