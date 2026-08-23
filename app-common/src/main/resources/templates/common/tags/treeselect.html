@@ -1,30 +1,49 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-<!-- 使用 th:block 避免渲染出多余的外层 div -->
+<!--/*
+  使用 th:block 避免渲染出多余的外层 div
+    字段说明文档：
+    - id (String): 编号
+    - name (String): 隐藏域名称（ID）
+    - value (String): 隐藏域值（ID）
+    - labelName (String): 输入框名称（Name）
+    - labelValue (String): 输入框值（Name）
+    - title (String): 选择框标题
+    - url (String): 树结构数据地址
+    - checked (Boolean): 是否显示复选框
+    - extId (String): 排除掉的编号（不能选择的编号）
+    - notAllowSelectRoot (Boolean): 不允许选择根节点
+    - notAllowSelectParent (Boolean): 不允许选择父节点
+    - allSelectNodeTypes (String): 允许选择的节点类型，多个之间以','分割
+    - module (String): 过滤栏目模型（仅针对CMS的Category树）
+    - selectScopeModule (Boolean): 选择范围内的模型（仅针对CMS的Category树）
+    - allowClear (Boolean): 是否允许清除
+    - cssClass (String): css样式类
+    - cssStyle (String): css内联样式
+    - smallBtn (Boolean): 缩小按钮显示
+    - hideBtn (Boolean): 是否显示按钮
+    - disabled (String): 是否限制选择
+    - nodesLevel (String): 菜单展开层数
+    - nameLevel (String): 返回名称关联级别
+*/-->
 <th:block th:fragment="treeselect">
 
   <div class="input-append">
-    <!-- 隐藏域 ID -->
     <input th:id="${id + 'Id'}" th:name="${name}" th:class="${cssClass}" type="hidden" th:value="${value}" th:disabled="${disabled == 'true' or disabled == true}"/>
-    <!-- 显示域 Name -->
     <input th:id="${id + 'Name'}" th:name="${labelName}" readonly="readonly" type="text" th:value="${labelValue}" th:disabled="${disabled == 'true' or disabled == true}" th:class="${cssClass}" th:style="${cssStyle}"/>
-    <!-- 搜索按钮 -->
     <a th:id="${id + 'Button'}" href="javascript:"
        th:class="'btn ' + (${disabled == 'true' or disabled == true} ? 'disabled ' : '') + (${hideBtn == true or hideBtn == 'true'} ? 'hide' : '')"
        th:style="${smallBtn == true or smallBtn == 'true' ? 'padding:4px 2px;' : ''}">
       &nbsp;<i class="icon-search"></i>
     </a>&nbsp;&nbsp;
   </div>
-
   <style type="text/css">
     .jbox-title-panel, .jbox-button-panel { box-sizing: content-box; }
     #jbox-state-state0 > div { overflow-y: hidden; -webkit-overflow-scrolling: touch; overflow-x: hidden; }
     #jbox-content { overflow-y: hidden; -webkit-overflow-scrolling: touch; overflow-x: hidden; }
     #jbox-iframe { overflow-y: auto; -webkit-overflow-scrolling: touch; overflow-x: hidden; }
   </style>
-
-  <!-- 使用 th:inline 注入后台参数至 JS 中 -->
   <script th:inline="javascript">
     /*<![CDATA[*/
     (function() {
