@@ -8,7 +8,6 @@ package com.eryansky.modules.sys.web;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.core.security.annotation.PrepareOauth2;
 import com.eryansky.core.security.annotation.RequiresUser;
-import com.eryansky.utils.AppConstants;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -29,27 +28,23 @@ public class DefaultDecoratorController extends SimpleController {
     @RequestMapping(value = {"default"},method = {RequestMethod.GET,RequestMethod.POST})
     public ModelAndView _default(HttpServletRequest request) {
         ModelAndView modelAndView = new ModelAndView("modules/sys/layouts/default.html");
-        modelAndView.addObject("appName", AppConstants.getAppName());
         return modelAndView;
     }
 
     @RequestMapping(value = {"default_sys"},method = {RequestMethod.GET,RequestMethod.POST})
     public ModelAndView default_sys(HttpServletRequest request) {
         ModelAndView modelAndView = new ModelAndView("modules/sys/layouts/default.html");
-        modelAndView.addObject("appName", AppConstants.getAppName());
         return modelAndView;
     }
 
     @RequestMapping(value = {"default_full"},method = {RequestMethod.GET,RequestMethod.POST})
     public ModelAndView default_full(HttpServletRequest request) {
         ModelAndView modelAndView = new ModelAndView("modules/sys/layouts/default_full.html");
-        modelAndView.addObject("appName", AppConstants.getAppName());
         return modelAndView;
     }
     @RequestMapping(value = {"default_mobile"},method = {RequestMethod.GET,RequestMethod.POST})
     public ModelAndView default_mobile(HttpServletRequest request) {
         ModelAndView modelAndView = new ModelAndView("modules/sys/layouts/default_mobile.html");
-        modelAndView.addObject("appName", AppConstants.getAppName());
         return modelAndView;
     }
 }
