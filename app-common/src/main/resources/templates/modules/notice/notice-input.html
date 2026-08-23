@@ -1,61 +1,48 @@
-<%@ page import="com.eryansky.modules.notice.utils.NoticeUtils" %>
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html; charset=UTF-8" %>
-<%@ include file="/common/taglibs.jsp" %>
-<script type="text/javascript">
-    var modelIsTop = '${model.isTop}';
-    var modelIsReply = '${model.isReply}';
-    var modelTipMessage = '${model.tipMessage}';
-    var modelType = '${model.type}';
-    var dictionaryTypeCode = '<%=NoticeUtils.DIC_NOTICE%>';
-    var modelFileIds = ${fns:toJson(model.fileIds)};
-    var noticeReceiveUserIds =  ${fns:toJson(receiveUserIds)};
-    var noticeReceiveOrganIds = ${fns:toJson(receiveOrganIds)};
-    var noticeReceiveContactGroupIds = ${fns:toJson(receiveContactGroupIds)};
-    var fileSizeLimit = '<%=AppConstants.getNoticeMaxUploadSize()%>';//附件上传大小限制
-</script>
-<script type="text/javascript" src="${ctxStatic}/app/modules/notice/notice-input${yuicompressor}.js?_=${sysInitTime}" charset="utf-8"></script>
-<style type="text/css">
-    .img_div{
-        display : inline-block;
-        position : relative;
-    }
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+    var modelIsTop = [[${model.isTop}]];
+    var modelIsReply = [[${model.isReply}]];
+    var modelTipMessage = [[${model.tipMessage}]];
+    var modelType = [[${model.type}]];
+    var dictionaryTypeCode = [[${dictionaryTypeCode}]];
 
-    .img_div .delete{
-        position : absolute;
-        top : 5px;
-        right : 5px;
-        color: red;
-        border: 1px solid red;
-        text-align: center;
-        cursor: pointer;
-        border-radius: 20px;
-        width : 20px;
-        height : 20px;
-        line-height: 20px;
-    }
-    #notice_form div label{text-align: right;}
-</style>
+    var modelFileIds = JSON.parse(/*[[${T(com.eryansky.utils.AppUtils).toJson(fileIds)}]]*/ []);
+    var noticeReceiveUserIds = JSON.parse(/*[[${T(com.eryansky.utils.AppUtils).toJson(receiveUserIds)}]]*/ []);
+    var noticeReceiveOrganIds = JSON.parse(/*[[${T(com.eryansky.utils.AppUtils).toJson(receiveOrganIds)}]]*/ []);
+    var receiveContactGroupIdsJson = JSON.parse(/*[[${T(com.eryansky.utils.AppUtils).toJson(receiveContactGroupIds)}]]*/ []);
+
+    var fileSizeLimit = [[${T(com.eryansky.utils.AppConstants).getNoticeMaxUploadSize()}]];
+    /*]]>*/
+</script>
+<script type="text/javascript" th:src="${ctxStatic}+'/app/modules/notice/notice-input'+${yuicompressor}+'.js?_='+${sysInitTime}" charset="utf-8"></script>
 <div>
     <form id="notice_form" class="dialog-form"  method="post" novalidate>
-        <input type="hidden" name="id" value="${model.id}"/>
+        <input type="hidden" name="id" th:value="${model.id}"/>
         <!-- 用户版本控制字段 version -->
-        <input type="hidden" id="version" name="version" value="${model.version}"/>
-        <input type="hidden" id="objectType" name="objectType" value="${model.objectType}"/>
-        <input type="hidden" id="objectId" name="objectId" value="${model.objectId}"/>
+        <input type="hidden" id="version" name="version" th:value="${model.version}"/>
+        <input type="hidden" id="objectType" name="objectType" th:value="${model.objectType}"/>
+        <input type="hidden" id="objectId" name="objectId" th:value="${model.objectId}"/>
 
         <div>
             <label>通知标题：</label>
-            <input name="title" type="text" class="easyui-validatebox textbox" style="width: 360px;" value="${model.title}"
+            <input name="title" type="text" class="easyui-validatebox textbox" style="width: 360px;" th:value="${model.title}"
                    maxLength="255" data-options="required:true,missingMessage:'请输入标题.',validType:['minLength[1]']">
-            <e:dictionary id="notice_type" name="type" code="<%=NoticeUtils.DIC_NOTICE%>" type="combobox" value="${model.type}" editable="false" selectType="select" height="28"></e:dictionary>
-            <%--<input id="notice_type" name="type" style="height: 28px;" />--%>
+
+            <select id="notice_type" name="noticeType"  th:value="${model.type}"
+                    class="easyui-combobox" style="height: 28px;">
+                <option th:each="item : ${noticeTypes}"
+                        th:value="${item.value}"
+                        th:text="${item.name}"
+                        th:selected="${item.value eq model.type}">
+                </option>
+            </select>
         </div>
         <div>
             <label>标题图：</label>
             <div id="head_image_div" style="margin-left: 96px;">
-                <input id="head_image" name="headImage" readonly="readonly" value="${model.headImage}" type="hidden"/>
+                <input id="head_image" name="headImage" readonly="readonly" th:value="${model.headImage}" type="hidden"/>
                 <div class="img_div">
-                    <img id="head_image_pre" class="img-rounded" src="${model.headImageUrl}" alt="标题图" style="max-height: 160px;display: none;" />
+                    <img id="head_image_pre" class="img-rounded" th:src="${model.headImageUrl}" alt="标题图" style="max-height: 160px;display: none;" />
                     <div class="delete" onclick="delImageFile();" style="display: none;">x</div>
                 </div>
                 <div id="head_image_uploadify"></div>
@@ -64,7 +51,7 @@
         </div>
         <div>
             <label>接收范围：</label>
-            <input type="select" id="receiveScope" name="receiveScope" value="${model.receiveScope}"
+            <input type="select" id="receiveScope" name="receiveScope" th:value="${model.receiveScope}"
                    style="width: 200px;height: 28px;"/>
         </div>
         <div id="noticeUserIds_div">
@@ -89,15 +76,16 @@
         <table style="border: 0px;width: 100%;">
             <tr>
                 <td style="width: 96px; vertical-align: top;text-align: right;">通知内容：&nbsp;</td>
-                <td><textarea id="editor" name="content">${model.content}</textarea></td>
+                <td><textarea id="editor" name="content">[[${model.content}]]</textarea></td>
             </tr>
         </table>
         <div>
             <label>有效期：</label>
             <input id="_effectTime" name="effectTime" placeholder="开始时间" type="text"
-                   class="easyui-my97" data-options="dateFmt:'yyyy-MM-dd HH:mm',required:true,missingMessage:'请设置开始时间.'" value="<fmt:formatDate value="${model.effectTime}" pattern="yyyy-MM-dd HH:mm"/>" >&nbsp;
+                   class="easyui-my97" data-options="dateFmt:'yyyy-MM-dd HH:mm',required:true,missingMessage:'请设置开始时间.'"
+                   th:value="${#dates.format(model.effectTime, 'yyyy-MM-dd')}" >&nbsp;
             ~&nbsp;<input id="_endTime" name="invalidTime" placeholder="截止时间" type="text" class="easyui-my97"
-                          data-options="dateFmt:'yyyy-MM-dd HH:mm'" value="<fmt:formatDate value="${model.invalidTime}" pattern="yyyy-MM-dd HH:mm"/>"/>
+                          data-options="dateFmt:'yyyy-MM-dd HH:mm'" th:value="${#dates.format(model.invalidTime, 'yyyy-MM-dd')}">
             <span class="tree-icon tree-file easyui-icon-tip easyui-tooltip"
                   title="截止时间不设置，则一直有效。" ></span>
         </div>
@@ -126,30 +114,39 @@
                 <input type="radio" name="isReply" style="width: 20px;" value="1" /> 需要回复
             </label>
         </div>
-        <c:if test="${not empty noticeTipChannels}">
-            <div>
-                <label>提醒方式：</label>
-                <c:forEach items="${noticeTipChannels}" var="item">
-                    <label style="text-align: left;width: 100px;">
-                        <input type="checkbox" class="easyui-checkbox" name="tipMessage" style="width: 20px;" value="${item.value}" /> ${item.description}
-                    </label>
-                </c:forEach>
-            </div>
-        </c:if>
+        <div th:if="${not #lists.isEmpty(noticeTipChannels)}">
+            <label>提醒方式：</label>
+            <label th:each="item : ${noticeTipChannels}"
+                   style="text-align: left; width: 100px;">
+                <input type="checkbox"
+                       class="easyui-checkbox"
+                       name="tipMessage"
+                       style="width: 20px;"
+                       th:value="${item.value}" />
+                <span th:text="${item.description}"></span>
+            </label>
+        </div>
+
 
         <div>
             <label>附件：</label>
             <div style="margin-left: 96px;">
                 <div id="uploadify"></div>
                 <input id="fileIds" name="fileIds" type="hidden" />
-                <c:if test="${not empty files}">
-                    <div>
-                        <c:forEach items="${files}" begin="0" var="file" varStatus="i">
-                            <div id='${file.id}' style="font-size: 14px;">${i.index +1}、<a href="#" onclick="loadOrOpen('${file.id}');" style="color: #0000ff;">${file.name}</a>&nbsp;&nbsp;
-                                <a href="#" onclick="delUpload('${file.id}');" style="color: red;">删除</a></div>
-                        </c:forEach>
+                <div th:if="${not #lists.isEmpty(files)}">
+                    <div th:each="file,iStat : ${files}" th:id="${file.id}" style="font-size: 14px;">
+                        <span th:text="${iStat.index + 1}"></span>、
+                        <a href="#"
+                           onclick="loadOrOpen([[${file.id}]]);"
+                           style="color: #0000ff;"
+                           th:text="${file.name}">文件名</a>&nbsp;&nbsp;
+                        <a href="#"
+                           onclick="delUpload([[${file.id}]]);"
+                           style="color: red;">删除</a>
                     </div>
-                </c:if>
+                </div>
+
+
             </div>
 
         </div>

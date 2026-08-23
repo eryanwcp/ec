@@ -22,9 +22,11 @@ import com.eryansky.core.web.annotation.MobileValue;
 import com.eryansky.core.web.upload.FileUploadUtils;
 import com.eryansky.modules.disk.mapper.File;
 import com.eryansky.modules.notice.utils.NoticeConstants;
+import com.eryansky.modules.notice.utils.NoticeUtils;
 import com.eryansky.modules.notice.vo.NoticeReceiveInfoSimpleVo;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys.service.UserService;
+import com.eryansky.modules.sys.utils.DictionaryUtils;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -110,7 +112,7 @@ public class NoticeController extends SimpleController {
                              @RequestParam(value = "receiveUserIds", required = false) List<String> receiveUserIds,
                              @RequestParam(value = "receiveOrganIds", required = false) List<String> receiveOrganIds,
                              @RequestParam(value = "receiveContactGroupIds", required = false) List<String> receiveContactGroupIds) {
-        ModelAndView modelAndView = new ModelAndView("modules/notice/notice");
+        ModelAndView modelAndView = new ModelAndView("modules/notice/notice.html");
         modelAndView.addObject("noticeId", noticeId);
         modelAndView.addObject("objectType", objectType);
         modelAndView.addObject("objectId", objectId);
@@ -229,7 +231,7 @@ public class NoticeController extends SimpleController {
                               @RequestParam(value = "receiveOrganIds", required = false) List<String> receiveOrganIds,
                               @RequestParam(value = "receiveContactGroupIds", required = false) List<String> receiveContactGroupIds,
                               OperateType operateType) {
-        ModelAndView modelAndView = new ModelAndView("modules/notice/notice-input");
+        ModelAndView modelAndView = new ModelAndView("modules/notice/notice-input.html");
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         String loginUserId = sessionInfo.getUserId();
         List<File> files = Collections.emptyList();
@@ -265,14 +267,16 @@ public class NoticeController extends SimpleController {
 
         }
         modelAndView.addObject("files", files);
-        modelAndView.addObject("fileIds", _fileIds);
-        modelAndView.addObject("receiveUserIds", _receiveUserIds);
-        modelAndView.addObject("receiveOrganIds", _receiveOrganIds);
-        modelAndView.addObject("receiveContactGroupIds", _receiveContactGroupIds);
+        modelAndView.addObject("fileIds", null != _fileIds ? _fileIds : Collections.emptyList());
+        modelAndView.addObject("receiveUserIds", null != _receiveUserIds ? _receiveUserIds : Collections.emptyList());
+        modelAndView.addObject("receiveOrganIds", null != _receiveOrganIds ? _receiveOrganIds : Collections.emptyList());
+        modelAndView.addObject("receiveContactGroupIds", null != _receiveContactGroupIds ? _receiveContactGroupIds : Collections.emptyList());
         modelAndView.addObject("operateType", operateType);
         modelAndView.addObject("model", model);
 //        modelAndView.addObject("noticeTipChannels", MessageChannel.values());
         modelAndView.addObject("noticeTipChannels", NoticeConstants.getNoticeTipChannels());
+        modelAndView.addObject("dictionaryTypeCode", NoticeUtils.DIC_NOTICE);
+        modelAndView.addObject("noticeTypes", DictionaryUtils.getDictList(NoticeUtils.DIC_NOTICE));
         return modelAndView;
     }
 

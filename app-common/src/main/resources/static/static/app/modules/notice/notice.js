@@ -8,8 +8,6 @@ var receiveUserIds = receiveUserIds;
 var receiveOrganIds = receiveOrganIds;
 var receiveContactGroupIds = receiveContactGroupIds;
 var hasRepeatPermission = hasRepeatPermission;
-var isSuperUser = isSuperUser;
-
 
 var $notice_datagrid;
 var $notice_dialog;
@@ -24,11 +22,6 @@ var $query_PublishUser_MultiSelect;
 
 var _operateType = undefined;//全局变量
 $(function () {
-    if (isSuperUser) {//meta.jsp
-        $("#publishUserIds_tr").show();
-        $("#layout_north").panel("resize", {height: 156});
-        $.parser.parse($(".easyui-layout").parent());
-    }
     $notice_search_form = $('#notice_search_form').form();
     initReadDatagrid();
     initSelectUser();
