@@ -36,7 +36,7 @@
 				<when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
 				<otherwise>'%'+#{query}+'%'</otherwise>
 			</choose>
-			OR a.cron_expression LIKE
+			OR c.cron_expression LIKE
 			<choose>
 				<when test="dbName == 'db2'">'%'||#{query}||'%'</when>
 				<when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
