@@ -36,13 +36,7 @@
 				<when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
 				<otherwise>'%'+#{query}+'%'</otherwise>
 			</choose>
-			OR c.cron_expression LIKE
-			<choose>
-				<when test="dbName == 'db2'">'%'||#{query}||'%'</when>
-				<when test="dbName == 'mysql'">CONCAT('%', #{query}, '%')</when>
-				<when test="dbName == 'oracle'">'%'||#{query}||'%'</when>
-				<otherwise>'%'+#{query}+'%'</otherwise>
-			</choose>
+			OR c.cron_expression = #{query}
 			)
 		</if>
 		<if test="jobState !=null and jobState !=''" >
