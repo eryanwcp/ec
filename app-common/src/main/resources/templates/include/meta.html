@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:fragment="meta">
+        <meta http-equiv="X-UA-Compatible" content="IE=EDGE;chrome=1" />
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+        <meta http-equiv="Cache-Control" content="no-store"/>
+        <meta http-equiv="Pragma" content="no-cache"/>
+        <meta http-equiv="Expires" content="0"/>
+        <meta name="author" content="Eryan" />
+        <link rel="shortcut icon" th:href="@{/static/img/favicon.ico}"/>
+        <!-- 全局 JS 变量注入 -->
+        <script type="text/javascript" th:inline="javascript">
+            /*<![CDATA[*/
+            var ctx = /*[[${ctx}]]*/ '';
+            var ctxAdmin = /*[[${ctxAdmin}]]*/ '';
+            var ctxFront = /*[[${ctxFront}]]*/ '';
+            var ctxMobile = /*[[${ctxMobile}]]*/ '';
+            var ctxStatic = /*[[${ctxStatic}]]*/ '';
+            var appURL = /*[[${appURL}]]*/ '';
+            /*]]>*/
+        </script>
+        <link rel="stylesheet" type="text/css"  th:href="${ctxStatic} +'/css/default.min.css?_='+${sysInitTime}" />
+        <!-- 基础脚本与样式库 -->
+        <script th:src="@{/static/js/jquery/jquery-1.12.4.min.js}" type="text/javascript"></script>
+        <script th:src="@{/static/js/jquery/jquery-migrate-1.4.1.min.js}" type="text/javascript"></script>
+        <script th:src="${ctxStatic} + '/js/jquery/jquery-extend.min.js?_='+${sysInitTime}" type="text/javascript"></script>
+
+        <!-- jQuery Cookie插件 -->
+        <script type="text/javascript" th:src="${ctxStatic} +'/js/jquery/jquery.cookie.min.js}" charset="utf-8"></script>
+        <link id="easyuiTheme" rel="stylesheet" type="text/css" th:href="${ctxStatic} +'/js/easyui/themes/bootstrap/easyui.css'" />
+        <link rel="stylesheet" type="text/css" th:href="@{/static/js/easyui/extend/icon/easyui-icon.min.css}" />
+        <script type="text/javascript" th:src="@{/static/js/My97DatePicker/WdatePicker.js}" charset="utf-8"></script>
+        <script type="text/javascript" th:src="@{/static/js/easyui/jquery.easyui.mine.min.js}" charset="utf-8"></script>
+        <script type="text/javascript" th:src="@{/static/js/easyui/locale/easyui-lang-zh_CN.js}" charset="utf-8"></script>
+        <link rel="stylesheet" type="text/css" th:href="@{/static/js/easyui/extend/my97/my97.min.css}" />
+        <script type="text/javascript" th:src="@{/static/js/easyui/extend/my97/jquery.easyui.my97.min.js}" charset="utf-8"></script>
+        <link rel="stylesheet" type="text/css" th:href="@{/static/js/easyui/portal/portal.min.css}">
+        <script type="text/javascript" th:src="@{/static/js/easyui/portal/jquery.portal.min.js}" charset="utf-8"></script>
+        <link rel="stylesheet" type="text/css" th:href="@{/static/js/easyui/extend/icon/eu-icon.min.css}" />
+        <script type="text/javascript" th:src="@{/static/js/easyui/extend/js/easyui-extend.min.js}" charset="utf-8"></script>
+        <script type="text/javascript" th:src="@{/static/js/easyui/extend/js/validatebox-extend.min.js}" charset="utf-8"></script>
+        <script type="text/javascript" th:inline="javascript">
+            /*<![CDATA[*/
+            try {
+                var token = /*[[${sessionInfo.token}]]*/ '';
+                $.ajaxSetup({headers: {'Authorization': 'Bearer ' + token}});
+            } catch (e) {
+                console.log(e);
+            }
+            /*]]>*/
+        </script>
+    </th:block>
+</head>
+<body>
+</body>
+</html>

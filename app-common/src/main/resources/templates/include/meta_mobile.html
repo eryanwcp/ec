@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:fragment="meta_mobile">
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0">
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta http-equiv="Pragma" content="no-cache"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Access-Control-Allow-Origin" content="*" />
+        <meta name="author" content="Eryan"/>
+        <link rel="shortcut icon" th:href="@{/static/img/favicon.ico}"/>
+
+        <script type="text/javascript" th:src="${appURL}+'/static/js/jquery/jquery-2.2.4.min.js'" charset="utf-8"></script>
+        <script type="text/javascript" th:src="${appURL}+'/static/js/jquery/jquery-extend.min.js'" charset="utf-8"></script>
+        <script type="text/javascript" th:src="${appURL}+'/static/js/jquery/jquery.cookie.min.js'" charset="utf-8"></script>
+        <script type="text/javascript" charset="utf-8" th:src="${appURL}+'/static/mobile/af/fastclick.min.js'"></script>
+        <script type="text/javascript" charset="utf-8" th:src="${appURL}+'/static/mobile/af/appframework.ui.js'"></script>
+        <script type="text/javascript" charset="utf-8" th:src="${appURL}+'/static/mobile/mobile.min.js'"></script>
+        <!-- <link rel="stylesheet" type="text/css" th:href="${appURL}+'/static/mobile/af/icons.css'" />-->
+        <link rel="stylesheet" type="text/css" href="${appURL}/static/mobile/af/af.ui.mine.css}" />
+        <link rel="stylesheet" type="text/css" href="${appURL}/static/app/mobile/mobile.min.css}" />
+
+        <script type="text/javascript" th:inline="javascript">
+            /*<![CDATA[*/
+            $.afui.useOSThemes=false;
+            var ctx = /*[[${ctx}]]*/ '';
+            var ctxAdmin = /*[[${ctxAdmin}]]*/ '';
+            var ctxFront = /*[[${ctxFront}]]*/ '';
+            var ctxMobile = /*[[${ctxMobile}]]*/ '';
+            var ctxStatic = /*[[${ctxStatic}]]*/ '';
+            var appURL = /*[[${appURL}]]*/ '';
+            try {
+                var token = /*[[${sessionInfo.token}]]*/ '';
+                $.ajaxSetup({headers: {'Authorization': 'Bearer ' + token}});
+            } catch (e) {
+                console.log(e);
+            }
+            /*]]>*/
+        </script>
+    </th:block>
+</head>
+<body>
+</body>
+</html>
