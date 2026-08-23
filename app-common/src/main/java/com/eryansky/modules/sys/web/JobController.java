@@ -15,6 +15,7 @@ import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys.mapper.QuartzJobDetail;
 import com.eryansky.modules.sys.service.JobService;
 import com.google.common.collect.Maps;
+import jakarta.annotation.Resource;
 import org.quartz.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -34,9 +35,9 @@ import java.util.Map;
 @Controller
 @RequestMapping(value = "${adminPath}/sys/job")
 public class JobController extends SimpleController {
-	@jakarta.annotation.Resource
+	@Resource
 	private JobService jobService;
-	@jakarta.annotation.Resource
+	@Resource
 	private Scheduler scheduler;
 
 	/**
@@ -58,7 +59,7 @@ public class JobController extends SimpleController {
 			if(export){
 				page.setPageSize(Page.PAGESIZE_ALL);
 			}
-			page = jobService.findJobList(page,model.getJobName(),model.getTriggerState());
+			page = jobService.findJobList(page,model.getQuery(),model.getTriggerState());
 			if(export){
 				String title = "定时任务列表";
 				String[] hearders = new String[] {"任务名", "任务状态", "执行实例","时间表达式","上一次执行时间","下一次执行时间","下一次执行时间"};//表头数组
@@ -77,7 +78,7 @@ public class JobController extends SimpleController {
 		uiModel.addAttribute("page",page);
 		uiModel.addAttribute("model",model);
 		uiModel.addAttribute("states",JobState.values());
-		return "modules/sys/jobList";
+		return "modules/sys/jobList.html";
 
 	}
 
@@ -247,7 +248,6 @@ public class JobController extends SimpleController {
 	@PostMapping(value = "removeJob")
 	@ResponseBody
 	public Result removeJob(String jobClassName, String jobGroupName, HttpServletRequest request, HttpServletResponse response) {
-		Map<String, String> returnData = Maps.newHashMap();
 		try {
 			//TriggerKey定义了trigger的名称和组别
 			TriggerKey triggerKey = TriggerKey.triggerKey(jobClassName, jobGroupName);
