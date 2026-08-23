@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.eryansky.com/thymeleaf/shiro"
+      xmlns:sitemesh="http://www.opensymphony.com/sitemesh/decorator">
+<head>
+    <title>缓存管理-缓存明细-[[${key}]]</title>
+    <!-- 装饰器配置 (沿用 SiteMesh) -->
+    <meta name="decorator" content="default_sys"/>
+</head>
+<body>
+<ul class="nav nav-tabs">
+    <li><a th:href="${ctxAdmin} + '/sys/systemMonitor/cache'">缓存管理</a></li>
+    <li><a th:href="${ctxAdmin}+'/sys/systemMonitor/cacheDetail?region='+${region}">缓存明细</a></li>
+    <li class="active"><a th:href="${ctxAdmin}+'/sys/systemMonitor/cacheKeyDetail?region='+${region}+'&key='+${key}">缓存数据</a></li>
+</ul>
+<form id="searchForm" method="post" class="breadcrumb form-search">
+    [[${region}]]:[[${key}]]
+</form>
+<div th:replace="~{common/tags/message :: messageBox(${message}, null)}"></div>
+<div>[[${data}]]</div>
+</body>
+</html>

@@ -8,13 +8,7 @@
       xmlns:sitemesh="http://www.opensymphony.com/sitemesh/decorator"
       class="no-js">
 <head>
-    <meta charset="UTF-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-    <meta name="renderer" content="webkit"/>
-
-    <title th:text="${T(com.eryansky.utils.AppConstants).getAppName()}">
-        <sitemesh:write property="title"/>
-    </title>
+    <title><sitemesh:write property="title"/> - [[${T(com.eryansky.utils.AppConstants).getAppName()}]]</title>
 
     <th:block th:replace="~{modules/sys/include/head :: head}"></th:block>
 

@@ -112,7 +112,7 @@ public class SystemMonitorController extends SimpleController {
             return renderString(response, page);
         }
         uiModel.addAttribute("page", page);
-        return "modules/sys/systemMonitor-cache";
+        return "modules/sys/systemMonitor-cache.html";
     }
 
     /**
@@ -142,7 +142,7 @@ public class SystemMonitorController extends SimpleController {
         }
         uiModel.addAttribute("region", region);
         uiModel.addAttribute("page", page);
-        return "modules/sys/systemMonitor-cacheDetail";
+        return "modules/sys/systemMonitor-cacheDetail.html";
     }
 
     /**
@@ -166,7 +166,7 @@ public class SystemMonitorController extends SimpleController {
         uiModel.addAttribute("object", object);
         uiModel.addAttribute("region", region);
         uiModel.addAttribute("key", key);
-        return "modules/sys/systemMonitor-cacheKeyDetail";
+        return "modules/sys/systemMonitor-cacheKeyDetail.html";
     }
 
     /**
