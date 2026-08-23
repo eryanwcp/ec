@@ -217,7 +217,7 @@
     </div>
 </div>
 
-<div th:replace="~{common/tags/message :: messageBox(${message}, null)}"></div>
+<div th:replace="~{common/tags/message :: messageBox(content=${message})}"></div>
 <div id="list"></div>
 <iframe id="annexFrame" src="" frameborder="no" style="padding: 0;border: 0;width: 100%;height: 50px;display: none;"></iframe>
 </body>

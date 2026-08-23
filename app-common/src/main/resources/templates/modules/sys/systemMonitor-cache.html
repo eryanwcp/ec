@@ -92,7 +92,7 @@
         <a class="btn btn-link" th:href="${ctxAdmin}+'/sys/systemMonitor/clearCache'">清空缓存</a>&nbsp;&nbsp;
     </shiro:hasPermission>
 </form>
-<div th:replace="~{common/tags/message :: messageBox(${message}, null)}"></div>
+<div th:replace="~{common/tags/message :: messageBox(content=${message})}"></div>
 <div id="list"></div>
 </body>
 </html>

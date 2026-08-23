@@ -16,7 +16,7 @@
 <form id="searchForm" method="post" class="breadcrumb form-search">
     [[${region}]]:[[${key}]]
 </form>
-<div th:replace="~{common/tags/message :: messageBox(${message}, null)}"></div>
+<div th:replace="~{common/tags/message :: messageBox(content=${message})}"></div>
 <div>[[${data}]]</div>
 </body>
 </html>

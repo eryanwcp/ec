@@ -28,14 +28,14 @@
                 cache: false,
                 dataType: 'json',
                 beforeSend: function (jqXHR, settings) {
-                    $("#systemInfo_div").html("<div style='padding: 10px 30px;text-align:center;font-size: 16px;'><img src='" + ctxStatic + "/js/easyui/themes/bootstrap/images/loading.gif' />数据加载中...</div>");
+                    $("#list").html("<div style='padding: 10px 30px;text-align:center;font-size: 16px;'><img src='" + ctxStatic + "/js/easyui/themes/bootstrap/images/loading.gif' />数据加载中...</div>");
                 },
                 success: function (data) {
                     if (data.code === 1) {
-                        var html = Mustache.render($("#systemList").html(), data['data']);
-                        $("#systemInfo_div").html(html);
+                        var html = Mustache.render($("#list_template").html(), data['data']);
+                        $("#list").html(html);
                     } else {
-                        $("#systemInfo_div").html(data['msg'] || "加载异常");
+                        $("#list").html(data['msg'] || "加载异常");
                     }
                 }
             });
@@ -44,7 +44,7 @@
     </script>
 
     <!-- Mustache 前端模板语法保持不变 -->
-    <script type="text/template" id="systemList">
+    <script type="text/template" id="list_template">
         <table class="table table-striped table-bordered table-condensed">
             <tbody>
                 <tr><td>名称</td><td>{{sys.computerName}}</td></tr>
@@ -97,6 +97,6 @@
 <form id="searchForm" method="post" class="breadcrumb form-search">
     &nbsp;&nbsp;<input id="btnSubmit" class="btn btn-primary" type="button" value="刷新" onclick="reLoad();"/>&nbsp;&nbsp;
 </form>
-<div id="systemInfo_div"></div>
+<div id="list"></div>
 </body>
 </html>

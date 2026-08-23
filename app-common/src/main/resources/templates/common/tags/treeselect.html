@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 使用 th:block 避免渲染出多余的外层 div -->
+<th:block th:fragment="treeselect">
+
+  <div class="input-append">
+    <!-- 隐藏域 ID -->
+    <input th:id="${id + 'Id'}" th:name="${name}" th:class="${cssClass}" type="hidden" th:value="${value}" th:disabled="${disabled == 'true' or disabled == true}"/>
+    <!-- 显示域 Name -->
+    <input th:id="${id + 'Name'}" th:name="${labelName}" readonly="readonly" type="text" th:value="${labelValue}" th:disabled="${disabled == 'true' or disabled == true}" th:class="${cssClass}" th:style="${cssStyle}"/>
+    <!-- 搜索按钮 -->
+    <a th:id="${id + 'Button'}" href="javascript:"
+       th:class="'btn ' + (${disabled == 'true' or disabled == true} ? 'disabled ' : '') + (${hideBtn == true or hideBtn == 'true'} ? 'hide' : '')"
+       th:style="${smallBtn == true or smallBtn == 'true' ? 'padding:4px 2px;' : ''}">
+      &nbsp;<i class="icon-search"></i>
+    </a>&nbsp;&nbsp;
+  </div>
+
+  <style type="text/css">
+    .jbox-title-panel, .jbox-button-panel { box-sizing: content-box; }
+    #jbox-state-state0 > div { overflow-y: hidden; -webkit-overflow-scrolling: touch; overflow-x: hidden; }
+    #jbox-content { overflow-y: hidden; -webkit-overflow-scrolling: touch; overflow-x: hidden; }
+    #jbox-iframe { overflow-y: auto; -webkit-overflow-scrolling: touch; overflow-x: hidden; }
+  </style>
+
+  <!-- 使用 th:inline 注入后台参数至 JS 中 -->
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    (function() {
+      // 获取Thymeleaf变量，通过闭包避免同一页面多次调用发生变量名冲突
+      var p_id = /*[[${id}]]*/ 'id';
+      var p_url = /*[[${url}]]*/ '';
+      var p_title = /*[[${title}]]*/ '选择';
+      var p_module = /*[[${module}]]*/ '';
+      var p_checked = /*[[${checked}]]*/ false;
+      var p_extId = /*[[${extId}]]*/ '';
+      var p_nodesLevel = /*[[${nodesLevel}]]*/ '';
+      var p_nameLevel = /*[[${nameLevel != null ? nameLevel : 1}]]*/ 1;
+      var p_allSelectNodeTypes = /*[[${allSelectNodeTypes}]]*/ '';
+      var p_allowClear = /*[[${allowClear}]]*/ false;
+      var p_notAllowSelectRoot = /*[[${notAllowSelectRoot}]]*/ false;
+      var p_notAllowSelectParent = /*[[${notAllowSelectParent}]]*/ false;
+      var p_selectScopeModule = /*[[${selectScopeModule}]]*/ false;
+
+      // 假设 ctxAdmin 存在于全局环境中或Model中
+      var ctxAdmin = /*[[${ctxAdmin}]]*/ '';
+
+      // 暴露给外部调用的动态函数
+      window[p_id + '_ajax_url'] = p_url;
+      window[p_id + 'SetAjaxURL'] = function(url){ window[p_id + '_ajax_url'] = url; };
+      window[p_id + 'GetAjaxURL'] = function(){ return window[p_id + '_ajax_url']; };
+
+      $("#" + p_id + "Button").click(function(){
+        // 是否限制选择，如果限制，直接返回
+        if ($("#" + p_id + "Id").attr("disabled")){ return true; }
+
+        var iframeUrl = ctxAdmin + "/tag/treeselect?url=" + encodeURIComponent(window[p_id + 'GetAjaxURL']())
+                + "&module=" + (p_module || "")
+                + "&checked=" + (p_checked || "")
+                + "&extId=" + (p_extId || "")
+                + "&nodesLevel=" + (p_nodesLevel || "")
+                + "&selectIds=" + $("#" + p_id + "Id").val();
+
+        var buttons = {"确定": "ok"};
+        if (p_allowClear == true || p_allowClear == "true") {
+          buttons["清除"] = "clear";
+        }
+        buttons["关闭"] = true;
+
+        $.jBox.open("iframe:" + iframeUrl, "选择" + p_title, 300, 420, {
+          buttons: buttons,
+          submit: function(v, h, f) {
+            if (v == "ok") {
+              var tree = h.find("iframe")[0].contentWindow.tree;
+              var ids = [], names = [], nodes = [];
+              if (p_checked == true || p_checked == "true") {
+                nodes = tree.getCheckedNodes(true);
+              } else {
+                nodes = tree.getSelectedNodes();
+              }
+              for (var i = 0; i < nodes.length; i++) {
+                if ((p_checked == true || p_checked == "true") && nodes[i].isParent) {
+                  continue; // 如果为复选框选择，则过滤掉父节点
+                }
+                if ((p_notAllowSelectRoot == true || p_notAllowSelectRoot == "true") && nodes[i].level == 0) {
+                  $.jBox.tip("不能选择根节点（" + nodes[i]['text'] + "）请重新选择。");
+                  return false;
+                }
+                if ((p_notAllowSelectParent == true || p_notAllowSelectParent == "true") && nodes[i].isParent) {
+                  $.jBox.tip("不能选择父节点（" + nodes[i]['text'] + "）请重新选择。");
+                  return false;
+                }
+                if (p_module != null && p_module !== "" && (p_selectScopeModule == true || p_selectScopeModule == "true")) {
+                  if (nodes[i]['attributes']['module'] == "") {
+                    $.jBox.tip("不能选择公共模型（" + nodes[i]['text'] + "）请重新选择。");
+                    return false;
+                  } else if (nodes[i]['attributes']['module'] != p_module) {
+                    $.jBox.tip("不能选择当前栏目以外的栏目模型，请重新选择。");
+                    return false;
+                  }
+                }
+                if (p_allSelectNodeTypes != null && p_allSelectNodeTypes !== "") {
+                  if (p_allSelectNodeTypes.indexOf(nodes[i]['attributes']['nType']) < 0) {
+                    $.jBox.tip("不允许选择的节点类型（" + nodes[i]['text'] + "）请重新选择。");
+                    return false;
+                  }
+                }
+
+                ids.push(nodes[i].id);
+                var t_node = nodes[i];
+                var t_name = "";
+                var name_l = 0;
+                do {
+                  name_l++;
+                  t_name = t_node['text'] + " " + t_name;
+                  t_node = t_node.getParentNode();
+                } while (name_l < parseInt(p_nameLevel));
+                names.push(t_name);
+
+                if (p_checked != true && p_checked != "true") {
+                  break; // 非复选框时返回第一个选择
+                }
+              }
+              $("#" + p_id + "Id").val(ids.join(",")).trigger("change");
+              $("#" + p_id + "Name").val(names.join(",")).trigger("change");
+            } else if (v == "clear") {
+              $("#" + p_id + "Id").val("").trigger("change");
+              $("#" + p_id + "Name").val("").trigger("change");
+            }
+          },
+          loaded: function(h) {
+            $(".jbox-content", document).css("overflow", "inherit");
+          }
+        });
+      });
+    })();
+    /*]]>*/
+  </script>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" xmlns:th="http://www.thymeleaf.org"
+	  xmlns:shiro="http://www.eryansky.com/thymeleaf/shiro"
+	  xmlns:sitemesh="http://www.opensymphony.com/sitemesh/decorator">
+<head>
+	<title>区域管理</title>
+	<!-- 装饰器配置 (沿用 SiteMesh) -->
+	<meta name="decorator" content="default_sys"/>
+	<script type="text/javascript" th:inline="javascript">
+		/*<![CDATA[*/
+		$(document).ready(function() {
+			$("#name").focus();
+			$("#inputForm").validate({
+				submitHandler: function(form){
+					loading('正在提交，请稍等...');
+					form.submit();
+				},
+				errorContainer: "#messageBox",
+				errorPlacement: function(error, element) {
+					$("#messageBox").text("输入有误，请先更正。");
+					if (element.is(":checkbox")||element.is(":radio")||element.parent().is(".input-append")){
+						error.appendTo(element.parent().parent());
+					} else {
+						error.insertAfter(element);
+					}
+				}
+			});
+		});
+		/*]]>*/
+	</script>
+</head>
+<body>
+	<ul class="nav nav-tabs">
+		<li><a th:href="${ctxAdmin}+'/sys/area'">区域列表</a></li>
+		<li class="active"><a th:href="${ctxAdmin}+'/sys/area/form?id='+${model.id}+'&parent.id='+${model.parent?.id}">区域<shiro:hasPermission name="sys:area:edit">[[${model.id != null ? '修改':'添加'}]]</shiro:hasPermission><shiro:lacksPermission name="sys:area:edit">查看</shiro:lacksPermission></a></li>
+	</ul><br/>
+	<form id="inputForm" th:action="${ctxAdmin}+'/sys/area/save'" method="post" class="form-horizontal">
+		<input name="id" type="hidden" th:value="${model.id}"/>
+		<div th:replace="~{common/tags/message :: messageBox(content=${message})}"></div>
+		<div class="control-group">
+			<label class="control-label">上级区域：</label>
+			<div class="controls">
+				<th:block th:replace="~{common/tags/treeselect :: treeselect(
+					id='area',
+					name='parent.id',
+					value=${model.parent != null ? model.parent.id : ''},
+					labelName='parent.name',
+					labelValue=${model.parent != null ? model.parent.name : ''},
+					title='区域',
+					url=${ctxAdmin + '/sys/area/treeData'},
+					extId=${model.id},
+					cssClass='',
+					allowClear=true
+				)}"></th:block>
+
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">区域名称：</label>
+			<div class="controls">
+				<input name="name" maxlength="128" class="input-xxlarge required" th:value="${model.name}"/>
+				<span class="help-inline"><font color="red">*</font> </span>
+				<select name="type" class="input-medium">
+					<option th:each="item : ${areas}"
+							th:value="${item.value}"
+							th:text="${item.description}"
+							th:selected="${item.value eq model.type}">
+					</option>
+				</select>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">区域简称：</label>
+			<div class="controls">
+				<input name="shortName" maxlength="128" class="input-xxlarge" th:value="${model.shortName}"/>
+				<span class="help-inline"></span>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">区域编码：</label>
+			<div class="controls">
+				<input name="code" maxlength="64" class="input-xxlarge required" th:value="${model.code}"/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">信息分类：</label>
+			<div class="controls">
+				<input name="bizCode" maxlength="64" class="input-xxlarge"  th:value="${model.bizCode}"/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">备注：</label>
+			<div class="controls">
+				<textarea name="remark" rows="4" maxlength="200" class="input-xxlarge">[[${model.remark}]]</textarea>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">自定义参数：</label>
+			<div class="controls">
+				<textarea name="extendAttr" rows="4" class="input-xxlarge">[[${model.extendAttr}]]</textarea>
+			</div>
+		</div>
+		<div class="form-actions">
+			<shiro:hasPermission name="sys:area:edit">
+				<input id="btnSubmit" class="btn btn-primary" type="submit" value="保 存"/>&nbsp;
+			</shiro:hasPermission>
+			<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>
+		</div>
+	</form>
+</body>
+</html>

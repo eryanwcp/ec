@@ -6,7 +6,6 @@
     <title>系统监控-系统日志</title>
     <!-- 装饰器配置 (沿用 SiteMesh) -->
     <meta name="decorator" content="default_sys"/>
-    
     <script type="text/javascript" th:inline="javascript">
         /*<![CDATA[*/
         $(function () {
@@ -134,7 +133,7 @@
         <a class="btn btn-link" th:href="${ctxAdmin}+'/sys/systemMonitor/clearExpireSession'">删除过期会话</a>&nbsp;&nbsp;
     </shiro:hasPermission>
 </form>
-<div th:replace="~{common/tags/message :: messageBox(${message}, null)}"></div>
+<div th:replace="~{common/tags/message :: messageBox(content=${message})}"></div>
 <div id="list"></div>
 </body>
 </html>

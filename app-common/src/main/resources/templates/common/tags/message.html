@@ -8,7 +8,7 @@
     content (String): 消息内容，必填
     type (String): 消息类型，可选。默认根据内容自动判断。消息类型：info、success、warning、error、loading
 -->
-<div th:fragment="messageBox(content, type)">
+<div th:fragment="messageBox">
   <!--
     1. 逻辑判断：只有当 content 不为空时才渲染
     2. 定义局部变量 ctype：
