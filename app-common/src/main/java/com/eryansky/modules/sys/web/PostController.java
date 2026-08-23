@@ -33,6 +33,7 @@ import com.eryansky.modules.sys.utils.PostUtils;
 import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.utils.SelectType;
 import com.google.common.collect.Lists;
+import jakarta.annotation.Resource;
 import org.apache.commons.lang3.Validate;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -56,11 +57,11 @@ import java.util.Set;
 @RequestMapping(value = "${adminPath}/sys/post")
 public class PostController extends SimpleController {
 
-    @jakarta.annotation.Resource
+    @Resource
     private PostService postService;
-    @jakarta.annotation.Resource
+    @Resource
     private OrganService organService;
-    @jakarta.annotation.Resource
+    @Resource
     private UserService userService;
 
     @ModelAttribute("model")

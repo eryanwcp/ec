@@ -22,6 +22,7 @@ import com.eryansky.modules.sys.service.ConfigService;
 import com.eryansky.modules.sys.service.LogService;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Maps;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,9 +40,9 @@ import java.util.Map;
 @RequestMapping(value = "${adminPath}/sys/encrypt")
 public class SystemEncryptController extends SimpleController {
 
-    @jakarta.annotation.Resource
+    @Resource
     private ConfigService configService;
-    @jakarta.annotation.Resource
+    @Resource
     private LogService logService;
 
     /**
