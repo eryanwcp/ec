@@ -312,7 +312,7 @@ public class SystemMonitorController extends SimpleController {
             return renderString(response, page);
         }
         uiModel.addAttribute("page", page);
-        return "modules/sys/systemMonitor-queue";
+        return "modules/sys/systemMonitor-queue.html";
     }
 
     @RequiresPermissions("sys:systemMonitor:view")
@@ -322,7 +322,7 @@ public class SystemMonitorController extends SimpleController {
         Collection<String> queueList = CacheUtils.getCacheChannel().queueList(region);
         uiModel.addAttribute("region", region);
         uiModel.addAttribute("data", JsonMapper.toJsonString(queueList));
-        return "modules/sys/systemMonitor-queueDetail";
+        return "modules/sys/systemMonitor-queueDetail.html";
     }
 
     @RequiresPermissions("sys:systemMonitor:edit")
@@ -511,6 +511,6 @@ public class SystemMonitorController extends SimpleController {
             map.put("queueRemainingCapacity", threadPoolExecutor.getQueue().remainingCapacity());
             return renderString(response, Result.successResult().setData(map));
         }
-        return "modules/sys/systemMonitor-asyncTask";
+        return "modules/sys/systemMonitor-asyncTask.html";
     }
 }
