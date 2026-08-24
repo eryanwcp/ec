@@ -80,7 +80,7 @@ public class MessageReceiveController extends SimpleController {
 
         uiModel.addAttribute("page", page);
         uiModel.addAttribute("model", model);
-        return "modules/notice/messageReceiveList";
+        return "modules/notice/messageReceiveList.html";
     }
 
     /**

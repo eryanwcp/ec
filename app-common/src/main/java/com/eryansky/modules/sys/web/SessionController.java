@@ -45,7 +45,7 @@ public class SessionController extends SimpleController {
     @GetMapping(value = {""})
     @Mobile(value = MobileValue.ALL)
     public ModelAndView list() {
-        return new ModelAndView("modules/sys/session");
+        return new ModelAndView("modules/sys/session.html");
     }
 
     /**

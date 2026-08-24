@@ -1,8 +1,10 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
-<%@ include file="/common/taglibs.jsp" %>
-<html>
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.eryansky.com/thymeleaf/shiro"
+      xmlns:sitemesh="http://www.opensymphony.com/sitemesh/decorator">
 <head>
-    <title>消息中心</title>
+    <title>消息中心-我的消息</title>
+    <!--    装饰器-->
     <meta name="decorator" content="default_mobile"/>
     <style type="text/css">
         *{box-sizing: border-box;}
@@ -13,7 +15,8 @@
         .list>li:nth-child(even){background-color: #f0f0f0;}
         .list>li.pressed{background-color: #d4d4d4;}
     </style>
-    <script type="text/javascript">
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
         $(function(){
             loadData();
             $("#setReadAll").click(function(){
@@ -46,7 +49,7 @@
                 data: queryParam,
                 cache: false,
                 beforeSend: function (jqXHR, settings) {
-                    $("#list").html("<div style='padding: 10px 30px;text-align:center;font-size: 16px;'><img src='${ctxStatic}/js/easyui/themes/bootstrap/images/loading.gif' />数据加载中...</div>");
+                    $("#list").html("<div style='padding: 10px 30px;text-align:center;font-size: 16px;'><img src='"+ctxStatic+"/js/easyui/themes/bootstrap/images/loading.gif' />数据加载中...</div>");
                 },
                 success: function (data) {
                     data = data['obj'];
@@ -67,7 +70,7 @@
          */
         function setRead(id,messageId,linkUrl){
             $.ajax({
-                url: '${ctxAdmin}/notice/messageReceive/setRead?id='+id,
+                url: ctxAdmin + '/notice/messageReceive/setRead?id='+id,
                 type: 'post',
                 dataType: 'json',
                 success: function (data) {}
@@ -75,7 +78,7 @@
             if(linkUrl){
                 try {
                     $.ajax({
-                        url: '${ctx}/f/getMessageSSOUrl?messageId=' + messageId,
+                        url: ctx + '/f/getMessageSSOUrl?messageId=' + messageId,
                         type: 'post',
                         dataType: 'json',
                         success: function (data) {
@@ -89,26 +92,34 @@
                 }
             }
         }
+        /*]]>*/
     </script>
     <script type="text/template" id="list_template">
         <ul id="contentTable" class="list">
             {{#result}}
-                <li onclick="setRead('{{id}}','{{message.id}}','{{message.url}}');">{{message.sendTime}}[{{message.senderName}}]：{{message.content}}</li>
+            <li onclick="setRead('{{id}}','{{message.id}}','{{message.url}}');">{{message.sendTime}}[{{message.senderName}}]：{{message.content}}</li>
             {{/result}}
         </ul>
         <div class="page pagination"></div>
     </script>
 </head>
 <body style="border: 0;padding: 0;">
-<form:form id="searchForm" modelAttribute="model" action="${ctxAdmin}/notice/messageReceive" method="post" class="breadcrumb form-search">
-    <input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
-    <input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
-    <form:radiobutton path="isRead" value="0" label="未阅" onclick="$('#pageNo').val(1);loadData();"/>
-    <form:radiobutton path="isRead" value="1" label="已阅" onclick="$('#pageNo').val(1);loadData();"/>
-    <c:if test="${model.isRead eq '0'}">
-        <input id="setReadAll" class="btn btn-primary" type="button" value="全部标记为已读"/>
-    </c:if>
-</form:form>
+<form id="searchForm" th:action="${ctxAdmin}+'/notice/messageReceive'" method="post" class="breadcrumb form-search">
+    <input id="pageNo" name="pageNo" type="hidden" th:value="${page.pageNo}"/>
+    <input id="pageSize" name="pageSize" type="hidden" th:value="${page.pageSize}"/>
+    <label><input type="radio"
+                  name="isRead"
+                  value="0"
+                  th:checked="${model.isRead == '0'}"
+                  onclick="$('#pageNo').val(1);loadData();"/>未阅</label>
+    <label><input type="radio"
+                  name="isRead"
+                  value="1"
+                  th:checked="${model.isRead == '1'}"
+                  onclick="$('#pageNo').val(1);loadData();"/>
+        已阅</label> &nbsp;&nbsp;
+    <input id="setReadAll" class="btn btn-primary" type="button" value="全部标记为已读"/>
+</form>
 <div id="list"></div>
 </body>
 </html>
