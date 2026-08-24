@@ -10,7 +10,7 @@
 <body>
 <ul class="nav nav-tabs">
     <li><a th:href="${ctxAdmin}+'/notice/messageReceive'">消息列表</a></li>
-    <li class="active"><a th:href="${ctxAdmin}+'/notice/message/info?id='+${model.id}">消息详情</a></li>
+    <li class="active"><a th:href="${ctxAdmin}+'/notice/messageReceive/info?id='+${model.id}">消息详情</a></li>
 </ul>
 <br/>
 <div>[[${model.message.content}]]</div>
