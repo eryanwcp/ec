@@ -18,6 +18,7 @@ import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.core.aop.annotation.Logging;
+import com.eryansky.core.rpc.utils.RPCUtils;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
 import com.eryansky.core.security.annotation.PrepareOauth2;
@@ -370,137 +371,116 @@ public class MobileIndexController extends SimpleController {
                               @RequestParam(value = "latitude", required = false) Double latitude,
                               @RequestParam(value = "press", defaultValue = "true") Boolean press,
                               String pressText) {
-        CaseInsensitiveMap<String,String> caseInsensitiveMap = new CaseInsensitiveMap<>(headers);
-        String requestEncrypt =  caseInsensitiveMap.get(DecryptRequestBodyAdvice.ENCRYPT);
-        String requestEncryptKey =  caseInsensitiveMap.get(DecryptRequestBodyAdvice.ENCRYPT_KEY);
+        CaseInsensitiveMap<String, String> caseInsensitiveMap = new CaseInsensitiveMap<>(headers);
+        String requestEncrypt = caseInsensitiveMap.get(DecryptRequestBodyAdvice.ENCRYPT);
+        String requestEncryptKey = caseInsensitiveMap.get(DecryptRequestBodyAdvice.ENCRYPT_KEY);
         Result result = null;
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         Exception exception = null;
         File file = null;
-        java.io.File tempFile = null;
-        try {
-//            FileUploadUtils.assertAllowed(multipartFile,FileUploadUtils.IMAGE_EXTENSION, FileUploadUtils.DEFAULT_MAX_SIZE);
-            String _folderName = "IMAGE";//默认文件夹
 
+        try {
+            String _folderName = "IMAGE";
             String filename = DiskUtils.getMultipartOriginalFilename(multipartFile);
             String extension = FilenameUtils.getExtension(filename);
-            //文件解密处理
-            byte[] data = null;
-            if(CipherMode.SM4.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)){
-                String key = null;
-                try {
-                    key = RSAUtils.decryptHexString(requestEncryptKey, EncryptProvider.privateKeyBase64());
-                    data =  Sm4Utils.decryptCbcPadding(EncodeUtils.hexDecode(key),multipartFile.getBytes());
-                } catch (Exception e) {
-                    try {
-                        data =  Sm4Utils.decryptCbcPadding(EncodeUtils.base64Decode(requestEncryptKey),multipartFile.getBytes());
-                    } catch (Exception e2) {
-                        logger.error(e2.getMessage(),e2);
-                    }
-                }
-
-            }else if(CipherMode.AES.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)){
-                String key = null;
-                try {
-                    key = RSAUtils.decryptBase64String(requestEncryptKey, EncryptProvider.privateKeyBase64());
-                    data =  Cryptos.aesECBDecryptBytes(multipartFile.getBytes(),EncodeUtils.base64Decode(key));
-                } catch (Exception e) {
-                    try {
-                        data =  Cryptos.aesECBDecryptBytes(multipartFile.getBytes(),EncodeUtils.base64Decode(requestEncryptKey));
-                    } catch (Exception e2) {
-                        logger.error(e2.getMessage(),e2);
-                    }
-
-                }
-
-            }else if(CipherMode.BASE64.name().equals(requestEncrypt)){
-                try {
-                    data =  EncodeUtils.base64Decode(multipartFile.getBytes());
-                } catch (Exception e) {
-                    logger.error(e.getMessage(),e);
-                }
+            if (StringUtils.isBlank(extension)) {
+                extension = "jpg";
             }
 
-            if(null != data){
-                multipartFile = new CustomMultipartFile(filename,data);
+            // 1. 文件解密处理
+            byte[] data = RPCUtils.decryptDataByRequest(requestEncrypt,requestEncryptKey,multipartFile.getBytes());
+            if (null != data) {
+                multipartFile = new CustomMultipartFile(filename, data);
             }
 
-            //兼容处理 无后缀文件的处理
-            if(StringUtils.isNotBlank(extension)){
-                FileUploadUtils.assertAllowed(multipartFile,FileUploadUtils.IMAGE_EXTENSION, FileUploadUtils.DEFAULT_MAX_SIZE);
+            // 兼容处理 无后缀文件的处理
+            if (StringUtils.isNotBlank(extension)) {
+                FileUploadUtils.assertAllowed(multipartFile, FileUploadUtils.IMAGE_EXTENSION, FileUploadUtils.DEFAULT_MAX_SIZE);
             }
-            if(StringUtils.isNotBlank(folderCode)){
+            if (StringUtils.isNotBlank(folderCode)) {
                 _folderName = FilenameUtils.getName(folderCode);
             }
 
-            InputStream inputStream = multipartFile.getInputStream();
-            String tempFileName = Identities.uuid() +"."+ extension;
-            if(press){
-                // 获取偏转角度
+            byte[] uploadBytes;
+
+            // 2. 图像处理与水印添加
+            if (press) {
                 int angle = getAngle(multipartFile);
-                // 原始图片缓存
-                BufferedImage originalImage =  ImgUtil.read(multipartFile.getInputStream());
+                BufferedImage originalImage;
 
-                // 水印文字
-                String watermarkText = StringUtils.isNotBlank(pressText) ? pressText:sessionInfo.getLoginName()+" "+ DateUtils.getDateTime();
-                String watermarkTextGPS = null;
-                if (null != longitude && null != latitude) {
-                    watermarkTextGPS = Arith.round(latitude,6) + "," + Arith.round(longitude,6);
+                // 使用 try-with-resources 保证输入流显式关闭
+                try (InputStream is = multipartFile.getInputStream()) {
+                    originalImage = ImgUtil.read(is);
                 }
-                BufferedImage watermarkImage = null;
-                if (angle != 90 && angle != 270) {
-                    // 不需要旋转，直接处理
-                    watermarkImage = new BufferedImage(
-                            originalImage.getWidth(),
-                            originalImage.getHeight(),
-                            BufferedImage.TYPE_INT_RGB
-                    );
 
-                    Graphics2D g2d = (Graphics2D) watermarkImage.getGraphics();
-                    g2d.setFont(new java.awt.Font("宋体", java.awt.Font.BOLD, 28)); // 设置水印字体
-                    g2d.drawImage(originalImage, 0, 0, null); // 绘制原始图片
-                    g2d.setColor(Color.WHITE); // 设置水印颜色
-                    g2d.drawString(watermarkText, 20, 30); // 绘制水印文字
-                    if (null != watermarkTextGPS) {
-                        FontMetrics metrics = g2d.getFontMetrics();
-                        int lineHeight = metrics.getHeight();
-                        g2d.drawString(watermarkTextGPS, 20, 30 + (1 * lineHeight)); // 绘制水印文字
-                    }
-                    g2d.dispose();
-                } else {
-                    // 宽高互换
+                // 处理旋转角度
+                BufferedImage orientedImage = originalImage;
+                if (angle == 90 || angle == 270) {
                     int imgWidth = originalImage.getHeight();
                     int imgHeight = originalImage.getWidth();
-
-                    // 中心点位置
                     double centerWidth = ((double) imgWidth) / 2;
                     double centerHeight = ((double) imgHeight) / 2;
 
-                    // 图片缓存
-                    watermarkImage = new BufferedImage(imgWidth, imgHeight, BufferedImage.TYPE_INT_RGB);
-
-                    // 旋转对应角度
-                    Graphics2D g = watermarkImage.createGraphics();
-                    g.rotate(Math.toRadians(angle), centerWidth, centerHeight);
-                    g.drawImage(originalImage, (imgWidth - originalImage.getWidth()) / 2, (imgHeight - originalImage.getHeight()) / 2, null);
-                    g.rotate(Math.toRadians(-angle), centerWidth, centerHeight);
-                    g.setFont(new java.awt.Font("宋体", java.awt.Font.BOLD, 28)); // 设置水印字体
-                    g.setColor(Color.WHITE); // 设置水印颜色
-                    g.drawString(watermarkText, 20, 30); // 绘制水印文字
-                    if (null != watermarkTextGPS) {
-                        FontMetrics metrics = g.getFontMetrics();
-                        int lineHeight = metrics.getHeight();
-                        g.drawString(watermarkTextGPS, 20, 30 + (1 * lineHeight)); // 绘制水印文字
-                    }
-                    g.dispose();
+                    orientedImage = new BufferedImage(imgWidth, imgHeight, BufferedImage.TYPE_INT_RGB);
+                    Graphics2D gRot = orientedImage.createGraphics();
+                    gRot.rotate(Math.toRadians(angle), centerWidth, centerHeight);
+                    gRot.drawImage(originalImage, (imgWidth - originalImage.getWidth()) / 2, (imgHeight - originalImage.getHeight()) / 2, null);
+                    gRot.dispose();
                 }
-                tempFile = new java.io.File(tempFileName);
-                ImgUtil.write(watermarkImage, tempFile);
-                inputStream = Files.newInputStream(Paths.get(tempFileName));
+
+                // 水印文本配置
+                String watermarkText = StringUtils.isNotBlank(pressText) ? pressText : sessionInfo.getLoginName() + " " + DateUtils.getDateTime();
+                String watermarkTextGPS = null;
+                if (null != longitude && null != latitude) {
+                    watermarkTextGPS = Arith.round(latitude, 6) + "," + Arith.round(longitude, 6);
+                }
+
+                // 计算顶部 Banner 扩展高度
+                Font font = new Font("宋体", Font.BOLD, 28);
+                int topPadding = 15;
+                int lineMargin = 10;
+                int fontSize = 28;
+                int lineCount = (watermarkTextGPS != null) ? 2 : 1;
+                int bannerHeight = (topPadding * 2) + (fontSize * lineCount) + (lineMargin * (lineCount - 1));
+
+                int srcW = orientedImage.getWidth();
+                int srcH = orientedImage.getHeight();
+
+                // 绘制扩展区域与内容
+                BufferedImage watermarkImage = new BufferedImage(srcW, srcH + bannerHeight, BufferedImage.TYPE_INT_RGB);
+                Graphics2D g2d = watermarkImage.createGraphics();
+
+                g2d.setColor(Color.BLACK);
+                g2d.fillRect(0, 0, srcW, bannerHeight);
+                g2d.drawImage(orientedImage, 0, bannerHeight, null);
+
+                g2d.setFont(font);
+                g2d.setColor(Color.WHITE);
+
+                int textX = 20;
+                int textY1 = topPadding + fontSize;
+                g2d.drawString(watermarkText, textX, textY1);
+
+                if (null != watermarkTextGPS) {
+                    int textY2 = textY1 + fontSize + lineMargin;
+                    g2d.drawString(watermarkTextGPS, textX, textY2);
+                }
+
+                g2d.dispose();
+
+                // 直接通过内存 ByteArrayOutputStream 转换，完全替代磁盘临时文件写读
+                try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                    javax.imageio.ImageIO.write(watermarkImage, extension, baos);
+                    uploadBytes = baos.toByteArray();
+                }
+            } else {
+                // 不加水印时，直接复用已有的 byte 数组，避免两次 InputStream 转换
+                uploadBytes = (null != data) ? data : multipartFile.getBytes();
             }
 
-
-            file = DiskUtils.saveSystemFile(_folderName, FolderType.NORMAL.getValue(), sessionInfo.getUserId(), new CustomMultipartFile(tempFileName, FileCopyUtils.copyToByteArray(inputStream)));
+            // 3. 保存目标系统文件
+            String tempFileName = Identities.uuid() + "." + extension;
+            file = DiskUtils.saveSystemFile(_folderName, FolderType.NORMAL.getValue(), sessionInfo.getUserId(), new CustomMultipartFile(tempFileName, uploadBytes));
             Map<String, Object> _data = Maps.newHashMap();
             String base64Data = "data:image/jpeg;base64," + Base64Utils.encodeToString(FileCopyUtils.copyToByteArray(Files.newInputStream(file.getDiskFile().toPath())));
             _data.put("file", file);
@@ -527,18 +507,13 @@ public class MobileIndexController extends SimpleController {
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
         } finally {
             if (exception != null) {
-                logger.error(exception.getMessage(),exception);
+                logger.error(exception.getMessage(), exception);
                 if (file != null) {
                     DiskUtils.deleteFile(file);
                 }
             }
-            if (tempFile != null) {
-                tempFile.delete();
-            }
-
         }
         return result;
-
     }
 
     private int getAngle(MultipartFile file) {
