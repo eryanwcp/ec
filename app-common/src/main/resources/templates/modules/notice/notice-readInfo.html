@@ -1,5 +1,6 @@
-<script type="text/javascript">
-    var noticeId = '${noticeId}';
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+    var noticeId = [[${noticeId}]];
     $(function() {
         $('#notice_readInfo_datagrid').datagrid({
             url : ctxAdmin + '/notice/noticeReceiveInfo/readInfoDatagrid/'+noticeId,
@@ -36,6 +37,7 @@
     function downloadReplyFile(fileIds){
         $('#annexFrame').attr('src', ctxAdmin + "/disk/downloadDiskFile?fileIds="+ fileIds);
     }
+    /*]]>*/
 </script>
 <table id="notice_readInfo_datagrid"></table>
 <iframe id="annexFrame" style="display:none" src=""></iframe>
