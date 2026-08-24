@@ -1,0 +1,65 @@
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+    var modelIsReply = [[${model.isReply}]];
+    var modelFileIds = JSON.parse(/*[[${T(com.eryansky.utils.AppUtils).toJson(fileIds)}]]*/ []);
+    var fileSizeLimit = [[${T(com.eryansky.utils.AppConstants).getNoticeMaxUploadSize()}]];
+    /*]]>*/
+</script>
+<script type="text/javascript" th:src="${ctxStatic}+'/app/modules/notice/notice-reply-input'+${yuicompressor}+'.js?_='+${sysInitTime}" charset="utf-8"></script>
+<style type="text/css">
+    .img_div{
+        display : inline-block;
+        position : relative;
+    }
+
+    .img_div .delete{
+        position : absolute;
+        top : 5px;
+        right : 5px;
+        color: red;
+        border: 1px solid red;
+        text-align: center;
+        cursor: pointer;
+        border-radius: 20px;
+        width : 20px;
+        height : 20px;
+        line-height: 20px;
+    }
+    #notice_form div label{text-align: right;}
+</style>
+<div>
+    <form id="notice_reply_form" class="dialog-form"  method="post" novalidate>
+        <input type="hidden" name="id" th:value="${model.id}"/>
+        <!-- 用户版本控制字段 version -->
+        <input type="hidden" id="noticeId" name="noticeId" th:value="${model.noticeId}"/>
+
+        <table style="border: 0px;width: 100%;">
+            <tr>
+                <td style="width: 96px; vertical-align: top;text-align: right;">回复内容：&nbsp;</td>
+                <td><textarea id="editor" name="replyContent">[[${model.replyContent}]]</textarea></td>
+            </tr>
+        </table>
+        <div>
+            <label>附件：</label>
+            <div style="margin-left: 96px;">
+                <div id="uploadify"></div>
+                <input id="fileIds" name="fileIds" type="hidden" />
+                <div th:if="${not #lists.isEmpty(files)}">
+                    <div th:each="file,iStat : ${files}" th:id="${file.id}" style="font-size: 14px;">
+                        <span th:text="${iStat.index + 1}"></span>、
+                        <a href="#"
+                           onclick="loadOrOpen([[${file.id}]]);"
+                           style="color: #0000ff;"
+                           th:text="${file.name}">文件名</a>&nbsp;&nbsp;
+                        <a href="#"
+                           onclick="delUpload([[${file.id}]]);"
+                           style="color: red;">删除</a>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </form>
+    <iframe id="annexFrame" style="display:none" src=""></iframe>
+</div>

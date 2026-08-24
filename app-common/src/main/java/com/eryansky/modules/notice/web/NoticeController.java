@@ -187,7 +187,7 @@ public class NoticeController extends SimpleController {
     @Logging(logType = LogType.access, value = "通知管理-查看通知")
     @GetMapping(value = {"readInfo/{id}"})
     public ModelAndView readInfo(@PathVariable String id) {
-        ModelAndView modelAndView = new ModelAndView("modules/notice/notice-readInfo");
+        ModelAndView modelAndView = new ModelAndView("modules/notice/notice-readInfo.html");
         modelAndView.addObject("noticeId", id);
         return modelAndView;
     }
@@ -203,7 +203,7 @@ public class NoticeController extends SimpleController {
     @Mobile(value = MobileValue.ALL)
     @GetMapping(value = {"view/{id}"})
     public ModelAndView view(@PathVariable String id) {
-        ModelAndView modelAndView = new ModelAndView("modules/notice/notice-view");
+        ModelAndView modelAndView = new ModelAndView("modules/notice/notice-view.html");
         List<File> files = DiskUtils.findFilesByIds(noticeService.findFileIdsByNoticeId(id));
         Notice model = noticeService.get(id);
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
