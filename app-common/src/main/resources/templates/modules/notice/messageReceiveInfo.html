@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.eryansky.com/thymeleaf/shiro"
+      xmlns:sitemesh="http://www.opensymphony.com/sitemesh/decorator">
+<head>
+    <title>[[${model.message.content}]]</title>
+    <!--    装饰器-->
+    <meta name="decorator" content="default_sys"/>
+</head>
+<body>
+<ul class="nav nav-tabs">
+    <li><a th:href="${ctxAdmin}+'/notice/messageReceive'">消息列表</a></li>
+    <li class="active"><a th:href="${ctxAdmin}+'/notice/message/info?id='+${model.id}">消息详情</a></li>
+</ul>
+<br/>
+<div>[[${model.message.content}]]</div>
+<div>发布人：[[${model.message.senderName}]] &nbsp;</div>
+<div>发布时间：[[${#dates.format(model.message.sendTime, 'yyyy-MM-dd')}]] &nbsp;</div>
+<div>推送状态：[[${model.isSendView}]]</div>
+<div>阅读状态：[[${model.isReadView}]]</div>
+<div class="form-actions">
+    <input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>
+</div>
+</body>
+</html>
