@@ -49,7 +49,7 @@
 <body>
     <h3 class="newstitle">[[${model.title}]]</h3>
     <h4 class="newstime">[[${model.publishOrganName}]] [[${model.publishUserName}]] [[${#dates.format(model.publishTime, 'yyyy-MM-dd HH:mm')}]]</h4>
-    <div id="content">${model.content}</div>
+    <div id="content" th:text="${model.content}"></div>
     <div th:if="${not #lists.isEmpty(files)}">
         <div th:each="file,iStat : ${files}" th:id="${file.id}" style="float: left;width:100%;border-top:1px solid #000;padding-top:10px;margin-top:10px;">
             <strong>附件列表：</strong>

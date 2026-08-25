@@ -51,8 +51,7 @@
             [ <label>发布部门：</label>[[${model.publishOrganName}]]&nbsp;&nbsp;<label>发布人：</label>[[${model.publishUserName}]]&nbsp;&nbsp;<label>发布时间：</label>[[${#dates.format(model.publishTime, 'yyyy-MM-dd HH:mm')}]]]
         </div>
     </div>
-    <div id="content" style="float: left;">
-        [[${model.content}]]
+    <div id="content" style="float: left;" th:text="${model.content}">
     </div>
     <br/>
     <div th:if="${not #lists.isEmpty(files)}">
