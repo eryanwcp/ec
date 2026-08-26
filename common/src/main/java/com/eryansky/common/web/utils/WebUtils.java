@@ -262,7 +262,7 @@ public class WebUtils extends org.springframework.web.util.WebUtils {
      * @param paramNames 参数名列表，按优先级从高到低排列
      * @return 找到的第一个有效参数值，若均未找到则返回 null
      */
-    private String getParameter(HttpServletRequest request, String... paramNames) {
+    public static String getParameter(HttpServletRequest request, String... paramNames) {
         if (paramNames == null) {
             return null;
         }
