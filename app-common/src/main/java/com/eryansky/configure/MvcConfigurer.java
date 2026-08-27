@@ -15,9 +15,15 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.collect.Lists;
 import jakarta.annotation.Resource;
 //import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.impl.routing.SystemDefaultRoutePlanner;
 import org.apache.hc.client5.http.ssl.*;
 import org.apache.hc.core5.reactor.ssl.SSLBufferMode;
 import org.apache.hc.core5.ssl.SSLContexts;
@@ -39,6 +45,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
 import javax.net.ssl.SSLContext;
+import java.net.ProxySelector;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -254,12 +261,50 @@ public class MvcConfigurer implements WebMvcConfigurer {
 //                    .register(StandardCookieSpec.STRICT, cookieSpecFactory)
 //                    .build();
 
-
-            CloseableHttpClient httpClient = HttpClients.custom()
+            PoolingHttpClientConnectionManager connectionManager = PoolingHttpClientConnectionManagerBuilder.create()
+                    .setTlsSocketStrategy(tlsSocketStrategy)
+                    .setMaxConnTotal(POOL_MAX_CONN)
+                    .setMaxConnPerRoute(POOL_MAX_PER_CONN)
+                    .build();
+            HttpClientBuilder clientBuilder = HttpClients.custom()
 //                    .disableCookieManagement()
 //                    .setDefaultCookieSpecRegistry(cookieSpecRegistry)
-                    .setConnectionManager(PoolingHttpClientConnectionManagerBuilder
-                    .create().setTlsSocketStrategy(tlsSocketStrategy).setMaxConnTotal(POOL_MAX_CONN).setMaxConnPerRoute(POOL_MAX_PER_CONN).build()).build();
+                    .setConnectionManager(connectionManager);
+
+            // 读取系统代理配置
+            Properties props = System.getProperties();
+            String proxyHost = props.getProperty("http.proxyHost");
+            String proxyPort = props.getProperty("http.proxyPort");
+
+            if (proxyHost != null && !proxyHost.isEmpty()) {
+                int port = proxyPort != null ? Integer.parseInt(proxyPort) : 80;
+                org.apache.hc.core5.http.HttpHost proxy = new org.apache.hc.core5.http.HttpHost(proxyHost, port);
+
+                // 1. 设置默认代理服务
+                clientBuilder.setProxy(proxy);
+
+                // 2. 处理代理身份认证（如果有）
+                String proxyUser = props.getProperty("http.proxyUser");
+                String proxyPassword = props.getProperty("http.proxyPassword");
+                if (proxyUser != null && proxyPassword != null) {
+                    BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+                    credentialsProvider.setCredentials(
+                            new AuthScope(proxy),
+                            new UsernamePasswordCredentials(proxyUser, proxyPassword.toCharArray())
+                    );
+                    clientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+                }
+
+                // 3. 处理不走代理的域名 (http.nonProxyHosts，如 "localhost|127.0.0.1|*.example.com")
+                String nonProxyHosts = props.getProperty("http.nonProxyHosts");
+                if (nonProxyHosts != null && !nonProxyHosts.isEmpty()) {
+                    // 使用自带的代理选择器路线解析 nonProxyHosts
+                    clientBuilder.setRoutePlanner(new SystemDefaultRoutePlanner(ProxySelector.getDefault()));
+                }
+            }
+
+            CloseableHttpClient httpClient = clientBuilder.build();
+
             HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
             requestFactory.setHttpClient(httpClient);
             requestFactory.setConnectionRequestTimeout(10*1000);
