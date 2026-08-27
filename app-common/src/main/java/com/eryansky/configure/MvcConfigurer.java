@@ -1,5 +1,6 @@
 package com.eryansky.configure;
 
+import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.core.dialect.dialect.ShiroDialect;
@@ -276,8 +277,8 @@ public class MvcConfigurer implements WebMvcConfigurer {
             String proxyHost = props.getProperty("http.proxyHost");
             String proxyPort = props.getProperty("http.proxyPort");
 
-            if (proxyHost != null && !proxyHost.isEmpty()) {
-                int port = proxyPort != null ? Integer.parseInt(proxyPort) : 80;
+            if (StringUtils.isNotBlank(proxyHost) && StringUtils.isNotBlank(proxyPort)) {
+                int port = Integer.parseInt(proxyPort);
                 org.apache.hc.core5.http.HttpHost proxy = new org.apache.hc.core5.http.HttpHost(proxyHost, port);
 
                 // 1. 设置默认代理服务
@@ -286,7 +287,7 @@ public class MvcConfigurer implements WebMvcConfigurer {
                 // 2. 处理代理身份认证（如果有）
                 String proxyUser = props.getProperty("http.proxyUser");
                 String proxyPassword = props.getProperty("http.proxyPassword");
-                if (proxyUser != null && proxyPassword != null) {
+                if (StringUtils.isNotBlank(proxyUser) && StringUtils.isNotBlank(proxyPassword)) {
                     BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
                     credentialsProvider.setCredentials(
                             new AuthScope(proxy),
@@ -297,7 +298,7 @@ public class MvcConfigurer implements WebMvcConfigurer {
 
                 // 3. 处理不走代理的域名 (http.nonProxyHosts，如 "localhost|127.0.0.1|*.example.com")
                 String nonProxyHosts = props.getProperty("http.nonProxyHosts");
-                if (nonProxyHosts != null && !nonProxyHosts.isEmpty()) {
+                if (StringUtils.isNotBlank(nonProxyHosts) ) {
                     // 使用自带的代理选择器路线解析 nonProxyHosts
                     clientBuilder.setRoutePlanner(new SystemDefaultRoutePlanner(ProxySelector.getDefault()));
                 }
