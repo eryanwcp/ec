@@ -244,10 +244,13 @@ public class MvcConfigurer implements WebMvcConfigurer {
     private static final int POOL_MAX_PER_CONN = 256;
 
     //配置SSL, 使用RestTemplate访问https
-    public HttpComponentsClientHttpRequestFactory getRequestFactory(){
+    // 配置SSL, 使用RestTemplate访问https
+    public HttpComponentsClientHttpRequestFactory getRequestFactory() {
         try {
+            // 1. SSL 配置 (当前策略为信任所有证书)
             TrustStrategy trustStrategy = (x509Certificates, s) -> true;
-            SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null,trustStrategy).build();
+            SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, trustStrategy).build();
+
             TlsSocketStrategy tlsSocketStrategy = new DefaultClientTlsStrategy(
                     sslContext,
                     HttpsSupport.getSystemProtocols(),
@@ -262,56 +265,55 @@ public class MvcConfigurer implements WebMvcConfigurer {
 //                    .register(StandardCookieSpec.STRICT, cookieSpecFactory)
 //                    .build();
 
+            // 2. 配置连接池
             PoolingHttpClientConnectionManager connectionManager = PoolingHttpClientConnectionManagerBuilder.create()
                     .setTlsSocketStrategy(tlsSocketStrategy)
                     .setMaxConnTotal(POOL_MAX_CONN)
                     .setMaxConnPerRoute(POOL_MAX_PER_CONN)
                     .build();
+
             HttpClientBuilder clientBuilder = HttpClients.custom()
 //                    .disableCookieManagement()
 //                    .setDefaultCookieSpecRegistry(cookieSpecRegistry)
                     .setConnectionManager(connectionManager);
 
-            // 读取系统代理配置
-            Properties props = System.getProperties();
-            String proxyHost = props.getProperty("http.proxyHost");
-            String proxyPort = props.getProperty("http.proxyPort");
+            // 3. 处理代理与路由配置 (修复 setProxy 与 RoutePlanner 冲突的 Bug)
+            String proxyHost = System.getProperty("http.proxyHost");
+            String proxyPort = System.getProperty("http.proxyPort");
 
             if (StringUtils.isNotBlank(proxyHost) && StringUtils.isNotBlank(proxyPort)) {
-                int port = Integer.parseInt(proxyPort);
-                org.apache.hc.core5.http.HttpHost proxy = new org.apache.hc.core5.http.HttpHost(proxyHost, port);
 
-                // 1. 设置默认代理服务
-                clientBuilder.setProxy(proxy);
+                // 统一使用系统默认的路由规划器，它会自动读取系统属性中的 http(s).proxyHost 和 http.nonProxyHosts
+                clientBuilder.setRoutePlanner(new SystemDefaultRoutePlanner(ProxySelector.getDefault()));
 
-                // 2. 处理代理身份认证（如果有）
-                String proxyUser = props.getProperty("http.proxyUser");
-                String proxyPassword = props.getProperty("http.proxyPassword");
+                // 处理自定义的代理身份认证
+                String proxyUser = System.getProperty("http.proxyUser");
+                String proxyPassword = System.getProperty("http.proxyPassword");
+
                 if (StringUtils.isNotBlank(proxyUser) && StringUtils.isNotBlank(proxyPassword)) {
                     BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+                    org.apache.hc.core5.http.HttpHost proxy = new org.apache.hc.core5.http.HttpHost(proxyHost, Integer.parseInt(proxyPort));
                     credentialsProvider.setCredentials(
                             new AuthScope(proxy),
                             new UsernamePasswordCredentials(proxyUser, proxyPassword.toCharArray())
                     );
                     clientBuilder.setDefaultCredentialsProvider(credentialsProvider);
                 }
-
-                // 3. 处理不走代理的域名 (http.nonProxyHosts，如 "localhost|127.0.0.1|*.example.com")
-                String nonProxyHosts = props.getProperty("http.nonProxyHosts");
-                if (StringUtils.isNotBlank(nonProxyHosts) ) {
-                    // 使用自带的代理选择器路线解析 nonProxyHosts
-                    clientBuilder.setRoutePlanner(new SystemDefaultRoutePlanner(ProxySelector.getDefault()));
-                }
             }
 
+            // 4. 构建 HttpClient 及 Factory
             CloseableHttpClient httpClient = clientBuilder.build();
-
             HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
             requestFactory.setHttpClient(httpClient);
-            requestFactory.setConnectionRequestTimeout(10*1000);
+
+            // 设置从连接池获取连接的超时时间 (注: Spring 6/Boot 3 中推荐使用 Duration，这里保留原有的毫秒单位)
+            requestFactory.setConnectionRequestTimeout(10 * 1000);
+
             return requestFactory;
+
         } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
-            throw new RuntimeException(e);
+            // 优化：抛出带上下文信息的异常
+            throw new RuntimeException("初始化 HttpComponentsClientHttpRequestFactory 失败, SSL配置错误", e);
         }
     }
 
