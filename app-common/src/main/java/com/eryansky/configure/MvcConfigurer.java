@@ -111,11 +111,18 @@ public class MvcConfigurer implements WebMvcConfigurer {
 
         List<String> dList = Lists.newArrayList("/jump.jsp", "/index.html", "/web/**", "/mweb/**", "/assets/**", "/icons/**", "/static/**", "/**/*.css", "/**/*.js", "/**/*.png", "/**/*.ico", "/**/*.json", "favicon**", "/userfiles/**", "/servlet/**", "/error/**", "/api/**", "/rest/**");
 
+
         if (AppConstants.isOauth2Enable()) {
             List<String> cList = AppConstants.getOauth2ExcludePathList();
+            registry.addInterceptor(new SSOAuthorityOauth2Interceptor()).addPathPatterns("/**")
+                    .excludePathPatterns(Collections3.aggregate(dList, cList))
+                    .order(Ordered.HIGHEST_PRECEDENCE + 190);
+
             registry.addInterceptor(new AuthorityOauth2Interceptor()).addPathPatterns("/**")
                     .excludePathPatterns(Collections3.aggregate(dList, cList))
                     .order(Ordered.HIGHEST_PRECEDENCE + 195);
+
+
         }
 
         List<String> authExcludePathList = AppConstants.getAuthExcludePathList();

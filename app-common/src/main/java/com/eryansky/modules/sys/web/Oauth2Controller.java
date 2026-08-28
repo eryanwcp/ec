@@ -2,17 +2,29 @@ package com.eryansky.modules.sys.web;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.eryansky.common.model.R;
 import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.common.utils.StringUtils;
+import com.eryansky.common.utils.encode.Sm4Utils;
+import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
+import com.eryansky.encrypt.config.EncryptProvider;
+import com.eryansky.modules.sys.mapper.User;
+import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.modules.sys.vo.OAuth2Client;
 import com.eryansky.utils.AppConstants;
+import com.eryansky.utils.AppUtils;
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.*;
 
@@ -25,23 +37,17 @@ public class Oauth2Controller {
 
     private static final Logger log = LoggerFactory.getLogger(Oauth2Controller.class);
 
-    /** 默认 Token 有效期 (单位：秒) */
+    /** 默认 Access Token 有效期 (单位：秒) */
     private static final long DEFAULT_EXPIRE_SECONDS = 7200L;
-
+    /** 默认 单点登录Token 有效期 (单位：秒) */
+    private static final long DEFAULT_EXPIRE_SSO_SECONDS = 600L;
+    public static final String SUBJECT = "username";
     /**
-     * 手动实现 Token 发放接口
+     * Access Token 认证授权
      */
     @PostMapping("token")
-    public R<Map<String, Object>> accessToken(@RequestParam("grant_type") String grantType,
-                                              @RequestParam("client_id") String clientId,
-                                              @RequestParam("client_secret") String clientSecret,
-                                              @RequestParam(value = "user_code", required = false) String userCode) {
-
-        // 0. 校验 grant_type
-        if (StringUtils.isBlank(grantType)) {
-            return new R<Map<String, Object>>().setCode(R.FAIL).setMsg("请求参数 grant_type 不能为空！");
-        }
-
+    public R<Map<String, Object>> accessToken(@RequestParam("client_id") String clientId,
+                                              @RequestParam("client_secret") String clientSecret) {
         // 1. 手动校验 Client 合法性
         List<OAuth2Client> oAuth2Clients = AppConstants.getOauth2ClientList();
         if (CollectionUtils.isEmpty(oAuth2Clients)) {
@@ -77,7 +83,7 @@ public class Oauth2Controller {
 
             JWTCreator.Builder builder = JWT.create()
                     .withIssuer(SpringContextHolder.getApplicationContext().getId())
-                    .withSubject(userCode)
+                    .withSubject(clientId)
                     .withIssuedAt(new Date(now))
                     .withExpiresAt(new Date(now + expire * 1000))
                     .withClaim("client_id", clientId);
@@ -94,8 +100,59 @@ public class Oauth2Controller {
             return new R<Map<String, Object>>().setCode(R.SUCCESS).setData(map);
 
         } catch (Exception e) {
-            log.error("生成 OAuth2 Token 失败, clientId: {}, userCode: {}, error: {}", clientId, userCode, e.getMessage(), e);
+            log.error("生成 OAuth2 Token 失败, clientId: {}, error: {}", clientId, e.getMessage(), e);
             return new R<Map<String, Object>>().setCode(R.FAIL).setMsg("Token 生成失败！");
         }
+    }
+
+
+    /**
+     * 用户单点登录 Token 发放
+     */
+    @PostMapping("ssoToken")
+    public R<Map<String, Object>> ssoToken(@RequestParam("access_token") String token,
+                                              @RequestParam(value = "user_code", required = false) String userCode) {
+        Algorithm algorithm = Algorithm.HMAC256(AppConstants.getRestDefaultApiKey());
+        DecodedJWT jwt = JWT.decode(token);
+        String clientId = jwt.getClaims().get(SUBJECT).asString();
+        try {
+            JWTVerifier verifier = JWT.require(algorithm)
+                    .withClaim(SUBJECT,clientId)
+                    .build();
+            verifier.verify(token);
+        } catch (JWTVerificationException e) {
+            if (!(e instanceof TokenExpiredException)) {
+                log.warn("Token verification failed for clientId: {}", clientId, e);
+            }
+            return new R<Map<String, Object>>().setCode(R.FAIL).setMsg("访问凭证失效：" + token);
+        }
+
+
+        Map<String, Object> payload = Maps.newHashMap();
+        User user = UserUtils.getUserByLoginNameOrMobile(userCode);
+        if (user == null) {
+            return new R<Map<String, Object>>().setCode(R.FAIL).setMsg("用户不存在：" + userCode);
+        }
+        payload.put("userId", user.getId());
+        payload.put("username", user.getLoginName());//必选字段
+        payload.put("mobile", user.getMobile());
+        payload.put("iss", SpringContextHolder.getApplicationContext().getId());//必选字段
+        payload.put("clientId", clientId);//必选字段
+        payload.put("iat", System.currentTimeMillis());
+        payload.put("exp", System.currentTimeMillis() + DEFAULT_EXPIRE_SSO_SECONDS * 1000L);//必选字段
+        String ssoToken = JsonMapper.toJsonString(payload);
+
+        String encryptSsoToken = null;
+        try {
+            encryptSsoToken = Sm4Utils.encrypt(EncryptProvider.aesKey(), ssoToken);
+        } catch (Exception e) {
+            log.error(e.getMessage(),e);
+            return new R<Map<String, Object>>().setCode(R.FAIL).setMsg("服务期内部异常！");
+        }
+
+        Map<String, Object> map = Maps.newHashMap();
+        payload.put("sso_token", encryptSsoToken);
+        payload.put("expire", DEFAULT_EXPIRE_SSO_SECONDS);
+        return new R<Map<String, Object>>().setCode(R.SUCCESS).setData(map);
     }
 }
