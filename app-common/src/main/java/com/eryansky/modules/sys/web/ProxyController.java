@@ -37,7 +37,7 @@ import java.util.Enumeration;
 import java.util.Map;
 
 /**
- * 代理访问服务 (已迁移至 HttpClient 5.x)
+ * 代理访问服务
  * 白名单机制，无需登录授权
  *
  * @author Eryan
@@ -92,7 +92,7 @@ public class ProxyController extends SimpleController {
     }
 
     /**
-     * 核心路由转发公共方法（适配 HttpClient 5.x）
+     * 核心路由转发公共方法
      */
     private void doForwardProxy(CustomHttpServletRequestWrapper request, HttpServletResponse response, String contentUrl) throws Exception {
         // 1. 检查URL是否允许代理
@@ -130,7 +130,7 @@ public class ProxyController extends SimpleController {
 
             entity = httpResponse.getEntity();
 
-            // 4. 判断响应状态码（【HC5】移除了 StatusLine，直接使用 getCode()）
+            // 4. 判断响应状态码
             if (httpResponse.getStatusLine().getStatusCode() >= 400) {
                 String errorMsg = "代理访问异常：" + contentUrl;
                 logger.error("{}, 状态码: {}", errorMsg, httpResponse.getStatusLine().getStatusCode());
@@ -141,7 +141,7 @@ public class ProxyController extends SimpleController {
                 return;
             }
 
-            // 5. 设置返回头（【HC5】getContentType 直接返回 String）
+            // 5. 设置返回头
             if (entity != null && entity.getContentType() != null && StringUtils.isNotBlank(entity.getContentType().getValue())) {
                 response.setContentType(entity.getContentType().getValue());
             }
