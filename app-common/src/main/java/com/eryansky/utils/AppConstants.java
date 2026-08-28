@@ -11,8 +11,10 @@ import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.SysConstants;
 import com.eryansky.common.utils.io.FileUtils;
 import com.eryansky.common.utils.io.PropertiesLoader;
+import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.core.rpc.utils.SerializerFactory;
 import com.eryansky.modules.sys.service.ConfigService;
+import com.eryansky.modules.sys.vo.OAuth2Client;
 
 import java.io.File;
 import java.util.Arrays;
@@ -945,6 +947,26 @@ public class AppConstants extends SysConstants {
     public static String getSSOCallbackUrl() {
         String code = "system.sso.callbackUrl";
         return getAppConfig(code, "");
+    }
+
+
+    /**
+     * Oauth2 客户端配置
+     * @return
+     */
+    public static String getOauth2Clients() {
+        String code = "system.oauth2.clients";
+        return getConfigValue(code, "");
+    }
+
+    /**
+     * Oauth2 客户端配置
+     * @return
+     */
+    public static List<OAuth2Client> getOauth2ClientList() {
+        String value = getOauth2Clients();
+        List<OAuth2Client> clients = JsonMapper.getInstance().toJavaObjectList(value, OAuth2Client.class);
+        return null != clients ? clients : Collections.emptyList();
     }
 
 }
