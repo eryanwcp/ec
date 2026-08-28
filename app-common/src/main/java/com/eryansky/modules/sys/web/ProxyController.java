@@ -24,7 +24,6 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -32,12 +31,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Map;
 
 /**
- * 代理访问服务
+ * 代理访问服务 (已迁移至 HttpClient 5.x)
  * 白名单机制，无需登录授权
  *
  * @author Eryan
@@ -48,228 +48,154 @@ import java.util.Map;
 @RequestMapping(value = "${adminPath}/sys/proxy")
 public class ProxyController extends SimpleController {
 
-
     /**
      * 判断URL是否允许代理
-     *
-     * @param url
      */
     private Boolean isAuthProxyUrl(String url) {
-        boolean proxyEnable = AppConstants.isProxyEnable();
-        if(!proxyEnable){
+        if (!AppConstants.isProxyEnable()) {
             logger.warn("系统未启用Proxy功能。");
             return false;
         }
-        //白名单
+
+        // 白名单校验优化：使用 anyMatch 替代 filter().findAny()
         Collection<String> whiteList = AppConstants.getProxyWhiteList();
-        if (null != whiteList && null != whiteList.stream().filter(v->"*".equals(v) || StringUtils.simpleWildcardMatch(v,url)).findAny().orElse(null)) {
-            return true;
+        if (whiteList != null) {
+            return whiteList.stream().anyMatch(v -> "*".equals(v) || StringUtils.simpleWildcardMatch(v, url));
         }
         return false;
     }
 
     /**
-     * 代理访问
-     *
-     * @param nativeWebRequest
-     * @param contentUrl       远程URL
-     * @throws IOException
+     * 代理访问（指定contentUrl参数）
      */
     @GetMapping(value = {""})
     public void getHttpProxy(NativeWebRequest nativeWebRequest, String contentUrl) throws Exception {
         CustomHttpServletRequestWrapper request = nativeWebRequest.getNativeRequest(CustomHttpServletRequestWrapper.class);
         HttpServletResponse response = nativeWebRequest.getNativeResponse(HttpServletResponse.class);
-        //检查URL是否允许代理
-        if(!isAuthProxyUrl(contentUrl)){
-            logger.warn("未授权proxy访问权限：{}",contentUrl);
-            String errorMsg = "未授权访问权限!";
-            if (WebUtils.isAjaxRequest(request)) {
-                WebUtils.renderJson(response, Result.errorResult().setObj(errorMsg));
-            } else {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, errorMsg);
-            }
-            return;
-        }
 
-        HttpPoolCompoents httpPoolCompoents = HttpPoolCompoents.getInstance();//获取当前实例 可自动维护Cookie信息
-        String param = AppUtils.joinParasWithEncodedValue(WebUtils.getParametersStartingWith(request, null));//请求参数
-        String url = contentUrl + "?" + param;
-        logger.debug("proxy url：{}", url);
-        Map<String,String> headers = Maps.newHashMap();
-        Enumeration<String> enumeration = request.getHeaderNames();
-        while (enumeration.hasMoreElements()){
-            String header = enumeration.nextElement();
-            headers.put(header,request.getHeader(header));
-        }
-        Response remoteResponse= null;
-        HttpEntity entity = null;
-        try{
-            remoteResponse = httpPoolCompoents.getResponse(url,headers);
-            // 判断返回值
-            if (remoteResponse == null) {
-                String errorMsg = "代理访问异常：" + contentUrl;
-                logger.error(errorMsg);
-                if (WebUtils.isAjaxRequest(request)) {
-                    WebUtils.renderJson(response, Result.errorResult().setObj(errorMsg));
-                } else {
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND, errorMsg);
-                }
-                return;
-            }
-            HttpResponse httpResponse = remoteResponse.returnResponse();
-            entity = httpResponse.getEntity();
-            // 判断返回值
-            if (httpResponse.getStatusLine().getStatusCode() >= 400) {
-                String errorMsg = "代理访问异常：" + contentUrl;
-                logger.error(errorMsg);
-                logger.error(httpResponse.getStatusLine().getStatusCode() + "");
-                logger.error(EntityUtils.toString(entity, "utf-8"));
-                if (WebUtils.isAjaxRequest(request)) {
-                    WebUtils.renderJson(response, Result.errorResult().setObj(errorMsg));
-                } else {
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND, errorMsg);
-                }
-                return;
-            }
-
-
-            // 设置Header
-            if(null != entity.getContentType()){
-                response.setContentType(entity.getContentType().getValue());
-            }
-            if (entity.getContentLength() > 0) {
-                response.setContentLength((int) entity.getContentLength());
-            }
-            Header[] allHeaders = httpResponse.getAllHeaders();
-            if(null != allHeaders){
-                for(Header h:allHeaders){
-                    if("Content-Disposition".equalsIgnoreCase(h.getName())){
-                        response.setHeader(h.getName(),h.getValue());
-                    }
-                }
-            }
-            // 输出内容
-            InputStream input = entity.getContent();
-            OutputStream output = response.getOutputStream();
-            // 基于byte数组读取InputStream并直接写入OutputStream, 数组默认大小为4k.
-            IOUtils.copy(input, output);
-            output.flush();
-        } finally {
-            //回收链接到连接池
-//            try {
-//                EntityUtils.consume(entity);
-//                if (null != remoteResponse) {
-//                    remoteResponse.discardContent();
-//                }
-//            } catch (IOException e) {
-//                logger.error(e.getMessage(), e);
-//            }
-        }
+        doForwardProxy(request, response, contentUrl);
     }
 
-
     /**
-     * 代理访问
-     *
-     * @param nativeWebRequest
-     * @throws IOException
+     * 代理访问（通过RESTful通配符路径提取URL）
      */
     @GetMapping(value = {"**"})
     public ModelAndView proxy(NativeWebRequest nativeWebRequest) throws Exception {
         CustomHttpServletRequestWrapper request = nativeWebRequest.getNativeRequest(CustomHttpServletRequestWrapper.class);
-        String requestUrl = request.getRequestURI();
-
-        String contentUrl = StringUtils.substringAfterLast(requestUrl, AppConstants.getAdminPath() + "/sys/proxy/");
-        String param = AppUtils.joinParasWithEncodedValue(WebUtils.getParametersStartingWith(request, null));//请求参数
-        String url = contentUrl + "?" + param;
-        logger.debug("proxy url：{}", url);
         HttpServletResponse response = nativeWebRequest.getNativeResponse(HttpServletResponse.class);
-        //检查URL是否允许代理
-        if(!isAuthProxyUrl(contentUrl)){
-            logger.warn("未授权proxy访问权限：{}",contentUrl);
-            String errorMsg = "未授权访问权限!";
-            if (WebUtils.isAjaxRequest(request)) {
-                WebUtils.renderJson(response, Result.errorResult().setObj(errorMsg));
-            } else {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, errorMsg);
-            }
-            return null;
-        }
 
-        HttpPoolCompoents httpCompoents = HttpPoolCompoents.getInstance();//获取当前实例 可自动维护Cookie信息
-        Map<String,String> headers = Maps.newHashMap();
-        Enumeration<String> enumeration = request.getHeaderNames();
-        while (enumeration.hasMoreElements()){
-            String header = enumeration.nextElement();
-            headers.put(header,request.getHeader(header));
-        }
-        Response remoteResponse= null;
-        HttpEntity entity = null;
-        try {
-            remoteResponse = httpCompoents.getResponse(url,headers);
-            // 判断返回值
-            if (remoteResponse == null) {
-                String errorMsg = "代理访问异常：" + contentUrl;
-                logger.error(errorMsg);
-                if (WebUtils.isAjaxRequest(request)) {
-                    WebUtils.renderJson(response, Result.errorResult().setObj(errorMsg));
-                } else {
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND, errorMsg);
-                }
-                return null;
-            }
-            HttpResponse httpResponse = remoteResponse.returnResponse();
-            entity = httpResponse.getEntity();
-            // 判断返回值
-            if (httpResponse.getStatusLine().getStatusCode() >= 400) {
-                String errorMsg = "代理访问异常：" + contentUrl;
-                logger.error(errorMsg);
-                logger.error(httpResponse.getStatusLine().getStatusCode() + "");
-                logger.error(EntityUtils.toString(entity, "utf-8"));
-                if (WebUtils.isAjaxRequest(request)) {
-                    WebUtils.renderJson(response, Result.errorResult().setObj(errorMsg));
-                } else {
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND, errorMsg);
-                }
-                return null;
-            }
+        String requestUrl = request.getRequestURI();
+        String contentUrl = StringUtils.substringAfterLast(requestUrl, AppConstants.getAdminPath() + "/sys/proxy/");
 
-
-            // 设置Header
-            if(null != entity.getContentType()){
-                response.setContentType(entity.getContentType().getValue());
-            }
-            if (entity.getContentLength() > 0) {
-                response.setContentLength((int) entity.getContentLength());
-            }
-            Header[] allHeaders = httpResponse.getAllHeaders();
-            if(null != allHeaders){
-                for(Header h:allHeaders){
-                    if("Content-Disposition".equalsIgnoreCase(h.getName())){
-                        response.setHeader(h.getName(),h.getValue());
-                    }
-                }
-            }
-            // 输出内容
-            InputStream input = entity.getContent();
-            OutputStream output = response.getOutputStream();
-            // 基于byte数组读取InputStream并直接写入OutputStream, 数组默认大小为4k.
-            IOUtils.copy(input, output);
-            output.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage(),e);
-        } finally {
-            //回收链接到连接池
-//            try {
-//                EntityUtils.consume(entity);
-//                if (null != remoteResponse) {
-//                    remoteResponse.discardContent();
-//                }
-//            } catch (IOException e) {
-//                logger.error(e.getMessage(), e);
-//            }
-        }
+        doForwardProxy(request, response, contentUrl);
         return null;
     }
 
+    /**
+     * 核心路由转发公共方法（适配 HttpClient 5.x）
+     */
+    private void doForwardProxy(CustomHttpServletRequestWrapper request, HttpServletResponse response, String contentUrl) throws Exception {
+        // 1. 检查URL是否允许代理
+        if (!isAuthProxyUrl(contentUrl)) {
+            logger.warn("未授权proxy访问权限：{}", contentUrl);
+            renderError(request, response, "未授权访问权限!");
+            return;
+        }
+
+        // 2. 拼接 URL 与请求参数
+        String param = AppUtils.joinParasWithEncodedValue(WebUtils.getParametersStartingWith(request, null));
+        String url = StringUtils.isNotBlank(param) ? contentUrl + "?" + param : contentUrl;
+        logger.debug("proxy url：{}", url);
+
+        // 3. 复制请求头
+        Map<String, String> headers = Maps.newHashMap();
+        Enumeration<String> enumeration = request.getHeaderNames();
+        while (enumeration.hasMoreElements()) {
+            String header = enumeration.nextElement();
+            headers.put(header, request.getHeader(header));
+        }
+
+        HttpPoolCompoents httpPoolCompoents = HttpPoolCompoents.getInstance();
+        Response remoteResponse = null;
+        HttpEntity entity = null;
+
+        try {
+            remoteResponse = httpPoolCompoents.getResponse(url, headers);
+            if (remoteResponse == null) {
+                renderError(request, response, "代理访问异常：" + contentUrl);
+                return;
+            }
+
+            HttpResponse httpResponse = remoteResponse.returnResponse();
+
+            entity = httpResponse.getEntity();
+
+            // 4. 判断响应状态码（【HC5】移除了 StatusLine，直接使用 getCode()）
+            if (httpResponse.getStatusLine().getStatusCode() >= 400) {
+                String errorMsg = "代理访问异常：" + contentUrl;
+                logger.error("{}, 状态码: {}", errorMsg, httpResponse.getStatusLine().getStatusCode());
+                if (entity != null) {
+                    logger.error("错误响应内容: {}", EntityUtils.toString(entity, StandardCharsets.UTF_8));
+                }
+                renderError(request, response, errorMsg);
+                return;
+            }
+
+            // 5. 设置返回头（【HC5】getContentType 直接返回 String）
+            if (entity != null && entity.getContentType() != null && StringUtils.isNotBlank(entity.getContentType().getValue())) {
+                response.setContentType(entity.getContentType().getValue());
+            }
+
+            // 安全处理 Content-Length 强转，防止大文件溢出
+            if (entity != null && entity.getContentLength() > 0) {
+                long contentLength = entity.getContentLength();
+                if (contentLength <= Integer.MAX_VALUE) {
+                    response.setContentLength((int) contentLength);
+                } else {
+                    response.setHeader("Content-Length", String.valueOf(contentLength));
+                }
+            }
+
+            // 传递 Content-Disposition 头以支持文件下载等
+            if (httpResponse.getAllHeaders() != null) {
+                for (Header h : httpResponse.getAllHeaders()) {
+                    if ("Content-Disposition".equalsIgnoreCase(h.getName())) {
+                        response.setHeader(h.getName(), h.getValue());
+                    }
+                }
+            }
+
+            // 6. 输出流拷贝（通过 Try-with-resources 自动关闭远程输入流）
+            if (entity != null) {
+                try (InputStream input = entity.getContent();
+                     OutputStream output = response.getOutputStream()) {
+                    IOUtils.copy(input, output);
+                    output.flush();
+                }
+            }
+        } catch (IOException e) {
+            logger.error("代理转发流处理异常: " + e.getMessage(), e);
+            throw e;
+        } finally {
+            // 7. 必须释放 Entity 归还 HttpClient 连接池，杜绝连接泄露
+            if (entity != null) {
+                try {
+                    EntityUtils.consume(entity);
+                } catch (IOException e) {
+                    logger.error("释放HttpEntity资源失败", e);
+                }
+            }
+        }
+    }
+
+    /**
+     * 抽取统一的错误渲染逻辑
+     */
+    private void renderError(CustomHttpServletRequestWrapper request, HttpServletResponse response, String errorMsg) throws IOException {
+        if (WebUtils.isAjaxRequest(request)) {
+            WebUtils.renderJson(response, Result.errorResult().setObj(errorMsg));
+        } else {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, errorMsg);
+        }
+    }
 }
