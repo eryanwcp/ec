@@ -11,6 +11,7 @@ import com.eryansky.common.utils.http.HttpPoolCompoents;
 import com.eryansky.common.web.filter.CustomHttpServletRequestWrapper;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.utils.WebUtils;
+import com.eryansky.core.security.annotation.RequiresUser;
 import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.AppUtils;
 import com.google.common.collect.Maps;
