@@ -186,6 +186,17 @@ public class AppConstants extends SysConstants {
     }
 
     /**
+     * 权限拦截器是否启用
+     *
+     * @return
+     */
+    public static boolean isAuthEnable() {
+        String code = "system.security.auth.enable";
+        String value = getConfigValue(code,"true");
+        return Boolean.parseBoolean(value);
+    }
+
+    /**
      * auth 排除URL 多个之间以“,”分割
      * @return
      */
@@ -201,21 +212,9 @@ public class AppConstants extends SysConstants {
     public static List<String> getAuthExcludePathList() {
         String value = getAuthExcludePaths();
         if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(value.split(","));
+            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
         }
         return Collections.emptyList();
-    }
-
-
-    /**
-     * 权限拦截器是否启用
-     *
-     * @return
-     */
-    public static boolean isAuthEnable() {
-        String code = "system.security.auth.enable";
-        String value = getConfigValue(code,"true");
-        return Boolean.parseBoolean(value);
     }
 
 
@@ -246,7 +245,7 @@ public class AppConstants extends SysConstants {
     public static List<String> getOauth2SSOExcludePathList() {
         String value = getOauth2SSOExcludePaths();
         if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(StringUtils.split(StringUtils.trim(value).replaceAll("\r\n", ",").replaceAll("，", ",").replaceAll("；", ",").replaceAll(";", ","), ","));
+            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
         }
         return Collections.emptyList();
     }
@@ -268,7 +267,7 @@ public class AppConstants extends SysConstants {
     public static List<String> getOauth2SSOIncludePathList() {
         String value = getOauth2SSOIncludePaths();
         if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(StringUtils.split(StringUtils.trim(value).replaceAll("\r\n", ",").replaceAll("，", ",").replaceAll("；", ",").replaceAll(";", ","), ","));
+            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
         }
         return Collections.emptyList();
     }
@@ -311,7 +310,7 @@ public class AppConstants extends SysConstants {
     public static List<String> getOauth2ExcludePathList() {
         String value = getOauth2ExcludePaths();
         if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(value.split(","));
+            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
         }
         return Collections.emptyList();
     }
@@ -333,7 +332,7 @@ public class AppConstants extends SysConstants {
     public static List<String> getOauth2IncludePathList() {
         String value = getOauth2IncludePaths();
         if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(StringUtils.split(StringUtils.trim(value).replaceAll("\r\n", ",").replaceAll("，", ",").replaceAll("；", ",").replaceAll(";", ","), ","));
+            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
         }
         return Collections.emptyList();
     }
@@ -355,7 +354,7 @@ public class AppConstants extends SysConstants {
     public static List<String> getCorsAllowedOriginList() {
         String value = getCorsAllowedOrigins();
         if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(value.split(","));
+            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
         }
         return Collections.emptyList();
     }
@@ -370,7 +369,7 @@ public class AppConstants extends SysConstants {
         String code = "system.security.limit.user.whitelist";
         String value = getConfigValue(code);
         if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(StringUtils.split(StringUtils.trim(value.toUpperCase()).replaceAll("\r\n", ",").replaceAll("，", ",").replaceAll("；", ",").replaceAll(";", ","), ","));
+            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
         }
         return Collections.emptyList();
     }
@@ -407,7 +406,7 @@ public class AppConstants extends SysConstants {
         String code = "system.security.limit.ip.whitelist";
         String value = getConfigValue(code);
         if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(StringUtils.split(StringUtils.trim(value).replaceAll("\r\n", ",").replaceAll("，", ",").replaceAll("；", ",").replaceAll(";", ","), ","));
+            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
         }
         return Collections.emptyList();
     }
@@ -422,7 +421,7 @@ public class AppConstants extends SysConstants {
         String code = "system.security.limit.ip.blacklist";
         String value = getConfigValue(code);
         if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(StringUtils.split(StringUtils.trim(value).replaceAll("\r\n", ",").replaceAll("，", ",").replaceAll("；", ",").replaceAll(";", ","), ","));
+            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
         }
         return Collections.emptyList();
     }
@@ -439,18 +438,29 @@ public class AppConstants extends SysConstants {
     }
 
     /**
-     * #不通过应用集成账号验证的账号 每行一个或多个之间以";"分割
+     * XSS拦截黑名单 不拦截 每行一个或多个之间以";"分割
      * 自动转换成小写
      *
      * @return
      */
     public static String getXssBlackListURL() {
         String code = "system.security.xssFilter.blackListURL";
-        String value = getAppConfig(code);
-        return StringUtils.trim(value).replaceAll("\r\n", ";").replaceAll("；", ";");
+        return getAppConfig(code);
     }
 
 
+    /**
+     * XSS拦截黑名单 不拦截
+     *
+     * @return
+     */
+    public static List<String> getXssBlackList() {
+        String value = getXssBlackListURL();
+        if(StringUtils.isNotBlank(value)){
+            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
+        }
+        return Collections.emptyList();
+    }
 
     /**
      * URL请求限制
@@ -485,7 +495,7 @@ public class AppConstants extends SysConstants {
         String code = "system.security.proxy.whitelist";
         String value = getConfigValue(code);
         if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(StringUtils.split(StringUtils.trim(value).replaceAll("\r\n", ",").replaceAll("，", ",").replaceAll("；", ",").replaceAll(";", ","), ","));
+            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
         }
         return Collections.emptyList();
     }
@@ -863,7 +873,7 @@ public class AppConstants extends SysConstants {
         String code = "system.rest.limit.ip.whitelist";
         String value = getConfigValue(code);
         if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(StringUtils.split(StringUtils.trim(value).replaceAll("\r\n", ",").replaceAll("，", ",").replaceAll("；", ",").replaceAll(";", ","), ","));
+            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
         }
         return Collections.emptyList();
     }
@@ -904,7 +914,7 @@ public class AppConstants extends SysConstants {
     public static List<String> getSystemOpsWarnLoginNameList() {
         String value = getSystemOpsWarnLoginNames();
         if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(StringUtils.split(StringUtils.trim(value).replaceAll("\r\n", ",").replaceAll("，", ",").replaceAll("；", ",").replaceAll(";", ","), ","));
+            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
         }
         return Collections.emptyList();
     }
@@ -935,7 +945,7 @@ public class AppConstants extends SysConstants {
     public static List<String> getSerializerTypeCheckAllowClassList() {
         String value = getSerializerTypeCheckAllowClasses();
         if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(StringUtils.split(StringUtils.trim(value).replaceAll("\r\n", ",").replaceAll("，", ",").replaceAll("；", ",").replaceAll(";", ","), ","));
+            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
         }
         return Collections.emptyList();
     }
@@ -954,7 +964,7 @@ public class AppConstants extends SysConstants {
     public static List<String> getSerializerTypeCheckDisallowClassList() {
         String value = getSerializerTypeCheckDisallowClasses();
         if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(StringUtils.split(StringUtils.trim(value).replaceAll("\r\n", ",").replaceAll("，", ",").replaceAll("；", ",").replaceAll(";", ","), ","));
+            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
         }
         return Collections.emptyList();
     }
