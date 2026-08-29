@@ -82,7 +82,7 @@ public class EcServiceClient {
                     return (R)obj;
                 }
 
-                r = new R().setCode(R.SUCCESS).setData(obj);
+                r = R.ok(obj);
             } catch (Exception e) {
                 log.error(e.getMessage(),e);
                 String message = e.getMessage();
