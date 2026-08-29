@@ -5,6 +5,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
+import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.core.aop.ContextCopyingDecorator;
 import com.eryansky.core.orm.mybatis.entity.BaseEntity;
@@ -100,16 +101,17 @@ public class DefaultAsyncConfigurer implements AsyncConfigurer {
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
         return (throwable, method, objects) -> {
             StringBuffer msg = new StringBuffer();
-            msg.append("线程池执行任务发生未知异常（注：30分钟内仅提示一条）：").append(method.getDeclaringClass().getName()).append(".").append(method.getName()).append(",").append(throwable.getMessage());
-            log.error(msg.toString(),throwable);
+            msg.append("【" + SpringContextHolder.getApplicationContext().getId() + "】")
+                    .append("线程池执行任务发生未知异常（注：30分钟内仅提示一条）：").append(method.getDeclaringClass().getName()).append(".").append(method.getName()).append(",").append(throwable.getMessage());
+            log.error(msg.toString(), throwable);
             String tipKey = "system_ops_warn_asyncUncaughtExceptionHandler";
             Boolean isTip = CacheUtils.get(tipKey);
             if (null == isTip) {
-                List<String>  systemOpsWarnUserIds = UserUtils.findUsersByLoginNames(AppConstants.getSystemOpsWarnLoginNameList()).stream().map(BaseEntity::getId).collect(Collectors.toList());
-                if(Collections3.isEmpty(systemOpsWarnUserIds)){
+                List<String> systemOpsWarnUserIds = UserUtils.findUsersByLoginNames(AppConstants.getSystemOpsWarnLoginNameList()).stream().map(BaseEntity::getId).collect(Collectors.toList());
+                if (Collections3.isEmpty(systemOpsWarnUserIds)) {
                     systemOpsWarnUserIds = Lists.newArrayList(User.SUPERUSER_ID);
                 }
-                MessageUtils.sendToUserMessage(systemOpsWarnUserIds,msg.toString());
+                MessageUtils.sendToUserMessage(systemOpsWarnUserIds, msg.toString());
                 CacheUtils.put(tipKey, true);
             }
 
