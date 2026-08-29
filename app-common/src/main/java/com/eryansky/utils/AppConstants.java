@@ -15,14 +15,13 @@ import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.core.rpc.utils.SerializerFactory;
 import com.eryansky.modules.sys.service.ConfigService;
 import com.eryansky.modules.sys.vo.OAuth2Client;
+import com.google.common.base.Splitter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * 系统使用的静态变量.
@@ -65,9 +64,9 @@ public class AppConstants extends SysConstants {
      */
     public static final String CONFIG_FILE_PATH = "config.properties";
 
-    /** 预编译分隔符正则表达式，提高分割性能 */
-    private static final Pattern SPLIT_PATTERN = Pattern.compile("[\\s,，;；]+");
-
+    private static final Splitter SPLITTER = Splitter.onPattern("[,，;；\\r\\n]")
+            .trimResults()       // 自动剔除每个元素的前后空格
+            .omitEmptyStrings(); // 自动忽略空元素
     /**
      * 静态内部类，延迟加载，懒汉式，线程安全的单例模式
      */
@@ -105,7 +104,7 @@ public class AppConstants extends SysConstants {
      */
     private static List<String> splitToList(String value) {
         if (StringUtils.isNotBlank(value)) {
-            return Arrays.asList(SPLIT_PATTERN.split(value.trim()));
+            return SPLITTER.splitToList(value);
         }
         return Collections.emptyList();
     }
