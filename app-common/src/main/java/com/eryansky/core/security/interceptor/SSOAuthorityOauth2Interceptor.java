@@ -53,7 +53,7 @@ public class SSOAuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
             token = WebUtils.getHeader(request,REQUEST_NAME,REQUEST_NAME_PRIVATE);
         }
 
-        if (StringUtils.isNotBlank(token)) {//包含该参数，则为浪潮单点登录
+        if (StringUtils.isNotBlank(token)) {//包含该参数，则为单点登录
             logger.debug("token:{}", token);
             //登录用户
             SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
@@ -129,7 +129,7 @@ public class SSOAuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
                 return false; // 返回到登录页面
             }
 
-            //浪潮单点登录成功 将用户信息放入session中
+            //单点登录成功 将用户信息放入session中
             SecurityUtils.putUserToSession(request, user);
             UserUtils.recordLogin(user.getId());
             sessionInfo = SecurityUtils.getCurrentSessionInfo();
