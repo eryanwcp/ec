@@ -35,7 +35,7 @@ public class DemoProvider implements DemoAPI {
 
     @Override
     public R<Boolean> test10(String param1) {
-        return R.rest(true);
+        return R.ok(true);
     }
 
     @Override

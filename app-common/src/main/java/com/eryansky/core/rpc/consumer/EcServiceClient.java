@@ -55,7 +55,7 @@ public class EcServiceClient {
 //                Boolean isPermitted = SecurityUtils.isPermitted(providerInfo.getRpcBean().getClass(), rm.getMethod());
                 Boolean isPermitted = RPCUtils.isPermitted(rm.getMethod().getDeclaringClass(), rm.getMethod());
                 if (null != isPermitted && !isPermitted) {
-                    r = R.rest(false).setMsg("未授权或会话信息已失效！");
+                    r = R.fail(false,"未授权或会话信息已失效！");
                     return r;
                 }
 
@@ -86,7 +86,7 @@ public class EcServiceClient {
             } catch (Exception e) {
                 log.error(e.getMessage(),e);
                 String message = e.getMessage();
-                r = R.rest(false).setMsg(message);
+                r = R.fail(false,message);
             }
         } else {//远程微服务
             ConsumerHolder.ConsumerInfo consumerInfo = ConsumerHolder.RPC_CONSUMER_MAP.get(serviceName);
@@ -96,7 +96,7 @@ public class EcServiceClient {
 
             Boolean isPermitted = RPCUtils.isPermitted(rm.getClass(), rm.getMethod());
             if (null != isPermitted && !isPermitted) {
-                r = R.rest(false).setMsg("未授权或会话信息已失效！");
+                r = R.fail(false,"未授权或会话信息已失效！");
                 return r;
             }
 
@@ -145,7 +145,7 @@ public class EcServiceClient {
             } catch (Exception e) {
                 log.error(e.getMessage(),e);
                 String message = e.getMessage();
-                r = R.rest(false).setMsg(message);
+                r = R.fail(false,message);
             }
         }
         return r;
