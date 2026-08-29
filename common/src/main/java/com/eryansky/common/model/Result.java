@@ -146,7 +146,7 @@ public class Result implements Serializable {
 	/**
 	 * 仅复制.
 	 */
-	public static Result copyR(R r) {
+	public static Result copy(R r) {
 		return new Result().setCode(r.getCode()).setData(r.getData()).setMsg(r.getMsg());
 	}
 
@@ -154,7 +154,7 @@ public class Result implements Serializable {
 	 * 转换 注意code规范不一致
 	 */
 	@Deprecated
-	public static Result toR(R r) {
+	public static Result convert(R r) {
 		return new Result().setCode(r.isSuccess() ? SUCCESS:ERROR).setObj(r.getData()).setMsg(r.getMsg());
 	}
 
