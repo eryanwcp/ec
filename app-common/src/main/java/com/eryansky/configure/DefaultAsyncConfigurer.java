@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
@@ -35,29 +36,37 @@ public class DefaultAsyncConfigurer implements AsyncConfigurer {
     private static final String REJECT_CACHE_KEY = "system_ops_warn_defaultAsyncExecutor";
     private static final String EXCEPTION_CACHE_KEY = "system_ops_warn_asyncUncaughtExceptionHandler";
 
-    // @Value("${thread.pool.corePoolSize:10}")
-    // private int corePoolSize;
-    //
-    // @Value("${thread.pool.maxPoolSize:20}")
-    // private int maxPoolSize;
-    //
-    // @Value("${thread.pool.keepAliveSeconds:60}")
-    // private int keepAliveSeconds;
-    //
-    // @Value("${thread.pool.queueCapacity:1024}")
-    // private int queueCapacity;
+    // 使用 0 作为默认值，方便后续判断是否启用了自定义配置
+    @Value("${system.async.thread.pool.corePoolSize:0}")
+    private int corePoolSize;
+
+    @Value("${system.async.thread.pool.maxPoolSize:0}")
+    private int maxPoolSize;
+
+    @Value("${system.async.thread.pool.keepAliveSeconds:60}")
+    private int keepAliveSeconds;
+
+    @Value("${system.async.thread.pool.queueCapacity:0}")
+    private int queueCapacity;
 
     @Bean
     public Executor defaultAsyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 
-        // 核心线程池数量，方法: 返回可用处理器的Java虚拟机的数量。
+        // --- 核心线程池数量动态计算 ---
         int processors = Runtime.getRuntime().availableProcessors();
         int initProcessors = processors < 4 ? processors : processors - 1;
 
-        executor.setCorePoolSize(initProcessors);
-        executor.setMaxPoolSize(initProcessors * 2); // 最大线程数量
-        executor.setQueueCapacity(Math.max(100000, initProcessors * 10000)); // 线程池的队列容量
+        // --- 兼容配置与默认计算逻辑 ---
+        // 逻辑：如果 application.yml 中配置了大于 0 的值，则使用配置值；否则使用动态计算的默认值
+        int actualCorePoolSize = corePoolSize > 0 ? corePoolSize : initProcessors;
+        int actualMaxPoolSize = maxPoolSize > 0 ? maxPoolSize : (initProcessors * 2);
+        int actualQueueCapacity = queueCapacity > 0 ? queueCapacity : Math.max(100000, initProcessors * 10000);
+
+        executor.setCorePoolSize(actualCorePoolSize);
+        executor.setMaxPoolSize(actualMaxPoolSize);
+        executor.setQueueCapacity(actualQueueCapacity);
+        executor.setKeepAliveSeconds(keepAliveSeconds);
 
         // for passing in request scope context 转换请求范围的上下文
         executor.setTaskDecorator(new ContextCopyingDecorator());
