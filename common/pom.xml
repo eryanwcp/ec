@@ -38,7 +38,7 @@
         <guava.version>33.7.1-jre</guava.version>
         <dozer.version>6.5.2</dozer.version>
         <freemarker.version>2.3.35</freemarker.version>
-        <jsoup.version>1.23.3</jsoup.version>
+        <jsoup.version>1.23.2</jsoup.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
