@@ -103,7 +103,7 @@ public class NoticeController extends SimpleController {
      */
     @Logging(logType = LogType.access, value = "通知管理")
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {""})
-    public ModelAndView list(String noticeId,
+    public ModelAndView list(@RequestParam(value = "noticeId", required = false) String noticeId,
                              @RequestParam(value = "objectType", required = false) String objectType,
                              @RequestParam(value = "objectId", required = false) String objectId,
                              @RequestParam(value = "title", required = false) String title,
