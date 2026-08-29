@@ -15,11 +15,14 @@ import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.core.rpc.utils.SerializerFactory;
 import com.eryansky.modules.sys.service.ConfigService;
 import com.eryansky.modules.sys.vo.OAuth2Client;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * 系统使用的静态变量.
@@ -29,6 +32,11 @@ import java.util.List;
  */
 public class AppConstants extends SysConstants {
 
+    private static final Logger log = LoggerFactory.getLogger(AppConstants.class);
+
+    /**
+     * 系统初始化时间戳
+     */
     public static long SYS_INIT_TIME = System.currentTimeMillis();
 
     /**
@@ -52,22 +60,102 @@ public class AppConstants extends SysConstants {
      */
     public static final String ROLE_DISK_MANAGER = "disk_manager";
 
-
     /**
      * 配置文件路径
      */
     public static final String CONFIG_FILE_PATH = "config.properties";
 
+    /** 预编译分隔符正则表达式，提高分割性能 */
+    private static final Pattern SPLIT_PATTERN = Pattern.compile("[\\s,，;；]+");
+
     /**
      * 静态内部类，延迟加载，懒汉式，线程安全的单例模式
      */
     private static final class Static {
-        private static final ConfigService configService = SpringContextHolder.getBean(ConfigService.class);
-        private static final PropertiesLoader config = getConfig();
-        private static PropertiesLoader getConfig(){
-            String activeProfile = getAppConfig().getActiveProfiles()[0];
+        private static final PropertiesLoader config = initConfig();
+
+        private static PropertiesLoader initConfig() {
+            String activeProfile = null;
+            try {
+                String[] profiles = getAppConfig().getActiveProfiles();
+                if (profiles != null && profiles.length > 0) {
+                    activeProfile = profiles[0];
+                }
+            } catch (Exception e) {
+                log.warn("获取 activeProfile 失败，将使用默认配置", e);
+            }
             return new PropertiesLoader("config" + (null == activeProfile ? "" : "-" + activeProfile) + ".properties");
         }
+    }
+
+    /**
+     * 安全获取 ConfigService 实例（避免 Spring 容器未就绪时直接抛异常）
+     */
+    private static ConfigService getConfigService() {
+        try {
+            return SpringContextHolder.getBean(ConfigService.class);
+        } catch (Exception e) {
+            log.debug("ConfigService 未初始化或获取失败: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 将字符串按分隔符切分为列表（复用分割逻辑）
+     */
+    private static List<String> splitToList(String value) {
+        if (StringUtils.isNotBlank(value)) {
+            return Arrays.asList(SPLIT_PATTERN.split(value.trim()));
+        }
+        return Collections.emptyList();
+    }
+
+    /**
+     * 安全解析 int 配置
+     */
+    private static int getIntConfig(String code, int defaultValue) {
+        String val = getConfigValue(code);
+        if (StringUtils.isBlank(val)) {
+            return defaultValue;
+        }
+        try {
+            return Integer.parseInt(val.trim());
+        } catch (NumberFormatException e) {
+            log.warn("配置项 [{}] 值 [{}] 无法转换为整数，使用默认值: {}", code, val, defaultValue);
+            return defaultValue;
+        }
+    }
+
+    /**
+     * 安全解析 long 配置
+     */
+    private static long getLongConfig(String code, long defaultValue) {
+        String val = getConfigValue(code);
+        if (StringUtils.isBlank(val)) {
+            return defaultValue;
+        }
+        try {
+            return Long.parseLong(val.trim());
+        } catch (NumberFormatException e) {
+            log.warn("配置项 [{}] 值 [{}] 无法转换为长整型，使用默认值: {}", code, val, defaultValue);
+            return defaultValue;
+        }
+    }
+
+    /**
+     * 更新系统初始化时间为当前时间戳
+     */
+    public static void updateSysInitTime() {
+        SYS_INIT_TIME = System.currentTimeMillis();
+    }
+
+    /**
+     * 更新系统初始化时间为指定的时间戳
+     *
+     * @param initTime 指定的毫秒级时间戳
+     */
+    public static void updateSysInitTime(long initTime) {
+        SYS_INIT_TIME = initTime;
     }
 
     /**
@@ -151,24 +239,25 @@ public class AppConstants extends SysConstants {
      * @return
      */
     public static String getConfigValue(String code, String defaultValue) {
-        if (isdevMode()) {//调试模式 从本地配置文件读取
+        if (isdevMode()) {
+            //调试模式 从本地配置文件读取
             return getConfig(code, defaultValue);
         }
-        String configValue = Static.configService.getConfigValueByCode(code);
-        if (StringUtils.isBlank(configValue)) {
-            return getConfig(code, defaultValue);
+        ConfigService configService = getConfigService();
+        if (configService != null) {
+            String configValue = configService.getConfigValueByCode(code);
+            if (StringUtils.isNotBlank(configValue)) {
+                return configValue;
+            }
         }
-        return configValue == null ? defaultValue : configValue;
+        return getConfig(code, defaultValue);
     }
-
-
 
     /**
      * 日志保留时间 天(默认值:30).
      */
     public static int getLogKeepTime() {
-        String code = "system.logKeepTime";
-        return Integer.parseInt(getConfigValue(code, "30"));
+        return getIntConfig("system.logKeepTime", 30);
     }
 
     /**
@@ -178,7 +267,7 @@ public class AppConstants extends SysConstants {
      */
     public static String getLogPath(String defaultPath) {
         String code = "system.logPath";
-        String value = getConfigValue(code,defaultPath);
+        String value = getConfigValue(code, defaultPath);
         if (StringUtils.isBlank(value)) {
             value = defaultPath;
         }
@@ -192,7 +281,7 @@ public class AppConstants extends SysConstants {
      */
     public static boolean isAuthEnable() {
         String code = "system.security.auth.enable";
-        String value = getConfigValue(code,"true");
+        String value = getConfigValue(code, "true");
         return Boolean.parseBoolean(value);
     }
 
@@ -202,7 +291,7 @@ public class AppConstants extends SysConstants {
      */
     public static String getAuthExcludePaths() {
         String code = "system.security.auth.excludePaths";
-        return getConfigValue(code,"");
+        return getConfigValue(code, "");
     }
 
     /**
@@ -210,13 +299,8 @@ public class AppConstants extends SysConstants {
      * @return
      */
     public static List<String> getAuthExcludePathList() {
-        String value = getAuthExcludePaths();
-        if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
-        }
-        return Collections.emptyList();
+        return splitToList(getAuthExcludePaths());
     }
-
 
     /**
      * Oauth2拦截器是否启用
@@ -225,7 +309,7 @@ public class AppConstants extends SysConstants {
      */
     public static Boolean isOauth2SSOEnable() {
         String code = "system.security.oauth2.sso.enable";
-        String value = getConfigValue(code,"false");
+        String value = getConfigValue(code, "false");
         return Boolean.parseBoolean(value);
     }
 
@@ -243,13 +327,8 @@ public class AppConstants extends SysConstants {
      * @return
      */
     public static List<String> getOauth2SSOExcludePathList() {
-        String value = getOauth2SSOExcludePaths();
-        if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
-        }
-        return Collections.emptyList();
+        return splitToList(getOauth2SSOExcludePaths());
     }
-
 
     /**
      * oauth2 SSO 包含URL 多个之间以“,”分割
@@ -265,13 +344,8 @@ public class AppConstants extends SysConstants {
      * @return
      */
     public static List<String> getOauth2SSOIncludePathList() {
-        String value = getOauth2SSOIncludePaths();
-        if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
-        }
-        return Collections.emptyList();
+        return splitToList(getOauth2SSOIncludePaths());
     }
-
 
     /**
      * Oauth2拦截器是否启用
@@ -280,7 +354,7 @@ public class AppConstants extends SysConstants {
      */
     public static Boolean isOauth2Enable() {
         String code = "system.security.oauth2.enable";
-        String value = getConfigValue(code,"false");
+        String value = getConfigValue(code, "false");
         return Boolean.parseBoolean(value);
     }
 
@@ -292,7 +366,6 @@ public class AppConstants extends SysConstants {
         String code = "system.security.oauth2.scope";
         return getConfigValue(code);
     }
-
 
     /**
      * oauth2 排除URL 多个之间以“,”分割
@@ -308,13 +381,8 @@ public class AppConstants extends SysConstants {
      * @return
      */
     public static List<String> getOauth2ExcludePathList() {
-        String value = getOauth2ExcludePaths();
-        if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
-        }
-        return Collections.emptyList();
+        return splitToList(getOauth2ExcludePaths());
     }
-
 
     /**
      * oauth2 包含URL 多个之间以“,”分割
@@ -330,13 +398,8 @@ public class AppConstants extends SysConstants {
      * @return
      */
     public static List<String> getOauth2IncludePathList() {
-        String value = getOauth2IncludePaths();
-        if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
-        }
-        return Collections.emptyList();
+        return splitToList(getOauth2IncludePaths());
     }
-
 
     /**
      * 允许跨站 多个之间以“,”分割
@@ -352,11 +415,7 @@ public class AppConstants extends SysConstants {
      * @return
      */
     public static List<String> getCorsAllowedOriginList() {
-        String value = getCorsAllowedOrigins();
-        if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
-        }
-        return Collections.emptyList();
+        return splitToList(getCorsAllowedOrigins());
     }
 
     /**
@@ -367,11 +426,7 @@ public class AppConstants extends SysConstants {
      */
     public static List<String> getLimitUserWhiteList() {
         String code = "system.security.limit.user.whitelist";
-        String value = getConfigValue(code);
-        if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
-        }
-        return Collections.emptyList();
+        return splitToList(getConfigValue(code));
     }
 
     /**
@@ -381,7 +436,7 @@ public class AppConstants extends SysConstants {
      */
     public static Boolean isLimitIpEnable() {
         String code = "system.security.limit.ip.enable";
-        String value = getConfigValue(code,"false");
+        String value = getConfigValue(code, "false");
         return Boolean.valueOf(value);
     }
 
@@ -392,7 +447,7 @@ public class AppConstants extends SysConstants {
      */
     public static Boolean isLimitIpWhiteEnable() {
         String code = "system.security.limit.ip.whiteEnable";
-        String value = getConfigValue(code,"true");
+        String value = getConfigValue(code, "true");
         return Boolean.valueOf(value);
     }
 
@@ -404,11 +459,7 @@ public class AppConstants extends SysConstants {
      */
     public static List<String> getLimitIpWhiteList() {
         String code = "system.security.limit.ip.whitelist";
-        String value = getConfigValue(code);
-        if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
-        }
-        return Collections.emptyList();
+        return splitToList(getConfigValue(code));
     }
 
     /**
@@ -419,11 +470,7 @@ public class AppConstants extends SysConstants {
      */
     public static List<String> getLimitIpBlackList() {
         String code = "system.security.limit.ip.blacklist";
-        String value = getConfigValue(code);
-        if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
-        }
-        return Collections.emptyList();
+        return splitToList(getConfigValue(code));
     }
 
     /**
@@ -433,7 +480,7 @@ public class AppConstants extends SysConstants {
      */
     public static Boolean isXssEnable() {
         String code = "system.security.xssFilter.enable";
-        String value = getAppConfig(code,"true");
+        String value = getAppConfig(code, "true");
         return Boolean.valueOf(value);
     }
 
@@ -448,18 +495,13 @@ public class AppConstants extends SysConstants {
         return getAppConfig(code);
     }
 
-
     /**
      * XSS拦截黑名单 不拦截
      *
      * @return
      */
     public static List<String> getXssBlackList() {
-        String value = getXssBlackListURL();
-        if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
-        }
-        return Collections.emptyList();
+        return splitToList(getXssBlackListURL());
     }
 
     /**
@@ -469,10 +511,9 @@ public class AppConstants extends SysConstants {
      */
     public static Boolean isLimitUrlEnable() {
         String code = "system.security.limit.url.enable";
-        String value = getConfigValue(code,"false");
+        String value = getConfigValue(code, "false");
         return Boolean.valueOf(value);
     }
-
 
     /**
      * 启用内部代理
@@ -481,7 +522,7 @@ public class AppConstants extends SysConstants {
      */
     public static Boolean isProxyEnable() {
         String code = "system.security.proxy.enable";
-        String value = getConfigValue(code,"false");
+        String value = getConfigValue(code, "false");
         return Boolean.valueOf(value);
     }
 
@@ -493,13 +534,8 @@ public class AppConstants extends SysConstants {
      */
     public static List<String> getProxyWhiteList() {
         String code = "system.security.proxy.whitelist";
-        String value = getConfigValue(code);
-        if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
-        }
-        return Collections.emptyList();
+        return splitToList(getConfigValue(code));
     }
-
 
     /**
      * 应用文件 磁盘绝对路径
@@ -510,7 +546,6 @@ public class AppConstants extends SysConstants {
         String code = "app.basePath";
         return getConfigValue(code);
     }
-
 
     /**
      * 应用文件存储目录 放置于webapp下 应用相对路径
@@ -525,7 +560,6 @@ public class AppConstants extends SysConstants {
         return getConfigValue(code);
     }
 
-
     /**
      * 云盘存储路径 磁盘绝对路径
      *
@@ -539,7 +573,6 @@ public class AppConstants extends SysConstants {
         }
         return diskBasePath;
     }
-
 
     /**
      * 文件缓存目录
@@ -562,8 +595,7 @@ public class AppConstants extends SysConstants {
      * @return
      */
     public static Long getDiskMaxUploadSize() {
-        String code = "disk.maxUploadSize";
-        return Long.valueOf(getConfigValue(code));
+        return getLongConfig("disk.maxUploadSize", 0L);
     }
 
     /**
@@ -587,7 +619,7 @@ public class AppConstants extends SysConstants {
         if (StringUtils.isBlank(value)) {
             return getDiskMaxUploadSize();
         }
-        return Long.valueOf(value);
+        return getLongConfig("notice.maxUploadSize", getDiskMaxUploadSize());
     }
 
     /**
@@ -600,7 +632,6 @@ public class AppConstants extends SysConstants {
         return PrettyMemoryUtils.prettyByteSize(maxUploadSize);
     }
 
-
     /**
      * 启用安全检查
      *
@@ -609,7 +640,7 @@ public class AppConstants extends SysConstants {
     public static boolean getIsSecurityOn() {
         String code = "security.on";
         String value = getConfigValue(code, "false");
-        return "true".equals(value) || "1".equals(value);
+        return "true".equalsIgnoreCase(value) || "1".equals(value);
     }
 
     /**
@@ -620,7 +651,7 @@ public class AppConstants extends SysConstants {
     public static boolean isCheckLoginPassword() {
         String code = "security.password.checkLogin";
         String value = getConfigValue(code, "false");
-        return "true".equals(value) || "1".equals(value);
+        return "true".equalsIgnoreCase(value) || "1".equals(value);
     }
 
     /**
@@ -631,9 +662,8 @@ public class AppConstants extends SysConstants {
     public static boolean isCheckPasswordPolicy() {
         String code = "security.password.checkPolicy";
         String value = getConfigValue(code, "false");
-        return "true".equals(value) || "1".equals(value);
+        return "true".equalsIgnoreCase(value) || "1".equals(value);
     }
-
 
     /**
      * 修改密码地址 PC端
@@ -653,19 +683,14 @@ public class AppConstants extends SysConstants {
         return getConfigValue(code);
     }
 
-
-
     /**
      * 系统最大登录用户数
      *
      * @return
      */
     public static int getSessionUserMaxSize() {
-        String code = "security.sessionUser.MaxSize";
-        String value = getConfigValue(code,"0");
-        return StringUtils.isBlank(value) ? 0 :Integer.parseInt(value);
+        return getIntConfig("security.sessionUser.MaxSize", 0);
     }
-
 
     /**
      * 获取用户可创建会话数量 默认值：0
@@ -674,9 +699,7 @@ public class AppConstants extends SysConstants {
      * @return
      */
     public static int getUserSessionSize() {
-        String code = "security.sessionUser.UserSessionSize";
-        String value = getConfigValue(code,"0");
-        return StringUtils.isBlank(value) ? 0 : Integer.parseInt(value);
+        return getIntConfig("security.sessionUser.UserSessionSize", 0);
     }
 
     /**
@@ -685,9 +708,7 @@ public class AppConstants extends SysConstants {
      * @return
      */
     public static int getLoginAgainSize() {
-        String code = "security.password.loginAgainSize";
-        String value = getConfigValue(code);
-        return StringUtils.isBlank(value) ? 3 : Integer.parseInt(value);
+        return getIntConfig("security.password.loginAgainSize", 3);
     }
 
     /**
@@ -696,9 +717,7 @@ public class AppConstants extends SysConstants {
      * @return
      */
     public static int getUserPasswordUpdateCycle() {
-        String code = "security.password.updateCycle";
-        String value = getConfigValue(code);
-        return StringUtils.isBlank(value) ? 30 : Integer.parseInt(value);
+        return getIntConfig("security.password.updateCycle", 30);
     }
 
     /**
@@ -707,11 +726,8 @@ public class AppConstants extends SysConstants {
      * @return
      */
     public static int getUserPasswordRepeatCount() {
-        String code = "security.password.repeatCount";
-        String value = getConfigValue(code);
-        return StringUtils.isBlank(value) ? 5 : Integer.parseInt(value);
+        return getIntConfig("security.password.repeatCount", 5);
     }
-
 
     /**
      * webserice发布地址
@@ -731,7 +747,6 @@ public class AppConstants extends SysConstants {
         String code = "app.url";
         return getConfigValue(code);
     }
-
 
     /**
      * 应用名称
@@ -775,7 +790,7 @@ public class AppConstants extends SysConstants {
      */
     public static String getAppPortalPage() {
         String code = "app.portalPage";
-        return getConfigValue(code,"/a/portal");
+        return getConfigValue(code, "/a/portal");
     }
 
     /**
@@ -814,7 +829,6 @@ public class AppConstants extends SysConstants {
         return getConfigValue(code);
     }
 
-
     /**
      * 客服链接
      * @return
@@ -831,7 +845,7 @@ public class AppConstants extends SysConstants {
     public static boolean getIsSystemRestEnable() {
         String code = "system.rest.enable";
         String value = getConfigValue(code, "false");
-        return "true".equals(value) || "1".equals(value);
+        return "true".equalsIgnoreCase(value) || "1".equals(value);
     }
 
     /**
@@ -841,9 +855,8 @@ public class AppConstants extends SysConstants {
     public static boolean isRestDefaultInterceptorEnable() {
         String code = "system.rest.defaultInterceptor.enable";
         String value = getConfigValue(code, "true");
-        return "true".equals(value) || "1".equals(value);
+        return "true".equalsIgnoreCase(value) || "1".equals(value);
     }
-
 
     /**
      * REST 服务访问密钥
@@ -851,7 +864,7 @@ public class AppConstants extends SysConstants {
      */
     public static String getRestDefaultApiKey() {
         String code = "system.rest.defaultApiKey";
-        return getConfigValue(code,"");
+        return getConfigValue(code, "");
     }
 
     /**
@@ -861,7 +874,7 @@ public class AppConstants extends SysConstants {
     public static boolean getIsSystemRestLimitEnable() {
         String code = "system.rest.limit.ip.enable";
         String value = getConfigValue(code, "true");
-        return "true".equals(value) || "1".equals(value);
+        return "true".equalsIgnoreCase(value) || "1".equals(value);
     }
 
     /**
@@ -871,13 +884,8 @@ public class AppConstants extends SysConstants {
      */
     public static List<String> getRestLimitIpWhiteList() {
         String code = "system.rest.limit.ip.whitelist";
-        String value = getConfigValue(code);
-        if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
-        }
-        return Collections.emptyList();
+        return splitToList(getConfigValue(code));
     }
-
 
     /**
      * RPC 服务认证客户端密钥
@@ -906,19 +914,13 @@ public class AppConstants extends SysConstants {
         return getConfigValue(code);
     }
 
-
     /**
      * 统预警消息推送（运维账号） 接收消息账号
      * @return
      */
     public static List<String> getSystemOpsWarnLoginNameList() {
-        String value = getSystemOpsWarnLoginNames();
-        if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
-        }
-        return Collections.emptyList();
+        return splitToList(getSystemOpsWarnLoginNames());
     }
-
 
     /**
      * 并发线程数
@@ -927,10 +929,16 @@ public class AppConstants extends SysConstants {
      */
     public static Integer getPoolParallelism() {
         String code = "system.pool.parallelism";
-        String value = getConfigValue(code,"");
-        return null != value  && !value.isEmpty() ? Integer.valueOf(value):null;
+        String value = getConfigValue(code, "");
+        if (StringUtils.isNotBlank(value)) {
+            try {
+                return Integer.valueOf(value.trim());
+            } catch (NumberFormatException e) {
+                log.warn("配置项 [{}] 值 [{}] 解析错误，返回 null", code, value);
+            }
+        }
+        return null;
     }
-
 
     /**
      * 序列化注册 示例：com.erynasky.* 白名单 多个之间检以";"分割
@@ -938,18 +946,12 @@ public class AppConstants extends SysConstants {
      */
     public static String getSerializerTypeCheckAllowClasses() {
         String code = "system.security.SerializerTypeCheck.allowClasses";
-        return getConfigValue(code,"com.eryansky.*");
+        return getConfigValue(code, "com.eryansky.*");
     }
-
 
     public static List<String> getSerializerTypeCheckAllowClassList() {
-        String value = getSerializerTypeCheckAllowClasses();
-        if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
-        }
-        return Collections.emptyList();
+        return splitToList(getSerializerTypeCheckAllowClasses());
     }
-
 
     /**
      * 序列化注册  黑名单(权限等级高于白名单) 多个之间检以";"分割
@@ -960,15 +962,9 @@ public class AppConstants extends SysConstants {
         return getConfigValue(code);
     }
 
-
     public static List<String> getSerializerTypeCheckDisallowClassList() {
-        String value = getSerializerTypeCheckDisallowClasses();
-        if(StringUtils.isNotBlank(value)){
-            return Arrays.asList(value.trim().split("[\\s,，;；]+"));
-        }
-        return Collections.emptyList();
+        return splitToList(getSerializerTypeCheckDisallowClasses());
     }
-
 
     /**
      * 是否启用SSO单点登录
@@ -977,7 +973,7 @@ public class AppConstants extends SysConstants {
     public static boolean getIsSSOEnable() {
         String code = "system.sso.enable";
         String value = getAppConfig(code, "false");
-        return "true".equals(value) || "1".equals(value);
+        return "true".equalsIgnoreCase(value) || "1".equals(value);
     }
 
     /**
@@ -1026,7 +1022,6 @@ public class AppConstants extends SysConstants {
         return getAppConfig(code, "");
     }
 
-
     /**
      * Oauth2 客户端配置
      * @return
@@ -1042,8 +1037,10 @@ public class AppConstants extends SysConstants {
      */
     public static List<OAuth2Client> getOauth2ClientList() {
         String value = getOauth2Clients();
+        if (StringUtils.isBlank(value)) {
+            return Collections.emptyList();
+        }
         List<OAuth2Client> clients = JsonMapper.getInstance().toJavaObjectList(value, OAuth2Client.class);
-        return null != clients ? clients : Collections.emptyList();
+        return clients != null ? clients : Collections.emptyList();
     }
-
 }

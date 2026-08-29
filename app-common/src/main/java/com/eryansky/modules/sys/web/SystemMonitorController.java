@@ -184,7 +184,7 @@ public class SystemMonitorController extends SimpleController {
             for (String _cacheName : regions) {
                 CacheUtils.clearCache(_cacheName);
             }
-            AppConstants.SYS_INIT_TIME = System.currentTimeMillis();
+            AppConstants.updateSysInitTime();
         }
         addMessage(redirectAttributes, "操作成功！");
         return "redirect:" + AppConstants.getAdminPath() + "/sys/systemMonitor/cache?repage";
