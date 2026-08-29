@@ -3,7 +3,7 @@
       xmlns:sitemesh="http://www.opensymphony.com/sitemesh/decorator"
       class="no-js">
 <head>
-    <title><sitemesh:write property="title"/> - [[${T(com.eryansky.utils.AppConstants).getAppName()}]]</title>
+    <title><sitemesh:write property="title">[[${T(com.eryansky.utils.AppConstants).getAppName()}]]</sitemesh:write></title>
     <meta name="viewport" id="viewport" content="width=device-width, initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
 
     <th:block th:replace="~{modules/sys/include/head_mobile :: head_mobile}"></th:block>

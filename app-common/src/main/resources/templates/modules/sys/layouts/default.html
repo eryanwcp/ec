@@ -9,7 +9,7 @@
       class="no-js">
 <!--<![endif]-->
 <head>
-    <title><sitemesh:write property="title"/> - [[${T(com.eryansky.utils.AppConstants).getAppName()}]]</title>
+    <title><sitemesh:write property="title">[[${T(com.eryansky.utils.AppConstants).getAppName()}]]</sitemesh:write></title>
     <th:block th:replace="~{modules/sys/include/head :: head}"></th:block>
 
     <th:block th:replace="~{include/dialog :: dialog}"></th:block>
