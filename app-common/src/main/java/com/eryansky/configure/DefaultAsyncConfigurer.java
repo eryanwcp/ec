@@ -129,7 +129,7 @@ public class DefaultAsyncConfigurer implements AsyncConfigurer {
      * @param msg      需要发送的消息内容
      */
     private void sendWarnMessageWithRateLimit(String cacheKey, String msg) {
-        Boolean isTip = CacheUtils.get(cacheKey);
+        Boolean isTip = CacheUtils.get(cacheKey,cacheKey);
         if (isTip == null) {
             List<String> systemOpsWarnUserIds = UserUtils.findUsersByLoginNames(AppConstants.getSystemOpsWarnLoginNameList())
                     .stream()
@@ -141,7 +141,7 @@ public class DefaultAsyncConfigurer implements AsyncConfigurer {
             }
 
             MessageUtils.sendToUserMessage(systemOpsWarnUserIds, msg);
-            CacheUtils.put(cacheKey, true); // 存入缓存，依赖配置的过期时间（30分钟）
+            CacheUtils.put(cacheKey,cacheKey, true); // 存入缓存，依赖配置的过期时间（30分钟）
         }
     }
 }
