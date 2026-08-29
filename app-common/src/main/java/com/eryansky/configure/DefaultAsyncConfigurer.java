@@ -33,8 +33,9 @@ public class DefaultAsyncConfigurer implements AsyncConfigurer {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultAsyncConfigurer.class);
 
-    private static final String CACHE_KEY_REJECT = "system_ops_warn_defaultAsyncExecutor";
-    private static final String CACHE_KEY_EXCEPTION = "system_ops_warn_asyncUncaughtExceptionHandler";
+    private static final String CACHE = "system_ops_warn_defaultAsyncExecutor";
+    private static final String CACHE_KEY_REJECT = "reject";
+    private static final String CACHE_KEY_EXCEPTION = "exception";
 
     // 使用 0 作为默认值，方便后续判断是否启用了自定义配置
     @Value("${system.async.thread.pool.corePoolSize:0}")
@@ -129,7 +130,7 @@ public class DefaultAsyncConfigurer implements AsyncConfigurer {
      * @param msg      需要发送的消息内容
      */
     private void sendWarnMessageWithRateLimit(String cacheKey, String msg) {
-        Boolean isTip = CacheUtils.get(cacheKey,cacheKey);
+        Boolean isTip = CacheUtils.get(CACHE,cacheKey);
         if (isTip == null) {
             List<String> systemOpsWarnUserIds = UserUtils.findUsersByLoginNames(AppConstants.getSystemOpsWarnLoginNameList())
                     .stream()
@@ -141,7 +142,7 @@ public class DefaultAsyncConfigurer implements AsyncConfigurer {
             }
 
             MessageUtils.sendToUserMessage(systemOpsWarnUserIds, msg);
-            CacheUtils.put(cacheKey,cacheKey, true); // 存入缓存，依赖配置的过期时间（30分钟）
+            CacheUtils.put(CACHE,cacheKey, true); // 存入缓存，依赖配置的过期时间（30分钟）
         }
     }
 }
