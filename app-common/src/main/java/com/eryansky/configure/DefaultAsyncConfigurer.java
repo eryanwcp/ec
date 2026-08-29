@@ -33,8 +33,8 @@ public class DefaultAsyncConfigurer implements AsyncConfigurer {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultAsyncConfigurer.class);
 
-    private static final String REJECT_CACHE_KEY = "system_ops_warn_defaultAsyncExecutor";
-    private static final String EXCEPTION_CACHE_KEY = "system_ops_warn_asyncUncaughtExceptionHandler";
+    private static final String CACHE_KEY_REJECT = "system_ops_warn_defaultAsyncExecutor";
+    private static final String CACHE_KEY_EXCEPTION = "system_ops_warn_asyncUncaughtExceptionHandler";
 
     // 使用 0 作为默认值，方便后续判断是否启用了自定义配置
     @Value("${system.async.thread.pool.corePoolSize:0}")
@@ -89,7 +89,7 @@ public class DefaultAsyncConfigurer implements AsyncConfigurer {
             );
 
             log.error(msg);
-            sendWarnMessageWithRateLimit(REJECT_CACHE_KEY, msg);
+            sendWarnMessageWithRateLimit(CACHE_KEY_REJECT, msg);
 
             // 如果线程池未关闭，则由调用者所在的线程执行任务 (CallerRunsPolicy 的逻辑)
             if (!exe.isShutdown()) {
@@ -118,7 +118,7 @@ public class DefaultAsyncConfigurer implements AsyncConfigurer {
             );
 
             log.error(msg, throwable);
-            sendWarnMessageWithRateLimit(EXCEPTION_CACHE_KEY, msg);
+            sendWarnMessageWithRateLimit(CACHE_KEY_EXCEPTION, msg);
         };
     }
 
