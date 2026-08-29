@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012-2024 https://www.eryansky.com
+ * Copyright (c) 2012-2026 https://www.eryansky.com
  * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -17,6 +17,7 @@ import com.eryansky.modules.sys.mapper.Config;
 import com.eryansky.modules.sys.service.ConfigService;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Maps;
+import javax.annotation.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,7 +36,7 @@ import java.util.Map;
 @Controller
 @RequestMapping(value = "${adminPath}/sys/config")
 public class ConfigController extends SimpleController {
-    @javax.annotation.Resource
+    @Resource
     private ConfigService configService;
 
 

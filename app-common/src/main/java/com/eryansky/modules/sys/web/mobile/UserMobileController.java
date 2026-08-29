@@ -49,7 +49,7 @@ import org.springframework.util.Base64Utils;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
@@ -72,7 +72,7 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "${mobilePath}/sys/user")
 public class UserMobileController extends SimpleController {
 
-    @Autowired
+    @Resource
     private UserService userService;
 
     @ModelAttribute("model")

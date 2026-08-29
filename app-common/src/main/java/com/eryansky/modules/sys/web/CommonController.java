@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012-2024 https://www.eryansky.com
+ * Copyright (c) 2012-2026 https://www.eryansky.com
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -20,6 +20,7 @@ import com.eryansky.encrypt.anotation.DecryptRequestBody;
 import com.eryansky.encrypt.anotation.EncryptResponseBody;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys.service.SystemService;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.springframework.stereotype.Controller;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012-2024 https://www.eryansky.com
+ * Copyright (c) 2012-2026 https://www.eryansky.com
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -20,8 +20,8 @@ import com.eryansky.modules.sys.service.DictionaryItemService;
 import com.eryansky.modules.sys.service.DictionaryService;
 import com.eryansky.utils.SelectType;
 import com.google.common.collect.Lists;
+import javax.annotation.Resource;
 import org.apache.commons.collections4.ListUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -43,9 +43,9 @@ import java.util.List;
 public class DictionaryController extends SimpleController {
 
 
-    @Autowired
+    @Resource
     private DictionaryService dictionaryService;
-    @Autowired
+    @Resource
     private DictionaryItemService dictionaryItemService;
 
     @ModelAttribute

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012-2024 https://www.eryansky.com
+ * Copyright (c) 2012-2026 https://www.eryansky.com
  * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -26,7 +26,6 @@ import com.eryansky.modules.sys.service.SystemSerialNumberService;
 import com.eryansky.modules.sys.sn.MaxSerial;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Lists;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
@@ -47,7 +46,7 @@ import java.util.List;
 @RequestMapping(value = "${adminPath}/sys/systemSerialNumber")
 public class SystemSerialNumberController extends SimpleController {
 
-    @Autowired
+    @javax.annotation.Resource
     private SystemSerialNumberService systemSerialNumberService;
 
     @ModelAttribute("model")
@@ -103,7 +102,7 @@ public class SystemSerialNumberController extends SimpleController {
             return renderString(response, page);
         }
         uiModel.addAttribute("page", page);
-        return "modules/sys/systemSerialNumberList";
+        return "modules/sys/systemSerialNumberList.html";
     }
 
 
@@ -112,7 +111,7 @@ public class SystemSerialNumberController extends SimpleController {
     public String form(@ModelAttribute("model") SystemSerialNumber model, Model uiModel) {
         uiModel.addAttribute("model", model);
         uiModel.addAttribute("resetTypes", ResetType.values());
-        return "modules/sys/systemSerialNumberForm";
+        return "modules/sys/systemSerialNumberForm.html";
     }
 
     @Override

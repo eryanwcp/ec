@@ -54,7 +54,7 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
-
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -74,7 +74,7 @@ import java.util.Map;
 @RequestMapping(value="${mobilePath}")
 public class MobileIndexController extends SimpleController {
 
-    @Autowired
+    @Resource
     private VersionLogService versionLogService;
 
     @Logging(logType = LogType.access, value = "移动APP")

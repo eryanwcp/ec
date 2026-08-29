@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012-2024 https://www.eryansky.com
+ * Copyright (c) 2012-2026 https://www.eryansky.com
  * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -18,6 +18,7 @@ import com.eryansky.modules.sys.service.SystemService;
 import com.eryansky.modules.sys.utils.OrganUtils;
 import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.utils.AppConstants;
+import javax.annotation.Resource;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -25,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -42,11 +42,11 @@ import java.util.List;
 @Aspect
 public class SystemAspect implements InitializingBean, DisposableBean {
 
-    private static Logger logger = LoggerFactory.getLogger(SystemAspect.class);
+    private static final Logger logger = LoggerFactory.getLogger(SystemAspect.class);
 
-    @Autowired
+    @Resource
     private SystemService systemService;
-    @Autowired
+    @Resource
     private OrganService organService;
 
     /**

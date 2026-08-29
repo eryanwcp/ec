@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012-2024 https://www.eryansky.com
+ * Copyright (c) 2012-2026 https://www.eryansky.com
  * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -41,7 +41,6 @@ import com.eryansky.modules.disk.utils.DiskUtils;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.utils.SelectType;
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -49,6 +48,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -65,9 +65,9 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "${adminPath}/disk")
 public class DiskController extends SimpleController {
 
-    @Autowired
+    @Resource
     private FolderService folderService;
-    @Autowired
+    @Resource
     private FileService fileService;
 
     public static final String NODE_TYPE = "nType";
@@ -552,6 +552,7 @@ public class DiskController extends SimpleController {
     @GetMapping(value = {"fileDownload/{fileId}"})
     public ModelAndView fileDownload(HttpServletResponse response,
                                      HttpServletRequest request, @PathVariable String fileId,String downloadType) throws Exception {
+        response.setHeader("Access-Control-Allow-Origin", "*");
         File file = fileService.get(StringUtils.substringBefore(fileId,"."));
         try {
             return downloadSingleFileUtil(response, request, file,downloadType);

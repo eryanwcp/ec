@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.eryansky.com/thymeleaf/shiro"
+      xmlns:sitemesh="http://www.opensymphony.com/sitemesh/decorator">
+<head>
+    <title>[[${model.title}]]</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=EDGE;chrome=1" />
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <meta http-equiv="Cache-Control" content="no-store"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0">
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="0"/>
+    <!-- 基础脚本与样式库 -->
+    <script th:src="@{/static/js/jquery/jquery-1.12.4.min.js}" type="text/javascript"></script>
+    <script th:src="@{/static/js/jquery/jquery-migrate-1.4.1.min.js}" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" th:href="${ctxStatic}+'/app/mobile/modules/notice/news-view'+${yuicompressor}+'.css?_='+${sysInitTime}" />
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        $(function(){
+            var maxWidth = $(window).width();
+            $.each($("#content").find("img"),function(i,img){
+                var imgSrc = $(img).attr("src");
+                getImageWidth(imgSrc,function(w,h){
+                    if(w > maxWidth){
+                        $(img).css({"width":"100%"});
+                    }
+                });
+            });
+            $("#content").find("img").parent().css({"text-indent":0});
+            $("#content").find("table").css({"width":"100%","margin-left":0});
+        });
+
+        function getImageWidth(url,callback){
+            var img = new Image();
+            img.src = url;
+            // 如果图片被缓存，则直接返回缓存数据
+            if(img.complete){
+                callback(img.width, img.height);
+            }else{
+                // 完全加载完毕的事件
+                img.onload = function(){
+                    callback(img.width, img.height);
+                }
+            }
+        }
+        /*]]>*/
+    </script>
+</head>
+<body>
+    <h3 class="newstitle">[[${model.title}]]</h3>
+    <h4 class="newstime">[[${model.publishOrganName}]] [[${model.publishUserName}]] [[${#dates.format(model.publishTime, 'yyyy-MM-dd HH:mm')}]]</h4>
+    <div id="content" th:utext="${model.content}"></div>
+    <div th:if="${not #lists.isEmpty(files)}">
+        <div th:each="file,iStat : ${files}" th:id="${file.id}" style="float: left;width:100%;border-top:1px solid #000;padding-top:10px;margin-top:10px;">
+            <strong>附件列表：</strong>
+            <br/>
+            <span th:text="${iStat.index + 1}"></span>、
+            <a href="#"
+               onclick="_download([[${file.id}]]);"
+               style="color: #0000ff;"
+               th:text="${file.name}">文件名</a>&nbsp;&nbsp;
+        </div>
+    </div>
+    <iframe id="annexFrame" src="" frameborder="no" style="padding: 0;border: 0;width: 100%;height: 50px;"></iframe>
+</body>
+</html>

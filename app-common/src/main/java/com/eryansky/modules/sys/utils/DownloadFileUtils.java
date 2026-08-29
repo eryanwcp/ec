@@ -18,7 +18,7 @@ import java.util.Enumeration;
 public class DownloadFileUtils {
 
 
-    private static Logger logger = LoggerFactory.getLogger(DownloadFileUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(DownloadFileUtils.class);
 
     private DownloadFileUtils() {
     }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012-2024 https://www.eryansky.com
+ * Copyright (c) 2012-2026 https://www.eryansky.com
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -20,9 +20,9 @@ import com.eryansky.modules.disk.extend.IFileManager;
 import com.eryansky.modules.disk.mapper.Folder;
 import com.eryansky.modules.disk.utils.DiskUtils;
 import com.eryansky.utils.AppConstants;
+import javax.annotation.Resource;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -45,10 +45,10 @@ import java.util.List;
 @Service
 public class FileService extends CrudService<FileDao, File> {
 
-    @Autowired
+    @Resource
     @Lazy
     private FolderService folderService;
-    @Autowired
+    @Resource
     private IFileManager iFileManager;
 
     /**

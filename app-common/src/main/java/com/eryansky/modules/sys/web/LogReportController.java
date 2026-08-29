@@ -21,7 +21,7 @@ import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.utils.AppDateUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -41,7 +41,7 @@ import java.util.Map;
 @RequestMapping(value = "${adminPath}/sys/log/report")
 public class LogReportController extends SimpleController {
 
-    @Autowired
+    @Resource
     private LogService logService;
 
     /**
@@ -53,7 +53,7 @@ public class LogReportController extends SimpleController {
     @RequiresPermissions(value = "sys:log:loginStatistics")
     @GetMapping(value = {"loginStatistics"})
     public String loginStatistics() {
-        return "modules/sys/log-loginStatistics";
+        return "modules/sys/log-loginStatistics.html";
     }
 
     @RequiresPermissions(value = "sys:log:loginStatistics")
@@ -148,7 +148,7 @@ public class LogReportController extends SimpleController {
         uiModel.addAttribute("page", page);
         uiModel.addAttribute("startTime", _startTime);
         uiModel.addAttribute("endTime", endTime);
-        return "modules/sys/log-dayLoginStatistics";
+        return "modules/sys/log-dayLoginStatistics.html";
     }
 
     /**
@@ -184,7 +184,7 @@ public class LogReportController extends SimpleController {
 
         model.addAttribute("page", page);
         model.addAttribute("paramMap", paramMap);
-        return "modules/sys/log-moduleStatistics";
+        return "modules/sys/log-moduleStatistics.html";
     }
 
     @RequiresPermissions(value = "sys:log:moduleStatistics")

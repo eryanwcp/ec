@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.eryansky.com/thymeleaf/shiro"
+      xmlns:sitemesh="http://www.opensymphony.com/sitemesh/decorator">
+<head>
+    <title>系统监控-系统日志</title>
+    <!-- 装饰器配置 (沿用 SiteMesh) -->
+    <meta name="decorator" content="default_sys"/>
+    
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        $(function () {
+            $("#showTotal").change(function () {
+                reLoad();
+            });
+            $("#pretty").change(function () {
+                reLoad();
+            });
+            $("#fileName").change(function () {
+                reLoad();
+            });
+            reLoad();
+        });
+
+        function page(n, s) {
+            $("#pageNo").val(n);
+            $("#pageSize").val(s);
+            reLoad();
+            return false;
+        }
+
+        function reLoad() {
+            $.ajax({
+                url: ctxAdmin + '/sys/systemMonitor/log',
+                type: 'post',
+                data: $.serializeObject($("#searchForm")),
+                cache: false,
+                dataType: 'json',
+                beforeSend: function (jqXHR, settings) {
+                    $("#list").html("<div style='padding: 10px 30px;text-align:center;font-size: 16px;'><img src='" + ctxStatic + "/js/easyui/themes/bootstrap/images/loading.gif' />数据加载中...</div>");
+                },
+                success: function (data) {
+                    if (data.code === 1) {
+                        var html = Mustache.render($("#list_template").html(), data['data']);
+                        $("#list").html(html);
+                        $(".pagination").append(data['data']['html']);
+                        $(".pagination").find("ul").append("<li class=\"disabled controls\"><a>"+data['obj']+"</a></li>");
+                    } else {
+                        $("#list").html(data['msg']);
+                    }
+                }
+            });
+        }
+        function _download() {
+            var annexFrame = document.getElementById("annexFrame");
+            annexFrame.src = ctxAdmin + '/sys/systemMonitor/downloadLogFile?fileName='+$("#fileName").val();
+        }
+        /*]]>*/
+    </script>
+
+    <!-- Mustache 前端模板定义 -->
+    <script type="text/template" id="list_template">
+        <div class="page pagination"></div>
+        <div style="padding: 10px;">
+            {{#result}}
+            {{&.}}</br>
+            {{/result}}
+        </div>
+        <input class="btn btn-primary" type="button" value="刷新" onclick="reLoad();"/>
+        <div class="page pagination"></div>
+    </script>
+</head>
+<body>
+<ul class="nav nav-tabs">
+    <li><a th:href="${ctxAdmin} + '/sys/systemMonitor'">系统监控</a></li>
+    <li class="active"><a th:href="${ctxAdmin} + '/sys/systemMonitor/log'">系统日志</a></li>
+    <li><a th:href="${ctxAdmin} + '/sys/systemMonitor/sessionCache'">会话监控</a></li>
+    <li><a th:href="${ctxAdmin} + '/sys/systemMonitor/cache'">缓存管理</a></li>
+    <li><a th:href="${ctxAdmin} + '/sys/systemMonitor/queue'">队列管理</a></li>
+    <li><a th:href="${ctxAdmin} + '/sys/systemMonitor/asyncTask'">异步任务</a></li>
+    <li><a th:href="${ctxAdmin} + '/sys/job'">调度任务</a></li>
+</ul>
+
+<form id="searchForm" method="post" class="breadcrumb form-search">
+    <input id="pageNo" name="pageNo" type="hidden" th:value="${page.pageNo}"/>
+    <input id="pageSize" name="pageSize" type="hidden" th:value="${page.pageSize}"/>
+    <select id="fileName" name="fileName">
+        <option th:each="item : ${fileNames}"
+                th:value="${item}"
+                th:text="${item}"
+                th:selected="${item eq fileName}">
+        </option>
+    </select>
+    <label> <input id="showTotal" name="showTotal" type="checkbox" value="true">全部显示</label>&nbsp;
+    <label> <input id="pretty" name="pretty" type="checkbox" value="true" >彩色日志</label>&nbsp;
+    &nbsp;&nbsp;<input id="btnSubmit" class="btn btn-primary" type="button" value="刷新" onclick="reLoad();"/>&nbsp;&nbsp;
+    &nbsp;&nbsp;<input class="btn btn-primary" type="button" value="下载" onclick="_download();"/>&nbsp;&nbsp;
+</form>
+<div id="list"></div>
+<iframe id="annexFrame" src="" frameborder="no" style="padding: 0;border: 0;width: 100%;height: 50px;"></iframe>
+</body>
+</html>

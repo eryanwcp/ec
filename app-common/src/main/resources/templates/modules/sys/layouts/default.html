@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]><html class="ie ie6 ie-lte9 ie-lte8 ie-lte7 no-js"><![endif]-->
+<!--[if IE 7]><html class="ie ie7 ie-lte9 ie-lte8 ie-lte7 no-js"><![endif]-->
+<!--[if IE 8]><html class="ie ie8 ie-lte9 ie-lte8 no-js"><![endif]-->
+<!--[if IE 9]><html class="ie9 ie-lte9 no-js"><![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html class="no-js"> <!--<![endif]-->
+<html  lang="zh-cmn-Hans" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sitemesh="http://www.opensymphony.com/sitemesh/decorator"
+      class="no-js">
+<head>
+    <title><sitemesh:title/> - [[${T(com.eryansky.utils.AppConstants).getAppName()}]]</title>
+    <th:block th:replace="~{modules/sys/include/head :: head}"></th:block>
+    <th:block th:replace="~{include/dialog :: dialog}"></th:block>
+    <sitemesh:head/>
+</head>
+<body>
+<sitemesh:body/>
+</body>
+</html>

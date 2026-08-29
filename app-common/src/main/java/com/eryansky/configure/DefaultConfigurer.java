@@ -119,9 +119,9 @@ public class DefaultConfigurer {
     @EventListener(ApplicationReadyEvent.class)
     public void onReady() {
         //XSS配置文件配置
-        String xssBlackListURL = AppConstants.getXssBlackListURL();
-        if(StringUtils.isNotBlank(xssBlackListURL)){
-            XssWhiteListMatcher.addWhiteList(xssBlackListURL.split(";"));
+        List<String> xssBlackList = AppConstants.getXssBlackList();
+        if(Collections3.isNotEmpty(xssBlackList)){
+            XssWhiteListMatcher.addWhiteList(xssBlackList);
         }
         // 动态配置序列化安全策略
         checkSerializerTypeCheck();

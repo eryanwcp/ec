@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012-2024 https://www.eryansky.com
+ * Copyright (c) 2012-2026 https://www.eryansky.com
  * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -23,7 +23,7 @@ import com.eryansky.modules.sys.service.AreaService;
 import com.eryansky.modules.sys.utils.AreaUtils;
 import com.eryansky.modules.sys.utils.OrganUtils;
 import com.eryansky.utils.AppConstants;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
@@ -45,7 +45,7 @@ import java.util.List;
 @RequestMapping(value = "${adminPath}/sys/area")
 public class AreaController extends SimpleController {
 
-    @Autowired
+    @Resource
     private AreaService areaService;
 
     @ModelAttribute("model")
@@ -72,7 +72,7 @@ public class AreaController extends SimpleController {
         model.addAttribute("list", list);
         model.addAttribute("parentId", parentId);
         model.addAttribute("rootId", "0".equals(parentId) ? parentId : AreaUtils.get(parentId).getParentId());
-        return "modules/sys/areaList";
+        return "modules/sys/areaList.html";
     }
 
     @RequiresPermissions("sys:area:view")
@@ -97,10 +97,10 @@ public class AreaController extends SimpleController {
                 area.setCode(area.getParent().getCode() + StringUtils.leftPad(String.valueOf(size > 0 ? size : 1), 4, "0"));
             }
         }
-        model.addAttribute("area", area);
+        model.addAttribute("model", area);
 
         model.addAttribute("areas", AreaType.values());
-        return "modules/sys/areaForm";
+        return "modules/sys/areaForm.html";
     }
 
     @Override

@@ -10,7 +10,6 @@ import com.eryansky.common.orm.model.Parameter;
 import com.eryansky.common.orm.mybatis.interceptor.BaseInterceptor;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
-import com.eryansky.modules.sys.mapper.Role;
 import com.eryansky.utils.AppConstants;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;

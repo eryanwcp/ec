@@ -53,7 +53,7 @@ public class NoticeMobileController extends SimpleController {
     @Logging(logType = LogType.access, value = "我的通知")
     @GetMapping(value = {""})
     public String list() {
-        return "modules/notice/notice";
+        return "modules/notice/notice.html";
     }
 
 

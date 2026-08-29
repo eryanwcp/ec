@@ -80,7 +80,7 @@ public class MessageReceiveController extends SimpleController {
 
         uiModel.addAttribute("page", page);
         uiModel.addAttribute("model", model);
-        return "modules/notice/messageReceiveList";
+        return "modules/notice/messageReceiveList.html";
     }
 
     /**
@@ -93,7 +93,7 @@ public class MessageReceiveController extends SimpleController {
      */
     @GetMapping(value = "info")
     public ModelAndView info(@ModelAttribute("model")  MessageReceive model, HttpServletRequest request, HttpServletResponse response) {
-        ModelAndView modelAndView = new ModelAndView("modules/notice/messageReceiveInfo");
+        ModelAndView modelAndView = new ModelAndView("modules/notice/messageReceiveInfo.html");
         messageReceiveService.setRead(model);
 //        messageTask.setRead(model);
         modelAndView.addObject("model", model);

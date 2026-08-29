@@ -103,10 +103,14 @@ public class MvcConfigurer implements WebMvcConfigurer {
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new IpLimitInterceptor())
-                .addPathPatterns("/**")
-                .order(Ordered.HIGHEST_PRECEDENCE + 90);
+        //IP 限制拦截器
+        if(AppConstants.isLimitIpEnable()){
+            registry.addInterceptor(new IpLimitInterceptor())
+                    .addPathPatterns("/**")
+                    .order(Ordered.HIGHEST_PRECEDENCE + 88);
+        }
 
+        // URL 限制拦截器
         if (AppConstants.isLimitUrlEnable()) {
             registry.addInterceptor(new UrlLimitInterceptor())
                     .addPathPatterns("/**")
@@ -118,6 +122,7 @@ public class MvcConfigurer implements WebMvcConfigurer {
 //                .excludePathPatterns("/static/**")
 //                .order(Ordered.HIGHEST_PRECEDENCE + 100);
 
+        // Rest 权限拦截器
         if (AppConstants.getIsSystemRestEnable() && AppConstants.isRestDefaultInterceptorEnable()) {
             registry.addInterceptor(new RestDefaultAuthorityInterceptor())
                     .addPathPatterns("/rest/**")
@@ -125,29 +130,43 @@ public class MvcConfigurer implements WebMvcConfigurer {
         }
 
         List<String> dList = Lists.newArrayList("/jump.jsp", "/index.html", "/web/**", "/mweb/**", "/assets/**", "/icons/**", "/static/**", "/**/*.css", "/**/*.js", "/**/*.png", "/**/*.ico", "/**/*.json", "favicon**", "/userfiles/**", "/servlet/**", "/error/**", "/api/**", "/rest/**");
-
+        //外部SSO OAuth2 拦截器
+        if (AppConstants.isOauth2SSOEnable()) {
+            List<String> includeList = AppConstants.getOauth2SSOIncludePathList();
+            List<String> cList = AppConstants.getOauth2SSOExcludePathList();
+            registry.addInterceptor(new SSOAuthorityOauth2Interceptor()).addPathPatterns(Collections3.aggregate(includeList, Lists.newArrayList("/**")))
+                    .excludePathPatterns(Collections3.aggregate(dList, cList))
+                    .order(Ordered.HIGHEST_PRECEDENCE + 192);
+        }
+        //内部 OAuth2 拦截器
         if (AppConstants.isOauth2Enable()) {
+            List<String> includeList = AppConstants.getOauth2IncludePathList();
             List<String> cList = AppConstants.getOauth2ExcludePathList();
-            registry.addInterceptor(new AuthorityOauth2Interceptor()).addPathPatterns("/**")
+            registry.addInterceptor(new AuthorityOauth2Interceptor()).addPathPatterns(Collections3.aggregate(includeList, Lists.newArrayList("/**")))
                     .excludePathPatterns(Collections3.aggregate(dList, cList))
                     .order(Ordered.HIGHEST_PRECEDENCE + 195);
+
+
         }
 
-        List<String> authExcludePathList = AppConstants.getAuthExcludePathList();
-        AuthorityInterceptor authorityInterceptor = new AuthorityInterceptor();
-        String redirectURL = "/jump.jsp";
-        //开启SSO单点登录
-        if (AppConstants.getIsSSOEnable()) {
-            redirectURL = AppUtils.appendParaToUrlBuilder(AppConstants.getSSOIssuerUri(), "client_id", AppConstants.getSSOClientId())
-                    .append("redirect_uri", AppConstants.getSSOCallbackUrl()).toString();
+        // 主权限拦截器
+        if (AppConstants.isAuthEnable()) { // 建议增加总控制开关
+            AuthorityInterceptor authorityInterceptor = new AuthorityInterceptor();
+            String redirectURL = "/jump.jsp";
+            if (AppConstants.getIsSSOEnable()) {
+                redirectURL = AppUtils.appendParaToUrlBuilder(AppConstants.getSSOIssuerUri(), "client_id", AppConstants.getSSOClientId())
+                        .append("redirect_uri", AppConstants.getSSOCallbackUrl()).toString();
+            }
+            authorityInterceptor.setRedirectURL(redirectURL);
+
+            List<String> authExcludePathList = AppConstants.getAuthExcludePathList();
+            registry.addInterceptor(authorityInterceptor)
+                    .addPathPatterns("/**")
+                    .excludePathPatterns(Collections3.aggregate(dList, authExcludePathList))
+                    .order(Ordered.HIGHEST_PRECEDENCE + 200);
         }
 
-        authorityInterceptor.setRedirectURL(redirectURL);
-        registry.addInterceptor(authorityInterceptor).addPathPatterns("/**")
-                .excludePathPatterns(Collections3.aggregate(dList, authExcludePathList))
-                .order(Ordered.HIGHEST_PRECEDENCE + 200);
-
-
+        //移动端拦截器
         registry.addInterceptor(new MobileInterceptor())
                 .addPathPatterns("/**")
                 .excludePathPatterns(Lists.newArrayList("/static/**","/api/**","/rest/**"))

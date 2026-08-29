@@ -137,7 +137,7 @@ public class NoticeReceiveController extends SimpleController {
      */
     @GetMapping(value = "info")
     public ModelAndView info(@ModelAttribute("model") NoticeReceiveInfo model, HttpServletRequest request, HttpServletResponse response) {
-        ModelAndView modelAndView = new ModelAndView("modules/notice/noticeReceiveInfo");
+        ModelAndView modelAndView = new ModelAndView("modules/notice/noticeReceiveInfo.html");
         noticeReceiveInfoService.updateReadById(model.getId());
         modelAndView.addObject("model", model);
         return modelAndView;
@@ -192,7 +192,7 @@ public class NoticeReceiveController extends SimpleController {
      */
     @GetMapping(value = {"replyInput"})
     public ModelAndView replyInput(@ModelAttribute("model") NoticeReceiveInfo model) {
-        ModelAndView modelAndView = new ModelAndView("modules/notice/notice-reply-input");
+        ModelAndView modelAndView = new ModelAndView("modules/notice/notice-reply-input.html");
 //        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         String[] fs = StringUtils.split(model.getReplyFileIds(), ",");
         modelAndView.addObject("files", null == fs ? Collections.emptyList() : DiskUtils.findFilesByIds(Lists.newArrayList(fs)));

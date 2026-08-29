@@ -250,8 +250,62 @@ public class WebUtils extends org.springframework.web.util.WebUtils {
     /**
      * 取得HttpRequest中Parameter的简化方法.
      */
-    public static <T> T getParameter(HttpServletRequest request,String name) {
-        return (T) request.getParameter(name);
+    public static String getParameter(HttpServletRequest request,String name) {
+        return request.getParameter(name);
+    }
+
+    /**
+     * 按优先级从 Request 中获取第一个有效的参数值。
+     * 有效值定义：非 null、非空字符串、非纯空白字符。
+     *
+     * @param request    HTTP 请求对象
+     * @param paramNames 参数名列表，按优先级从高到低排列
+     * @return 找到的第一个有效参数值，若均未找到则返回 null
+     */
+    public static String getParameter(HttpServletRequest request, String... paramNames) {
+        if (paramNames == null) {
+            return null;
+        }
+
+        for (String paramName : paramNames) {
+            // 防止 paramName 本身为 null 导致 getParameter 抛出异常（虽然罕见，但更健壮）
+            if (paramName == null) {
+                continue;
+            }
+
+            String value = request.getParameter(paramName);
+            if (StringUtils.isNotBlank(value)) {
+                return value.trim(); // 返回前去除首尾空白，提高数据质量
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 按优先级从 Request 中获取第一个有效的Header值。
+     * 有效值定义：非 null、非空字符串、非纯空白字符。
+     *
+     * @param request    HTTP 请求对象
+     * @param paramNames Header名列表，按优先级从高到低排列
+     * @return 找到的第一个有效参数值，若均未找到则返回 null
+     */
+    public static String getHeader(HttpServletRequest request, String... paramNames) {
+        if (paramNames == null) {
+            return null;
+        }
+
+        for (String paramName : paramNames) {
+            // 防止 paramName 本身为 null 导致 getParameter 抛出异常（虽然罕见，但更健壮）
+            if (paramName == null) {
+                continue;
+            }
+
+            String value = request.getHeader(paramName);
+            if (StringUtils.isNotBlank(value)) {
+                return value.trim(); // 返回前去除首尾空白，提高数据质量
+            }
+        }
+        return null;
     }
 
     /**

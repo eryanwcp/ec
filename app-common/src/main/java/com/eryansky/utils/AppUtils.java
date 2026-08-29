@@ -703,17 +703,12 @@ public class AppUtils {
      */
     public static String extractToken(HttpServletRequest request) {
         // 优先从Header获取（大小写兼容）
-        String authorization = request.getHeader(ATTR_AUTHORIZATION);
-        if (StringUtils.isBlank(authorization)) {
-            authorization = request.getHeader(ATTR_AUTHORIZATION.toLowerCase());
-        }
+        String authorization = WebUtils.getHeader(request,ATTR_AUTHORIZATION,ATTR_AUTHORIZATION.toLowerCase());
         // Header无则从参数获取
         if (StringUtils.isBlank(authorization)) {
-            authorization = request.getParameter(ATTR_TOKEN);
+            authorization = WebUtils.getParameter(request,ATTR_TOKEN,ATTR_TOKEN.toLowerCase());
         }
-        if (StringUtils.isBlank(authorization)) {
-            authorization = request.getParameter(ATTR_AUTHORIZATION);
-        }
+
         if (StringUtils.isBlank(authorization)) {
             return null;
         }

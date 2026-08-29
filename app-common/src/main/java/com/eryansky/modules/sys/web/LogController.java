@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2012-2024 https://www.eryansky.com
+ *  Copyright (c) 2012-2026 https://www.eryansky.com
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -30,11 +30,11 @@ import com.eryansky.modules.sys.service.LogService;
 import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.SelectType;
 import com.google.common.collect.Lists;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "${adminPath}/sys/log")
 public class LogController extends SimpleController {
 
-    @Autowired
+    @Resource
     private LogService logService;
 
     @ModelAttribute("model")
@@ -130,7 +130,7 @@ public class LogController extends SimpleController {
             return renderString(response, json, WebUtils.JSON_TYPE);
         }
         uiModel.addAttribute("startTime", DateUtils.formatDate(_startTime));
-        return "modules/sys/log";
+        return "modules/sys/log.html";
     }
 
 

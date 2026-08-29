@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012-2017 http://www.eryansky.com
+ * Copyright (c) 2012-2026 http://www.eryansky.com
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -23,7 +23,7 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 @QuartzJob(enable = true,name = "DiskCleanTempFileJob", cronExp = "0 0 0 * * ?",remark = "定期清理缓存文件夹")
 public class DiskCleanTempFileJob extends QuartzJobBean {
 
-    private static Logger logger = LoggerFactory.getLogger(DiskCleanTempFileJob.class);
+    private static final Logger logger = LoggerFactory.getLogger(DiskCleanTempFileJob.class);
 
 
     /**
