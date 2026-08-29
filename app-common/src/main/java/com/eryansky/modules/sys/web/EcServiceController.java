@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012-2024 https://www.eryansky.com
+ * Copyright (c) 2012-2026 https://www.eryansky.com
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -47,7 +47,7 @@ public class EcServiceController extends SimpleController {
         R ecpResultBean = null;
         try {
             if (null == requestData) {
-                return R.fail("参数错误：requestData");
+                return R.fail(false,"参数错误：requestData");
             }
             String serviceName = requestData.get("serviceName").asText();
             String serviceMethod = requestData.get("serviceMethod").asText();

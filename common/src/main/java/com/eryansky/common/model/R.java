@@ -88,16 +88,32 @@ public class R<T> implements Serializable {
      * 失败响应（自定义提示信息）
      */
     public static <T> R<T> fail(String msg) {
-        return fail(FAIL, msg);
+        R<T> r = new R<>();
+        r.setCode(FAIL);
+        r.setMsg(msg);
+        return r;
     }
+
 
     /**
      * 失败响应（自定义状态码与提示信息）
      */
-    public static <T> R<T> fail(int code, String msg) {
+    public static <T> R<T> fail(T data,  String msg) {
+        R<T> r = new R<>();
+        r.setCode(FAIL);
+        r.setMsg(msg);
+        r.setData(data);
+        return r;
+    }
+
+    /**
+     * 自定义响应（自定义状态码与提示信息）
+     */
+    public static <T> R<T> custom(T data, int code, String msg) {
         R<T> r = new R<>();
         r.setCode(code);
         r.setMsg(msg);
+        r.setData(data);
         return r;
     }
 

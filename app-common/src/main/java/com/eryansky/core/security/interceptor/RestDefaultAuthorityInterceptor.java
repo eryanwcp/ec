@@ -84,7 +84,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
 
         boolean restEnable = AppConstants.getIsSystemRestEnable();
         if (!restEnable) {
-            R<Boolean> result = R.rest(false).setMsg("系统维护中，请稍后再试！");
+            R<Boolean> result = R.fail(false,"系统维护中，请稍后再试！");
             renderJson(request, response, result);
             return false;
         }
