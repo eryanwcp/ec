@@ -8,9 +8,12 @@
       xmlns:sitemesh="http://www.opensymphony.com/sitemesh/decorator"
       class="no-js">
 <head>
-    <title><sitemesh:title/> - [[${T(com.eryansky.utils.AppConstants).getAppName()}]]</title>
+    <title><sitemesh:write property="title"/> - [[${T(com.eryansky.utils.AppConstants).getAppName()}]]</title>
+
     <th:block th:replace="~{modules/sys/include/head :: head}"></th:block>
+
     <th:block th:replace="~{include/dialog :: dialog}"></th:block>
+
     <link id="easyuiTheme" rel="stylesheet" type="text/css" th:href="@{/static/js/easyui/themes/bootstrap/easyui.css}" />
     <link rel="stylesheet" type="text/css" th:href="@{/static/js/easyui/extend/icon/easyui-icon.min.css}" />
     <script type="text/javascript" th:src="@{/static/js/easyui/jquery.easyui.mine.min.js}" charset="utf-8"></script>
@@ -22,9 +25,11 @@
     <script type="text/javascript" th:src="${ctxStatic} + '/js/easyui/extend/js/easyui-extend.min.js?_='+${sysInitTime}" charset="utf-8"></script>
     <script type="text/javascript" th:src="${ctxStatic} + '/js/easyui/extend/js/validatebox-extend.min.js?_='+${sysInitTime}" charset="utf-8"></script>
     
-    <sitemesh:head/>
+    <!-- SiteMesh head 写入注入点 -->
+    <sitemesh:write property="head"/>
 </head>
 <body>
-<sitemesh:body/>
+<!-- SiteMesh body 写入注入点 -->
+<sitemesh:write property="body"/>
 </body>
 </html>

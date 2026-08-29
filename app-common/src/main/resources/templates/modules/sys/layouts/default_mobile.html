@@ -8,16 +8,21 @@
       xmlns:sitemesh="http://www.opensymphony.com/sitemesh/decorator"
       class="no-js">
 <head>
-    <title><sitemesh:title/> - [[${T(com.eryansky.utils.AppConstants).getAppName()}]]</title>
+    <title><sitemesh:write property="title"/> - [[${T(com.eryansky.utils.AppConstants).getAppName()}]]</title>
     <meta name="viewport" id="viewport" content="width=device-width, initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+
     <th:block th:replace="~{modules/sys/include/head_mobile :: head_mobile}"></th:block>
     <th:block th:replace="~{include/mobile-select-area :: mobile-select-area}"></th:block>
     <th:block th:replace="~{include/dialog :: dialog}"></th:block>
+
     <script type="text/javascript" charset="utf-8" th:src="${ctxStatic} + '/mobile/map_module.min.js?_='+${sysInitTime}"></script>
     <link rel="stylesheet" type="text/css" th:href="${ctxStatic} + '/app/mobile/mobile.min.css?_='+${sysInitTime}" />
-    <sitemesh:head/>
+
+    <!-- SiteMesh head 写入注入点 -->
+    <sitemesh:write property="head"/>
 </head>
 <body>
-<sitemesh:body/>
+<!-- SiteMesh body 写入注入点 -->
+<sitemesh:write property="body"/>
 </body>
 </html>
