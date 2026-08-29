@@ -25,17 +25,17 @@ public class DemoProvider implements DemoAPI {
     @Logging(value = "rest1",logType = LogType.API)
     @Override
     public R<String> test1(String param1) {
-        return new R<String>().setCode(R.SUCCESS).setData(param1);
+        return R.ok(param1);
     }
 
     @Override
     public R<String> test1(String param1, String param2) {
-        return new R<String>().setCode(R.SUCCESS).setData( param1+" "+param2);
+        return R.ok( param1+" "+param2);
     }
 
     @Override
     public R<Boolean> test10(String param1) {
-        return new R<Boolean>(true);
+        return R.rest(true);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class DemoProvider implements DemoAPI {
         data.put("map",map);
         data.put("list",list);
         data.put("page",page);
-        return new R<>(data).setCode(R.SUCCESS);
+        return R.ok(data);
     }
 
     @Override
@@ -67,6 +67,6 @@ public class DemoProvider implements DemoAPI {
 
     @Override
     public R<Object> encrypt(String param1) {
-        return new R<>().setData(new User(User.SUPERUSER_ID)).setCode(R.SUCCESS);
+        return R.ok(new User(User.SUPERUSER_ID));
     }
 }

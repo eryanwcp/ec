@@ -71,7 +71,7 @@ public class CommonController extends SimpleController {
         R r = null;
         try {
             if (null == requestData) {
-                return R.rest(false).setMsg("参数错误：requestData");
+                return R.fail("参数错误：requestData");
             }
             String serviceName = requestData.get("serviceName").asText();
             String serviceMethod = requestData.get("serviceMethod").asText();
