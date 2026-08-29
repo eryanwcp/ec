@@ -76,7 +76,7 @@ public class DefaultAsyncConfigurer implements AsyncConfigurer {
         // rejection-policy：当pool已经达到max size的时候，如何处理新任务
         executor.setRejectedExecutionHandler((Runnable r, ThreadPoolExecutor exe) -> {
             String msg = String.format(
-                    "【%s】当前任务线程池队列已满（注：30分钟内仅提示一条）：%d; 默认线程数：%d; 最大线程数：%d; 执行中线程数：%d; 待执行队列数：%d; 提交任务数：%d; 完成任务数：%d; 可用队列长度：%d",
+                    "【%s】当前任务线程池队列已满（注：10分钟内仅提示一条）：%d; 默认线程数：%d; 最大线程数：%d; 执行中线程数：%d; 待执行队列数：%d; 提交任务数：%d; 完成任务数：%d; 可用队列长度：%d",
                     SpringContextHolder.getApplicationContext().getId(),
                     exe.getQueue().size(),
                     exe.getCorePoolSize(),
@@ -110,7 +110,7 @@ public class DefaultAsyncConfigurer implements AsyncConfigurer {
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
         return (throwable, method, objects) -> {
             String msg = String.format(
-                    "【%s】线程池执行任务发生未知异常（注：30分钟内仅提示一条）：%s.%s, %s",
+                    "【%s】线程池执行任务发生异常（注：10分钟内仅提示一条）：%s.%s, %s",
                     SpringContextHolder.getApplicationContext().getId(),
                     method.getDeclaringClass().getName(),
                     method.getName(),
