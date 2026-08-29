@@ -208,6 +208,73 @@ public class AppConstants extends SysConstants {
 
 
     /**
+     * 权限拦截器是否启用
+     *
+     * @return
+     */
+    public static boolean isAuthEnable() {
+        String code = "system.security.auth.enable";
+        String value = getConfigValue(code,"true");
+        return Boolean.parseBoolean(value);
+    }
+
+
+    /**
+     * Oauth2拦截器是否启用
+     *
+     * @return
+     */
+    public static Boolean isOauth2SSOEnable() {
+        String code = "system.security.oauth2.sso.enable";
+        String value = getConfigValue(code,"false");
+        return Boolean.parseBoolean(value);
+    }
+
+    /**
+     * oauth2 SSO排除URL 多个之间以“,”分割
+     * @return
+     */
+    public static String getOauth2SSOExcludePaths() {
+        String code = "system.security.oauth2.sso.excludePaths";
+        return getConfigValue(code);
+    }
+
+    /**
+     * oauth2 SSO排除URL 多个之间以“,”分割
+     * @return
+     */
+    public static List<String> getOauth2SSOExcludePathList() {
+        String value = getOauth2SSOExcludePaths();
+        if(StringUtils.isNotBlank(value)){
+            return Arrays.asList(StringUtils.split(StringUtils.trim(value).replaceAll("\r\n", ",").replaceAll("，", ",").replaceAll("；", ",").replaceAll(";", ","), ","));
+        }
+        return Collections.emptyList();
+    }
+
+
+    /**
+     * oauth2 SSO 包含URL 多个之间以“,”分割
+     * @return
+     */
+    public static String getOauth2SSOIncludePaths() {
+        String code = "system.security.oauth2.sso.includePaths";
+        return getConfigValue(code);
+    }
+
+    /**
+     * oauth2 SSO 包含URL 多个之间以“,”分割
+     * @return
+     */
+    public static List<String> getOauth2SSOIncludePathList() {
+        String value = getOauth2SSOIncludePaths();
+        if(StringUtils.isNotBlank(value)){
+            return Arrays.asList(StringUtils.split(StringUtils.trim(value).replaceAll("\r\n", ",").replaceAll("，", ",").replaceAll("；", ",").replaceAll(";", ","), ","));
+        }
+        return Collections.emptyList();
+    }
+
+
+    /**
      * Oauth2拦截器是否启用
      *
      * @return
@@ -215,7 +282,7 @@ public class AppConstants extends SysConstants {
     public static Boolean isOauth2Enable() {
         String code = "system.security.oauth2.enable";
         String value = getConfigValue(code,"false");
-        return Boolean.valueOf(value);
+        return Boolean.parseBoolean(value);
     }
 
     /**
