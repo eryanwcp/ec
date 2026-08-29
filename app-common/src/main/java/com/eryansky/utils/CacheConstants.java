@@ -13,7 +13,7 @@ package com.eryansky.utils;
  */
 public class CacheConstants {
 	
-	//Spring Ehcache Annoction
+	//Spring Annoction
 	/**
 	 * 用户导航菜单(根据用户权限缓存).
 	 */
