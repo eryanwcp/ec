@@ -16,9 +16,9 @@ import com.eryansky.common.utils.SysUtils;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.utils.WebUtils;
-import com.eryansky.core.rpc.utils.RPCUtils;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.encrypt.advice.EncryptResultResponseBodyAdvice;
+import com.eryansky.encrypt.util.RequestEncryptUtils;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,7 +121,7 @@ public class ExceptionInterceptor implements HandlerExceptionResolver {
             String encryptKey = WebUtils.getHeaderIgnoreCase(request,EncryptResultResponseBodyAdvice.ENCRYPT_KEY);
             if(StringUtils.isNotBlank(encrypt) && StringUtils.isNotBlank(encryptKey)){
                 try {
-                    byte[] encryptData = RPCUtils.encryptDataByRequest(encrypt,encryptKey,JsonMapper.getInstance().writeValueAsBytes(result));
+                    byte[] encryptData = RequestEncryptUtils.encryptDataByRequest(encrypt,encryptKey,JsonMapper.getInstance().writeValueAsBytes(result));
                     WebUtils.render(response, WebUtils.JSON_TYPE,encryptData);
                 } catch (Exception e) {
                     logger.error(e.getMessage(),e);

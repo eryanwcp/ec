@@ -150,7 +150,7 @@ public class SSOAuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
             return false;
         }
 
-        // 10. 校验通过，写入 Session 
+        // 10. 校验通过，写入 Session
         SecurityUtils.putUserToSession(request, user);
         UserUtils.recordLogin(user.getId());
 

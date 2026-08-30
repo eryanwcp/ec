@@ -1,15 +1,14 @@
 package com.eryansky.encrypt.advice;
 
-import com.eryansky.common.utils.encode.Cryptos;
-import com.eryansky.common.utils.encode.EncodeUtils;
-import com.eryansky.common.utils.encode.RSAUtils;
-import com.eryansky.common.utils.encode.Sm4Utils;
-import com.eryansky.common.utils.io.IoUtils;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
+import com.eryansky.common.utils.encode.Cryptos;
+import com.eryansky.common.utils.encode.EncodeUtils;
+import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.encrypt.anotation.DecryptRequestBody;
-import com.eryansky.encrypt.config.EncryptProvider;
 import com.eryansky.encrypt.enums.CipherMode;
+import com.eryansky.encrypt.util.RequestEncryptUtils;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +19,7 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdvice;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
@@ -54,26 +54,18 @@ public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
             return new HttpInputMessage() {
                 @Override
                 public InputStream getBody() throws IOException {
-                    String content = IoUtils.toString(httpInputMessage.getBody(), StandardCharsets.UTF_8);
                     try {
-                        if(CipherMode.SM4.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)){
-                            String key = null;
-                            try {
-                                key = RSAUtils.decryptHexString(requestEncryptKey, EncryptProvider.privateKeyBase64());
-                            } catch (Exception e) {
-                                key = requestEncryptKey;
+                        if(StringUtils.isNotBlank(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)){
+                            byte[] data = null;
+                            if (CipherMode.SM4.name().equals(requestEncrypt)) {
+                                data = EncodeUtils.hexDecode(IOUtils.toCharArray(httpInputMessage.getBody(), StandardCharsets.UTF_8));
+                            } else if (CipherMode.AES.name().equals(requestEncrypt)) {
+                                data = EncodeUtils.base64Decode(IOUtils.toByteArray(httpInputMessage.getBody()));
+                            } else if (CipherMode.BASE64.name().equals(requestEncrypt)) {
+                                data =  Base64.decodeBase64(IOUtils.toByteArray(httpInputMessage.getBody()));
                             }
-                            return IOUtils.toInputStream(Sm4Utils.decrypt(key, content), StandardCharsets.UTF_8);
-                        }else if(CipherMode.AES.name().equals(requestEncrypt) && StringUtils.isNotBlank(requestEncryptKey)){
-                            String key = null;
-                            try {
-                                key = RSAUtils.decryptBase64String(requestEncryptKey, EncryptProvider.privateKeyBase64());
-                            } catch (Exception e) {
-                                key = requestEncryptKey;
-                            }
-                            return IOUtils.toInputStream(Cryptos.aesECBDecryptBase64String(content,key), StandardCharsets.UTF_8);
-                        }else if(CipherMode.BASE64.name().equals(requestEncrypt)){
-                            return IOUtils.toInputStream(new String(EncodeUtils.base64Decode(content)), StandardCharsets.UTF_8);
+                            byte[] decryptData = RequestEncryptUtils.decryptDataByRequest(requestEncrypt,requestEncryptKey, data);
+                            return new ByteArrayInputStream(decryptData);
                         }
                         return httpInputMessage.getBody();
                     } catch (Exception e) {
