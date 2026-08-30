@@ -53,7 +53,7 @@ public class Oauth2Controller {
                 .findFirst()
                 .orElse(null);
 
-        if (oAuth2Client == null) {
+        if (oAuth2Client == null || !StringUtils.isEquals(clientSecret, AppConstants.getRestDefaultApiKey())) {
             return R.fail("未授权或认证未通过客户端：" + clientId);
         }
 
