@@ -1,11 +1,7 @@
-import JSEncrypt from 'jsencrypt';
-import CryptoJS from 'crypto-js';
-import { sm4 } from 'sm-crypto';
-
 /**
  * RSA 加解密工具类 (基于 JSEncrypt)
  */
-export const RSAUtils = {
+window.RSAUtils = {
     /**
      * 公钥加密 (对应后端的公钥加密/前端请求密钥加密)
      * @param {string} plainText 待加密明文
@@ -15,6 +11,7 @@ export const RSAUtils = {
     encrypt(plainText, publicKey) {
         if (!plainText || !publicKey) return plainText;
         try {
+            // 直接使用页面先引入的全局 JSEncrypt 对象
             const encryptor = new JSEncrypt();
             encryptor.setPublicKey(publicKey);
             return encryptor.encrypt(plainText);
@@ -44,33 +41,25 @@ export const RSAUtils = {
 };
 
 /**
- * 国密 SM4 加解密工具类
+ * 国密 SM4 加解密工具类 (基于全局 sm4)
  */
-export const Sm4Utils = {
+window.Sm4Utils = {
     getZeroIV() {
         return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     },
-
     encrypt(hexKey, paramStr) {
         if (!hexKey || !paramStr) return paramStr;
         try {
-            return sm4.encrypt(paramStr, hexKey, {
-                mode: 'cbc',
-                iv: this.getZeroIV()
-            });
+            return sm4.encrypt(paramStr, hexKey, { mode: 'cbc', iv: this.getZeroIV() });
         } catch (e) {
             console.error('SM4 Encryption Error:', e);
             return paramStr;
         }
     },
-
     decrypt(hexKey, text) {
         if (!hexKey || !text) return text;
         try {
-            return sm4.decrypt(text, hexKey, {
-                mode: 'cbc',
-                iv: this.getZeroIV()
-            });
+            return sm4.decrypt(text, hexKey, { mode: 'cbc', iv: this.getZeroIV() });
         } catch (e) {
             console.error('SM4 Decryption Error:', e);
             return text;
@@ -79,32 +68,25 @@ export const Sm4Utils = {
 };
 
 /**
- * AES 加解密工具类
+ * AES 加解密工具类 (基于全局 CryptoJS)
  */
-export const Cryptos = {
+window.Cryptos = {
     aesECBEncrypt(input, base64Key) {
         if (!input || !base64Key) return input;
         try {
             const key = CryptoJS.enc.Base64.parse(base64Key);
-            const encrypted = CryptoJS.AES.encrypt(input, key, {
-                mode: CryptoJS.mode.ECB,
-                padding: CryptoJS.pad.Pkcs7
-            });
+            const encrypted = CryptoJS.AES.encrypt(input, key, { mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.Pkcs7 });
             return encrypted.toString();
         } catch (e) {
             console.error('AES Encryption Error:', e);
             return input;
         }
     },
-
     aesECBDecrypt(base64Data, base64Key) {
         if (!base64Data || !base64Key) return base64Data;
         try {
             const key = CryptoJS.enc.Base64.parse(base64Key);
-            const decrypted = CryptoJS.AES.decrypt(base64Data, key, {
-                mode: CryptoJS.mode.ECB,
-                padding: CryptoJS.pad.Pkcs7
-            });
+            const decrypted = CryptoJS.AES.decrypt(base64Data, key, { mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.Pkcs7 });
             return decrypted.toString(CryptoJS.enc.Utf8);
         } catch (e) {
             console.error('AES Decryption Error:', e);
