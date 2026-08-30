@@ -108,20 +108,20 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
     private void renderJson(HttpServletRequest request, HttpServletResponse response, R<Boolean> r) {
         String requestUrl = request.getRequestURI().replace("//", "/");
         logger.warn("{} {} {}", IpUtils.getIpAddr0(request), JsonMapper.toJsonString(WebUtils.getHeaders(request)), requestUrl);
-        WebUtils.renderJson(response, r);
+//        WebUtils.renderJson(response, r);
 
         // 返回接口 数据加密
-//        String encrypt = WebUtils.getHeaderIgnoreCase(request,RPCUtils.HEADER_ENCRYPT);
-//        String encryptKey = WebUtils.getHeaderIgnoreCase(request,RPCUtils.HEADER_ENCRYPT_KEY);
-//        if(StringUtils.isNotBlank(encrypt) && StringUtils.isNotBlank(encryptKey)){
-//            try {
-//                byte[] encryptData = RPCUtils.encryptDataByRequest(encrypt,encryptKey,JsonMapper.getInstance().writeValueAsBytes(r));
-//                WebUtils.render(response, WebUtils.JSON_TYPE,encryptData);
-//            } catch (Exception e) {
-//                logger.error(e.getMessage(),e);
-//                WebUtils.renderJson(response, r);
-//            }
-//        }
+        String encrypt = WebUtils.getHeaderIgnoreCase(request,RPCUtils.HEADER_ENCRYPT);
+        String encryptKey = WebUtils.getHeaderIgnoreCase(request,RPCUtils.HEADER_ENCRYPT_KEY);
+        if(StringUtils.isNotBlank(encrypt) && StringUtils.isNotBlank(encryptKey)){
+            try {
+                byte[] encryptData = RPCUtils.encryptDataByRequest(encrypt,encryptKey,JsonMapper.getInstance().writeValueAsBytes(r));
+                WebUtils.render(response, WebUtils.JSON_TYPE,encryptData);
+            } catch (Exception e) {
+                logger.error(e.getMessage(),e);
+                WebUtils.renderJson(response, r);
+            }
+        }
     }
 
     /**
