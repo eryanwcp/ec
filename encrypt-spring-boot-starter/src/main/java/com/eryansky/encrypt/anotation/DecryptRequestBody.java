@@ -1,5 +1,8 @@
 package com.eryansky.encrypt.anotation;
 
+import com.eryansky.encrypt.advice.DecryptRequestBodyAdvice;
+import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdvice;
+
 import java.lang.annotation.*;
 
 /**
@@ -22,9 +25,12 @@ public @interface DecryptRequestBody {
      */
     boolean defaultHandle() default true;
     /**
-     * 处理策略
-     * @return
+     * 指定自定义 RequestBodyAdvice 处理策略 Class
+     * <p>
+     * 默认为 DecryptRequestBodyAdvice.class 使用全局默认加密策略。
+     *
+     * @return 实现了 RequestBodyAdvice 的 Class 类型
      */
-    String handle() default "default";
+    Class<? extends RequestBodyAdvice> handle() default DecryptRequestBodyAdvice.class;
 
 }
