@@ -1,7 +1,6 @@
 package com.eryansky.modules.sys.web.mobile;
 
 import cn.hutool.core.img.ImgUtil;
-import cn.hutool.core.map.CaseInsensitiveMap;
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
