@@ -90,7 +90,7 @@ public class Oauth2Controller {
      */
     @PostMapping("ssoToken")
     public R<Map<String, Object>> ssoToken(@RequestParam("access_token") String token,
-                                              @RequestParam(value = "user_code", required = false) String userCode) {
+                                              @RequestParam(value = "user_code") String userCode) {
         String clientId = JWTUtils.getUsername(token);
         boolean verify = JWTUtils.verify(token,clientId,AppConstants.getRestDefaultApiKey());
         if(!verify){
