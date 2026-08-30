@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012-2014 http://www.eryansky.com
+ * Copyright (c) 2012-2026 http://www.eryansky.com
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -33,7 +33,7 @@ import java.util.Map;
 
 /**
  * 外部用户传递用户单点登录 权限拦截器
- * @author wencp
+ * @author Eryan
  * @date 2026-05-25
  */
 public class SSOAuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
@@ -110,7 +110,7 @@ public class SSOAuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
             }
 
             // 4. 签发者必须是我们信任的认证中心 或自己签发
-            if (!(AppConstants.getSSOIssuer().equals(payload.get("iss")) || SpringContextHolder.getApplicationContext().getId().equals(payload.get("iss")))) {
+            if (!(AppConstants.getSSOIssuer().equals(payload.get("iss")) || StringUtils.isEquals(SpringContextHolder.getApplicationContext().getId(), (String) payload.get("iss")))) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "签发者不合法");
                 return false;
             }
