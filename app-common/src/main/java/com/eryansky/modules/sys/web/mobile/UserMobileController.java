@@ -354,14 +354,13 @@ public class UserMobileController extends SimpleController {
      */
     @PostMapping(value = {"imageUpLoad"})
     @ResponseBody
-    public Result imageUpLoad(@RequestHeader Map<String, String> headers,
-                              @RequestParam(value = "uploadFile", required = false) MultipartFile multipartFile,
+    public Result imageUpLoad(@RequestParam(value = "uploadFile", required = false) MultipartFile multipartFile,
                               @RequestParam(value = "folderCode", defaultValue = User.FOLDER_USER_PHOTO) String folderCode,
                               @RequestParam(value = "press", defaultValue = "false") Boolean press,
-                              String pressText) {
-        CaseInsensitiveMap<String,String> caseInsensitiveMap = new CaseInsensitiveMap<>(headers);
-        String requestEncrypt =  caseInsensitiveMap.get(RequestEncryptUtils.ENCRYPT);
-        String requestEncryptKey =  caseInsensitiveMap.get(RequestEncryptUtils.ENCRYPT_KEY);
+                              @RequestParam(value = "pressText", required = false) String pressText,
+                              HttpServletRequest request, HttpServletResponse response) {
+        String requestEncrypt = WebUtils.getHeaderIgnoreCase(request, RequestEncryptUtils.ENCRYPT);
+        String requestEncryptKey = WebUtils.getHeaderIgnoreCase(request, RequestEncryptUtils.ENCRYPT_KEY);
         Result result = null;
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         Exception exception = null;
