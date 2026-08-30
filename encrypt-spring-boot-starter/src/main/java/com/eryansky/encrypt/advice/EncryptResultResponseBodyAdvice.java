@@ -24,9 +24,6 @@ public class EncryptResultResponseBodyAdvice implements ResponseBodyAdvice<Resul
 
     private static final Logger log = LoggerFactory.getLogger(EncryptResultResponseBodyAdvice.class);
 
-    public static final String  ENCRYPT = "Encrypt";
-    public static final String  ENCRYPT_KEY = "Encrypt-Key";
-
     @Override  
     public boolean supports(MethodParameter returnType, Class converterType) {
         EncryptResponseBody encrypt = returnType.getMethodAnnotation(EncryptResponseBody.class);
@@ -37,8 +34,8 @@ public class EncryptResultResponseBodyAdvice implements ResponseBodyAdvice<Resul
     @Override  
     public Result beforeBodyWrite(Result body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
         HttpHeaders headers = request.getHeaders();
-        String requestEncrypt = Collections3.getFirst(headers.get(ENCRYPT));
-        String requestEncryptKey = Collections3.getFirst(headers.get(ENCRYPT_KEY));
+        String requestEncrypt = Collections3.getFirst(headers.get(RequestEncryptUtils.ENCRYPT));
+        String requestEncryptKey = Collections3.getFirst(headers.get(RequestEncryptUtils.ENCRYPT_KEY));
         if (StringUtils.isNotBlank(requestEncrypt)){
             if(body != null && body.getData() != null){
                 try {

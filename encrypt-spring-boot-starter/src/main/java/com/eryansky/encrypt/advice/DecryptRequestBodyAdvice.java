@@ -30,10 +30,6 @@ public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
 
     private static final Logger log = LoggerFactory.getLogger(DecryptRequestBodyAdvice.class);
 
-    public static final String  ENCRYPT = "Encrypt";
-    public static final String  ENCRYPT_KEY = "Encrypt-Key";
-
-
     @Override  
     public boolean supports(MethodParameter methodParameter, Type type, Class<? extends HttpMessageConverter<?>> aClass) {
         DecryptRequestBody decrypt = methodParameter.getMethodAnnotation(DecryptRequestBody.class);
@@ -48,8 +44,8 @@ public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
     @Override  
     public HttpInputMessage beforeBodyRead(HttpInputMessage httpInputMessage, MethodParameter methodParameter, Type type, Class<? extends HttpMessageConverter<?>> aClass) throws IOException {
         HttpHeaders headers = httpInputMessage.getHeaders();
-        String requestEncrypt = Collections3.getFirst(headers.get(ENCRYPT));
-        String requestEncryptKey = Collections3.getFirst(headers.get(ENCRYPT_KEY));
+        String requestEncrypt = Collections3.getFirst(headers.get(RequestEncryptUtils.ENCRYPT));
+        String requestEncryptKey = Collections3.getFirst(headers.get(RequestEncryptUtils.ENCRYPT_KEY));
         if (StringUtils.isNotBlank(requestEncrypt)){
             return new HttpInputMessage() {
                 @Override

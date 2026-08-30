@@ -28,8 +28,6 @@ public class EncryptRPCResponseBodyAdvice implements ResponseBodyAdvice<Object> 
 
     private static final Logger log = LoggerFactory.getLogger(EncryptRPCResponseBodyAdvice.class);
 
-    public static final String ENCRYPT = "Encrypt";
-    public static final String ENCRYPT_KEY = "Encrypt-Key";
     @Override
     public boolean supports(MethodParameter returnType, Class converterType) {
         EncryptResponseBody encrypt = returnType.getMethodAnnotation(EncryptResponseBody.class);
@@ -40,8 +38,8 @@ public class EncryptRPCResponseBodyAdvice implements ResponseBodyAdvice<Object> 
     @Override
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
         HttpHeaders headers = request.getHeaders();
-        String requestEncrypt = Collections3.getFirst(headers.get(ENCRYPT));
-        String requestEncryptKey = Collections3.getFirst(headers.get(ENCRYPT_KEY));
+        String requestEncrypt = Collections3.getFirst(headers.get(RequestEncryptUtils.ENCRYPT));
+        String requestEncryptKey = Collections3.getFirst(headers.get(RequestEncryptUtils.ENCRYPT_KEY));
         String requestSerializer = Collections3.getFirst(headers.get(RPCUtils.HEADER_RPC_SERIALIZER));
 
         // No encryption requested
