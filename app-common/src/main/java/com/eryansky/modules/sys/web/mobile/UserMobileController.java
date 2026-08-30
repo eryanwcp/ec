@@ -8,10 +8,8 @@ import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
 import com.eryansky.common.exception.ActionException;
 import com.eryansky.common.model.Result;
-import com.eryansky.common.orm._enum.StatusState;
 import com.eryansky.common.utils.Identities;
 import com.eryansky.common.utils.StringUtils;
-import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.encode.*;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SimpleController;
@@ -24,9 +22,9 @@ import com.eryansky.core.web.annotation.Mobile;
 import com.eryansky.core.web.upload.FileUploadUtils;
 import com.eryansky.core.web.upload.exception.FileNameLengthLimitExceededException;
 import com.eryansky.core.web.upload.exception.InvalidExtensionException;
-import com.eryansky.encrypt.advice.DecryptRequestBodyAdvice;
 import com.eryansky.encrypt.config.EncryptProvider;
 import com.eryansky.encrypt.enums.CipherMode;
+import com.eryansky.encrypt.util.RequestEncryptUtils;
 import com.eryansky.modules.disk._enum.FolderType;
 import com.eryansky.modules.disk.extend.CustomMultipartFile;
 import com.eryansky.modules.disk.mapper.File;
@@ -38,11 +36,9 @@ import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.service.UserService;
 import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.utils.AppConstants;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.fileupload.FileUploadBase;
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.Base64Utils;
@@ -54,10 +50,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -359,14 +353,13 @@ public class UserMobileController extends SimpleController {
      */
     @PostMapping(value = {"imageUpLoad"})
     @ResponseBody
-    public Result imageUpLoad(@RequestHeader Map<String, String> headers,
-                              @RequestParam(value = "uploadFile", required = false) MultipartFile multipartFile,
+    public Result imageUpLoad(@RequestParam(value = "uploadFile", required = false) MultipartFile multipartFile,
                               @RequestParam(value = "folderCode", defaultValue = User.FOLDER_USER_PHOTO) String folderCode,
                               @RequestParam(value = "press", defaultValue = "false") Boolean press,
-                              String pressText) {
-        CaseInsensitiveMap<String,String> caseInsensitiveMap = new CaseInsensitiveMap<>(headers);
-        String requestEncrypt =  caseInsensitiveMap.get(DecryptRequestBodyAdvice.ENCRYPT);
-        String requestEncryptKey =  caseInsensitiveMap.get(DecryptRequestBodyAdvice.ENCRYPT_KEY);
+                              @RequestParam(value = "pressText", required = false) String pressText,
+                              HttpServletRequest request, HttpServletResponse response) {
+        String requestEncrypt = WebUtils.getHeaderIgnoreCase(request, RequestEncryptUtils.ENCRYPT);
+        String requestEncryptKey = WebUtils.getHeaderIgnoreCase(request, RequestEncryptUtils.ENCRYPT_KEY);
         Result result = null;
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         Exception exception = null;

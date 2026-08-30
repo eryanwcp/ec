@@ -18,6 +18,9 @@ public class RequestEncryptUtils {
 
     private static final Logger log = LoggerFactory.getLogger(RequestEncryptUtils.class);
 
+    public static final String  ENCRYPT = "Encrypt";
+    public static final String  ENCRYPT_KEY = "Encrypt-Key";
+
     /**
      * 数据加密
      * @param encrypt 加密方式
