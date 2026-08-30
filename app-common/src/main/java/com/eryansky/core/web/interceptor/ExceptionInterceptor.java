@@ -40,9 +40,8 @@ public class ExceptionInterceptor implements HandlerExceptionResolver {
     private final static String MSG_DETAIL = " 详细信息:";
     @Override
     public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-        String requestUrl = request.getRequestURI();
-        requestUrl = requestUrl.replaceAll("//","/");
-
+        String requestUrl = request.getRequestURI().replace("//","/");
+        logger.error(requestUrl + "，" + ex.getMessage(), ex);
         Result result = null;
         //非Ajax请求 将跳转到500错误页面
 //        if(!WebUtils.isAjaxRequest(request)){
