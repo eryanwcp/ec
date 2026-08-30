@@ -26,7 +26,7 @@ $(function () {
     initReadDatagrid();
     initSelectUser();
 
-    if (noticeId !== "" && !objectId) {
+    if (noticeId && !objectId) {
         $.ajax({
             url: ctxAdmin + '/notice/noticeReceiveInfo/detail?noticeId='+noticeId,
             type: 'post',
