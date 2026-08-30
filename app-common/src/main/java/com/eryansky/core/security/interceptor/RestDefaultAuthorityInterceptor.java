@@ -115,58 +115,18 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
         logger.warn("{} {} {}", IpUtils.getIpAddr0(request), JsonMapper.toJsonString(WebUtils.getHeaders(request)), requestUrl);
         WebUtils.renderJson(response, r);
 
-        // 返回接口 数据解密
-//        String rpcService = request.getHeader(RPCUtils.HEADER_API_SERVICE_NAME);
-//        String methodName = request.getHeader(RPCUtils.HEADER_API_SERVICE_METHOD);
-//        String encrypt = request.getHeader(RPCUtils.HEADER_ENCRYPT);
-//        String encryptKey = request.getHeader(RPCUtils.HEADER_ENCRYPT_KEY);
-
-//        String data = JsonMapper.toJsonString(r);
-//        String encryptData = data;
-        //返回数据加密
-//        if (StringUtils.isNotBlank(encrypt)) {
-//            if (CipherMode.SM4.name().equals(encrypt) && StringUtils.isNotBlank(encryptKey)) {
-//                if (StringUtils.isNotBlank(data) && !StringUtils.equals(data, "null")) {
-//                    try {
-//                        String key = null;
-//                        try {
-//                            key = RSAUtils.decryptHexString(encryptKey, EncryptProvider.privateKeyBase64());
-//                        } catch (Exception e) {
-//                            key = encryptKey;
-//                        }
-//                        encryptData = Sm4Utils.encrypt(key, data);
-//                    } catch (Exception e) {
-//                        logger.error(e.getMessage(), e);
-//                    }
-//                }
-//            } else if (CipherMode.AES.name().equals(encrypt) && StringUtils.isNotBlank(encryptKey)) {
-//                if (StringUtils.isNotBlank(data) && !StringUtils.equals(data, "null")) {
-//                    try {
-//                        String key = null;
-//                        try {
-//                            key = RSAUtils.decryptBase64String(encryptKey, EncryptProvider.privateKeyBase64());
-//                        } catch (Exception e) {
-//                            key = encryptKey;
-//                        }
-//                        encryptData = Cryptos.aesECBEncryptBase64String(data, key);
-//                    } catch (Exception e) {
-//                        logger.error(e.getMessage(), e);
-//                    }
-//                }
-//
-//            } else if (CipherMode.BASE64.name().equals(encrypt)) {
-//                if (StringUtils.isNotBlank(data) && !StringUtils.equals(data, "null")) {
-//                    try {
-//                        encryptData = EncodeUtils.base64Encode(data.getBytes(StandardCharsets.UTF_8));
-//                    } catch (Exception e) {
-//                        logger.error(e.getMessage(), e);
-//                    }
-//                }
-//
+        // 返回接口 数据加密
+//        String encrypt = WebUtils.getHeaderIgnoreCase(request,RPCUtils.HEADER_ENCRYPT);
+//        String encryptKey = WebUtils.getHeaderIgnoreCase(request,RPCUtils.HEADER_ENCRYPT_KEY);
+//        if(StringUtils.isNotBlank(encrypt) && StringUtils.isNotBlank(encryptKey)){
+//            try {
+//                byte[] encryptData = RPCUtils.encryptDataByRequest(encrypt,encryptKey,JsonMapper.getInstance().writeValueAsBytes(r));
+//                WebUtils.render(response, WebUtils.JSON_TYPE,encryptData);
+//            } catch (Exception e) {
+//                logger.error(e.getMessage(),e);
+//                WebUtils.renderJson(response, r);
 //            }
 //        }
-
-//        WebUtils.renderJson(response, encryptData);
     }
 
     /**
@@ -224,7 +184,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                         return false;
                     }
                 } else if ("accessToken".equals(authType)) {
-                    String accessToken = WebUtils.getHeaderOrParameter(request, ACCESS_TOKEN);
+                    String accessToken = WebUtils.getHeaderIgnoreCaseOrParameter(request, ACCESS_TOKEN);
                     if (null == accessToken) {
                         notPermittedPermission(request, response, requestUrl, "未识别参数:Header['" + ACCESS_TOKEN + "']=" + apiKey);
                         return false;
