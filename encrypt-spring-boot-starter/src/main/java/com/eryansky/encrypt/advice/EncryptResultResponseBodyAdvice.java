@@ -40,7 +40,7 @@ public class EncryptResultResponseBodyAdvice implements ResponseBodyAdvice<Resul
         String requestEncrypt = Collections3.getFirst(headers.get(ENCRYPT));
         String requestEncryptKey = Collections3.getFirst(headers.get(ENCRYPT_KEY));
         if (StringUtils.isNotBlank(requestEncrypt)){
-            if(body.getData() != null){
+            if(body != null && body.getData() != null){
                 try {
                     byte[] data = JsonMapper.getInstance().writeValueAsBytes(body.getData());
                     body.setData(RequestEncryptUtils.encryptDataByRequest(requestEncrypt,requestEncryptKey,data));
@@ -49,7 +49,7 @@ public class EncryptResultResponseBodyAdvice implements ResponseBodyAdvice<Resul
                     throw new RuntimeException(e);
                 }
             }
-            if(body.getObj() != null){
+            if(body != null && body.getObj() != null){
                 try {
                     byte[] obj = JsonMapper.getInstance().writeValueAsBytes(body.getObj());
                     body.setObj(RequestEncryptUtils.encryptDataByRequest(requestEncrypt,requestEncryptKey,obj));

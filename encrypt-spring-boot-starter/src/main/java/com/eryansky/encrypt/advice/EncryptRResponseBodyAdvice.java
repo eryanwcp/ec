@@ -41,7 +41,7 @@ public class EncryptRResponseBodyAdvice implements ResponseBodyAdvice<R<Object>>
         String requestEncrypt = Collections3.getFirst(headers.get(ENCRYPT));
         String requestEncryptKey = Collections3.getFirst(headers.get(ENCRYPT_KEY));
         if (StringUtils.isNotBlank(requestEncrypt)){
-            if(body.getData() != null){
+            if(body != null && body.getData() != null){
                 try {
                     byte[] data = JsonMapper.getInstance().writeValueAsBytes(body.getData());
                     body.setData(RequestEncryptUtils.encryptDataByRequest(requestEncrypt,requestEncryptKey,data));
