@@ -172,7 +172,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                 //内置认证
                 if (RPCUtils.AUTH_TYPE.equals(authType)) {
                     if (null == apiKey) {
-                        notPermittedPermission(request, response, requestUrl, "未识别参数:Header['" + RPCUtils.HEADER_X_API_KEY + "']=" + apiKey);
+                        notPermittedPermission(request, response, requestUrl, "未识别参数:Header['" + RPCUtils.HEADER_X_API_KEY + "']");
                         return false;
                     }
                     // 密钥认证
@@ -184,7 +184,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                 } else if ("accessToken".equals(authType)) {
                     String accessToken = WebUtils.getHeaderIgnoreCaseOrParameter(request, ACCESS_TOKEN);
                     if (null == accessToken) {
-                        notPermittedPermission(request, response, requestUrl, "未识别参数:Header['" + ACCESS_TOKEN + "']=" + apiKey);
+                        notPermittedPermission(request, response, requestUrl, "未识别参数:Header['" + ACCESS_TOKEN + "']");
                         return false;
                     }
                     String clientId = JWTUtils.getUsername(accessToken);
