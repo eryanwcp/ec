@@ -207,35 +207,8 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                         return false;
                     }
                 } else {
-                    //兼容性处理 已登录用户
-                    SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
-                    if (null != sessionInfo) {
-                        if (sessionInfo.isSuperUser()) {
-                            return true;
-                        }
-                        String[] permissions = metadata.restApi.value();
-                        boolean permittedResource = false;
-                        for (String permission : permissions) {
-                            permittedResource = SecurityUtils.isPermitted(permission);
-                            if (Logical.AND.equals(metadata.restApi.logical())) {
-                                if (!permittedResource) {
-                                    notPermittedPermission(request, response, requestUrl, "禁止访问,无访问权限：" + sessionInfo.getLoginName() + " - " + permission);
-                                    return false;
-                                }
-                            } else {
-                                if (permittedResource) {
-                                    break;
-                                }
-                            }
-                        }
-                        if (!permittedResource) {
-                            notPermittedPermission(request, response, requestUrl, "禁止访问,无访问权限：" + sessionInfo.getLoginName() + " - " + permissions[0]);
-                            return false;
-                        }
-                    } else {
-                        notPermittedPermission(request, response, requestUrl, "禁止访问，未授权！");
-                        return false;
-                    }
+                    notPermittedPermission(request, response, requestUrl, "未识别参数:Header['" + RPCUtils.HEADER_AUTH_TYPE + "']");
+                    return false;
                 }
 
                 HttpSession httpSession = request.getSession();
