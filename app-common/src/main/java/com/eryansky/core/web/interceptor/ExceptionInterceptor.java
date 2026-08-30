@@ -115,8 +115,8 @@ public class ExceptionInterceptor implements HandlerExceptionResolver {
         if(WebUtils.JSON_TYPE.equals(request.getContentType()) || WebUtils.isAjaxRequest(request)){
             result.setCode(Result.ERROR_API);
             //数据加密
-            String encrypt = WebUtils.getHeaderIgnoreCase(request,EncryptResultResponseBodyAdvice.ENCRYPT);
-            String encryptKey = WebUtils.getHeaderIgnoreCase(request,EncryptResultResponseBodyAdvice.ENCRYPT_KEY);
+            String encrypt = WebUtils.getHeaderIgnoreCase(request,RequestEncryptUtils.ENCRYPT);
+            String encryptKey = WebUtils.getHeaderIgnoreCase(request,RequestEncryptUtils.ENCRYPT_KEY);
             if(StringUtils.isNotBlank(encrypt) && StringUtils.isNotBlank(encryptKey)){
                 try {
                     byte[] encryptData = RequestEncryptUtils.encryptDataByRequest(encrypt,encryptKey,JsonMapper.getInstance().writeValueAsBytes(result));

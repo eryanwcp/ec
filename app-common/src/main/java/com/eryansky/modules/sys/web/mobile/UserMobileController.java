@@ -8,10 +8,8 @@ import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
 import com.eryansky.common.exception.ActionException;
 import com.eryansky.common.model.Result;
-import com.eryansky.common.orm._enum.StatusState;
 import com.eryansky.common.utils.Identities;
 import com.eryansky.common.utils.StringUtils;
-import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.encode.*;
 import com.eryansky.common.utils.io.IoUtils;
 import com.eryansky.common.utils.mapper.JsonMapper;
@@ -25,9 +23,9 @@ import com.eryansky.core.web.annotation.Mobile;
 import com.eryansky.core.web.upload.FileUploadUtils;
 import com.eryansky.core.web.upload.exception.FileNameLengthLimitExceededException;
 import com.eryansky.core.web.upload.exception.InvalidExtensionException;
-import com.eryansky.encrypt.advice.DecryptRequestBodyAdvice;
 import com.eryansky.encrypt.config.EncryptProvider;
 import com.eryansky.encrypt.enums.CipherMode;
+import com.eryansky.encrypt.util.RequestEncryptUtils;
 import com.eryansky.modules.disk._enum.FolderType;
 import com.eryansky.modules.disk.extend.CustomMultipartFile;
 import com.eryansky.modules.disk.mapper.File;
@@ -39,14 +37,12 @@ import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.service.UserService;
 import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.utils.AppConstants;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import jakarta.annotation.Resource;
 import org.apache.commons.fileupload2.core.FileUploadSizeException;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -364,8 +360,8 @@ public class UserMobileController extends SimpleController {
                               @RequestParam(value = "press", defaultValue = "false") Boolean press,
                               String pressText) {
         CaseInsensitiveMap<String,String> caseInsensitiveMap = new CaseInsensitiveMap<>(headers);
-        String requestEncrypt =  caseInsensitiveMap.get(DecryptRequestBodyAdvice.ENCRYPT);
-        String requestEncryptKey =  caseInsensitiveMap.get(DecryptRequestBodyAdvice.ENCRYPT_KEY);
+        String requestEncrypt =  caseInsensitiveMap.get(RequestEncryptUtils.ENCRYPT);
+        String requestEncryptKey =  caseInsensitiveMap.get(RequestEncryptUtils.ENCRYPT_KEY);
         Result result = null;
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         Exception exception = null;
