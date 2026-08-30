@@ -1,18 +1,12 @@
 package com.eryansky.modules.sys.web;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTCreator;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.eryansky.common.model.R;
 import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
+import com.eryansky.core.security.jwt.JWTUtils;
 import com.eryansky.encrypt.config.EncryptProvider;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.utils.UserUtils;
@@ -73,26 +67,14 @@ public class Oauth2Controller {
         }
 
         try {
-            // 3. 构造 JWT Claims
-            long now = System.currentTimeMillis();
-            Algorithm algorithm = Algorithm.HMAC256(AppConstants.getRestDefaultApiKey());
-            long expire = DEFAULT_EXPIRE_SECONDS;
-
-            JWTCreator.Builder builder = JWT.create()
-                    .withIssuer(SpringContextHolder.getApplicationContext().getId())
-                    .withSubject(clientId)
-                    .withIssuedAt(new Date(now))
-                    .withExpiresAt(new Date(now + expire * 1000))
-                    .withClaim("client_id", clientId);
-
             // 4. 使用 HMAC256 算法签名生成 Token
-            String token = builder.sign(algorithm);
+            String token = JWTUtils.sign(clientId, AppConstants.getRestDefaultApiKey(),DEFAULT_EXPIRE_SECONDS * 1000);
 
             // 5. 返回标准 OAuth2 格式的响应 JSON
             Map<String, Object> map = new HashMap<>();
             map.put("access_token", token);
             map.put("token_type", "Bearer");
-            map.put("expires_in", expire);
+            map.put("expires_in", DEFAULT_EXPIRE_SECONDS);
 
             return R.ok(map);
 
@@ -109,21 +91,11 @@ public class Oauth2Controller {
     @PostMapping("ssoToken")
     public R<Map<String, Object>> ssoToken(@RequestParam("access_token") String token,
                                               @RequestParam(value = "user_code", required = false) String userCode) {
-        Algorithm algorithm = Algorithm.HMAC256(AppConstants.getRestDefaultApiKey());
-        DecodedJWT jwt = JWT.decode(token);
-        String clientId = jwt.getClaims().get(SUBJECT).asString();
-        try {
-            JWTVerifier verifier = JWT.require(algorithm)
-                    .withClaim(SUBJECT,clientId)
-                    .build();
-            verifier.verify(token);
-        } catch (JWTVerificationException e) {
-            if (!(e instanceof TokenExpiredException)) {
-                log.warn("Token verification failed for clientId: {}", clientId, e);
-            }
+        String clientId = JWTUtils.getUsername(token);
+        boolean verify = JWTUtils.verify(token,clientId,AppConstants.getRestDefaultApiKey());
+        if(!verify){
             return R.fail("访问凭证失效：" + token);
         }
-
 
         Map<String, Object> payload = Maps.newHashMap();
         User user = UserUtils.getUserByLoginNameOrMobile(userCode);
