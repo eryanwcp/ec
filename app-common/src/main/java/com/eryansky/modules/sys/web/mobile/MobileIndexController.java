@@ -241,6 +241,20 @@ public class MobileIndexController extends SimpleController {
     @PostMapping(value = {"deleteFile"})
     @ResponseBody
     public Result deleteFile(@RequestParam(value = "fileId") String fileId) {
+        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
+        if (sessionInfo == null) {
+            return Result.errorResult().setMsg("未授权操作");
+        }
+
+        // 获取文件信息并校验拥有者 (假设 DiskUtils 有此方法)
+        File file = DiskUtils.getFile(fileId);
+        if (file == null) {
+            return Result.errorResult().setMsg("文件不存在");
+        }
+        // 校验文件创建者是否为当前用户（如果业务允许管理员删除，需加上角色判断）
+        if (!sessionInfo.getUserId().equals(file.getUserId())) {
+            return Result.errorResult().setMsg("越权操作：无权删除该文件");
+        }
         DiskUtils.deleteFile(fileId);
         return Result.successResult();
     }
@@ -306,8 +320,7 @@ public class MobileIndexController extends SimpleController {
                 bs = EncodeUtils.base64Decode(data);
 //                bs = Base64Utils.decodeFromString(data);
             } catch (Exception e) {
-                logger.info("{},{}",sessionInfo.getLoginName(),base64Data);
-                logger.error("图片上传失败,"+e.getMessage(),e);
+                logger.error("图片上传失败, 用户:{}, 异常信息:{}", sessionInfo.getLoginName(), e.getMessage());
                 return Result.errorResult().setMsg("图片上传失败,解析异常！");
             }
             file = DiskUtils.saveSystemFile(_folderName, FolderType.NORMAL.getValue(), sessionInfo.getUserId(), new CustomMultipartFile(tempFileName,bs));
@@ -369,6 +382,7 @@ public class MobileIndexController extends SimpleController {
             String extension = FilenameUtils.getExtension(filename);
             if (StringUtils.isBlank(extension)) {
                 extension = "jpg";
+                filename = filename + "." + extension;
             }
 
             // 1. 文件解密处理
