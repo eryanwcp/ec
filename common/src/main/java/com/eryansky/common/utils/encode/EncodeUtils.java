@@ -60,6 +60,17 @@ public class EncodeUtils {
 	}
 
 	/**
+	 * Hex解码.
+	 */
+	public static byte[] hexDecode(char[] input) {
+		try {
+			return Hex.decodeHex(input);
+		} catch (DecoderException e) {
+			throw new IllegalStateException("Hex Decoder exception", e);
+		}
+	}
+
+	/**
 	 * Base64编码.
 	 */
 	public static String base64Encode(byte[] input) {

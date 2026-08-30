@@ -1,7 +1,6 @@
 package com.eryansky.modules.sys.web.mobile;
 
 import cn.hutool.core.img.ImgUtil;
-import cn.hutool.core.map.CaseInsensitiveMap;
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
@@ -9,16 +8,11 @@ import com.drew.metadata.Tag;
 import com.eryansky.common.exception.ActionException;
 import com.eryansky.common.model.Result;
 import com.eryansky.common.utils.*;
-import com.eryansky.common.utils.encode.Cryptos;
 import com.eryansky.common.utils.encode.EncodeUtils;
-import com.eryansky.common.utils.encode.RSAUtils;
-import com.eryansky.common.utils.encode.Sm4Utils;
-import com.eryansky.common.utils.io.IoUtils;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.aop.annotation.Logging;
-import com.eryansky.core.rpc.utils.RPCUtils;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
 import com.eryansky.core.security.annotation.PrepareOauth2;
@@ -29,8 +23,7 @@ import com.eryansky.core.web.upload.FileUploadUtils;
 import com.eryansky.core.web.upload.exception.FileNameLengthLimitExceededException;
 import com.eryansky.core.web.upload.exception.InvalidExtensionException;
 import com.eryansky.encrypt.advice.DecryptRequestBodyAdvice;
-import com.eryansky.encrypt.config.EncryptProvider;
-import com.eryansky.encrypt.enums.CipherMode;
+import com.eryansky.encrypt.util.RequestEncryptUtils;
 import com.eryansky.modules.disk._enum.FolderType;
 import com.eryansky.modules.disk.extend.CustomMultipartFile;
 import com.eryansky.modules.disk.mapper.File;
@@ -47,7 +40,6 @@ import jakarta.annotation.Resource;
 import org.apache.commons.fileupload2.core.FileUploadSizeException;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
@@ -58,10 +50,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Map;
 
 /**
@@ -385,7 +373,7 @@ public class MobileIndexController extends SimpleController {
             }
 
             // 1. 文件解密处理
-            byte[] data = RPCUtils.decryptDataByRequest(requestEncrypt,requestEncryptKey,multipartFile.getBytes());
+            byte[] data = RequestEncryptUtils.decryptDataByRequest(requestEncrypt,requestEncryptKey,multipartFile.getBytes());
             if (null != data) {
                 multipartFile = new CustomMultipartFile(filename, data);
             }

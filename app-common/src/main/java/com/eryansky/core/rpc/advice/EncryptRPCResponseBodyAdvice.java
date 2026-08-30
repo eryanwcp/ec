@@ -5,6 +5,7 @@ import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.core.rpc.utils.RPCUtils;
 import com.eryansky.core.rpc.utils.SerializerFactory;
 import com.eryansky.encrypt.anotation.EncryptResponseBody;
+import com.eryansky.encrypt.util.RequestEncryptUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.MethodParameter;
@@ -55,7 +56,7 @@ public class EncryptRPCResponseBodyAdvice implements ResponseBodyAdvice<Object> 
         // Process encryption according to requested mode
         byte[] out;
         try {
-            out = RPCUtils.encryptDataByRequest(requestEncrypt, requestEncryptKey, payload);
+            out = RequestEncryptUtils.encryptDataByRequest(requestEncrypt, requestEncryptKey, payload);
         } catch (Exception e) {
             log.error("Failed to process encryption for mode {}", requestEncrypt, e);
             throw new RuntimeException(e);

@@ -15,6 +15,7 @@ import com.eryansky.core.rpc.utils.RPCUtils;
 import com.eryansky.core.security.annotation.RequiresUser;
 import com.eryansky.core.security.annotation.RestApi;
 import com.eryansky.core.security.jwt.JWTUtils;
+import com.eryansky.encrypt.util.RequestEncryptUtils;
 import com.eryansky.modules.sys.vo.OAuth2Client;
 import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.AppUtils;
@@ -115,7 +116,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
         String encryptKey = WebUtils.getHeaderIgnoreCase(request,RPCUtils.HEADER_ENCRYPT_KEY);
         if(StringUtils.isNotBlank(encrypt) && StringUtils.isNotBlank(encryptKey)){
             try {
-                byte[] encryptData = RPCUtils.encryptDataByRequest(encrypt,encryptKey,JsonMapper.getInstance().writeValueAsBytes(r));
+                byte[] encryptData = RequestEncryptUtils.encryptDataByRequest(encrypt,encryptKey,JsonMapper.getInstance().writeValueAsBytes(r));
                 WebUtils.render(response, WebUtils.JSON_TYPE,encryptData);
             } catch (Exception e) {
                 logger.error(e.getMessage(),e);
