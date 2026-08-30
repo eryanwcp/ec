@@ -26,9 +26,9 @@ public class EncryptResultResponseBodyAdvice implements ResponseBodyAdvice<Resul
 
     @Override  
     public boolean supports(MethodParameter returnType, Class converterType) {
-        EncryptResponseBody encrypt = returnType.getMethodAnnotation(EncryptResponseBody.class);
+        EncryptResponseBody annotation = returnType.getMethodAnnotation(EncryptResponseBody.class);
         //如果带有注解且标记为验签，则进行验签操作
-        return null != encrypt && Boolean.parseBoolean(encrypt.enable()) && encrypt.handle().getName().equals(this.getClass().getName());
+        return null != annotation && Boolean.parseBoolean(annotation.enable()) && annotation.handle().equals(this.getClass());
     }  
 
     @Override  
