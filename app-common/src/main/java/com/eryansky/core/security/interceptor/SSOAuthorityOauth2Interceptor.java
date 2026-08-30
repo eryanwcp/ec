@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012-2014 http://www.eryansky.com
+ * Copyright (c) 2012-2026 http://www.eryansky.com
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -33,7 +33,7 @@ import java.util.Map;
 
 /**
  * 外部用户传递用户单点登录 权限拦截器
- * @author wencp
+ * @author Eryan
  * @date 2026-05-25
  */
 public class SSOAuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
