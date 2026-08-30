@@ -6,6 +6,8 @@ import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
+import com.eryansky.core.security.annotation.PrepareOauth2;
+import com.eryansky.core.security.annotation.RequiresUser;
 import com.eryansky.core.security.jwt.JWTUtils;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.utils.UserUtils;
@@ -21,6 +23,8 @@ import java.util.*;
 /**
  * 系统内置 OAuth2 认证 Controller
  */
+@RequiresUser(required = false)
+@PrepareOauth2(enable = false)
 @RestController
 @RequestMapping("${adminPath}/sys/oauth")
 public class Oauth2Controller {
