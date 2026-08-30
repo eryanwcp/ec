@@ -291,33 +291,33 @@
 
         App.fixIframeCotent();
 
-        $.ajax({
-          url: ctxAdmin + '/sys/encrypt/initKey',
-          type: 'get',
-          dataType: "json",
-          cache:false,
-          beforeSend: function (jqXHR, settings) {
-          },
-          success: function (data) {
-            console.log(data);
-            const encryptKey = RSAUtils.encrypt(requestEncryptAesKey,publicKey)
-            const encryptRequestData = Cryptos.aesECBEncrypt(JSON.stringify(data["data"]),requestEncryptAesKey);
-            $.ajax({
-              url: ctxAdmin + '/sys/encrypt/data',
-              type: 'post',
-              dataType: "json",
-              contentType: "application/json",
-              headers: {'Encrypt':requestEncrypt,'Encrypt-Key':encryptKey},
-              data: encryptRequestData,
-              beforeSend: function (jqXHR, settings) {
-              },
-              success: function (data) {
-                console.log(data);
-                console.log(Cryptos.aesECBDecrypt(data['data'],requestEncryptAesKey));
-              }
-            });
-          }
-        });
+        // $.ajax({
+        //   url: ctxAdmin + '/sys/encrypt/initKey',
+        //   type: 'get',
+        //   dataType: "json",
+        //   cache:false,
+        //   beforeSend: function (jqXHR, settings) {
+        //   },
+        //   success: function (data) {
+        //     console.log(data);
+        //     const encryptKey = RSAUtils.encrypt(requestEncryptAesKey,publicKey)
+        //     const encryptRequestData = Cryptos.aesECBEncrypt(JSON.stringify(data["data"]),requestEncryptAesKey);
+        //     $.ajax({
+        //       url: ctxAdmin + '/sys/encrypt/data',
+        //       type: 'post',
+        //       dataType: "json",
+        //       contentType: "application/json",
+        //       headers: {'Encrypt':requestEncrypt,'Encrypt-Key':encryptKey},
+        //       data: encryptRequestData,
+        //       beforeSend: function (jqXHR, settings) {
+        //       },
+        //       success: function (data) {
+        //         console.log(data);
+        //         console.log(Cryptos.aesECBDecrypt(data['data'],requestEncryptAesKey));
+        //       }
+        //     });
+        //   }
+        // });
 
 
         initMenu();
