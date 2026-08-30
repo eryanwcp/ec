@@ -8,21 +8,23 @@ package com.eryansky.core.security.interceptor;
 import com.eryansky.common.model.R;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
-import com.eryansky.common.utils.encode.Cryptos;
-import com.eryansky.common.utils.encode.EncodeUtils;
-import com.eryansky.common.utils.encode.RSAUtils;
-import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.rpc.utils.RPCUtils;
+import com.eryansky.core.security.SecurityUtils;
+import com.eryansky.core.security.SessionInfo;
+import com.eryansky.core.security._enum.Logical;
 import com.eryansky.core.security.annotation.RequiresUser;
 import com.eryansky.core.security.annotation.RestApi;
+import com.eryansky.core.security.jwt.JWTUtils;
+import com.eryansky.modules.sys.vo.OAuth2Client;
 import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.AppUtils;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -30,8 +32,8 @@ import org.springframework.web.servlet.ModelAndView;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -39,6 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Rest权限拦截器（注解缓存优化版）
+ *
  * @author Eryan
  * @date 2020-09-09
  */
@@ -49,7 +52,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
     public static final String SESSION_KEY_REST_AUTHORITY = "REST_AUTHORITY";
     public static final String SESSION_TAG_NAME = "loginUser";
     public static final String SYSTEM_PREFIX_NAME = "内部系统";
-
+    public static final String ACCESS_TOKEN = "access_token";
     /**
      * Rest 权限注解解析结果缓存，避免重复反射
      */
@@ -85,7 +88,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
 
         boolean restEnable = AppConstants.getIsSystemRestEnable();
         if (!restEnable) {
-            R<Boolean> result = R.fail(false,"系统维护中，请稍后再试！");
+            R<Boolean> result = R.fail(false, "系统维护中，请稍后再试！");
             renderJson(request, response, result);
             return false;
         }
@@ -102,6 +105,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
 
     /**
      * 根据客户端请求返回（是否加密）
+     *
      * @param request
      * @param response
      * @param r
@@ -167,6 +171,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
 
     /**
      * 注解处理（带缓存机制）
+     *
      * @param request
      * @param response
      * @param handler
@@ -193,9 +198,9 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                     return true;
                 }
 
-                // IP访问限制
+                // IP访问限制 全局
                 String ip = IpUtils.getIpAddr0(request);
-                if (checkIpLimit(ip)) {
+                if (checkGobalIpLimit(ip)) {
                     notPermittedPermission(request, response, requestUrl, "REST禁止访问：" + ip);
                     return false;
                 }
@@ -205,16 +210,74 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                 String encrypt = request.getHeader(RPCUtils.HEADER_ENCRYPT);
                 String apiKey = request.getHeader(RPCUtils.HEADER_X_API_KEY);
                 String applicationId = request.getHeader(RPCUtils.HEADER_APPLICATION_ID);
-                if (null == apiKey) {
-                    notPermittedPermission(request, response, requestUrl, "未识别参数:Header['X-API-Key']=" + apiKey);
-                    return false;
-                }
 
-                // 密钥认证
-                String DEFAULT_API_KEY = AppConstants.getRestDefaultApiKey();
-                if (!DEFAULT_API_KEY.equals(apiKey)) {
-                    notPermittedPermission(request, response, requestUrl, "未授权访问:Header['X-API-Key']=" + apiKey);
-                    return false;
+                //内置认证
+                if (RPCUtils.AUTH_TYPE.equals(authType)) {
+                    if (null == apiKey) {
+                        notPermittedPermission(request, response, requestUrl, "未识别参数:Header['" + RPCUtils.HEADER_X_API_KEY + "']=" + apiKey);
+                        return false;
+                    }
+                    // 密钥认证
+                    String DEFAULT_API_KEY = AppConstants.getRestDefaultApiKey();
+                    if (!DEFAULT_API_KEY.equals(apiKey)) {
+                        notPermittedPermission(request, response, requestUrl, "未授权访问:Header['" + RPCUtils.HEADER_X_API_KEY + "']=" + apiKey);
+                        return false;
+                    }
+                } else if ("accessToken".equals(authType)) {
+                    String accessToken = WebUtils.getHeaderOrParameter(request, ACCESS_TOKEN);
+                    if (null == accessToken) {
+                        notPermittedPermission(request, response, requestUrl, "未识别参数:Header['" + ACCESS_TOKEN + "']=" + apiKey);
+                        return false;
+                    }
+                    String clientId = JWTUtils.getUsername(accessToken);
+                    applicationId = clientId;
+                    List<OAuth2Client> oauth2Clients = AppConstants.getOauth2ClientList();
+                    OAuth2Client oAuth2Client = oauth2Clients.stream().filter(v -> StringUtils.isEquals(v.getClientId(), clientId)).findFirst().orElse(null);
+                    if (oAuth2Client == null) {
+                        notPermittedPermission(request, response, requestUrl, "未授权应用：" + clientId);
+                        return false;
+                    }
+                    //应用IP校验
+                    if (checkClientIpLimit(ip, oAuth2Client.getClientIps())) {
+                        notPermittedPermission(request, response, requestUrl, "REST禁止访问：" + clientId + "," + ip);
+                        return false;
+                    }
+                    boolean verify = JWTUtils.verify(accessToken, clientId, oAuth2Client.getClientSecret());
+
+                    if (!verify) {
+                        notPermittedPermission(request, response, requestUrl, "未授权应用：AccessToken无效" + clientId);
+                        return false;
+                    }
+                } else {
+                    //兼容性处理 已登录用户
+                    SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
+                    if (null != sessionInfo) {
+                        if (sessionInfo.isSuperUser()) {
+                            return true;
+                        }
+                        String[] permissions = metadata.restApi.value();
+                        boolean permittedResource = false;
+                        for (String permission : permissions) {
+                            permittedResource = SecurityUtils.isPermitted(permission);
+                            if (Logical.AND.equals(metadata.restApi.logical())) {
+                                if (!permittedResource) {
+                                    notPermittedPermission(request, response, requestUrl, "禁止访问,无访问权限：" + sessionInfo.getLoginName() + " - " + permission);
+                                    return false;
+                                }
+                            } else {
+                                if (permittedResource) {
+                                    break;
+                                }
+                            }
+                        }
+                        if (!permittedResource) {
+                            notPermittedPermission(request, response, requestUrl, "禁止访问,无访问权限：" + sessionInfo.getLoginName() + " - " + permissions[0]);
+                            return false;
+                        }
+                    } else {
+                        notPermittedPermission(request, response, requestUrl, "禁止访问，未授权！");
+                        return false;
+                    }
                 }
 
                 HttpSession httpSession = request.getSession();
@@ -252,7 +315,13 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
         return new RestAnnotationMetadata(restApi, restApiRequired, requiresUserSkip);
     }
 
-    private boolean checkIpLimit(String ip) {
+    /**
+     * 全局白名单
+     *
+     * @param ip
+     * @return
+     */
+    private boolean checkGobalIpLimit(String ip) {
         // IP访问限制
         boolean isRestLimitEnable = AppConstants.getIsSystemRestLimitEnable();
         boolean isLimit = false;
@@ -270,7 +339,26 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
     }
 
     /**
+     * 客户端应用白名单
+     *
+     * @param ip
+     * @param configWhiteList
+     * @return
+     */
+    private boolean checkClientIpLimit(String ip, List<String> configWhiteList) {
+        if (!CollectionUtils.isEmpty(configWhiteList)) {
+            boolean isAllowedIp = configWhiteList.stream()
+                    .anyMatch(v -> "*".equals(v) || com.eryansky.j2cache.util.IpUtils.checkIPMatching(v, ip));
+            if (!isAllowedIp) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * 未授权权限
+     *
      * @param request
      * @param response
      * @param requestUrl
