@@ -111,7 +111,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
      * @param r
      */
     private void renderJson(HttpServletRequest request, HttpServletResponse response, R<Boolean> r) {
-        String requestUrl = request.getRequestURI().replaceAll("//", "/");
+        String requestUrl = request.getRequestURI().replace("//", "/");
         logger.warn("{} {} {}", IpUtils.getIpAddr0(request), JsonMapper.toJsonString(WebUtils.getHeaders(request)), requestUrl);
         WebUtils.renderJson(response, r);
 
