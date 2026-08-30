@@ -383,7 +383,16 @@ public class SystemMonitorController extends SimpleController {
         File rootFile = new File(_logPath);
         File file = rootFile;
         if (StringUtils.isNotBlank(fileName)) {
-            file = new File(rootFile.getParentFile(), fileName);
+            file = new File(rootFile.getParentFile(), FileUtils.getFileName(fileName));
+            try {
+                if (!file.getCanonicalPath().startsWith(rootFile.getParentFile().getCanonicalPath())) {
+                    logger.warn("危险路径穿越尝试：IP={} Path={}", IpUtils.getIpAddr0(request), file.getAbsolutePath());
+                    throw new SystemException("危险注入！");
+                }
+            } catch (IOException e) {
+                logger.error("检验路径安全时发生异常", e);
+                throw new SystemException("非法路径拦截！");
+            }
         }
         if (WebUtils.isAjaxRequest(request)) {
             try {
