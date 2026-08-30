@@ -63,6 +63,15 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "${adminPath}/sys/systemMonitor")
 public class SystemMonitorController extends SimpleController {
 
+    /**
+     * 系统日志在线查看读取的分页大小行数
+     */
+    private static final int LOG_PAGE_SIZE_DEFAULT = 5000;
+    /**
+     * 系统日志在线查看单次最大允许读取的行数
+     */
+    private static final int LOG_PAGE_SIZE_LIMIT = 200 * LOG_PAGE_SIZE_DEFAULT;
+
     @Resource(name = "defaultAsyncExecutor")
     private Executor asyncExecutor;
 
@@ -364,9 +373,11 @@ public class SystemMonitorController extends SimpleController {
                       @RequestParam(name = "showTotal", defaultValue = "false") boolean showTotal,
                       @RequestParam(name = "fileName", required = false) String fileName,
                       HttpServletRequest request, HttpServletResponse response, Model uiModel) {
-        Page<String> page = new Page<>(request, response, 5000);
+        Page<String> page = new Page<>(request, response, LOG_PAGE_SIZE_DEFAULT);
         if (showTotal) {
-            page.setPageSize(Page.PAGESIZE_ALL);
+            page.setPageSize(LOG_PAGE_SIZE_LIMIT);
+        } else if (page.getPageSize() > LOG_PAGE_SIZE_LIMIT) {
+            page.setPageSize(LOG_PAGE_SIZE_LIMIT);
         }
         String _logPath = AppConstants.getLogPath(findLogFilePath());//读取配置文件配置的路径
         File rootFile = new File(_logPath);
