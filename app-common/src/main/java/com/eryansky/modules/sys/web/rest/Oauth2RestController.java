@@ -1,4 +1,4 @@
-package com.eryansky.modules.sys.web;
+package com.eryansky.modules.sys.web.rest;
 
 import com.eryansky.common.model.R;
 import com.eryansky.common.spring.SpringContextHolder;
@@ -6,8 +6,8 @@ import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
-import com.eryansky.core.security.annotation.PrepareOauth2;
 import com.eryansky.core.security.annotation.RequiresUser;
+import com.eryansky.core.security.annotation.RestApi;
 import com.eryansky.core.security.jwt.JWTUtils;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.utils.UserUtils;
@@ -24,12 +24,12 @@ import java.util.*;
  * 系统内置 OAuth2 认证 Controller
  */
 @RequiresUser(required = false)
-@PrepareOauth2(enable = false)
+@RestApi()
 @RestController
-@RequestMapping("${adminPath}/sys/oauth")
-public class Oauth2Controller {
+@RequestMapping("/rest/oauth")
+public class Oauth2RestController {
 
-    private static final Logger log = LoggerFactory.getLogger(Oauth2Controller.class);
+    private static final Logger log = LoggerFactory.getLogger(Oauth2RestController.class);
 
     /** 默认 Access Token 有效期 (单位：秒) */
     private static final long DEFAULT_EXPIRE_SECONDS = 7200L;
