@@ -110,7 +110,7 @@ public class SSOAuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
             }
 
             // 4. 签发者必须是我们信任的认证中心 或自己签发
-            if (!(AppConstants.getSSOIssuer().equals(payload.get("iss")) || SpringContextHolder.getApplicationContext().getId().equals(payload.get("iss")))) {
+            if (!(AppConstants.getSSOIssuer().equals(payload.get("iss")) || StringUtils.isEquals(SpringContextHolder.getApplicationContext().getId(), (String) payload.get("iss")))) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "签发者不合法");
                 return false;
             }
