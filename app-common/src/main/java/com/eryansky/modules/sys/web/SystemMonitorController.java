@@ -402,11 +402,11 @@ public class SystemMonitorController extends SimpleController {
                     line = XsslHttpServletRequestWrapper.replaceXSS(line);
                     if (pretty) {
                         //先转义
-                        line = line.replaceAll("&", "&amp;")
-                                .replaceAll("<", "&lt;")
-                                .replaceAll(">", "&gt;")
-                                .replaceAll("\"", "&quot;")
-                                .replaceAll("\t", "&nbsp;");
+                        line = line.replace("&", "&amp;")
+                                .replace("<", "&lt;")
+                                .replace(">", "&gt;")
+                                .replace("\"", "&quot;")
+                                .replace("\t", "&nbsp;");
 
                         //处理等级
                         line = line.replace("] DEBUG", "] <span style='color: blue;'>DEBUG</span>")
