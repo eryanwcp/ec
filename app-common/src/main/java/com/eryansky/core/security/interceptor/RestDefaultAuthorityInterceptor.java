@@ -161,10 +161,10 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                 }
 
                 // 请求密钥
-                String authType = request.getHeader(RPCUtils.HEADER_AUTH_TYPE);
-                String encrypt = request.getHeader(RPCUtils.HEADER_ENCRYPT);
-                String apiKey = request.getHeader(RPCUtils.HEADER_X_API_KEY);
-                String applicationId = request.getHeader(RPCUtils.HEADER_APPLICATION_ID);
+                String authType = WebUtils.getHeaderIgnoreCase(request,RPCUtils.HEADER_AUTH_TYPE);
+                String encrypt = WebUtils.getHeaderIgnoreCase(request,RPCUtils.HEADER_ENCRYPT);
+                String apiKey = WebUtils.getHeaderIgnoreCase(request,RPCUtils.HEADER_X_API_KEY);
+                String applicationId = WebUtils.getHeaderIgnoreCase(request,RPCUtils.HEADER_APPLICATION_ID);
 
                 //内置认证
                 if (RPCUtils.AUTH_TYPE.equals(authType)) {
