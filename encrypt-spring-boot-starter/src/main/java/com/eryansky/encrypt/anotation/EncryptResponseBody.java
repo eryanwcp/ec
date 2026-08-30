@@ -1,6 +1,7 @@
 package com.eryansky.encrypt.anotation;
 
 import com.eryansky.encrypt.advice.EncryptResultResponseBodyAdvice;
+import com.eryansky.encrypt.advice.EncryptRResponseBodyAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import java.lang.annotation.*;
@@ -21,6 +22,9 @@ public @interface EncryptResponseBody {
     String enable() default "true";
     /**
      * 指定自定义 ResponseBodyAdvice 处理策略 Class
+     * 注：需要注入spring
+     * @see EncryptResultResponseBodyAdvice
+     * @see EncryptRResponseBodyAdvice
      * <p>
      * 默认为 EncryptResultResponseBodyAdvice.class 使用全局默认加密策略。
      *

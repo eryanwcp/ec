@@ -26,6 +26,8 @@ public @interface DecryptRequestBody {
     boolean defaultHandle() default true;
     /**
      * 指定自定义 RequestBodyAdvice 处理策略 Class
+     * 注：需要注入spring
+     * @see DecryptRequestBodyAdvice
      * <p>
      * 默认为 DecryptRequestBodyAdvice.class 使用全局默认加密策略。
      *
