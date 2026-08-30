@@ -7,7 +7,6 @@ import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.core.security.jwt.JWTUtils;
-import com.eryansky.encrypt.config.EncryptProvider;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.modules.sys.vo.OAuth2Client;
@@ -32,7 +31,6 @@ public class Oauth2Controller {
     private static final long DEFAULT_EXPIRE_SECONDS = 7200L;
     /** 默认 单点登录Token 有效期 (单位：秒) */
     private static final long DEFAULT_EXPIRE_SSO_SECONDS = 600L;
-    public static final String SUBJECT = "username";
     /**
      * Access Token 认证授权
      */
@@ -113,7 +111,12 @@ public class Oauth2Controller {
 
         String encryptSsoToken = null;
         try {
-            encryptSsoToken = Sm4Utils.encrypt(EncryptProvider.aesKey(), ssoToken);
+            List<OAuth2Client> oAuth2Clients = AppConstants.getOauth2ClientList();
+            OAuth2Client oAuth2Client = oAuth2Clients.stream().filter(v -> v.getClientId().equals(clientId)).findFirst().orElse(null);
+            if(oAuth2Client == null || StringUtils.isBlank(oAuth2Client.getClientSecret())){
+                return R.fail("未配置授权终端："+clientId);
+            }
+            encryptSsoToken = Sm4Utils.encrypt(oAuth2Client.getClientSecret(), ssoToken);
         } catch (Exception e) {
             log.error(e.getMessage(),e);
             return R.fail("服务期内部异常！");
