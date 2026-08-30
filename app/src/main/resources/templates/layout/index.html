@@ -245,7 +245,9 @@
     <script src="../plugins/ie9/respond.min.js" th:src="@{/static/js/adminlte/plugins/ie9/respond.min.js}"></script>
     <![endif]-->
     <script th:src="@{/static/js/jsencrypt/jsencrypt.min.js}"></script>
-    <script th:src="@{/static/js/encrypt/HoneyBadgerEncrypt.js}"></script>
+    <script th:src="@{/static/js/jsencrypt/crypto-js.min.js}"></script>
+    <script th:src="@{/static/js/jsencrypt/sm4.js}"></script>
+    <script th:src="@{/static/js/jsencrypt/encrypt.js}"></script>
     <script type="text/javascript" th:inline="javascript">
       /*<![CDATA[*/
       /**
@@ -289,35 +291,33 @@
 
         App.fixIframeCotent();
 
-        // $.ajax({
-        //   url: ctxAdmin + '/sys/encrypt/initKey',
-        //   type: 'get',
-        //   dataType: "json",
-        //   cache:false,
-        //   beforeSend: function (jqXHR, settings) {
-        //   },
-        //   success: function (data) {
-        //     console.log(data);
-        //     var encrypt = new JSEncrypt(); //创建加密实例
-        //     encrypt.setPublicKey(publicKey);
-        //     var encryptKey = encrypt.encrypt(requestEncryptAesKey);
-        //     //TODO AES加密
-        //     var encryptRequestData = "";
-        //     $.ajax({
-        //       url: ctxAdmin + '/sys/encrypt/data',
-        //       type: 'post',
-        //       dataType: "json",
-        //       contentType: "application/json",
-        //       headers: {'Encrypt':requestEncrypt,'Encrypt-Key':encryptKey},
-        //       data: encryptRequestData,
-        //       beforeSend: function (jqXHR, settings) {
-        //       },
-        //       success: function (data) {
-        //         console.log(data);
-        //       }
-        //     });
-        //   }
-        // });
+        $.ajax({
+          url: ctxAdmin + '/sys/encrypt/initKey',
+          type: 'get',
+          dataType: "json",
+          cache:false,
+          beforeSend: function (jqXHR, settings) {
+          },
+          success: function (data) {
+            console.log(data);
+            var encryptKey = RSAUtils.encrypt(requestEncryptAesKey,publicKey)
+            var encryptRequestData = Cryptos.aesECBEncrypt(data["data"],requestEncryptAesKey);
+            $.ajax({
+              url: ctxAdmin + '/sys/encrypt/data',
+              type: 'post',
+              dataType: "json",
+              contentType: "application/json",
+              headers: {'Encrypt':requestEncrypt,'Encrypt-Key':encryptKey},
+              data: encryptRequestData,
+              beforeSend: function (jqXHR, settings) {
+              },
+              success: function (data) {
+                console.log(data);
+                console.log(Cryptos.aesECBDecrypt(data['data'],requestEncryptAesKey));
+              }
+            });
+          }
+        });
 
 
         initMenu();
