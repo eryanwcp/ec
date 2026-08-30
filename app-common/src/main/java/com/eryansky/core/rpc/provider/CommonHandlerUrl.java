@@ -40,7 +40,7 @@ public class CommonHandlerUrl {
     }
 
     @RestApi
-    @EncryptResponseBody(defaultHandle = false,handle = EncryptRPCResponseBodyAdvice.HANDLE)
+    @EncryptResponseBody(handle = EncryptRPCResponseBodyAdvice.class)
     @ResponseBody
     /**
      *  拦截自定义请求的url，可以做成统一的处理器

@@ -30,12 +30,11 @@ public class EncryptRPCResponseBodyAdvice implements ResponseBodyAdvice<Object> 
 
     public static final String ENCRYPT = "Encrypt";
     public static final String ENCRYPT_KEY = "Encrypt-Key";
-    public static final String HANDLE = "RPC";
     @Override
     public boolean supports(MethodParameter returnType, Class converterType) {
         EncryptResponseBody encrypt = returnType.getMethodAnnotation(EncryptResponseBody.class);
         //如果带有注解且标记为验签，则进行验签操作
-        return null != encrypt && !encrypt.defaultHandle() && HANDLE.equals(encrypt.handle());
+        return null != encrypt && Boolean.parseBoolean(encrypt.enable());
     }
 
     @Override

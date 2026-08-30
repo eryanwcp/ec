@@ -23,10 +23,10 @@ import com.eryansky.modules.sys.service.SystemService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.*;
@@ -63,7 +63,7 @@ public class CommonController extends SimpleController {
 
     @Logging(value = "'RPC服务'+#requestData.get(\"serviceName\").asText()+'.'+#requestData.get(\"serviceMethod\").asText()",logType = LogType.access,requestHeaders = true)
     @DecryptRequestBody()
-    @EncryptResponseBody(defaultHandle = false,handle = EncryptRPCResponseBodyAdvice.HANDLE)
+    @EncryptResponseBody(handle = EncryptRPCResponseBodyAdvice.class)
     @ResponseBody
     @PostMapping(value = {"service"})
     public R service(HttpServletRequest request, HttpServletResponse response, @RequestBody JsonNode requestData) {

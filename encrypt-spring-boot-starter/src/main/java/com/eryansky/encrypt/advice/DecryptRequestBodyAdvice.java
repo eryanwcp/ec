@@ -37,7 +37,7 @@ public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
     @Override  
     public boolean supports(MethodParameter methodParameter, Type type, Class<? extends HttpMessageConverter<?>> aClass) {
         DecryptRequestBody decrypt = methodParameter.getMethodAnnotation(DecryptRequestBody.class);
-        return null != decrypt && decrypt.defaultHandle();
+        return null != decrypt && Boolean.parseBoolean(decrypt.enable());
     }
 
     @Override  

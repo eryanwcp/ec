@@ -32,8 +32,8 @@ public class EncryptRResponseBodyAdvice implements ResponseBodyAdvice<R<Object>>
     public boolean supports(MethodParameter returnType, Class converterType) {
         EncryptResponseBody encrypt = returnType.getMethodAnnotation(EncryptResponseBody.class);
         //如果带有注解且标记为验签，则进行验签操作
-        return (null != encrypt && encrypt.defaultHandle());
-    }  
+        return (null != encrypt && Boolean.parseBoolean(encrypt.enable()));
+    }
 
     @Override
     public R<Object> beforeBodyWrite(R<Object> body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
