@@ -38,7 +38,7 @@ public class Oauth2RestController {
     /**
      * Access Token 认证授权
      */
-    @PostMapping("token")
+    @PostMapping("accessToken")
     public R<Map<String, Object>> accessToken(@RequestParam("client_id") String clientId,
                                               @RequestParam("client_secret") String clientSecret) {
         // 1. 手动校验 Client 合法性

@@ -7,6 +7,7 @@ import com.eryansky.core.rpc.utils.RPCUtils;
 import com.eryansky.core.rpc.utils.SerializerFactory;
 import com.eryansky.core.security.annotation.RestApi;
 import com.eryansky.encrypt.anotation.EncryptResponseBody;
+import com.eryansky.encrypt.util.RequestEncryptUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StreamUtils;
@@ -58,7 +59,7 @@ public class CommonHandlerUrl {
         byte[] data = StreamUtils.copyToByteArray(request.getInputStream());
         
         if (StringUtils.isNotBlank(encrypt)) {
-            data = RPCUtils.decryptDataByRequest(encrypt, encryptKey, data);
+            data = RequestEncryptUtils.decryptDataByRequest(encrypt, encryptKey, data);
         }
 
         Object[] params = (Object[]) SerializerFactory.getSerializer(serializer).deserialize(data);
