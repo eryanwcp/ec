@@ -16,6 +16,7 @@ import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.utils.io.IoUtils;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
+import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.rpc.utils.RPCUtils;
 import com.eryansky.core.security.SecurityUtils;
@@ -361,16 +362,15 @@ public class MobileIndexController extends SimpleController {
     @Logging(value = "图片上传", logType = LogType.operate)
     @PostMapping(value = {"imageUpLoad","iu"})
     @ResponseBody
-    public Result imageUpLoad(@RequestHeader Map<String, String> headers,
-                              @RequestParam(value = "uploadFile", required = false) MultipartFile multipartFile,
+    public Result imageUpLoad(@RequestParam(value = "uploadFile", required = false) MultipartFile multipartFile,
                               @RequestParam(value = "folderCode", defaultValue = "IMAGE") String folderCode,
                               @RequestParam(value = "longitude", required = false) Double longitude,
                               @RequestParam(value = "latitude", required = false) Double latitude,
                               @RequestParam(value = "press", defaultValue = "true") Boolean press,
-                              String pressText) {
-        CaseInsensitiveMap<String, String> caseInsensitiveMap = new CaseInsensitiveMap<>(headers);
-        String requestEncrypt = caseInsensitiveMap.get(DecryptRequestBodyAdvice.ENCRYPT);
-        String requestEncryptKey = caseInsensitiveMap.get(DecryptRequestBodyAdvice.ENCRYPT_KEY);
+                              @RequestParam(value = "pressText", required = false) String pressText,
+                              HttpServletRequest request, HttpServletResponse response) {
+        String requestEncrypt = WebUtils.getHeaderIgnoreCase(request, DecryptRequestBodyAdvice.ENCRYPT);
+        String requestEncryptKey = WebUtils.getHeaderIgnoreCase(request, DecryptRequestBodyAdvice.ENCRYPT_KEY);
         Result result = null;
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         Exception exception = null;
