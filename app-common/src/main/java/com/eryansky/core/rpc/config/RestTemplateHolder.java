@@ -1,9 +1,8 @@
 package com.eryansky.core.rpc.config;
 
-import org.springframework.web.client.RestTemplate;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import org.springframework.web.client.RestTemplate;
 
 public class RestTemplateHolder {
 
