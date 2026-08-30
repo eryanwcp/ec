@@ -114,9 +114,8 @@ public class ExceptionInterceptor implements HandlerExceptionResolver {
 //        return  new ModelAndView("error-business", model);
 
         //异步方式返回异常信息
-        if(StringUtils.startsWith(requestUrl, request.getContextPath() + "/rest") || WebUtils.isAjaxRequest(request)){
+        if(WebUtils.JSON_TYPE.equals(request.getContentType()) || WebUtils.isAjaxRequest(request)){
             result.setCode(Result.ERROR_API);
-
             //数据加密
             String encrypt = WebUtils.getHeaderIgnoreCase(request,EncryptResultResponseBodyAdvice.ENCRYPT);
             String encryptKey = WebUtils.getHeaderIgnoreCase(request,EncryptResultResponseBodyAdvice.ENCRYPT_KEY);
@@ -132,7 +131,6 @@ public class ExceptionInterceptor implements HandlerExceptionResolver {
                 WebUtils.renderJson(response, result);
             }
         }
-//        WebUtils.renderText(response, result);
 
         ModelAndView modelAndView = new ModelAndView();
         Map<String, Object> maps = Maps.newHashMap();
