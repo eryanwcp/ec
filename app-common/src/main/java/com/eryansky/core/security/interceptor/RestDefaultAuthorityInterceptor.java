@@ -12,9 +12,6 @@ import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.rpc.utils.RPCUtils;
-import com.eryansky.core.security.SecurityUtils;
-import com.eryansky.core.security.SessionInfo;
-import com.eryansky.core.security._enum.Logical;
 import com.eryansky.core.security.annotation.RequiresUser;
 import com.eryansky.core.security.annotation.RestApi;
 import com.eryansky.core.security.jwt.JWTUtils;
@@ -172,7 +169,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                 //内置认证
                 if (RPCUtils.AUTH_TYPE.equals(authType)) {
                     if (null == apiKey) {
-                        notPermittedPermission(request, response, requestUrl, "未识别参数:Header['" + RPCUtils.HEADER_X_API_KEY + "']=" + apiKey);
+                        notPermittedPermission(request, response, requestUrl, "未识别参数:Header['" + RPCUtils.HEADER_X_API_KEY + "']");
                         return false;
                     }
                     // 密钥认证
@@ -184,7 +181,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                 } else if ("accessToken".equals(authType)) {
                     String accessToken = WebUtils.getHeaderIgnoreCaseOrParameter(request, ACCESS_TOKEN);
                     if (null == accessToken) {
-                        notPermittedPermission(request, response, requestUrl, "未识别参数:Header['" + ACCESS_TOKEN + "']=" + apiKey);
+                        notPermittedPermission(request, response, requestUrl, "未识别参数:Header['" + ACCESS_TOKEN + "']");
                         return false;
                     }
                     String clientId = JWTUtils.getUsername(accessToken);
@@ -207,35 +204,8 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                         return false;
                     }
                 } else {
-                    //兼容性处理 已登录用户
-                    SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
-                    if (null != sessionInfo) {
-                        if (sessionInfo.isSuperUser()) {
-                            return true;
-                        }
-                        String[] permissions = metadata.restApi.value();
-                        boolean permittedResource = false;
-                        for (String permission : permissions) {
-                            permittedResource = SecurityUtils.isPermitted(permission);
-                            if (Logical.AND.equals(metadata.restApi.logical())) {
-                                if (!permittedResource) {
-                                    notPermittedPermission(request, response, requestUrl, "禁止访问,无访问权限：" + sessionInfo.getLoginName() + " - " + permission);
-                                    return false;
-                                }
-                            } else {
-                                if (permittedResource) {
-                                    break;
-                                }
-                            }
-                        }
-                        if (!permittedResource) {
-                            notPermittedPermission(request, response, requestUrl, "禁止访问,无访问权限：" + sessionInfo.getLoginName() + " - " + permissions[0]);
-                            return false;
-                        }
-                    } else {
-                        notPermittedPermission(request, response, requestUrl, "禁止访问，未授权！");
-                        return false;
-                    }
+                    notPermittedPermission(request, response, requestUrl, "未识别参数:Header['" + RPCUtils.HEADER_AUTH_TYPE + "']");
+                    return false;
                 }
 
                 HttpSession httpSession = request.getSession();
