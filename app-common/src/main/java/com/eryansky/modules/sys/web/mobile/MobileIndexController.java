@@ -469,7 +469,7 @@ public class MobileIndexController extends SimpleController {
             String tempFileName = Identities.uuid() + "." + extension;
             file = DiskUtils.saveSystemFile(_folderName, FolderType.NORMAL.getValue(), sessionInfo.getUserId(), new CustomMultipartFile(tempFileName, uploadBytes));
             Map<String, Object> _data = Maps.newHashMap();
-            String base64Data = "data:image/jpeg;base64," + Base64Utils.encodeToString(FileCopyUtils.copyToByteArray(Files.newInputStream(file.getDiskFile().toPath())));
+            String base64Data = "data:image/jpeg;base64," + Base64Utils.encodeToString(uploadBytes);
             _data.put("file", file);
             _data.put("data", base64Data);
             _data.put("url", AppConstants.getAdminPath() + "/disk/fileDownload/" + file.getId());
