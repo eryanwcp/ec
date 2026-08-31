@@ -49,7 +49,7 @@ $(function () {
 // 登录
 function login() {
     $("#messageBox2").addClass("hide");
-    var encryptKey = requestEncryptKey;
+    var encryptKey = '';
     var _password = $password.val();
     if("SM4" === requestEncrypt){
         let requestEncryptKey = Sm4Utils.generateSm4HexKey();
