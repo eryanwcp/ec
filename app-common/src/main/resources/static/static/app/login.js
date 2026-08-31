@@ -5,7 +5,6 @@ var sysInitTime = sysInitTime;
 var isValidateCodeLogin = isValidateCodeLogin;
 var publicKey = publicKey;
 var requestEncrypt = requestEncrypt;
-var requestEncryptKey = requestEncryptKey;
 var securityToken = securityToken;
 var homePage = homePage;
 
@@ -50,21 +49,24 @@ $(function () {
 // 登录
 function login() {
     $("#messageBox2").addClass("hide");
-    var encryptKey = requestEncryptKey;
-    var _password = $password.val();
+    let encryptKey = '';
+    let requestEncryptKey = '';
+    let _password = $password.val();
     if("SM4" === requestEncrypt){
-        encryptKey = RSAUtils.encryptHexString(requestEncryptKey,publicKey);
-        _password = Sm4Utils.encrypt(_password,requestEncryptKey);
+        encryptKey = Sm4Utils.generateSm4HexKey();
+        requestEncryptKey = RSAUtils.encryptHexString(encryptKey,publicKey);
+        _password = Sm4Utils.encrypt(_password,encryptKey);
     }else if("AES" === requestEncrypt){
-        encryptKey = RSAUtils.encryptBase64String(requestEncryptKey,publicKey);
-        _password = Cryptos.encrypt(_password,requestEncryptKey);
+        encryptKey = Cryptos.generateAesBase64Key();
+        requestEncryptKey = RSAUtils.encryptBase64String(encryptKey,publicKey);
+        _password = Cryptos.encrypt(_password,encryptKey);
     }
 
 
     $.ajax({
         url: ctxAdmin + '/login/login',
         type: 'post',
-        header:{"Encrypt": requestEncrypt,"Encrypt-Key":encryptKey},
+        header:{"Encrypt": requestEncrypt,"Encrypt-Key":requestEncryptKey},
         data: {
             client_id: $("#client_id").val(),
             redirect_uri: $("#redirect_uri").val(),
