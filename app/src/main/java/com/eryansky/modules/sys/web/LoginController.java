@@ -333,7 +333,6 @@ public class LoginController extends SimpleController {
             }
             //返回
             Map<String, Object> data = Maps.newHashMap();
-            data.put("sessionInfo", sessionInfo);
             data.put("homeUrl", resultUrl);
             result = new Result(Result.SUCCESS, "用户验证通过!", data);
             isValidateCodeLogin(loginName, false, true);
