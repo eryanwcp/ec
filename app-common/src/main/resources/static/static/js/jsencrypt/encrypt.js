@@ -3,32 +3,6 @@
  */
 window.RSAUtils = {
     /**
-     * 辅助方法：Hex 字符串转 Base64 字符串
-     */
-    hexToBase64(hexStr) {
-        if (!hexStr) return '';
-        const match = hexStr.match(/\x20*([0-9a-fA-F]{2})\x20*/g);
-        if (!match) return '';
-        const bytes = new Uint8Array(match.map(b => parseInt(b.trim(), 16)));
-        let binary = '';
-        bytes.forEach(b => binary += String.fromCharCode(b));
-        return window.btoa(binary);
-    },
-
-    /**
-     * 辅助方法：Base64 字符串转 Hex 字符串
-     */
-    base64ToHex(base64Str) {
-        if (!base64Str) return '';
-        const raw = window.atob(base64Str);
-        let hex = '';
-        for (let i = 0; i < raw.length; i++) {
-            const _hex = raw.charCodeAt(i).toString(16);
-            hex += (_hex.length === 2 ? _hex : '0' + _hex);
-        }
-        return hex;
-    },
-    /**
      * 公钥加密 (对应后端的公钥加密/前端请求密钥加密)
      * @param {string} plainText 待加密明文
      * @param {string} publicKey Base64 格式的公钥
@@ -84,23 +58,45 @@ window.RSAUtils = {
 
     /**
      * 公钥加密，返回 Hex（十六进制）格式密文
-     * @param {string} data 待加密明文
-     * @param {string} [base64PublicKey] 公钥 (可选，不传使用默认公钥)
+     * @param {string} plainText 待加密明文
+     * @param {string} publicKey Base64 格式的公钥
+     * @returns {string|boolean} Hex 加密字符串
      */
-    encryptHexString(data, base64PublicKey) {
-        const base64Data = this.encryptBase64String(data, base64PublicKey);
-        return base64Data ? this.base64ToHex(base64Data) : false;
+    encryptHexString(plainText, publicKey) {
+        // 先调用基础 encrypt 方法获取 Base64 格式的密文
+        const base64Cipher = this.encrypt(plainText, publicKey);
+        if (!base64Cipher) return base64Cipher;
+
+        try {
+            // 借助 CryptoJS 将 Base64 转为 Hex
+            const wordArray = CryptoJS.enc.Base64.parse(base64Cipher);
+            return CryptoJS.enc.Hex.stringify(wordArray);
+        } catch (e) {
+            console.error('RSA Hex Encryption Error:', e);
+            return false;
+        }
     },
 
     /**
      * 私钥解密 Hex（十六进制）格式密文
-     * @param {string} hexData Hex 密文
-     * @param {string} [base64PrivateKey] 私钥 (可选，不传使用默认私钥)
+     * @param {string} hexCipherText Hex 密文
+     * @param {string} privateKey Base64 格式的私钥
+     * @returns {string|boolean} 解密后的明文
      */
-    decryptHexString(hexData, base64PrivateKey) {
-        if (!hexData) return hexData;
-        const base64Data = this.hexToBase64(hexData);
-        return this.decryptBase64String(base64Data, base64PrivateKey);
+    decryptHexString(hexCipherText, privateKey) {
+        if (!hexCipherText || !privateKey) return hexCipherText;
+
+        try {
+            // 借助 CryptoJS 将 Hex 转为 Base64，以适应 JSEncrypt
+            const wordArray = CryptoJS.enc.Hex.parse(hexCipherText);
+            const base64Cipher = CryptoJS.enc.Base64.stringify(wordArray);
+
+            // 调用基础 decrypt 方法进行解密
+            return this.decrypt(base64Cipher, privateKey);
+        } catch (e) {
+            console.error('RSA Hex Decryption Error:', e);
+            return false;
+        }
     }
 };
 
