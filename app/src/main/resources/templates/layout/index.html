@@ -288,47 +288,47 @@
 
         App.fixIframeCotent();
 
-        $.ajax({
-          url: ctxAdmin + '/sys/encrypt/initKey',
-          type: 'get',
-          dataType: "json",
-          cache:false,
-          beforeSend: function (jqXHR, settings) {
-          },
-          success: function (data) {
-            let requestEncryptKey = '';
-            let encryptKey = '';
-            let encryptRequestData = JSON.stringify(data["data"]);
-            if("SM4" === requestEncrypt){
-              requestEncryptKey = Sm4Utils.generateSm4HexKey();
-              encryptKey = RSAUtils.encryptHexString(requestEncryptKey,publicKey);
-              encryptRequestData = Sm4Utils.encrypt(encryptRequestData,requestEncryptKey);
-            }else if("AES" === requestEncrypt){
-              requestEncryptKey = Cryptos.generateAesBase64Key();
-              encryptKey = RSAUtils.encryptBase64String(requestEncryptKey,publicKey);
-              encryptRequestData = Cryptos.encrypt(encryptRequestData,requestEncryptKey);
-            }
-
-            $.ajax({
-              url: ctxAdmin + '/sys/encrypt/data',
-              type: 'post',
-              dataType: "json",
-              contentType: "application/json",
-              headers: {'Encrypt':requestEncrypt,'Encrypt-Key':encryptKey},
-              data: encryptRequestData,
-              beforeSend: function (jqXHR, settings) {
-              },
-              success: function (data) {
-                console.log(data);
-                if("SM4" === requestEncrypt){
-                  console.log(Sm4Utils.decrypt(data['data'],requestEncryptKey));
-                }else if("AES" === requestEncrypt){
-                  console.log(Cryptos.decrypt(data['data'],requestEncryptKey));
-                }
-              }
-            });
-          }
-        });
+        // $.ajax({
+        //   url: ctxAdmin + '/sys/encrypt/initKey',
+        //   type: 'get',
+        //   dataType: "json",
+        //   cache:false,
+        //   beforeSend: function (jqXHR, settings) {
+        //   },
+        //   success: function (data) {
+        //     let requestEncryptKey = '';
+        //     let encryptKey = '';
+        //     let encryptRequestData = JSON.stringify(data["data"]);
+        //     if("SM4" === requestEncrypt){
+        //       requestEncryptKey = Sm4Utils.generateSm4HexKey();
+        //       encryptKey = RSAUtils.encryptHexString(requestEncryptKey,publicKey);
+        //       encryptRequestData = Sm4Utils.encrypt(encryptRequestData,requestEncryptKey);
+        //     }else if("AES" === requestEncrypt){
+        //       requestEncryptKey = Cryptos.generateAesBase64Key();
+        //       encryptKey = RSAUtils.encryptBase64String(requestEncryptKey,publicKey);
+        //       encryptRequestData = Cryptos.encrypt(encryptRequestData,requestEncryptKey);
+        //     }
+        //
+        //     $.ajax({
+        //       url: ctxAdmin + '/sys/encrypt/data',
+        //       type: 'post',
+        //       dataType: "json",
+        //       contentType: "application/json",
+        //       headers: {'Encrypt':requestEncrypt,'Encrypt-Key':encryptKey},
+        //       data: encryptRequestData,
+        //       beforeSend: function (jqXHR, settings) {
+        //       },
+        //       success: function (data) {
+        //         console.log(data);
+        //         if("SM4" === requestEncrypt){
+        //           console.log(Sm4Utils.decrypt(data['data'],requestEncryptKey));
+        //         }else if("AES" === requestEncrypt){
+        //           console.log(Cryptos.decrypt(data['data'],requestEncryptKey));
+        //         }
+        //       }
+        //     });
+        //   }
+        // });
 
 
         initMenu();
