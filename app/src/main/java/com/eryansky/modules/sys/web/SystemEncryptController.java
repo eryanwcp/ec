@@ -58,9 +58,8 @@ public class SystemEncryptController extends SimpleController {
         //RSA公钥
         data.put("publicKey", EncryptProvider.publicKeyBase64());
         //RSA加密密钥 RSA对密钥加密
-        data.put("requestEncryptKey", requestEncryptAesKey);
-        data.put("requestEncryptAesKey", requestEncryptAesKey);
-        data.put("requestEncryptSm4Key", requestEncryptSm4Key);
+//        data.put("requestEncryptAesKey", requestEncryptAesKey);
+//        data.put("requestEncryptSm4Key", requestEncryptSm4Key);
 
         //加密后的示例数据 模拟前端数据加密
         Map<String,Object> dataMap = Maps.newHashMap();

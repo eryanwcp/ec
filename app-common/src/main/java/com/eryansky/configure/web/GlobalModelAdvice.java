@@ -76,20 +76,20 @@ public class GlobalModelAdvice {
     public String requestEncrypt(HttpServletRequest request) throws Exception {
         return CipherMode.AES.name();//AES SM4
     }
-    @ModelAttribute("requestEncryptKey")
-    public String requestEncryptKey(HttpServletRequest request) throws Exception {
-        return requestEncryptAesKey(request);
-    }
-
-    @ModelAttribute("requestEncryptAesKey")
-    public String requestEncryptAesKey(HttpServletRequest request) throws Exception {
-        return Cryptos.getBase64EncodeKey();//AES base64编码
-    }
-
-    @ModelAttribute("requestEncryptSm4Key")
-    public String requestEncryptSm4Key(HttpServletRequest request) throws Exception {
-        return Sm4Utils.generateHexKeyString();//hex编码
-    }
+//    @ModelAttribute("requestEncryptKey")
+//    public String requestEncryptKey(HttpServletRequest request) throws Exception {
+//        return requestEncryptAesKey(request);
+//    }
+//
+//    @ModelAttribute("requestEncryptAesKey")
+//    public String requestEncryptAesKey(HttpServletRequest request) throws Exception {
+//        return Cryptos.getBase64EncodeKey();//AES base64编码
+//    }
+//
+//    @ModelAttribute("requestEncryptSm4Key")
+//    public String requestEncryptSm4Key(HttpServletRequest request) throws Exception {
+//        return Sm4Utils.generateHexKeyString();//hex编码
+//    }
 
     @ModelAttribute("yuicompressor")
     public String yuicompressor(HttpServletRequest request) {

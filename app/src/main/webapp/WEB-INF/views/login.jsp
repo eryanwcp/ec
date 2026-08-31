@@ -38,7 +38,7 @@
     <script src="${ctxStatic}/js/jsencrypt/jsencrypt.min.js" type="text/javascript"></script>
     <script src="${ctxStatic}/js/jsencrypt/crypto-js.min.js" type="text/javascript"></script>
     <script src="${ctxStatic}/js/jsencrypt/sm4.js" type="text/javascript"></script>
-    <script src="${ctxStatic}/js/jsencrypt/encrypt.js" type="text/javascript"></script>
+    <script src="${ctxStatic}/js/jsencrypt/encrypt.min.js" type="text/javascript"></script>
     <style type="text/css">
         .control-group{border-bottom:0px;}
         .login-form label {
