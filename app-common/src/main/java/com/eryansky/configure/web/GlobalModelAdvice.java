@@ -1,5 +1,9 @@
 package com.eryansky.configure.web;
 
+import com.eryansky.common.utils.encode.Cryptos;
+import com.eryansky.common.utils.encode.Sm4Utils;
+import com.eryansky.encrypt.config.EncryptProvider;
+import com.eryansky.encrypt.enums.CipherMode;
 import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.AppUtils;
 import javax.servlet.http.HttpServletRequest;
@@ -62,6 +66,30 @@ public class GlobalModelAdvice {
         return AppConstants.SYS_INIT_TIME;
     }
 
+    @ModelAttribute("publicKey")
+    public String publicKey(HttpServletRequest request) {
+        return EncryptProvider.publicKeyBase64();
+    }
+
+
+    @ModelAttribute("requestEncrypt")
+    public String requestEncrypt(HttpServletRequest request) throws Exception {
+        return CipherMode.AES.name();//AES SM4
+    }
+//    @ModelAttribute("requestEncryptKey")
+//    public String requestEncryptKey(HttpServletRequest request) throws Exception {
+//        return requestEncryptAesKey(request);
+//    }
+//
+//    @ModelAttribute("requestEncryptAesKey")
+//    public String requestEncryptAesKey(HttpServletRequest request) throws Exception {
+//        return Cryptos.getBase64EncodeKey();//AES base64编码
+//    }
+//
+//    @ModelAttribute("requestEncryptSm4Key")
+//    public String requestEncryptSm4Key(HttpServletRequest request) throws Exception {
+//        return Sm4Utils.generateHexKeyString();//hex编码
+//    }
 
     @ModelAttribute("yuicompressor")
     public String yuicompressor(HttpServletRequest request) {

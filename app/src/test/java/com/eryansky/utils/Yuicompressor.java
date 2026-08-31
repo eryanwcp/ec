@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012-2024 https://www.eryansky.com
+ * Copyright (c) 2012-2026 https://www.eryansky.com
  * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -10,6 +10,8 @@ import java.io.*;
 
 /**
  * 静态文件css/js文件压缩
+ * 替代方案：npm install -g esbuild
+ * esbuild app-common/src/main/resources/static/static/js/jsencrypt/encrypt.js --minify --outfile=app-common/src/main/resources/static/static/js/jsencrypt/encrypt.min.js
  * @author Eryan
  * @date 2015-09-14 
  */
@@ -27,6 +29,7 @@ public class Yuicompressor {
             "app-common/src/main/resources/static/static/mobile/ImageUploader/js/",
 //            "app-common/src/main/resources/static/static/js/adminlte/dist/",
             "app-common/src/main/resources/static/static/js/jquery/jquery-extend.js",
+            "app-common/src/main/resources/static/static/js/jsencrypt/encrypt.js",
 //            "app-common/src/main/resources/static/static/js/adminlte/dist"
     };
 
