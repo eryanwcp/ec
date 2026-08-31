@@ -49,14 +49,15 @@ $(function () {
 // 登录
 function login() {
     $("#messageBox2").addClass("hide");
-    var encryptKey = '';
-    var _password = $password.val();
+    let requestEncryptKey = '';
+    let encryptKey = '';
+    let _password = $password.val();
     if("SM4" === requestEncrypt){
-        let requestEncryptKey = Sm4Utils.generateSm4HexKey();
+        requestEncryptKey = Sm4Utils.generateSm4HexKey();
         encryptKey = RSAUtils.encryptHexString(requestEncryptKey,publicKey);
         _password = Sm4Utils.encrypt(_password,requestEncryptKey);
     }else if("AES" === requestEncrypt){
-        let requestEncryptKey = Cryptos.generateAesBase64Key();
+        requestEncryptKey = Cryptos.generateAesBase64Key();
         encryptKey = RSAUtils.encryptBase64String(requestEncryptKey,publicKey);
         _password = Cryptos.encrypt(_password,requestEncryptKey);
     }
