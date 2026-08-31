@@ -48,7 +48,7 @@ public class Yuicompressor {
                 r(f);
             }else{
                 StringBuffer cmd = new StringBuffer();
-                cmd.append("java -jar app/src/test/java/yuicompressor-2.4.7.jar --charset utf-8 --type ");
+                cmd.append("java -jar app/src/test/java/yuicompressor-2.4.8.jar --charset utf-8 --type ");
                 String fileName = f.getAbsolutePath();
                 if(fileName.endsWith(".js")){
                     cmd.append("js ")

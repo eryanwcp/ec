@@ -15,10 +15,12 @@ import com.eryansky.common.utils.Identities;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.UserAgentUtils;
 import com.eryansky.common.utils.collections.Collections3;
+import com.eryansky.common.utils.encode.EncodeUtils;
 import com.eryansky.common.utils.encode.Encrypt;
 import com.eryansky.common.utils.encode.RSAUtils;
 import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.utils.mapper.JsonMapper;
+import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.servlet.ValidateCodeServlet;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
@@ -27,6 +29,7 @@ import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.security.annotation.PrepareOauth2;
 import com.eryansky.core.web.annotation.MobileValue;
 import com.eryansky.encrypt.config.EncryptProvider;
+import com.eryansky.encrypt.util.RequestEncryptUtils;
 import org.bouncycastle.util.encoders.Hex;
 import com.eryansky.modules.sys.service.ResourceService;
 import com.eryansky.modules.sys.service.UserPasswordService;
@@ -190,9 +193,7 @@ public class LoginController extends SimpleController {
      *
      * @param loginName    用户名
      * @param password     密码
-     * @param encrypt      加密
      * @param validateCode 验证码
-     * @param theme        主题
      * @param request
      * @return
      */
@@ -200,14 +201,15 @@ public class LoginController extends SimpleController {
     @RequiresUser(required = false)
     @ResponseBody
     @PostMapping(value = {"login"})
-    public Result login(@RequestParam(value = "client_id",required = false) String clientId,
-                        @RequestParam(value = "redirect_uri",required = false) String redirectUri,
-                        @RequestParam(required = true) String loginName,
-                        @RequestParam(required = true) String password,
-                        @RequestParam(defaultValue = "true") String encrypt,
+    public Result login(@RequestParam(name = "client_id",required = false) String clientId,
+                        @RequestParam(name = "redirect_uri",required = false) String redirectUri,
+                        @RequestParam(name = "loginName",required = true) String loginName,
+                        @RequestParam(name = "password", required = true) String password,
                         @RequestParam(name = "_csrf_token",required = true) String csrfToken,
-                        String validateCode,
-                        String theme, HttpServletRequest request, Model uiModel) {
+                        @RequestParam(name = "validateCode",required = false) String validateCode,
+                        HttpServletRequest request, HttpServletResponse response) {
+        String encrypt = WebUtils.getHeaderIgnoreCase(request, RequestEncryptUtils.ENCRYPT);
+        String encryptKey = WebUtils.getHeaderIgnoreCase(request,RequestEncryptUtils.ENCRYPT_KEY);
         //登录限制
         checkLoginLimit();
 
@@ -234,13 +236,21 @@ public class LoginController extends SimpleController {
 
         String originPassword = password;
         String _password = password;
-        if ("RSA".equals(encrypt)) {
-            originPassword = RSAUtils.decryptBase64String(_password,EncryptProvider.privateKeyBase64());
+        if ("AES".equals(encrypt)) {
+            try {
+                originPassword = new String(RequestEncryptUtils.decryptDataByRequest(encrypt, encryptKey, EncodeUtils.base64Decode(password)));
+                _password = StringUtils.isNotBlank(securityToken) ? Encrypt.md5(Encrypt.e(originPassword) + securityToken) : Encrypt.e(originPassword);
+            } catch (Exception e) {
+                logger.error("IP:{},loginName:{},encrypt:{},password:{},securityToken:{},{}", IpUtils.getIpAddr0(SpringMVCHolder.getRequest()), loginName, encrypt, _password, securityToken, e.getMessage());
+            }
+        } else if ("SM4".equals(encrypt)) {
+            try {
+                originPassword = new String(RequestEncryptUtils.decryptDataByRequest(encrypt, encryptKey, EncodeUtils.hexDecode(password)));
+                _password = StringUtils.isNotBlank(securityToken) ? Encrypt.md5(Encrypt.e(originPassword) + securityToken) : Encrypt.e(originPassword);
+            } catch (Exception e) {
+                logger.error("IP:{},loginName:{},encrypt:{},password:{},securityToken:{},{}", IpUtils.getIpAddr0(SpringMVCHolder.getRequest()), loginName, encrypt, _password, securityToken, e.getMessage());
+            }
         }
-        if (!"true".equals(encrypt)) {
-            _password = Encrypt.e(originPassword);
-        }
-
 
 
         // 获取用户信息
