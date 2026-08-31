@@ -299,9 +299,15 @@
         //   beforeSend: function (jqXHR, settings) {
         //   },
         //   success: function (data) {
-        //     console.log(data);
-        //     const encryptKey = RSAUtils.encrypt(requestEncryptAesKey,publicKey)
-        //     const encryptRequestData = Cryptos.aesECBEncrypt(JSON.stringify(data["data"]),requestEncryptAesKey);
+        //     let encryptKey;
+        //     let encryptRequestData = JSON.stringify(data["data"]);
+        //     if("SM4" === requestEncrypt){
+        //       encryptKey = RSAUtils.encryptHexString(requestEncryptKey,publicKey);
+        //       encryptRequestData = Sm4Utils.encrypt(encryptRequestData,requestEncryptKey);
+        //     }else if("AES" === requestEncrypt){
+        //       encryptKey = RSAUtils.encryptBase64String(requestEncryptKey,publicKey);
+        //       encryptRequestData = Cryptos.encrypt(encryptRequestData,requestEncryptKey);
+        //     }
         //     $.ajax({
         //       url: ctxAdmin + '/sys/encrypt/data',
         //       type: 'post',
@@ -313,7 +319,13 @@
         //       },
         //       success: function (data) {
         //         console.log(data);
-        //         console.log(Cryptos.aesECBDecrypt(data['data'],requestEncryptAesKey));
+        //         if("SM4" === requestEncrypt){
+        //           console.log(Sm4Utils.decrypt(data['data'],requestEncryptKey));
+        //         }else if("AES" === requestEncrypt){
+        //           console.log(Cryptos.decrypt(data['data'],requestEncryptKey));
+        //         }
+        //
+        //
         //       }
         //     });
         //   }

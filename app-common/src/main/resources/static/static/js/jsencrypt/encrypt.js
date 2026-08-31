@@ -37,6 +37,66 @@ window.RSAUtils = {
             console.error('RSA Decryption Error:', e);
             return false;
         }
+    },
+    /**
+     * 公钥加密，返回 Base64 格式密文
+     * @param {string} data 待加密明文
+     * @param {string} [base64PublicKey] 公钥 (可选，不传使用默认公钥)
+     */
+    encryptBase64String(data, base64PublicKey) {
+        return this.encrypt(data, base64PublicKey);
+    },
+
+    /**
+     * 私钥解密 Base64 格式密文
+     * @param {string} base64Data Base64 密文
+     * @param {string} [base64PrivateKey] 私钥 (可选，不传使用默认私钥)
+     */
+    decryptBase64String(base64Data, base64PrivateKey) {
+        return this.decrypt(base64Data, base64PrivateKey);
+    },
+
+    /**
+     * 公钥加密，返回 Hex（十六进制）格式密文
+     * @param {string} plainText 待加密明文
+     * @param {string} publicKey Base64 格式的公钥
+     * @returns {string|boolean} Hex 加密字符串
+     */
+    encryptHexString(plainText, publicKey) {
+        // 先调用基础 encrypt 方法获取 Base64 格式的密文
+        const base64Cipher = this.encrypt(plainText, publicKey);
+        if (!base64Cipher) return base64Cipher;
+
+        try {
+            // 借助 CryptoJS 将 Base64 转为 Hex
+            const wordArray = CryptoJS.enc.Base64.parse(base64Cipher);
+            return CryptoJS.enc.Hex.stringify(wordArray);
+        } catch (e) {
+            console.error('RSA Hex Encryption Error:', e);
+            return false;
+        }
+    },
+
+    /**
+     * 私钥解密 Hex（十六进制）格式密文
+     * @param {string} hexCipherText Hex 密文
+     * @param {string} privateKey Base64 格式的私钥
+     * @returns {string|boolean} 解密后的明文
+     */
+    decryptHexString(hexCipherText, privateKey) {
+        if (!hexCipherText || !privateKey) return hexCipherText;
+
+        try {
+            // 借助 CryptoJS 将 Hex 转为 Base64，以适应 JSEncrypt
+            const wordArray = CryptoJS.enc.Hex.parse(hexCipherText);
+            const base64Cipher = CryptoJS.enc.Base64.stringify(wordArray);
+
+            // 调用基础 decrypt 方法进行解密
+            return this.decrypt(base64Cipher, privateKey);
+        } catch (e) {
+            console.error('RSA Hex Decryption Error:', e);
+            return false;
+        }
     }
 };
 
@@ -47,7 +107,7 @@ window.Sm4Utils = {
     getZeroIV() {
         return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     },
-    encrypt(hexKey, paramStr) {
+    encrypt(paramStr,hexKey) {
         if (!hexKey || !paramStr) return paramStr;
         try {
             return sm4.encrypt(paramStr, hexKey, { mode: 'cbc', iv: this.getZeroIV() });
@@ -56,7 +116,7 @@ window.Sm4Utils = {
             return paramStr;
         }
     },
-    decrypt(hexKey, text) {
+    decrypt(text,hexKey) {
         if (!hexKey || !text) return text;
         try {
             return sm4.decrypt(text, hexKey, { mode: 'cbc', iv: this.getZeroIV() });
@@ -71,6 +131,12 @@ window.Sm4Utils = {
  * AES 加解密工具类 (基于全局 CryptoJS)
  */
 window.Cryptos = {
+    encrypt(input, base64Key) {
+        return this.aesECBEncrypt(input, base64Key);
+    },
+    decrypt(base64Data, base64Key) {
+        return this.aesECBDecrypt(base64Data, base64Key);
+    },
     aesECBEncrypt(input, base64Key) {
         if (!input || !base64Key) return input;
         try {
