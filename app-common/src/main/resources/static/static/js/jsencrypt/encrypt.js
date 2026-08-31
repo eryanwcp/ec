@@ -104,6 +104,13 @@ window.RSAUtils = {
  * 国密 SM4 加解密工具类 (基于全局 sm4)
  */
 window.Sm4Utils = {
+    /**
+     * 生成 SM4 Hex 编码密钥 (16 字节 / 128 位，输出 32 位 Hex 字符串)
+     * 对应 Java: Sm4Utils.generateHexKeyString()
+     */
+    generateSm4HexKey() {
+        return CryptoJS.lib.WordArray.random(16).toString(CryptoJS.enc.Hex);
+    },
     getZeroIV() {
         return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     },
@@ -131,6 +138,13 @@ window.Sm4Utils = {
  * AES 加解密工具类 (基于全局 CryptoJS)
  */
 window.Cryptos = {
+    /**
+     * 生成 AES Base64 编码密钥 (默认 16 字节 / 128 位)
+     * 对应 Java: Cryptos.getBase64EncodeKey()
+     */
+    generateAesBase64Key(keyByteSize = 16) {
+        return CryptoJS.lib.WordArray.random(keyByteSize).toString(CryptoJS.enc.Base64);
+    },
     encrypt(input, base64Key) {
         return this.aesECBEncrypt(input, base64Key);
     },

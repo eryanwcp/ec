@@ -27,6 +27,7 @@ public class Yuicompressor {
             "app-common/src/main/resources/static/static/mobile/ImageUploader/js/",
 //            "app-common/src/main/resources/static/static/js/adminlte/dist/",
             "app-common/src/main/resources/static/static/js/jquery/jquery-extend.js",
+            "app-common/src/main/resources/static/static/js/jsencrypt/encrypt.js",
 //            "app-common/src/main/resources/static/static/js/adminlte/dist"
     };
 
