@@ -301,12 +301,12 @@
             let encryptRequestData = JSON.stringify(data["data"]);
             if("SM4" === requestEncrypt){
               requestEncryptKey = Sm4Utils.generateSm4HexKey();
-              encryptKey = RSAUtils.encryptHexString(requestEncryptKey,publicKey);
+              encryptKey = RSAUtils.encrypt(requestEncryptKey,publicKey);
               encryptRequestData = Sm4Utils.encrypt(encryptRequestData,requestEncryptKey);
             }else if("AES" === requestEncrypt){
               requestEncryptKey = Cryptos.generateAesBase64Key();
-              encryptKey = RSAUtils.encryptBase64String(requestEncryptKey,publicKey);
-              encryptRequestData = Cryptos.encryptRequestData(_password,requestEncryptKey);
+              encryptKey = RSAUtils.encrypt(requestEncryptKey,publicKey);
+              encryptRequestData = Cryptos.encrypt(encryptRequestData,requestEncryptKey);
             }
 
             $.ajax({
