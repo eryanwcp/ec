@@ -321,12 +321,10 @@
               success: function (data) {
                 console.log(data);
                 if("SM4" === requestEncrypt){
-                  console.log(Sm4Utils.decrypt(data['data'],encryptKey));
+                  console.log(Sm4Utils.decrypt(data['data'],requestEncryptKey));
                 }else if("AES" === requestEncrypt){
-                  console.log(Cryptos.decrypt(data['data'],encryptKey));
+                  console.log(Cryptos.decrypt(data['data'],requestEncryptKey));
                 }
-
-
               }
             });
           }
