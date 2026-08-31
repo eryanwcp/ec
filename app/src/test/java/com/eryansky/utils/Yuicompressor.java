@@ -12,6 +12,7 @@ import java.io.*;
  * 静态文件css/js文件压缩
  * 替代方案：npm install -g esbuild
  * esbuild app-common/src/main/resources/static/static/js/jsencrypt/encrypt.js --minify --outfile=app-common/src/main/resources/static/static/js/jsencrypt/encrypt.min.js
+ * esbuild index.js --bundle --minify --outfile=encrypt.all.min.js
  * @author Eryan
  * @date 2015-09-14 
  */
