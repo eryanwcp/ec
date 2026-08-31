@@ -3,13 +3,11 @@ var ctxAdmin = ctxAdmin;
 var ctxStatic = ctxStatic;
 var sysInitTime = sysInitTime;
 var isValidateCodeLogin = isValidateCodeLogin;
-var rememberMeCookieValue = rememberMeCookieValue;
-var needEncrypt = needEncrypt;
 var publicKey = publicKey;
-var SALT = SALT;
+var requestEncrypt = requestEncrypt;
+var requestEncryptKey = requestEncryptKey;
 var securityToken = securityToken;
 var homePage = homePage;
-
 
 var $loginForm;
 var $password, $rememberMe;
@@ -48,66 +46,28 @@ $(function () {
     });
 
     $password = $("#password");
-    $rememberMe = $("#rememberMe");
-
-    $rememberMe.prop("checked", rememberMeCookieValue == "" ? false : true);
-
-    $password.change(function(){
-        needEncrypt = true;
-    });
-
-    $rememberMe.click(function () {
-        var checked = $(this).prop('checked');
-        var _password = $password.val();
-        if(needEncrypt){
-            // _password = md5(md5(_password+SALT)+securityToken);
-            var encrypt = new JSEncrypt(); //创建加密实例
-            encrypt.setPublicKey(publicKey);
-            _password = encrypt.encrypt(_password);
-        }
-        if (checked) {
-            $.cookie('_password', _password, {
-                expires: 7
-            });
-            $.cookie('rememberMe', checked, {
-                expires: 7
-            });
-        } else {
-            $.cookie('_password', "", {
-                expires: 7
-            });
-            $.cookie('rememberMe', "", {
-                expires: 7
-            });
-        }
-    });
-
 });
 // 登录
 function login() {
     $("#messageBox2").addClass("hide");
-    $.cookie('loginName', $("#loginName").val(), {
-        expires: 7
-    });
+    var encryptKey = requestEncryptKey;
     var _password = $password.val();
-    if(needEncrypt){
-        // _password = md5(md5(_password+SALT)+securityToken);
-        var encrypt = new JSEncrypt(); //创建加密实例
-        encrypt.setPublicKey(publicKey);
-        _password = encrypt.encrypt(_password);
+    if("SM4" === requestEncrypt){
+        encryptKey = RSAUtils.encryptHexString(requestEncryptKey,publicKey);
+        _password = Sm4Utils.encrypt(_password,requestEncryptKey);
+    }else if("AES" === requestEncrypt){
+        encryptKey = RSAUtils.encryptBase64String(requestEncryptKey,publicKey);
+        _password = Cryptos.encrypt(_password,requestEncryptKey);
     }
-    if ($rememberMe.prop("checked")) {
-        $.cookie('_password', _password, {
-            expires: 7
-        });
-    }
+
+
     $.ajax({
         url: ctxAdmin + '/login/login',
         type: 'post',
+        header:{"Encrypt": requestEncrypt,"Encrypt-Key":encryptKey},
         data: {
             client_id: $("#client_id").val(),
             redirect_uri: $("#redirect_uri").val(),
-            encrypt: 'RSA',
             loginName: $("#loginName").val(),
             password: _password,
             _csrf_token: securityToken,
