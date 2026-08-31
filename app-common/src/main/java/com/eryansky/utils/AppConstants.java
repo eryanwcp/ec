@@ -102,7 +102,7 @@ public class AppConstants extends SysConstants {
     /**
      * 将字符串按分隔符切分为列表（复用分割逻辑）
      */
-    private static List<String> splitToList(String value) {
+    public static List<String> splitToList(String value) {
         if (StringUtils.isNotBlank(value)) {
             return SPLITTER.splitToList(value);
         }
