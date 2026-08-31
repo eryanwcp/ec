@@ -5,7 +5,6 @@ var sysInitTime = sysInitTime;
 var isValidateCodeLogin = isValidateCodeLogin;
 var publicKey = publicKey;
 var requestEncrypt = requestEncrypt;
-var requestEncryptKey = requestEncryptKey;
 var securityToken = securityToken;
 var homePage = homePage;
 
@@ -53,9 +52,11 @@ function login() {
     var encryptKey = requestEncryptKey;
     var _password = $password.val();
     if("SM4" === requestEncrypt){
+        let requestEncryptKey = Sm4Utils.generateSm4HexKey();
         encryptKey = RSAUtils.encryptHexString(requestEncryptKey,publicKey);
         _password = Sm4Utils.encrypt(_password,requestEncryptKey);
     }else if("AES" === requestEncrypt){
+        let requestEncryptKey = Cryptos.generateAesBase64Key();
         encryptKey = RSAUtils.encryptBase64String(requestEncryptKey,publicKey);
         _password = Cryptos.encrypt(_password,requestEncryptKey);
     }

@@ -53,7 +53,6 @@
         var isValidateCodeLogin = "${isValidateCodeLogin}";
         var publicKey = "${publicKey}";
         var requestEncrypt = "${requestEncrypt}";
-        var requestEncryptKey = "${requestEncryptKey}";
         var securityToken = "${securityToken}";
         var homePage = "<%=request.getContextPath() + AppConstants.getAppHomePage()%>";
     </script>
