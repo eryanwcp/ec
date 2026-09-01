@@ -66,7 +66,7 @@ function login() {
     $.ajax({
         url: ctxAdmin + '/login/login',
         type: 'post',
-        header:{"Encrypt": requestEncrypt,"Encrypt-Key":requestEncryptKey},
+        headers: {"Encrypt": requestEncrypt, "Encrypt-Key": requestEncryptKey},
         data: {
             client_id: $("#client_id").val(),
             redirect_uri: $("#redirect_uri").val(),
