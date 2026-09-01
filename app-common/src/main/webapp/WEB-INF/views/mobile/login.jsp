@@ -1,12 +1,6 @@
-<%@ page import="com.eryansky.common.web.utils.CookieUtils" %>
-<%@ page import="com.eryansky.common.utils.encode.Encrypt" %>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" language="java" %>
 <%@ include file="/common/taglibs.jsp" %>
 <%@ include file="/common/meta_mobile.jsp" %>
-<%
-    String loginNameOrName = CookieUtils.getCookie(request, "loginName");
-    request.setAttribute("loginNameOrName",loginNameOrName);
-%>
 <html>
 <head>
     <title>${fns:getAppFullName()}-用户登录</title>
@@ -19,20 +13,17 @@
     <link rel="stylesheet" type="text/css" href="${ctxStatic}/mobile/af/af.ui.css" />
 
     <script type="text/javascript" charset="utf-8" src="${ctxStatic}/js/jquery/jquery-2.2.4.min.js"></script>
-    <script type="text/javascript" charset="utf-8" src="${ctxStatic}/js/jquery/jquery.cookie.min.js"></script>
     <script type="text/javascript" charset="utf-8" src="${ctxStatic}/mobile/af/fastclick.min.js"></script>
     <script type="text/javascript" charset="utf-8" src="${ctxStatic}/mobile/af/appframework.ui.js"></script>
 
     <link rel="stylesheet" type="text/css" href="${ctxStatic}/app/mobile/login.mobile${yuicompressor}.css?_=${sysInitTime}" />
 <%--    <script src="${ctxStatic}/js/md5/md5.min.js"></script>--%>
-    <script src="${ctxStatic}/js/jsencrypt/jsencrypt.min.js"></script>
+    <script src="${ctxStatic}/js/jsencrypt/encrypt.all.min.js"></script>
 
     <script type="text/javascript">
-        var lPassword = window.localStorage.getItem("password");
-        var needEncrypt = null != lPassword;
-        <%--var SALT = "<%=Encrypt.SALT%>";--%>
-        var securityToken = "${securityToken}";
         var publicKey = "${publicKey}";
+        var requestEncrypt = "${requestEncrypt}";
+        var securityToken = "${securityToken}";
     </script>
     <script type="text/javascript" charset="utf-8" src="${ctxStatic}/app/mobile/login.mobile${yuicompressor}.js?_=${sysInitTime}"></script>
 </head>
