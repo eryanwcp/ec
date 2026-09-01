@@ -100,8 +100,7 @@ public class XssJsonSerializer extends JsonSerializer<String> implements Context
 
             XssIgnore xssIgnore = null;
             Object handler = request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE);
-            if (handler instanceof HandlerMethod) {
-                HandlerMethod handlerMethod = (HandlerMethod) handler;
+            if (handler instanceof HandlerMethod handlerMethod) {
                 // 优先取方法上的注解，再取类/Controller 上的注解
                 xssIgnore = handlerMethod.getMethodAnnotation(XssIgnore.class);
                 if (xssIgnore == null) {
