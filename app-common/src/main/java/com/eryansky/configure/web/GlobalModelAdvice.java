@@ -74,7 +74,7 @@ public class GlobalModelAdvice {
 
     @ModelAttribute("requestEncrypt")
     public String requestEncrypt(HttpServletRequest request) throws Exception {
-        return CipherMode.AES.name();//AES SM4
+        return CipherMode.SM4.name();//AES SM4
     }
 //    @ModelAttribute("requestEncryptKey")
 //    public String requestEncryptKey(HttpServletRequest request) throws Exception {
