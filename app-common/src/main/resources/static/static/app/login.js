@@ -9,7 +9,7 @@ var securityToken = securityToken;
 var homePage = homePage;
 
 var $loginForm;
-var $password, $rememberMe;
+var $password;
 $(function () {
     $.backstretch([
         ctxStatic + '/js/images/bg1.jpg?_='+sysInitTime,
