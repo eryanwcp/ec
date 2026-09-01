@@ -9,7 +9,7 @@ var securityToken = securityToken;
 var homePage = homePage;
 
 var $loginForm;
-var $password, $rememberMe;
+var $password;
 $(function () {
     $.backstretch([
         ctxStatic + '/js/images/bg1.jpg?_='+sysInitTime,
@@ -66,7 +66,7 @@ function login() {
     $.ajax({
         url: ctxAdmin + '/login/login',
         type: 'post',
-        header:{"Encrypt": requestEncrypt,"Encrypt-Key":requestEncryptKey},
+        headers: {"Encrypt": requestEncrypt, "Encrypt-Key": requestEncryptKey},
         data: {
             client_id: $("#client_id").val(),
             redirect_uri: $("#redirect_uri").val(),
