@@ -114,7 +114,7 @@ public class XssJsonDeserializer extends JsonDeserializer<String> implements Con
             request.setAttribute(CONTROLLER_XSS_IGNORE_CACHE_KEY, xssIgnore != null ? xssIgnore : NULL_HOLDER);
             return xssIgnore;
         } catch (Exception e) {
-            log.error(e.getMessage());
+//            log.error(e.getMessage());
             return null;
         }
     }
