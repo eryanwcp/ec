@@ -1,48 +1,12 @@
 $.afui.useOSThemes = false;
 var $loginName;
 var $password;
-var $rememberMe;
-var needEncrypt = needEncrypt;
-var SALT;
-var securityToken;
-var publicKey;
+var requestEncrypt = requestEncrypt;
+var publicKey = publicKey;
+var securityToken = securityToken;
 $(function () {
     $loginName = $("#loginName");
     $password = $("#password");
-    $rememberMe = $("#rememberMe");
-
-    $rememberMe.prop("checked", window.localStorage.getItem("rememberMe") !== "");
-    $loginName.val(window.localStorage.getItem("loginName"));
-
-    if (window.localStorage.getItem("rememberMe")) {
-        $password.val(window.localStorage.getItem("password"));
-    } else {
-        $loginName.focus();
-    }
-
-    $password.change(function(){
-        needEncrypt = true;
-    });
-
-    $rememberMe.click(function () {
-        var checked = $(this).prop('checked');
-        var _password = $password.val();
-        if(needEncrypt){
-            // _password = md5(md5(_password+SALT)+securityToken);
-            var encrypt = new JSEncrypt(); //创建加密实例
-            encrypt.setPublicKey(publicKey);
-            _password = encrypt.encrypt(_password);
-        }
-        if (checked) {
-            window.localStorage.setItem("loginName", $loginName.val());
-            window.localStorage.setItem("password", _password);
-            window.localStorage.setItem("rememberMe", checked);
-        } else {
-            window.localStorage.setItem("password", "");
-            window.localStorage.setItem("rememberMe", "");
-        }
-    });
-
 });
 
 function login() {
@@ -65,22 +29,28 @@ function login() {
         });
         return;
     }
-    if(needEncrypt){
-        // _password = md5(md5(_password+SALT)+securityToken);
-        var encrypt = new JSEncrypt(); //创建加密实例
-        encrypt.setPublicKey(publicKey);
-        _password = encrypt.encrypt(_password);
+    let encryptKey = '';
+    let requestEncryptKey = '';
+    if("SM4" === requestEncrypt){
+        encryptKey = Sm4Utils.generateSm4HexKey();
+        requestEncryptKey = RSAUtils.encryptHexString(encryptKey,publicKey);
+        _password = Sm4Utils.encrypt(_password,encryptKey);
+    }else if("AES" === requestEncrypt){
+        encryptKey = Cryptos.generateAesBase64Key();
+        requestEncryptKey = RSAUtils.encryptBase64String(encryptKey,publicKey);
+        _password = Cryptos.encrypt(_password,encryptKey);
     }
 
     $.ajax({
         url: ctxAdmin + '/login/login',
         type: 'post',
+        headers: {"Encrypt": requestEncrypt, "Encrypt-Key": requestEncryptKey},
         data: {
             client_id: $("#client_id").val(),
             redirect_uri: $("#redirect_uri").val(),
-            loginName: $loginName.val(),
+            loginName: $("#loginName").val(),
             password: _password,
-            encrypt: "RSA",
+            _csrf_token: securityToken,
             checkDevice: false
         },
         traditional: true,
