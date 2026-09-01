@@ -6,18 +6,21 @@ import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.HtmlUtils;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 /**
  * XSS JSON 反序列化器（结合静态常量单例与 Controller 级注解 Request 缓存）
  */
 public class XssJsonDeserializer extends JsonDeserializer<String> implements ContextualDeserializer {
+
+    private static final Logger log = LoggerFactory.getLogger(XssJsonDeserializer.class);
 
     // 预创建静态常量实例，彻底避免动态 new 对象
     private static final XssJsonDeserializer DEFAULT_INSTANCE = new XssJsonDeserializer(false);
@@ -88,34 +91,30 @@ public class XssJsonDeserializer extends JsonDeserializer<String> implements Con
             if (request == null) {
                 return null;
             }
-        } catch (Exception e) {
-            return null;
-        }
 
-        // 尝试从 Request 属性中直接获取缓存结果
-        Object cached = request.getAttribute(CONTROLLER_XSS_IGNORE_CACHE_KEY);
-        if (cached != null) {
-            return cached == NULL_HOLDER ? null : (XssIgnore) cached;
-        }
+            // 尝试从 Request 属性中直接获取缓存结果
+            Object cached = request.getAttribute(CONTROLLER_XSS_IGNORE_CACHE_KEY);
+            if (cached != null) {
+                return cached == NULL_HOLDER ? null : (XssIgnore) cached;
+            }
 
-        XssIgnore xssIgnore = null;
-        try {
+            XssIgnore xssIgnore = null;
             Object handler = request.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE);
-            if (handler instanceof HandlerMethod handlerMethod) {
+            if (handler instanceof HandlerMethod) {
+                HandlerMethod handlerMethod = (HandlerMethod) handler;
                 // 优先取 HandlerMethod 方法注解，其次取 Controller 类注解
                 xssIgnore = handlerMethod.getMethodAnnotation(XssIgnore.class);
-//                xssIgnore = AnnotatedElementUtils.findMergedAnnotation(handlerMethod.getMethod(), XssIgnore.class);
                 if (xssIgnore == null) {
                     xssIgnore = handlerMethod.getBeanType().getAnnotation(XssIgnore.class);
-//                    xssIgnore = AnnotatedElementUtils.findMergedAnnotation(handlerMethod.getBeanType(), XssIgnore.class);
                 }
             }
-        } catch (Exception ignored) {
-            // 解析失败降级
-        }
 
-        // 将解析到的结果（或 NULL_HOLDER）写入 Request 属性，供本次请求后续字段共享
-        request.setAttribute(CONTROLLER_XSS_IGNORE_CACHE_KEY, xssIgnore != null ? xssIgnore : NULL_HOLDER);
-        return xssIgnore;
+            // 将解析到的结果（或 NULL_HOLDER）写入 Request 属性，供本次请求后续字段共享
+            request.setAttribute(CONTROLLER_XSS_IGNORE_CACHE_KEY, xssIgnore != null ? xssIgnore : NULL_HOLDER);
+            return xssIgnore;
+        } catch (Exception e) {
+//            log.error(e.getMessage());
+            return null;
+        }
     }
 }
