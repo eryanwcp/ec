@@ -261,8 +261,6 @@ public class LoginController extends SimpleController {
             flag = null != user;
         }
 
-
-
         if (!flag) {
             msg = "用户名或密码不正确!";
         } else if (user.getStatus().equals(StatusState.LOCK.getValue())) {
@@ -304,7 +302,7 @@ public class LoginController extends SimpleController {
             //将用户信息放入session中
             SessionInfo sessionInfo = SecurityUtils.putUserToSession(request, user);
             userService.login(sessionInfo.getUserId());
-            CacheUtils.remove("securityToken:"+request.getSession().getId());
+            WebUtils.setSessionAttribute(request, "securityToken", null);
             logger.info("用户登录系统：{} {}", user.getLoginName(), SpringMVCHolder.getIp());
 
             //设置调整URL 如果session中包含未被授权的URL 则跳转到该页面
