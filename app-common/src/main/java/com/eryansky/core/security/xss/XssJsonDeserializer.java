@@ -1,19 +1,18 @@
 package com.eryansky.core.security.xss;
 
+import com.eryansky.common.utils.encode.EncodeUtils;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
-import javax.servlet.http.HttpServletRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerMapping;
-import org.springframework.web.util.HtmlUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 /**
@@ -54,7 +53,7 @@ public class XssJsonDeserializer extends JsonDeserializer<String> implements Con
             return value;
         }
 
-        return HtmlUtils.htmlUnescape(value);
+        return EncodeUtils.htmlUnescape(value);
     }
 
     @Override
