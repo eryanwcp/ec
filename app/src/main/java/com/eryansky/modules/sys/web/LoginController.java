@@ -17,7 +17,6 @@ import com.eryansky.common.utils.UserAgentUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.encode.EncodeUtils;
 import com.eryansky.common.utils.encode.Encrypt;
-import com.eryansky.common.utils.encode.RSAUtils;
 import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.utils.net.IpUtils;
@@ -99,11 +98,9 @@ public class LoginController extends SimpleController {
         modelAndView.addObject("isValidateCodeLogin", isValidateCodeLogin);
         modelAndView.addObject("isMobile", UserAgentUtils.isMobile(request));
         String randomSecurityToken = Identities.randomBase62(64);
-        modelAndView.addObject("securityToken", randomSecurityToken);
-        modelAndView.addObject("publicKey", EncryptProvider.publicKeyBase64());
-        modelAndView.addObject("clientId", clientId);
-        modelAndView.addObject("redirectUri", redirectUri);
         WebUtils.setSessionAttribute(request, "securityToken", randomSecurityToken);
+        modelAndView.addObject("redirectUri", redirectUri);
+        modelAndView.addObject("clientId", clientId);
         return modelAndView;
     }
 
@@ -173,7 +170,7 @@ public class LoginController extends SimpleController {
         Map<String,Object> data = Maps.newHashMap();
         data.put("securityToken:",randomSecurityToken);
         data.put("publicKey",publicKey);
-        WebUtils.setSessionAttribute(request, "securityToken", randomSecurityToken);
+
         return Result.successResult().setObj(data);
     }
 
@@ -307,7 +304,7 @@ public class LoginController extends SimpleController {
             //将用户信息放入session中
             SessionInfo sessionInfo = SecurityUtils.putUserToSession(request, user);
             userService.login(sessionInfo.getUserId());
-            CacheUtils.remove("securityToken:"+request.getSession().getId());
+            WebUtils.setSessionAttribute(request, "securityToken", null);
             logger.info("用户登录系统：{} {}", user.getLoginName(), SpringMVCHolder.getIp());
 
             //设置调整URL 如果session中包含未被授权的URL 则跳转到该页面
