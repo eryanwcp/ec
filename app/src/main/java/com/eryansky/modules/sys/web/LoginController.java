@@ -239,17 +239,20 @@ public class LoginController extends SimpleController {
         if ("AES".equals(encrypt)) {
             try {
                 originPassword = new String(RequestEncryptUtils.decryptDataByRequest(encrypt, encryptKey, EncodeUtils.base64Decode(password)));
-                _password = StringUtils.isNotBlank(securityToken) ? Encrypt.md5(Encrypt.e(originPassword) + securityToken) : Encrypt.e(originPassword);
+                _password = Encrypt.e(originPassword);
             } catch (Exception e) {
-                logger.error("IP:{},loginName:{},encrypt:{},password:{},securityToken:{},{}", IpUtils.getIpAddr0(SpringMVCHolder.getRequest()), loginName, encrypt, _password, securityToken, e.getMessage());
+                logger.error("IP:{},loginName:{},encrypt:{},password:{},{}", IpUtils.getIpAddr0(SpringMVCHolder.getRequest()), loginName, encrypt, _password, e.getMessage());
             }
         } else if ("SM4".equals(encrypt)) {
             try {
                 originPassword = new String(RequestEncryptUtils.decryptDataByRequest(encrypt, encryptKey, EncodeUtils.hexDecode(password)));
-                _password = StringUtils.isNotBlank(securityToken) ? Encrypt.md5(Encrypt.e(originPassword) + securityToken) : Encrypt.e(originPassword);
+                _password = Encrypt.e(originPassword);
             } catch (Exception e) {
-                logger.error("IP:{},loginName:{},encrypt:{},password:{},securityToken:{},{}", IpUtils.getIpAddr0(SpringMVCHolder.getRequest()), loginName, encrypt, _password, securityToken, e.getMessage());
+                logger.error("IP:{},loginName:{},encrypt:{},password:{},{}", IpUtils.getIpAddr0(SpringMVCHolder.getRequest()), loginName, encrypt, _password, e.getMessage());
             }
+        } else {
+            logger.warn("客户端未加密或加密策略不支持！");
+            return Result.errorApiResult().setMsg("客户端未加密或加密策略不支持!");
         }
 
 
