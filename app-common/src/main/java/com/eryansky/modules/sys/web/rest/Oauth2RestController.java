@@ -123,7 +123,7 @@ public class Oauth2RestController {
             encryptSsoToken = Sm4Utils.encrypt(oAuth2Client.getClientSecret(), ssoToken);
         } catch (Exception e) {
             log.error(e.getMessage(),e);
-            return R.fail("服务期内部异常！");
+            return R.fail("服务器内部异常！");
         }
 
         Map<String, Object> map = Maps.newHashMap();
