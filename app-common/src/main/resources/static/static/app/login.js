@@ -76,15 +76,14 @@ function login() {
             validateCode: $("#validateCode").val()
         },
         traditional: true,
-        async:false,
         dataType: 'json',
         success: function (data) {
-            if (data.code == 1) {
+            if (data.code === 1) {
                 window.location = data.obj.homeUrl;
                 //setTimeout(function(){//延时1秒 集群环境等待缓存同步
                 //    window.location = data.obj;
                 //},1000);
-            }else if (data.code == 6) {//需要设置密码
+            }else if (data.code === 6) {//需要设置密码
                 $("#loginError2").html(data.msg);
                 $("#messageBox2").removeClass("hide");
                 setTimeout(function(){
