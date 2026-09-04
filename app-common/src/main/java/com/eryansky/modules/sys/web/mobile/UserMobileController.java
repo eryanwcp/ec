@@ -24,6 +24,7 @@ import com.eryansky.core.web.annotation.Mobile;
 import com.eryansky.core.web.upload.FileUploadUtils;
 import com.eryansky.core.web.upload.exception.FileNameLengthLimitExceededException;
 import com.eryansky.core.web.upload.exception.InvalidExtensionException;
+import com.eryansky.encrypt.anotation.DecryptRequestBody;
 import com.eryansky.encrypt.config.EncryptProvider;
 import com.eryansky.encrypt.enums.CipherMode;
 import com.eryansky.encrypt.util.RequestEncryptUtils;
@@ -38,6 +39,7 @@ import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.service.UserService;
 import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.utils.AppConstants;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
 import jakarta.annotation.Resource;
 import org.apache.commons.fileupload2.core.FileUploadSizeException;
@@ -115,7 +117,7 @@ public class UserMobileController extends SimpleController {
             model = UserUtils.getUserByLoginName(tokenLoginName);
             //安全校验 仅允许自己修改
             if (null != model && !model.getId().equals(id)) {
-                logger.warn("未授权修改账号密码：{} {} {}", model.getLoginName(), loginName, token);
+                logger.warn("未授权修改账号密码：{} {} {} {}", model.getLoginName(), id, loginName, token);
                 throw new ActionException("未授权修改账号密码！");
             }
         } else {
@@ -128,7 +130,7 @@ public class UserMobileController extends SimpleController {
             model = StringUtils.isNotBlank(loginName) ? userService.getUserByLoginName(loginName) : userService.get(id);
             //安全校验 仅允许自己修改
             if (null != model && !model.getId().equals(sessionInfo.getUserId())) {
-                logger.warn("未授权修改账号密码：{} {} {}", model.getLoginName(), model.getLoginName(), token);
+                logger.warn("未授权修改账号密码：{} {} {} {}", model.getLoginName(), id, loginName, token);
                 throw new ActionException("未授权修改账号密码！");
             }
         }
@@ -181,6 +183,36 @@ public class UserMobileController extends SimpleController {
         }
         return Result.successResult();
     }
+
+
+    /**
+     * 设置初始密码或修改密码（仅限用户自己修改）
+     * @param requestData
+     *      id 用户ID
+     *      loginName 登录账号
+     *      paramEncrypt 是否加密 加密方法采用base64加密方案
+     *      type 修改密码类型 1：初始化密码 2：帐号与安全修改密码
+     *      password 原始密码
+     *      newPassword 新密码
+     *      token 安全Token
+     * @return
+     */
+    @RequiresUser(required = false)
+    @Logging(logType = LogType.security, value = "修改密码")
+    @DecryptRequestBody
+    @PostMapping(value = "savePassword")
+    @ResponseBody
+    public Result savePassword(@RequestBody JsonNode requestData,
+                               HttpServletRequest request) {
+        String id = requestData.get("id").asText();
+        String loginName = requestData.get("ln").asText();
+        String type = requestData.get("type").asText();
+        String password = requestData.get("ps").asText();
+        String newPassword = requestData.get("newPs").asText();
+        String token = requestData.get("token").asText();
+        return savePs(id,loginName,null,type,password,newPassword,token,request);
+    }
+
 
     /**
      * 修改个人信息 页面
