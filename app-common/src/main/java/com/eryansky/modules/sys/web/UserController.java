@@ -866,6 +866,12 @@ public class UserController extends SimpleController {
     @ResponseBody
     @RestApi()
     public Result detail(@ModelAttribute("model") User model) {
+        if (model == null) {
+            return Result.errorResult().setMsg("用户不存在");
+        }
+        // 脱敏处理，置空敏感字段或转为 UserVO
+        model.setPassword(null);
+        model.setOriginalPassword(null);
         return Result.successResult().setObj(model);
     }
 }
