@@ -192,7 +192,7 @@ public class UserMobileController extends SimpleController {
 
     /**
      * 设置初始密码或修改密码（仅限用户自己修改）
-     * @param requestData
+     * @param requestData 全字段安全加密
      *      id 用户ID
      *      loginName 登录账号
      *      paramEncrypt 是否加密 加密方法采用base64加密方案
