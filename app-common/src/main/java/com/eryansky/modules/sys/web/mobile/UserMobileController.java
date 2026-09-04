@@ -102,14 +102,19 @@ public class UserMobileController extends SimpleController {
     @ResponseBody
     public Result savePs(@RequestParam(name = "id", required = false) String id,
                          @RequestParam(name = "ln", required = false) String loginName,
-                         @RequestParam(name = "encrypt",defaultValue = "false") String paramEncrypt,
+                         @RequestParam(name = "encrypt",required = false) String paramEncrypt,
                          @RequestParam(name = "type", required = false) String type,
                          @RequestParam(name = "ps", required = false) String password,
                          @RequestParam(name = "newPs", required = true) String newPassword,
                          @RequestParam(name = "token", required = false) String token,
                          HttpServletRequest request) {
-        String encrypt = WebUtils.getHeaderIgnoreCase(request, RequestEncryptUtils.ENCRYPT);
-        String encryptKey = WebUtils.getHeaderIgnoreCase(request,RequestEncryptUtils.ENCRYPT_KEY);
+        String encrypt = null;
+        String encryptKey = null;
+        if(StringUtils.isEquals("true",paramEncrypt)){//兼容老版本客户端
+            encrypt = WebUtils.getHeaderIgnoreCase(request, RequestEncryptUtils.ENCRYPT);
+            encryptKey = WebUtils.getHeaderIgnoreCase(request,RequestEncryptUtils.ENCRYPT_KEY);
+        }
+
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         User model = null;
         if (StringUtils.isNotBlank(token)) {
@@ -204,13 +209,25 @@ public class UserMobileController extends SimpleController {
     @ResponseBody
     public Result savePassword(@RequestBody JsonNode requestData,
                                HttpServletRequest request) {
-        String id = requestData.get("id").asText();
-        String loginName = requestData.get("ln").asText();
-        String type = requestData.get("type").asText();
-        String password = requestData.get("ps").asText();
-        String newPassword = requestData.get("newPs").asText();
-        String token = requestData.get("token").asText();
-        return savePs(id,loginName,null,type,password,newPassword,token,request);
+        String id = Optional.ofNullable(requestData.get("id"))
+                .map(JsonNode::asText)
+                .orElse(null);
+        String loginName = Optional.ofNullable(requestData.get("ln"))
+                .map(JsonNode::asText)
+                .orElse(null);
+        String type = Optional.ofNullable(requestData.get("type"))
+                .map(JsonNode::asText)
+                .orElse(null);
+        String password = Optional.ofNullable(requestData.get("ps"))
+                .map(JsonNode::asText)
+                .orElse(null);
+        String newPassword = Optional.ofNullable(requestData.get("newPs"))
+                .map(JsonNode::asText)
+                .orElse(null);
+        String token = Optional.ofNullable(requestData.get("token"))
+                .map(JsonNode::asText)
+                .orElse(null);
+        return savePs(id,loginName,"false",type,password,newPassword,token,request);
     }
 
 
