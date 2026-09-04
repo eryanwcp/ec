@@ -120,7 +120,7 @@ public class UserController extends SimpleController {
 
         page = userService.findPage(page, organId, query, userType);
         Datagrid<User> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
-        return renderString(response,JsonMapper.getInstance().toJsonWithExcludeProperties(dg, new String[]{"password", "orignPassword"}), WebUtils.JSON_TYPE);
+        return renderString(response,JsonMapper.getInstance().toJsonWithExcludeProperties(dg, User.class,new String[]{"password", "originalPassword"}), WebUtils.JSON_TYPE);
     }
 
     /**
