@@ -155,8 +155,7 @@ public class UserController extends SimpleController {
             cList.add(titleCombobox);
         }
         SexType[] _enums = SexType.values();
-        for (int i = 0; i < _enums.length; i++) {
-            SexType e = _enums[i];
+        for (SexType e : _enums) {
             Combobox combobox = new Combobox(e.getValue(), e.getDescription());
             cList.add(combobox);
         }
@@ -764,7 +763,7 @@ public class UserController extends SimpleController {
         modelAndView.addObject("multiple", multiple);
         modelAndView.addObject("cascade", cascade);
         modelAndView.addObject("userDatagridData",
-                JsonMapper.getInstance().toJson(new Datagrid(users.size(), users), User.class,
+                JsonMapper.getInstance().toJson(new Datagrid<>(users.size(), users), User.class,
                         new String[]{"id","loginName", "name","code","bizCode", "sexView", "defaultOrganName"}));
         return modelAndView;
     }
@@ -805,9 +804,7 @@ public class UserController extends SimpleController {
         List<User> users = userService.findAllNormal();
 
         List<Object[]> list = new ArrayList<>();
-        Iterator<User> iterator = users.iterator();
-        while (iterator.hasNext()) {
-            User user = iterator.next();
+        for (User user : users) {
             list.add(new Object[]{UserUtils.getCompanyName(user.getId()), UserUtils.getDefaultOrganName(user.getId()), user.getLoginName(), user.getName(), user.getSexView(),
                     user.getTel(), user.getMobile(), user.getEmail()});
         }
@@ -870,6 +867,12 @@ public class UserController extends SimpleController {
     @ResponseBody
     @RestApi()
     public Result detail(@ModelAttribute("model") User model) {
+        if (model == null) {
+            return Result.errorResult().setMsg("用户不存在");
+        }
+        // 脱敏处理，置空敏感字段或转为 UserVO
+        model.setPassword(null);
+        model.setOriginalPassword(null);
         return Result.successResult().setObj(model);
     }
 }
