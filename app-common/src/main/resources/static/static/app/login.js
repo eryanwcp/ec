@@ -94,7 +94,7 @@ function login() {
                 refreshCheckCode();
                 $("#loginError2").html(data.msg);
                 $("#messageBox2").removeClass("hide");
-                if (data.obj != undefined && data.obj == true) {
+                if (data.obj !== undefined && data.obj === true) {
                     $(".validateCode").show();
                 }
             }
