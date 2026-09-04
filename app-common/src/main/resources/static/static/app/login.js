@@ -105,6 +105,6 @@ function login() {
 //刷新验证码
 function refreshCheckCode() {
     //加上随机时间 防止IE浏览器不请求数据
-    var url = ctx + '/servlet/ValidateCodeServlet?' + new Date().getTime();
+    const url = ctx + '/servlet/ValidateCodeServlet?' + new Date().getTime();
     $('#validateCodeImage').attr('src', url);
 }
