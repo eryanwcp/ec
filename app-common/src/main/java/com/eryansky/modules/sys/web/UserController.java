@@ -103,8 +103,7 @@ public class UserController extends SimpleController {
      * @return
      */
     @PostMapping(value = {"datagrid"})
-    @ResponseBody
-    public Datagrid<User> datagrid(String organId, String query, String userType) {
+    public String datagrid(String organId, String query, String userType,HttpServletRequest request,HttpServletResponse response) {
         Page<User> page = new Page<>(SpringMVCHolder.getRequest());
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         if (StringUtils.isBlank(organId)) {
@@ -122,7 +121,7 @@ public class UserController extends SimpleController {
 
         page = userService.findPage(page, organId, query, userType);
         Datagrid<User> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
-        return dg;
+        return renderString(response,JsonMapper.getInstance().toJsonWithExcludeProperties(dg, new String[]{"password", "orignPassword"}), WebUtils.JSON_TYPE);
     }
 
     /**
@@ -457,7 +456,6 @@ public class UserController extends SimpleController {
      * @return
      */
     @PostMapping(value = {"userList"})
-    @ResponseBody
     public String userList(String dataScope,
                            @RequestParam(value = "includeUserIds", required = false) List<String> includeUserIds,
                            @RequestParam(value = "excludeUserIds", required = false) List<String> excludeUserIds,
@@ -490,7 +488,7 @@ public class UserController extends SimpleController {
 
         String json = JsonMapper.getInstance().toJson(list, User.class,
                 new String[]{"id", "loginName","code","bizCode", "name", "sexView", "defaultOrganName", "companyName"});
-        return json;
+        return renderString(response,json, WebUtils.JSON_TYPE);
     }
 
     /**
