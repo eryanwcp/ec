@@ -203,7 +203,7 @@ public class UserController extends SimpleController {
                 return result;
             }
             try {
-                String _newPassword = RequestEncryptUtils.decryptDataByRequest(request,user.getPassword());
+                String _newPassword = RequestEncryptUtils.decryptEncodeDataByRequest(request,user.getPassword());
                 user.setOriginalPassword(Encryption.encrypt(_newPassword));
                 user.setPassword(Encrypt.e(_newPassword));
             } catch (Exception e) {
@@ -269,7 +269,7 @@ public class UserController extends SimpleController {
                                 HttpServletRequest request){
         String _newPassword = null;
         try {
-            _newPassword = RequestEncryptUtils.decryptDataByRequest(request,newPassword);
+            _newPassword = RequestEncryptUtils.decryptEncodeDataByRequest(request,newPassword);
         } catch (Exception e) {
             return Result.errorResult();
         }

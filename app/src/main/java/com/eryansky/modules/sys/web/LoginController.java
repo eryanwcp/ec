@@ -15,11 +15,9 @@ import com.eryansky.common.utils.Identities;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.UserAgentUtils;
 import com.eryansky.common.utils.collections.Collections3;
-import com.eryansky.common.utils.encode.EncodeUtils;
 import com.eryansky.common.utils.encode.Encrypt;
 import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.utils.mapper.JsonMapper;
-import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.servlet.ValidateCodeServlet;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
@@ -233,7 +231,7 @@ public class LoginController extends SimpleController {
 
         String originPassword = null;
         try {
-            originPassword = RequestEncryptUtils.decryptDataByRequest(request,password);
+            originPassword = RequestEncryptUtils.decryptEncodeDataByRequest(request,password);
         } catch (Exception e) {
             return Result.errorResult();
         }

@@ -32,7 +32,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -125,8 +124,8 @@ public class UserMobileController extends SimpleController {
         String pagePassword = StringUtils.trim(password);//页面输入的原始密码（未加密）
         String _newPassword = StringUtils.trim(newPassword);
         try {
-             pagePassword = RequestEncryptUtils.decryptDataByRequest(request,pagePassword);
-             _newPassword = RequestEncryptUtils.decryptDataByRequest(request,_newPassword);
+             pagePassword = RequestEncryptUtils.decryptEncodeDataByRequest(request,pagePassword);
+             _newPassword = RequestEncryptUtils.decryptEncodeDataByRequest(request,_newPassword);
             if(StringUtils.isEquals(paramEncrypt,"true")){//兼容方案 客户端升级后删除
                 pagePassword =  new String(EncodeUtils.base64Decode(pagePassword));
                 _newPassword =  new String(EncodeUtils.base64Decode(_newPassword));
@@ -141,7 +140,11 @@ public class UserMobileController extends SimpleController {
         }
 
         if(AppConstants.isCheckPasswordPolicy()){
-            UserUtils.checkSecurity(model.getId(), _newPassword);
+            try {
+                UserUtils.checkSecurity(model.getId(), _newPassword);
+            } catch (Exception e) {
+                return Result.errorResult().setMsg(e.getMessage());
+            }
         }
 
         //修改本地密码
@@ -195,6 +198,7 @@ public class UserMobileController extends SimpleController {
         String token = Optional.ofNullable(requestData.get("token"))
                 .map(JsonNode::asText)
                 .orElse(null);
+        request.setAttribute("ignoreEncrypt",true);
         return savePs(id,loginName,"false",type,password,newPassword,token,request);
     }
 

@@ -144,7 +144,7 @@ public class RequestEncryptUtils {
      * @return
      */
     public static byte[] decryptDataByRequest(HttpServletRequest request, byte[] bytes) throws Exception{
-        boolean ignoreEncrypt = Boolean.parseBoolean((String) request.getAttribute("ignoreEncrypt"));
+        boolean ignoreEncrypt = Boolean.parseBoolean((String.valueOf(request.getAttribute("ignoreEncrypt"))));
         if (ignoreEncrypt) {
             return bytes;
         }
@@ -172,8 +172,8 @@ public class RequestEncryptUtils {
     /**
      * 解密 Request 密码公用提取逻辑
      */
-    public static String decryptDataByRequest(HttpServletRequest request, String data) throws Exception {
-        boolean ignoreEncrypt = Boolean.parseBoolean((String) request.getAttribute("ignoreEncrypt"));
+    public static String decryptEncodeDataByRequest(HttpServletRequest request, String data) throws Exception {
+        boolean ignoreEncrypt = Boolean.parseBoolean(String.valueOf(request.getAttribute("ignoreEncrypt")));
         if (ignoreEncrypt || StringUtils.isBlank(data)) {
             return data;
         }
