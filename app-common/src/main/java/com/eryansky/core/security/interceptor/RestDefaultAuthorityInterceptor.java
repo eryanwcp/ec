@@ -157,7 +157,14 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                 return false;
             }
 
-            String clientId = JWTUtils.getUsername(accessToken);
+            String clientId;
+            try {
+                clientId = JWTUtils.getUsername(accessToken);
+            } catch (Exception e) {
+                notPermittedPermission(request, response, requestUrl, "AccessToken格式无效", metadata.defaultEncryptResponseBody);
+                return false;
+            }
+
             applicationId = clientId;
             List<OAuth2Client> oauth2Clients = AppConstants.getOauth2ClientList();
             OAuth2Client oAuth2Client = oauth2Clients.stream()
@@ -170,7 +177,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                 return false;
             }
 
-            // 应用客户端 IP 校验（修复原逻辑反转 Bug）
+            // 应用客户端 IP 校验
             if (!isClientIpAllowed(ip, oAuth2Client.getClientIps())) {
                 notPermittedPermission(request, response, requestUrl, "REST禁止访问：" + clientId + "," + ip, metadata.defaultEncryptResponseBody);
                 return false;
@@ -206,7 +213,6 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
         String encrypt = WebUtils.getHeaderIgnoreCase(request, RPCUtils.HEADER_ENCRYPT);
         String encryptKey = WebUtils.getHeaderIgnoreCase(request, RPCUtils.HEADER_ENCRYPT_KEY);
 
-        // 如果配置了加密且请求头包含加密 Key，进行数据加密输出（修复加密逻辑分支取反 Bug）
         if (defaultEncryptResponseBody && StringUtils.isNotBlank(encrypt) && StringUtils.isNotBlank(encryptKey)) {
             try {
                 byte[] encryptData = RequestEncryptUtils.encryptDataByRequest(encrypt, encryptKey, JsonMapper.getInstance().writeValueAsBytes(r));
@@ -214,6 +220,8 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                 return;
             } catch (Exception e) {
                 logger.error("加密渲染响应失败: {}", e.getMessage(), e);
+                WebUtils.renderJson(response, r);
+                return;
             }
         }
 
@@ -221,7 +229,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
     }
 
     /**
-     * 解析 HandlerMethod 及 Class 上的 RestApi 和 RequiresUser 注解（首次调用时触发）
+     * 解析 HandlerMethod 及 Class 上的 RestApi 和 RequiresUser 注解
      */
     private RestAnnotationMetadata parseRestAnnotationMetadata(HandlerMethod handlerMethod) {
         Class<?> beanType = handlerMethod.getBeanType();
@@ -259,14 +267,15 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
             return false;
         }
 
-        if ("127.0.0.1".equals(ip) || "localhost".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip)) {
+        // 包含常见的 IPv4 与 IPv6 回环地址
+        if ("127.0.0.1".equals(ip) || "localhost".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip) || "::1".equals(ip)) {
             return false;
         }
 
         List<String> ipList = AppConstants.getRestLimitIpWhiteList();
         if (Collections3.isNotEmpty(ipList)) {
             boolean matches = ipList.stream().anyMatch(v -> "*".equals(v) || com.eryansky.j2cache.util.IpUtils.checkIPMatching(v, ip));
-            return !matches; // 不在白名单内，则限制访问
+            return !matches; // 不在白名单内，表示被限制访问
         }
 
         return false;
