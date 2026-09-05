@@ -60,17 +60,7 @@ public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
 
         byte[] decryptBytes;
         try {
-            byte[] cipherBytes;
-            if (CipherMode.SM4.name().equalsIgnoreCase(requestEncrypt)) {
-                cipherBytes = EncodeUtils.hexDecode(IOUtils.toCharArray(httpInputMessage.getBody(), StandardCharsets.UTF_8));
-            } else if (CipherMode.AES.name().equalsIgnoreCase(requestEncrypt)) {
-                cipherBytes = EncodeUtils.base64Decode(IOUtils.toByteArray(httpInputMessage.getBody()));
-            } else if (CipherMode.BASE64.name().equalsIgnoreCase(requestEncrypt)) {
-                cipherBytes = Base64.decodeBase64(IOUtils.toByteArray(httpInputMessage.getBody()));
-            } else {
-                cipherBytes = IOUtils.toByteArray(httpInputMessage.getBody());
-            }
-            decryptBytes = RequestEncryptUtils.decryptDataByRequest(requestEncrypt, requestEncryptKey, cipherBytes);
+            decryptBytes = RequestEncryptUtils.decryptEncodeDataByRequest(request, IOUtils.toByteArray(httpInputMessage.getBody()));
         } catch (Exception e) {
             log.error("请求体解密异常, URI: {}, EncryptType: {}, Error: {}",
                     request.getRequestURI(), requestEncrypt, e.getMessage(), e);

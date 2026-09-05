@@ -11,7 +11,6 @@ import com.eryansky.common.utils.*;
 import com.eryansky.common.utils.encode.EncodeUtils;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
-import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
@@ -39,8 +38,6 @@ import com.google.common.collect.Maps;
 import org.apache.commons.fileupload.FileUploadBase;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.Base64Utils;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
@@ -51,7 +48,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.nio.file.Files;
 import java.util.Map;
 
 /**
@@ -372,8 +368,6 @@ public class MobileIndexController extends SimpleController {
                               @RequestParam(value = "press", defaultValue = "true") Boolean press,
                               @RequestParam(value = "pressText", required = false) String pressText,
                               HttpServletRequest request, HttpServletResponse response) {
-        String requestEncrypt = WebUtils.getHeaderIgnoreCase(request, RequestEncryptUtils.ENCRYPT);
-        String requestEncryptKey = WebUtils.getHeaderIgnoreCase(request, RequestEncryptUtils.ENCRYPT_KEY);
         Result result = null;
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         Exception exception = null;
@@ -389,7 +383,7 @@ public class MobileIndexController extends SimpleController {
             }
 
             // 1. 文件解密处理
-            byte[] data = RequestEncryptUtils.decryptDataByRequest(requestEncrypt,requestEncryptKey,multipartFile.getBytes());
+            byte[] data = RequestEncryptUtils.decryptDataByRequest(request,multipartFile.getBytes());
             if (null != data) {
                 multipartFile = new CustomMultipartFile(filename, data);
             }

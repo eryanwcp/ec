@@ -52,6 +52,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -150,16 +151,8 @@ public class UserMobileController extends SimpleController {
         String pagePassword = StringUtils.trim(password);//页面输入的原始密码（未加密）
         String _newPassword = StringUtils.trim(newPassword);
         try {
-            if ("AES".equals(encrypt)) {
-                pagePassword = new String(RequestEncryptUtils.decryptDataByRequest(encrypt, encryptKey, EncodeUtils.base64Decode(StringUtils.trim(password))));
-                _newPassword = new String(RequestEncryptUtils.decryptDataByRequest(encrypt, encryptKey, EncodeUtils.base64Decode(StringUtils.trim(newPassword))));
-            } else if ("SM4".equals(encrypt)) {
-                pagePassword = new String(RequestEncryptUtils.decryptDataByRequest(encrypt, encryptKey, EncodeUtils.hexDecode(StringUtils.trim(password))));
-                _newPassword = new String(RequestEncryptUtils.decryptDataByRequest(encrypt, encryptKey, EncodeUtils.hexDecode(StringUtils.trim(newPassword))));
-            }else if("true".equals(paramEncrypt)){//兼容方案 客户端升级后删除
-                pagePassword =  new String(EncodeUtils.base64Decode(StringUtils.trim(password)));
-                _newPassword =  new String(EncodeUtils.base64Decode(StringUtils.trim(newPassword)));
-            }
+             pagePassword = RequestEncryptUtils.decryptDataByRequest(request,StringUtils.trim(password));
+             _newPassword = RequestEncryptUtils.decryptDataByRequest(request,StringUtils.trim(newPassword));
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.warnResult().setMsg("密码解码错误！");
