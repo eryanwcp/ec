@@ -80,7 +80,7 @@ public class SystemEncryptController extends SimpleController {
     @ResponseBody
     public Result data(@RequestBody String data, HttpServletRequest request, HttpServletResponse response) {
         logger.info("data:{}",data);
-        return Result.successResult().setData(UserUtils.getUser(User.SUPERUSER_ID));
+        return Result.successResult().setData(data);
     }
 
 
