@@ -1,37 +1,19 @@
 package com.eryansky.modules.sys.web.mobile;
 
-import cn.hutool.core.img.ImgUtil;
-import com.drew.imaging.ImageMetadataReader;
-import com.drew.metadata.Directory;
-import com.drew.metadata.Metadata;
-import com.drew.metadata.Tag;
 import com.eryansky.common.exception.ActionException;
 import com.eryansky.common.model.Result;
-import com.eryansky.common.utils.Identities;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.encode.*;
-import com.eryansky.common.utils.io.IoUtils;
 import com.eryansky.common.utils.mapper.JsonMapper;
-import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.springmvc.SimpleController;
-import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
 import com.eryansky.core.security.annotation.RequiresUser;
 import com.eryansky.core.web.annotation.Mobile;
-import com.eryansky.core.web.upload.FileUploadUtils;
-import com.eryansky.core.web.upload.exception.FileNameLengthLimitExceededException;
-import com.eryansky.core.web.upload.exception.InvalidExtensionException;
 import com.eryansky.encrypt.anotation.DecryptRequestBody;
-import com.eryansky.encrypt.config.EncryptProvider;
-import com.eryansky.encrypt.enums.CipherMode;
 import com.eryansky.encrypt.util.RequestEncryptUtils;
-import com.eryansky.modules.disk._enum.FolderType;
-import com.eryansky.modules.disk.extend.CustomMultipartFile;
-import com.eryansky.modules.disk.mapper.File;
-import com.eryansky.modules.disk.utils.DiskUtils;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys._enum.UserPasswordUpdateType;
 import com.eryansky.modules.sys._enum.UserType;
@@ -41,20 +23,16 @@ import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.utils.AppConstants;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
-import org.apache.commons.fileupload.FileUploadBase;
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -106,13 +84,9 @@ public class UserMobileController extends SimpleController {
                          @RequestParam(name = "newPs", required = true) String newPassword,
                          @RequestParam(name = "token", required = false) String token,
                          HttpServletRequest request) {
-        String encrypt = null;
-        String encryptKey = null;
-        if(StringUtils.isEquals("true",paramEncrypt)){//兼容老版本客户端
-            encrypt = WebUtils.getHeaderIgnoreCase(request, RequestEncryptUtils.ENCRYPT);
-            encryptKey = WebUtils.getHeaderIgnoreCase(request,RequestEncryptUtils.ENCRYPT_KEY);
+        if(StringUtils.isEquals(paramEncrypt,"true")){//兼容方案 客户端升级后删除
+            request.setAttribute("ignoreEncrypt",true);
         }
-
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         User model = null;
         if (StringUtils.isNotBlank(token)) {
@@ -151,8 +125,12 @@ public class UserMobileController extends SimpleController {
         String pagePassword = StringUtils.trim(password);//页面输入的原始密码（未加密）
         String _newPassword = StringUtils.trim(newPassword);
         try {
-             pagePassword = RequestEncryptUtils.decryptDataByRequest(request,StringUtils.trim(password));
-             _newPassword = RequestEncryptUtils.decryptDataByRequest(request,StringUtils.trim(newPassword));
+             pagePassword = RequestEncryptUtils.decryptDataByRequest(request,pagePassword);
+             _newPassword = RequestEncryptUtils.decryptDataByRequest(request,_newPassword);
+            if(StringUtils.isEquals(paramEncrypt,"true")){//兼容方案 客户端升级后删除
+                pagePassword =  new String(EncodeUtils.base64Decode(pagePassword));
+                _newPassword =  new String(EncodeUtils.base64Decode(_newPassword));
+            }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.warnResult().setMsg("密码解码错误！");
