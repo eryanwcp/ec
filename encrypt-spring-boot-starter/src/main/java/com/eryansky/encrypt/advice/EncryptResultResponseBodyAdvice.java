@@ -42,10 +42,10 @@ public class EncryptResultResponseBodyAdvice implements ResponseBodyAdvice<Resul
             return body;
         }
 
-        if (!(request instanceof ServletServerHttpRequest servletServerHttpRequest)) {
+        if (!(request instanceof ServletServerHttpRequest)) {
             return body;
         }
-        HttpServletRequest servletRequest = servletServerHttpRequest.getServletRequest();
+        HttpServletRequest servletRequest = ((ServletServerHttpRequest) request).getServletRequest();
         String requestEncrypt = WebUtils.getHeaderIgnoreCaseOrParameter(servletRequest,RequestEncryptUtils.ENCRYPT);
         String requestEncryptKey = WebUtils.getHeaderIgnoreCaseOrParameter(servletRequest,RequestEncryptUtils.ENCRYPT_KEY);
         try {
