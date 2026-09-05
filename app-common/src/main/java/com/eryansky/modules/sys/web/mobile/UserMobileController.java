@@ -140,11 +140,7 @@ public class UserMobileController extends SimpleController {
         }
 
         if(AppConstants.isCheckPasswordPolicy()){
-            try {
-                UserUtils.checkSecurity(model.getId(), _newPassword);
-            } catch (Exception e) {
-                return Result.errorResult().setMsg(e.getMessage());
-            }
+            UserUtils.checkSecurity(model.getId(), _newPassword);
         }
 
         //修改本地密码
