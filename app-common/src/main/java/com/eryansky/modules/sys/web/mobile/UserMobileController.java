@@ -23,12 +23,12 @@ import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.utils.AppConstants;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -125,11 +125,11 @@ public class UserMobileController extends SimpleController {
         String pagePassword = StringUtils.trim(password);//页面输入的原始密码（未加密）
         String _newPassword = StringUtils.trim(newPassword);
         try {
-             pagePassword = RequestEncryptUtils.decryptDataByRequest(request,StringUtils.trim(password));
-             _newPassword = RequestEncryptUtils.decryptDataByRequest(request,StringUtils.trim(newPassword));
+             pagePassword = RequestEncryptUtils.decryptDataByRequest(request,pagePassword);
+             _newPassword = RequestEncryptUtils.decryptDataByRequest(request,_newPassword);
             if(StringUtils.isEquals(paramEncrypt,"true")){//兼容方案 客户端升级后删除
-                pagePassword =  new String(EncodeUtils.base64Decode(StringUtils.trim(password)));
-                _newPassword =  new String(EncodeUtils.base64Decode(StringUtils.trim(newPassword)));
+                pagePassword =  new String(EncodeUtils.base64Decode(pagePassword));
+                _newPassword =  new String(EncodeUtils.base64Decode(_newPassword));
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
