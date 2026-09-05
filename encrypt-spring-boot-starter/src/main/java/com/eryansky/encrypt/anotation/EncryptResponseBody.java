@@ -8,6 +8,7 @@ import java.lang.annotation.*;
 
 /**
  * 加密注解
+ * 注：需客户端自行传递加密方式以及加密密钥参数
  *
  * @author Eryan
  */

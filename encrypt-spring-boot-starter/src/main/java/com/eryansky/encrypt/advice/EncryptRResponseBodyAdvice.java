@@ -16,11 +16,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 /**
  * 默认加密策略 返回值为R
+ * 注：需客户端自行传递加密方式以及加密密钥参数
  */
 @RestControllerAdvice
 public class EncryptRResponseBodyAdvice implements ResponseBodyAdvice<R<Object>> {
@@ -39,13 +41,14 @@ public class EncryptRResponseBodyAdvice implements ResponseBodyAdvice<R<Object>>
         HttpHeaders headers = request.getHeaders();
 //        String requestEncrypt = Collections3.getFirst(headers.get(RequestEncryptUtils.ENCRYPT));
 //        String requestEncryptKey = Collections3.getFirst(headers.get(RequestEncryptUtils.ENCRYPT_KEY));
-        String requestEncrypt = WebUtils.getHeaderIgnoreCaseOrParameter((HttpServletRequest) request,RequestEncryptUtils.ENCRYPT);
-        String requestEncryptKey = WebUtils.getHeaderIgnoreCaseOrParameter((HttpServletRequest) request,RequestEncryptUtils.ENCRYPT_KEY);
+        HttpServletRequest request1 = ((ServletServerHttpRequest) request).getServletRequest();
+        String requestEncrypt = WebUtils.getHeaderIgnoreCaseOrParameter(request1,RequestEncryptUtils.ENCRYPT);
+        String requestEncryptKey = WebUtils.getHeaderIgnoreCaseOrParameter(request1,RequestEncryptUtils.ENCRYPT_KEY);
         if (StringUtils.isNotBlank(requestEncrypt)){
             if(body != null && body.getData() != null){
                 try {
                     byte[] data = JsonMapper.getInstance().writeValueAsBytes(body.getData());
-                    body.setData(RequestEncryptUtils.encryptDataByRequest(requestEncrypt,requestEncryptKey,data));
+                    body.setData(RequestEncryptUtils.encryptDataStringByRequest(requestEncrypt,requestEncryptKey,data));
                 } catch (Exception e) {
                     log.error(e.getMessage(),e);
                     throw new RuntimeException(e);

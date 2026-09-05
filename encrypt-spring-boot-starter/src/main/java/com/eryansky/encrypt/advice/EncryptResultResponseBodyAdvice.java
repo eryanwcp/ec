@@ -4,7 +4,6 @@ import com.eryansky.common.model.Result;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.mapper.JsonMapper;
-import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.encrypt.anotation.EncryptResponseBody;
 import com.eryansky.encrypt.util.RequestEncryptUtils;
@@ -16,11 +15,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 /**
  * 默认加密策略 返回值为Result
+ * 注：需客户端自行传递加密方式以及加密密钥参数
  */
 @RestControllerAdvice
 public class EncryptResultResponseBodyAdvice implements ResponseBodyAdvice<Result> {
@@ -39,13 +40,14 @@ public class EncryptResultResponseBodyAdvice implements ResponseBodyAdvice<Resul
         HttpHeaders headers = request.getHeaders();
 //        String requestEncrypt = Collections3.getFirst(headers.get(RequestEncryptUtils.ENCRYPT));
 //        String requestEncryptKey = Collections3.getFirst(headers.get(RequestEncryptUtils.ENCRYPT_KEY));
-        String requestEncrypt = WebUtils.getHeaderIgnoreCaseOrParameter((HttpServletRequest) request,RequestEncryptUtils.ENCRYPT);
-        String requestEncryptKey = WebUtils.getHeaderIgnoreCaseOrParameter((HttpServletRequest) request,RequestEncryptUtils.ENCRYPT_KEY);
+        HttpServletRequest request1 = ((ServletServerHttpRequest) request).getServletRequest();
+        String requestEncrypt = WebUtils.getHeaderIgnoreCaseOrParameter(request1,RequestEncryptUtils.ENCRYPT);
+        String requestEncryptKey = WebUtils.getHeaderIgnoreCaseOrParameter(request1,RequestEncryptUtils.ENCRYPT_KEY);
         if (StringUtils.isNotBlank(requestEncrypt)){
             if(body != null && body.getData() != null){
                 try {
                     byte[] data = JsonMapper.getInstance().writeValueAsBytes(body.getData());
-                    body.setData(RequestEncryptUtils.encryptDataByRequest(requestEncrypt,requestEncryptKey,data));
+                    body.setData(RequestEncryptUtils.encryptDataStringByRequest(requestEncrypt,requestEncryptKey,data));
                 } catch (Exception e) {
                     log.error(e.getMessage(),e);
                     throw new RuntimeException(e);
@@ -54,7 +56,7 @@ public class EncryptResultResponseBodyAdvice implements ResponseBodyAdvice<Resul
             if(body != null && body.getObj() != null){
                 try {
                     byte[] obj = JsonMapper.getInstance().writeValueAsBytes(body.getObj());
-                    body.setObj(RequestEncryptUtils.encryptDataByRequest(requestEncrypt,requestEncryptKey,obj));
+                    body.setObj(RequestEncryptUtils.encryptDataStringByRequest(requestEncrypt,requestEncryptKey,obj));
                 } catch (Exception e) {
                     log.error(e.getMessage(),e);
                     throw new RuntimeException(e);

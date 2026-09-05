@@ -305,7 +305,6 @@
         //       requestEncryptKey = RSAUtils.encryptBase64String(encryptKey,publicKey);
         //       encryptRequestData = Cryptos.encrypt(encryptRequestData,encryptKey);
         //     }
-        //
         //     $.ajax({
         //       url: ctxAdmin + '/sys/encrypt/data',
         //       type: 'post',
@@ -318,9 +317,9 @@
         //       success: function (data) {
         //         console.log(data);
         //         if("SM4" === requestEncrypt){
-        //           console.log(Sm4Utils.decrypt(data['data'],encryptKey));
+        //           console.log(JSON.parse(Sm4Utils.decrypt(data['data'],encryptKey)));
         //         }else if("AES" === requestEncrypt){
-        //           console.log(Cryptos.decrypt(data['data'],encryptKey));
+        //           console.log(JSON.parse(Cryptos.decrypt(data['data'],encryptKey)));
         //         }
         //       }
         //     });
