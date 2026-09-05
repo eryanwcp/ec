@@ -38,12 +38,10 @@ public class EncryptResultResponseBodyAdvice implements ResponseBodyAdvice<Resul
 
     @Override  
     public Result beforeBodyWrite(Result body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
-        // 1. 前置防御校验：body 或 body.data 为空时直接返回
         if (body == null) {
             return body;
         }
 
-        // 2. 安全获取 HttpServletRequest
         if (!(request instanceof ServletServerHttpRequest servletServerHttpRequest)) {
             return body;
         }
