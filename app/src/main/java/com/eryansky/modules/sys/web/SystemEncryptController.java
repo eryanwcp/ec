@@ -51,7 +51,7 @@ public class SystemEncryptController extends SimpleController {
     public Result initKey(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Map<String,Object> data = Maps.newHashMap();
         //数据传输加密方法 支持SM4、AES
-        data.put("requestEncrypt", CipherMode.AES.name());
+        data.put("requestEncrypt", CipherMode.SM4.name());
         //动态密钥
         String requestEncryptSm4Key = Sm4Utils.generateHexKeyString();//hex编码
         String requestEncryptAesKey = Cryptos.getBase64EncodeKey();//AES base64编码

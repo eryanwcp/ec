@@ -11,7 +11,6 @@ import com.eryansky.common.utils.*;
 import com.eryansky.common.utils.encode.EncodeUtils;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
-import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
@@ -369,8 +368,6 @@ public class MobileIndexController extends SimpleController {
                               @RequestParam(value = "press", defaultValue = "true") Boolean press,
                               @RequestParam(value = "pressText", required = false) String pressText,
                               HttpServletRequest request, HttpServletResponse response) {
-        String requestEncrypt = WebUtils.getHeaderIgnoreCase(request, RequestEncryptUtils.ENCRYPT);
-        String requestEncryptKey = WebUtils.getHeaderIgnoreCase(request, RequestEncryptUtils.ENCRYPT_KEY);
         Result result = null;
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         Exception exception = null;
@@ -386,7 +383,7 @@ public class MobileIndexController extends SimpleController {
             }
 
             // 1. 文件解密处理
-            byte[] data = RequestEncryptUtils.decryptDataByRequest(requestEncrypt,requestEncryptKey,multipartFile.getBytes());
+            byte[] data = RequestEncryptUtils.decryptDataByRequest(request,multipartFile.getBytes());
             if (null != data) {
                 multipartFile = new CustomMultipartFile(filename, data);
             }

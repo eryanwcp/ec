@@ -231,27 +231,13 @@ public class LoginController extends SimpleController {
             }
         }
 
-        String originPassword = password;
-        String _password = password;
-        if ("AES".equals(encrypt)) {
-            try {
-                originPassword = new String(RequestEncryptUtils.decryptDataByRequest(encrypt, encryptKey, EncodeUtils.base64Decode(password)));
-                _password = Encrypt.e(originPassword);
-            } catch (Exception e) {
-                logger.error("IP:{},loginName:{},encrypt:{},password:{},{}", IpUtils.getIpAddr0(SpringMVCHolder.getRequest()), loginName, encrypt, _password, e.getMessage());
-            }
-        } else if ("SM4".equals(encrypt)) {
-            try {
-                originPassword = new String(RequestEncryptUtils.decryptDataByRequest(encrypt, encryptKey, EncodeUtils.hexDecode(password)));
-                _password = Encrypt.e(originPassword);
-            } catch (Exception e) {
-                logger.error("IP:{},loginName:{},encrypt:{},password:{},{}", IpUtils.getIpAddr0(SpringMVCHolder.getRequest()), loginName, encrypt, _password, e.getMessage());
-            }
-        } else {
-            logger.warn("客户端未加密或加密策略不支持！");
-            return Result.errorApiResult().setMsg("客户端未加密或加密策略不支持!");
+        String originPassword = null;
+        try {
+            originPassword = RequestEncryptUtils.decryptDataByRequest(request,password);
+        } catch (Exception e) {
+            return Result.errorResult();
         }
-
+        String _password = Encrypt.e(originPassword);
 
         // 获取用户信息
         User user = userService.getUserByLMP(loginName,loginName, _password);

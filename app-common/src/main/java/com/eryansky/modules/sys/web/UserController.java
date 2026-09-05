@@ -10,7 +10,6 @@ import com.eryansky.common.model.*;
 import com.eryansky.common.orm.Page;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
-import com.eryansky.common.utils.encode.EncodeUtils;
 import com.eryansky.common.utils.encode.Encrypt;
 import com.eryansky.common.utils.encode.Encryption;
 import com.eryansky.common.utils.mapper.JsonMapper;
@@ -202,22 +201,8 @@ public class UserController extends SimpleController {
                 logger.warn(result.toString());
                 return result;
             }
-            String _newPassword = user.getPassword();
             try {
-                String encrypt = WebUtils.getHeaderIgnoreCaseOrParameter(request, RequestEncryptUtils.ENCRYPT);
-                String encryptKey = WebUtils.getHeaderIgnoreCaseOrParameter(request,RequestEncryptUtils.ENCRYPT_KEY);
-                boolean ignoreEncrypt = Boolean.parseBoolean((String) request.getAttribute("ignoreEncrypt"));
-                if(!ignoreEncrypt){
-                    try {
-                        if ("AES".equals(encrypt)) {
-                            _newPassword = new String(RequestEncryptUtils.decryptDataByRequest(encrypt, encryptKey, EncodeUtils.base64Decode(_newPassword)));
-                        } else if ("SM4".equals(encrypt)) {
-                            _newPassword = new String(RequestEncryptUtils.decryptDataByRequest(encrypt, encryptKey, EncodeUtils.hexDecode(_newPassword)));
-                        }
-                    } catch (Exception e) {
-                        logger.error(e.getMessage(), e);
-                    }
-                }
+                String _newPassword = RequestEncryptUtils.decryptDataByRequest(request,user.getPassword());
                 user.setOriginalPassword(Encryption.encrypt(_newPassword));
                 user.setPassword(Encrypt.e(_newPassword));
             } catch (Exception e) {
@@ -281,20 +266,11 @@ public class UserController extends SimpleController {
                                      @RequestParam(value = "newPassword", required = true) String newPassword,
                                      @RequestParam(value = "tipMessage", defaultValue = "0") String tipMessage,
                                 HttpServletRequest request){
-        String encrypt = WebUtils.getHeaderIgnoreCaseOrParameter(request, RequestEncryptUtils.ENCRYPT);
-        String encryptKey = WebUtils.getHeaderIgnoreCaseOrParameter(request,RequestEncryptUtils.ENCRYPT_KEY);
-        boolean ignoreEncrypt = Boolean.parseBoolean((String) request.getAttribute("ignoreEncrypt"));
-        String _newPassword = newPassword;
-        if(!ignoreEncrypt){
-            try {
-                if ("AES".equals(encrypt)) {
-                    _newPassword = new String(RequestEncryptUtils.decryptDataByRequest(encrypt, encryptKey, EncodeUtils.base64Decode(_newPassword)));
-                } else if ("SM4".equals(encrypt)) {
-                    _newPassword = new String(RequestEncryptUtils.decryptDataByRequest(encrypt, encryptKey, EncodeUtils.hexDecode(_newPassword)));
-                }
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
-            }
+        String _newPassword = null;
+        try {
+            _newPassword = RequestEncryptUtils.decryptDataByRequest(request,newPassword);
+        } catch (Exception e) {
+            return Result.errorResult();
         }
         UserUtils.updateUserPasswordReset(userIds, _newPassword,tipMessage);
         return Result.successResult();
@@ -676,18 +652,21 @@ public class UserController extends SimpleController {
                                         @RequestParam(value = "checkbox", defaultValue = "true") Boolean checkbox,
                                         @RequestParam(value = "cascade", defaultValue = "true") Boolean cascade,
                                         @RequestParam(value = "shortName", defaultValue = "false") Boolean shortName) {
-        List<TreeNode> treeNodes = shortName ? organService.findOrganUserTree(parentId, null, true, checkedUserIds, cascade, shortName) : organService.findOrganUserTree(parentId, checkedUserIds, cascade);
-        Post post = null;
-        if(StringUtils.isNotBlank(postCode) && StringUtils.isNotBlank(parentId) && !cascade){
-            post = PostUtils.getByCode(postCode);
-            if(null != post){
-                List<String> postOrganIds = organService.findAssociationOrganIdsByPostId(post.getId());
-                List<String> postUserIds = userService.findUserIdsByPostCode(postCode);
-                return treeNodes.stream().filter(v->{
-                    String nType = v.getAttribute("nType");
-                    if("o".equals(nType)){
+        List<TreeNode> treeNodes = Boolean.TRUE.equals(shortName)
+                ? organService.findOrganUserTree(parentId, null, true, checkedUserIds, cascade, shortName)
+                : organService.findOrganUserTree(parentId, checkedUserIds, cascade);
+
+        if (StringUtils.isNotBlank(postCode) && StringUtils.isNotBlank(parentId) && Boolean.FALSE.equals(cascade)) {
+            Post post = PostUtils.getByCode(postCode);
+            if (post != null) {
+                Set<String> postOrganIds = new HashSet<>(organService.findAssociationOrganIdsByPostId(post.getId()));
+                Set<String> postUserIds = new HashSet<>(userService.findUserIdsByPostCode(postCode));
+
+                return treeNodes.stream().filter(v -> {
+                    String nType = (String) v.getAttribute("nType");
+                    if ("o".equals(nType)) {
                         return postOrganIds.contains(v.getId());
-                    }else if("u".equals(nType)){
+                    } else if ("u".equals(nType)) {
                         return postUserIds.contains(v.getId());
                     }
                     return false;
