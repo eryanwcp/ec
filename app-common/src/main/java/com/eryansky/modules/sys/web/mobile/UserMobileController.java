@@ -108,13 +108,9 @@ public class UserMobileController extends SimpleController {
                          @RequestParam(name = "newPs", required = true) String newPassword,
                          @RequestParam(name = "token", required = false) String token,
                          HttpServletRequest request) {
-        String encrypt = null;
-        String encryptKey = null;
-        if(StringUtils.isEquals("true",paramEncrypt)){//兼容老版本客户端
-            encrypt = WebUtils.getHeaderIgnoreCase(request, RequestEncryptUtils.ENCRYPT);
-            encryptKey = WebUtils.getHeaderIgnoreCase(request,RequestEncryptUtils.ENCRYPT_KEY);
+        if(StringUtils.isEquals(paramEncrypt,"true")){//兼容方案 客户端升级后删除
+            request.setAttribute("ignoreEncrypt",true);
         }
-
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         User model = null;
         if (StringUtils.isNotBlank(token)) {
@@ -155,6 +151,10 @@ public class UserMobileController extends SimpleController {
         try {
              pagePassword = RequestEncryptUtils.decryptDataByRequest(request,StringUtils.trim(password));
              _newPassword = RequestEncryptUtils.decryptDataByRequest(request,StringUtils.trim(newPassword));
+            if(StringUtils.isEquals(paramEncrypt,"true")){//兼容方案 客户端升级后删除
+                pagePassword =  new String(EncodeUtils.base64Decode(StringUtils.trim(password)));
+                _newPassword =  new String(EncodeUtils.base64Decode(StringUtils.trim(newPassword)));
+            }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return Result.warnResult().setMsg("密码解码错误！");
