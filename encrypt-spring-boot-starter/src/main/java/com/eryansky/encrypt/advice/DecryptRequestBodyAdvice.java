@@ -3,9 +3,12 @@ package com.eryansky.encrypt.advice;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.encode.EncodeUtils;
+import com.eryansky.common.web.springmvc.SpringMVCHolder;
+import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.encrypt.anotation.DecryptRequestBody;
 import com.eryansky.encrypt.enums.CipherMode;
 import com.eryansky.encrypt.util.RequestEncryptUtils;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -42,8 +45,12 @@ public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
     @Override  
     public HttpInputMessage beforeBodyRead(HttpInputMessage httpInputMessage, MethodParameter methodParameter, Type type, Class<? extends HttpMessageConverter<?>> aClass) throws IOException {
         HttpHeaders headers = httpInputMessage.getHeaders();
-        String requestEncrypt = Collections3.getFirst(headers.get(RequestEncryptUtils.ENCRYPT));
-        String requestEncryptKey = Collections3.getFirst(headers.get(RequestEncryptUtils.ENCRYPT_KEY));
+//        String requestEncrypt = Collections3.getFirst(headers.get(RequestEncryptUtils.ENCRYPT));
+//        String requestEncryptKey = Collections3.getFirst(headers.get(RequestEncryptUtils.ENCRYPT_KEY));
+        HttpServletRequest request = SpringMVCHolder.getRequest();
+        String requestEncrypt = WebUtils.getHeaderIgnoreCaseOrParameter(request,RequestEncryptUtils.ENCRYPT);
+        String requestEncryptKey = WebUtils.getHeaderIgnoreCaseOrParameter(request,RequestEncryptUtils.ENCRYPT_KEY);
+
         if (StringUtils.isNotBlank(requestEncrypt)){
             return new HttpInputMessage() {
                 @Override

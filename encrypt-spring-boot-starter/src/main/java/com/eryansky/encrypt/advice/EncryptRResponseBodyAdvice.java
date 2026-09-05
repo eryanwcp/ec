@@ -4,8 +4,10 @@ import com.eryansky.common.model.R;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.mapper.JsonMapper;
+import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.encrypt.anotation.EncryptResponseBody;
 import com.eryansky.encrypt.util.RequestEncryptUtils;
+import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.MethodParameter;
@@ -35,8 +37,10 @@ public class EncryptRResponseBodyAdvice implements ResponseBodyAdvice<R<Object>>
     @Override
     public R<Object> beforeBodyWrite(R<Object> body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
         HttpHeaders headers = request.getHeaders();
-        String requestEncrypt = Collections3.getFirst(headers.get(RequestEncryptUtils.ENCRYPT));
-        String requestEncryptKey = Collections3.getFirst(headers.get(RequestEncryptUtils.ENCRYPT_KEY));
+//        String requestEncrypt = Collections3.getFirst(headers.get(RequestEncryptUtils.ENCRYPT));
+//        String requestEncryptKey = Collections3.getFirst(headers.get(RequestEncryptUtils.ENCRYPT_KEY));
+        String requestEncrypt = WebUtils.getHeaderIgnoreCaseOrParameter((HttpServletRequest) request,RequestEncryptUtils.ENCRYPT);
+        String requestEncryptKey = WebUtils.getHeaderIgnoreCaseOrParameter((HttpServletRequest) request,RequestEncryptUtils.ENCRYPT_KEY);
         if (StringUtils.isNotBlank(requestEncrypt)){
             if(body != null && body.getData() != null){
                 try {

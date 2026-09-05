@@ -10,6 +10,7 @@ import com.eryansky.common.model.*;
 import com.eryansky.common.orm.Page;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
+import com.eryansky.common.utils.encode.EncodeUtils;
 import com.eryansky.common.utils.encode.Encrypt;
 import com.eryansky.common.utils.encode.Encryption;
 import com.eryansky.common.utils.mapper.JsonMapper;
@@ -22,11 +23,14 @@ import com.eryansky.core.security.annotation.RequiresPermissions;
 import com.eryansky.core.security.annotation.RequiresRoles;
 import com.eryansky.core.security.annotation.RestApi;
 import com.eryansky.core.web.upload.FileUploadUtils;
+import com.eryansky.encrypt.anotation.DecryptRequestBody;
+import com.eryansky.encrypt.util.RequestEncryptUtils;
 import com.eryansky.modules.disk.mapper.File;
 import com.eryansky.modules.sys.mapper.*;
 import com.eryansky.modules.sys.utils.DictionaryUtils;
 import com.eryansky.modules.sys.utils.PostUtils;
 import com.eryansky.modules.sys.utils.SecurePasswordUtils;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import com.eryansky.core.excels.ExcelUtils;
 import com.eryansky.core.excels.JsGridReportBase;
@@ -180,7 +184,9 @@ public class UserController extends SimpleController {
     @Logging(value = "用户管理-保存用户", data = "#JsonMapper.toJson(#user)",logType = LogType.operate)
     @PostMapping(value = {"save"}, produces = {MediaType.TEXT_HTML_VALUE})
     @ResponseBody
-    public Result save(@ModelAttribute("model") User user) {
+    public Result save(@ModelAttribute("model") User user,HttpServletRequest request,HttpServletResponse response){
+
+
         Result result = null;
         // 名称重复校验
         User nameCheckUser = userService.getUserByLoginName(user.getLoginName());
@@ -196,12 +202,29 @@ public class UserController extends SimpleController {
                 logger.warn(result.toString());
                 return result;
             }
+            String _newPassword = user.getPassword();
             try {
-                user.setOriginalPassword(Encryption.encrypt(user.getPassword()));
+                String encrypt = WebUtils.getHeaderIgnoreCaseOrParameter(request, RequestEncryptUtils.ENCRYPT);
+                String encryptKey = WebUtils.getHeaderIgnoreCaseOrParameter(request,RequestEncryptUtils.ENCRYPT_KEY);
+                boolean ignoreEncrypt = Boolean.parseBoolean((String) request.getAttribute("ignoreEncrypt"));
+                if(!ignoreEncrypt){
+                    try {
+                        if ("AES".equals(encrypt)) {
+                            _newPassword = new String(RequestEncryptUtils.decryptDataByRequest(encrypt, encryptKey, EncodeUtils.base64Decode(_newPassword)));
+                        } else if ("SM4".equals(encrypt)) {
+                            _newPassword = new String(RequestEncryptUtils.decryptDataByRequest(encrypt, encryptKey, EncodeUtils.hexDecode(_newPassword)));
+                        }
+                    } catch (Exception e) {
+                        logger.error(e.getMessage(), e);
+                    }
+                }
+                user.setOriginalPassword(Encryption.encrypt(_newPassword));
+                user.setPassword(Encrypt.e(_newPassword));
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
+                return Result.errorResult().setMsg("服务器内部异常！");
             }
-            user.setPassword(Encrypt.e(user.getPassword()));
+
         } else {// 修改
             User superUser = userService.getSuperUser();
             SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
@@ -256,9 +279,58 @@ public class UserController extends SimpleController {
     @ResponseBody
     public Result passwordReset(@RequestParam(value = "userIds", required = true) List<String> userIds,
                                      @RequestParam(value = "newPassword", required = true) String newPassword,
-                                     @RequestParam(value = "tipMessage", defaultValue = "0") String tipMessage){
-        UserUtils.updateUserPasswordReset(userIds, newPassword,tipMessage);
+                                     @RequestParam(value = "tipMessage", defaultValue = "0") String tipMessage,
+                                HttpServletRequest request){
+        String encrypt = WebUtils.getHeaderIgnoreCaseOrParameter(request, RequestEncryptUtils.ENCRYPT);
+        String encryptKey = WebUtils.getHeaderIgnoreCaseOrParameter(request,RequestEncryptUtils.ENCRYPT_KEY);
+        boolean ignoreEncrypt = Boolean.parseBoolean((String) request.getAttribute("ignoreEncrypt"));
+        String _newPassword = newPassword;
+        if(!ignoreEncrypt){
+            try {
+                if ("AES".equals(encrypt)) {
+                    _newPassword = new String(RequestEncryptUtils.decryptDataByRequest(encrypt, encryptKey, EncodeUtils.base64Decode(_newPassword)));
+                } else if ("SM4".equals(encrypt)) {
+                    _newPassword = new String(RequestEncryptUtils.decryptDataByRequest(encrypt, encryptKey, EncodeUtils.hexDecode(_newPassword)));
+                }
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
+        }
+        UserUtils.updateUserPasswordReset(userIds, _newPassword,tipMessage);
         return Result.successResult();
+    }
+
+    /**
+     * 修改用户密码 批量、无需输入原密码.
+     *
+     * @param requestData
+     * @return
+     */
+    @DecryptRequestBody
+    @RequiresPermissions(logical = Logical.OR,value = {"sys:user:edit","sys:user:password:edit"})
+    @Logging(value = "用户管理-重置密码",data = "#JsonMapper.toJson(#userIds)", logType = LogType.operate)
+    @PostMapping(value = {"passwordResetV2"}, produces = {MediaType.TEXT_HTML_VALUE})
+    @ResponseBody
+    public Result passwordResetV2(@RequestBody JsonNode requestData,
+                                  HttpServletRequest request) {
+        List<String> userIds = Optional.ofNullable(requestData.get("userIds"))
+                .filter(JsonNode::isArray) // 确保它是数组
+                .map(node -> {
+                    List<String> list = new ArrayList<>();
+                    for (JsonNode item : node) {
+                        list.add(item.asText());
+                    }
+                    return list;
+                })
+                .orElse(Collections.emptyList());
+        String newPassword = Optional.ofNullable(requestData.get("newPassword"))
+                .map(JsonNode::asText)
+                .orElse(null);
+        String tipMessage = Optional.ofNullable(requestData.get("tipMessage"))
+                .map(JsonNode::asText)
+                .orElse(null);
+        request.setAttribute("ignoreEncrypt",true);
+        return passwordReset(userIds,newPassword,tipMessage,request) ;
     }
 
 

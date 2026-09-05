@@ -7,6 +7,8 @@ var hasPermissionUserOrganEdit = hasPermissionUserOrganEdit;
 var hasPermissionUserPostEdit = hasPermissionUserPostEdit;
 var hasPermissionUserRoleEdit = hasPermissionUserRoleEdit;
 var hasPermissionUserResourceEdit = hasPermissionUserResourceEdit;
+var publicKey = publicKey;
+var requestEncrypt = requestEncrypt;
 
 var toolbar = toolbar;
 /**
@@ -366,6 +368,26 @@ function formInit() {
             var isValid = $(this).form('validate');
             if (!isValid) {
                 $.messager.progress('close');
+            }else{
+                var  $password = $("#password");
+                if($password){
+                    let _password =$password.val();
+                    let encryptKey = '';
+                    let requestEncryptKey = '';
+                    if("SM4" === requestEncrypt){
+                        encryptKey = Sm4Utils.generateSm4HexKey();
+                        requestEncryptKey = RSAUtils.encryptHexString(encryptKey,publicKey);
+                        _password = Sm4Utils.encrypt(_password,encryptKey);
+                    }else if("AES" === requestEncrypt){
+                        encryptKey = Cryptos.generateAesBase64Key();
+                        requestEncryptKey = RSAUtils.encryptBase64String(encryptKey,publicKey);
+                        _password = Cryptos.encrypt(_password,encryptKey);
+                    }
+                    $password.val(_password);
+                    $("#repassword").val('');
+                    param['Encrypt'] = requestEncrypt;
+                    param['Encrypt-Key'] = requestEncryptKey;
+                }
             }
             return isValid;
         },
@@ -502,17 +524,36 @@ function initPasswordForm() {
                 title: '提示信息！',
                 text: '数据处理中，请稍后....'
             });
-            var isValid = $(this).form('validate');
+            const isValid = $(this).form('validate');
             if (!isValid) {
                 $.messager.progress('close');
             } else {
-                var rows = $user_datagrid.datagrid('getSelections');
-                var userIds = [];
+                const rows = $user_datagrid.datagrid('getSelections');
+                const userIds = [];
                 $.each(rows, function (i, row) {
                     userIds.push(row.id);
                 });
-                param.userIds = userIds;
+                param['userIds'] = userIds;
+
+                let encryptKey = '';
+                let requestEncryptKey = '';
+                var  $newPassword = $("#newPassword");
+                let _password =$newPassword.val();
+                if("SM4" === requestEncrypt){
+                    encryptKey = Sm4Utils.generateSm4HexKey();
+                    requestEncryptKey = RSAUtils.encryptHexString(encryptKey,publicKey);
+                    _password = Sm4Utils.encrypt(_password,encryptKey);
+                }else if("AES" === requestEncrypt){
+                    encryptKey = Cryptos.generateAesBase64Key();
+                    requestEncryptKey = RSAUtils.encryptBase64String(encryptKey,publicKey);
+                    _password = Cryptos.encrypt(_password,encryptKey);
+                }
+                $newPassword.val(_password);
+                $("#newPassword2").val('');
+                param['Encrypt'] = requestEncrypt;
+                param['Encrypt-Key'] = requestEncryptKey;
             }
+
             return isValid;
         },
         success: function (data) {

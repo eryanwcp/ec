@@ -4,8 +4,11 @@ import com.eryansky.common.model.Result;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.mapper.JsonMapper;
+import com.eryansky.common.web.springmvc.SpringMVCHolder;
+import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.encrypt.anotation.EncryptResponseBody;
 import com.eryansky.encrypt.util.RequestEncryptUtils;
+import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.MethodParameter;
@@ -24,7 +27,7 @@ public class EncryptResultResponseBodyAdvice implements ResponseBodyAdvice<Resul
 
     private static final Logger log = LoggerFactory.getLogger(EncryptResultResponseBodyAdvice.class);
 
-    @Override  
+    @Override
     public boolean supports(MethodParameter returnType, Class converterType) {
         EncryptResponseBody annotation = returnType.getMethodAnnotation(EncryptResponseBody.class);
         //如果带有注解且标记为验签，则进行验签操作
@@ -34,8 +37,10 @@ public class EncryptResultResponseBodyAdvice implements ResponseBodyAdvice<Resul
     @Override  
     public Result beforeBodyWrite(Result body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
         HttpHeaders headers = request.getHeaders();
-        String requestEncrypt = Collections3.getFirst(headers.get(RequestEncryptUtils.ENCRYPT));
-        String requestEncryptKey = Collections3.getFirst(headers.get(RequestEncryptUtils.ENCRYPT_KEY));
+//        String requestEncrypt = Collections3.getFirst(headers.get(RequestEncryptUtils.ENCRYPT));
+//        String requestEncryptKey = Collections3.getFirst(headers.get(RequestEncryptUtils.ENCRYPT_KEY));
+        String requestEncrypt = WebUtils.getHeaderIgnoreCaseOrParameter((HttpServletRequest) request,RequestEncryptUtils.ENCRYPT);
+        String requestEncryptKey = WebUtils.getHeaderIgnoreCaseOrParameter((HttpServletRequest) request,RequestEncryptUtils.ENCRYPT_KEY);
         if (StringUtils.isNotBlank(requestEncrypt)){
             if(body != null && body.getData() != null){
                 try {
