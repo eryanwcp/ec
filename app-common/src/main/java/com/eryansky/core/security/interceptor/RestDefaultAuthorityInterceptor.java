@@ -98,20 +98,21 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
         if (handlerMethod != null) {
              metadata = restAnnotationCache.computeIfAbsent(handlerMethod, this::parseRestAnnotationMetadata);
         }
-        boolean restEnable = AppConstants.getIsSystemRestEnable();
-        if (!restEnable) {
-            R<Boolean> result = R.fail(false, "系统维护中，请稍后再试！");
-            renderJson(request, response, result,metadata.defaultEncryptResponseBody);
-            return false;
-        }
+        if(metadata != null){
+            boolean restEnable = AppConstants.getIsSystemRestEnable();
+            if (!restEnable) {
+                R<Boolean> result = R.fail(false, "系统维护中，请稍后再试！");
+                renderJson(request, response, result,metadata.defaultEncryptResponseBody);
+                return false;
+            }
 
-        // 注解处理
-        handlerResult = this.defaultHandler(request, response, metadata, requestUrl);
-        httpSession.setAttribute(SESSION_KEY_REST_AUTHORITY, handlerResult);
-        if (null != handlerResult) {
-            return handlerResult;
+            // 注解处理
+            handlerResult = this.defaultHandler(request, response, metadata, requestUrl);
+            httpSession.setAttribute(SESSION_KEY_REST_AUTHORITY, handlerResult);
+            if (null != handlerResult) {
+                return handlerResult;
+            }
         }
-
         return true;
     }
 
