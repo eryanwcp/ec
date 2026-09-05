@@ -16,8 +16,11 @@
     var hasPermissionUserPostEdit = <%= SecurityUtils.isPermitted("sys:user:post:edit")%>;
     var hasPermissionUserRoleEdit = <%= SecurityUtils.isPermitted("sys:user:role:edit")%>;
     var hasPermissionUserResourceEdit = <%= SecurityUtils.isPermitted("sys:user:resource:edit")%>;
+    var publicKey = "${publicKey}";
+    var requestEncrypt = "${requestEncrypt}";
     var toolbar = [];
 </script>
+<script type="text/javascript" src="${ctxStatic}/js/jsencrypt/encrypt.all.min.js" charset="utf-8"></script>
 <script type="text/javascript" src="${ctxStatic}/app/modules/sys/user-extend-before${yuicompressor}.js?_=${sysInitTime}" charset="utf-8"></script>
 <script type="text/javascript" src="${ctxStatic}/app/modules/sys/user${yuicompressor}.js?_=${sysInitTime}" charset="utf-8"></script>
 <script type="text/javascript" src="${ctxStatic}/app/modules/sys/user-extend-after${yuicompressor}.js?_=${sysInitTime}" charset="utf-8"></script>
