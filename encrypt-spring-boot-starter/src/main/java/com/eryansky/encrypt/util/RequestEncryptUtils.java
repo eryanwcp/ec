@@ -1,6 +1,7 @@
 package com.eryansky.encrypt.util;
 
 import com.eryansky.common.utils.encode.Cryptos;
+import com.eryansky.common.utils.encode.EncodeUtils;
 import com.eryansky.common.utils.encode.RSAUtils;
 import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.encrypt.config.EncryptProvider;
@@ -129,6 +130,33 @@ public class RequestEncryptUtils {
 
         // Unknown/unsupported mode — return original payload
         return bytes;
+    }
+
+
+    /**
+     * 数据加密（根据请求加密密钥）
+     * @param encrypt 加密方式
+     * @param encryptKey 加密密钥
+     * @param bytes 数据
+     * @return
+     */
+    public static String encryptDataStringByRequest(String encrypt, String encryptKey, byte[] bytes) throws Exception {
+        if (CipherMode.SM4.name().equalsIgnoreCase(encrypt) && com.eryansky.common.utils.StringUtils.isNotBlank(encryptKey)) {
+            String key = tryDecryptKeyHex(encryptKey);
+            return EncodeUtils.hexEncode(Sm4Utils.encrypt(key, bytes));
+        }
+
+        if (CipherMode.AES.name().equalsIgnoreCase(encrypt) && com.eryansky.common.utils.StringUtils.isNotBlank(encryptKey)) {
+            String key = tryDecryptKeyBase64(encryptKey);
+            return EncodeUtils.base64Encode(Cryptos.aesECBEncrypt(bytes, key));
+        }
+
+        if (CipherMode.BASE64.name().equalsIgnoreCase(encrypt)) {
+            return EncodeUtils.base64Encode(bytes);
+        }
+
+        // Unknown/unsupported mode — return original payload
+        return new String(bytes);
     }
 
     public static String tryDecryptKeyHex(String encryptedKey) {

@@ -24,6 +24,7 @@ import com.eryansky.core.security.annotation.RequiresRoles;
 import com.eryansky.core.security.annotation.RestApi;
 import com.eryansky.core.web.upload.FileUploadUtils;
 import com.eryansky.encrypt.anotation.DecryptRequestBody;
+import com.eryansky.encrypt.anotation.EncryptResponseBody;
 import com.eryansky.encrypt.util.RequestEncryptUtils;
 import com.eryansky.modules.disk.mapper.File;
 import com.eryansky.modules.sys.mapper.*;
@@ -792,6 +793,7 @@ public class UserController extends SimpleController {
      * @param loginName
      * @return
      */
+    @EncryptResponseBody
     @RequiresRoles(AppConstants.ROLE_SYSTEM_MANAGER)
     @Logging(value = "用户管理-查看密码", data = "#JsonMapper.toJson(#loginName)", logType = LogType.security)
     @PostMapping(value = "viewUserPassword")

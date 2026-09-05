@@ -341,15 +341,31 @@ $(function () {
 });
 
 function viewUserPassword(loginName) {
+    let encryptKey = '';
+    let requestEncryptKey = '';
+    if ("SM4" === requestEncrypt) {
+        encryptKey = Sm4Utils.generateSm4HexKey();
+        requestEncryptKey = RSAUtils.encryptHexString(encryptKey, publicKey);
+    } else if ("AES" === requestEncrypt) {
+        encryptKey = Cryptos.generateAesBase64Key();
+        requestEncryptKey = RSAUtils.encryptBase64String(encryptKey, publicKey);
+    }
     $.ajax({
         url: ctxAdmin + '/sys/user/viewUserPassword',
         type: 'post',
+        headers: {'Encrypt': requestEncrypt, 'Encrypt-Key': requestEncryptKey},
         data: {loginName: loginName},
         traditional: true,
         dataType: 'json',
         success: function (data) {
             if (data.code === 1) {
-                eu.showTopCenterMsg(data.obj);//操作结果提示
+                if ("SM4" === requestEncrypt) {
+                    eu.showTopCenterMsg(JSON.parse(Sm4Utils.decrypt(data['obj'], encryptKey)));
+                } else if ("AES" === requestEncrypt) {
+                    eu.showTopCenterMsg(JSON.parse(Cryptos.decrypt(data['obj'], encryptKey)));
+                } else {
+                    eu.showTopCenterMsg(data['obj']);
+                }
             } else {
                 eu.showAlertMsg(data.msg, 'error');
             }
