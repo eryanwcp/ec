@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.response;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
@@ -16,13 +16,13 @@ public class GetCustomWaitSessionResponse extends BaseResponse {
     /**
      * 未接入会话数量
      */
-    @JSONField(name = "count")
+    @JsonProperty("count")
     private Integer count;
 
     /**
      * 未接入会话列表，最多返回100条数据，按照来访顺序
      */
-    @JSONField(name = "waitcaselist")
+    @JsonProperty("waitcaselist")
     List<WaitSessionInfo> waitcaselist;
 
     public GetCustomWaitSessionResponse() {
@@ -48,9 +48,9 @@ public class GetCustomWaitSessionResponse extends BaseResponse {
         /**
          * 粉丝的openid
          */
-        @JSONField(name = "openid")
+        @JsonProperty("openid")
         private String openid;
-        @JSONField(name = "openid")
+        @JsonProperty("openid")
         private Long latestTime;
 
         public WaitSessionInfo() {

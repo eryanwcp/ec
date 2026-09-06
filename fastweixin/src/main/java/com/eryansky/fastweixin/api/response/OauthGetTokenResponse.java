@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.response;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Oauth授权获取token接口响应对象
@@ -9,7 +9,7 @@ import com.alibaba.fastjson.annotation.JSONField;
  */
 public class OauthGetTokenResponse extends GetTokenResponse {
 
-    @JSONField(name = "refresh_token")
+    @JsonProperty("refresh_token")
     private String refreshToken;
 
     private String openid;

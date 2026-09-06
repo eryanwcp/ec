@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.response;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  *
@@ -9,13 +9,13 @@ import com.alibaba.fastjson.annotation.JSONField;
  */
 public class GetMaterialTotalCountResponse extends BaseResponse {
 
-    @JSONField(name="video_count")
+    @JsonProperty("video_count")
     private int video;
-    @JSONField(name="voice_count")
+    @JsonProperty("voice_count")
     private int voice;
-    @JSONField(name="image_count")
+    @JsonProperty("image_count")
     private int image;
-    @JSONField(name="news_count")
+    @JsonProperty("news_count")
     private int news;
 
     public int getVideo() {

@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.response;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 
@@ -13,7 +13,7 @@ public class GetUsersResponse extends BaseResponse {
     private long   total;
     private int    count;
     private Openid data;
-    @JSONField(name = "next_openid")
+    @JsonProperty("next_openid")
     private String nextOpenid;
 
     public long getTotal() {

@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.response;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,11 +16,11 @@ public class GetMaterialListResponse extends BaseResponse {
 
     private static final Logger LOG = LoggerFactory.getLogger(GetMaterialListResponse.class);
 
-    @JSONField(name="total_count")
+    @JsonProperty("total_count")
     private int totalCount;// 该类型素材总数
-    @JSONField(name="item_count")
+    @JsonProperty("item_count")
     private int itemCount;// 本次获取的数量
-    @JSONField(name="item")
+    @JsonProperty("item")
     private List<Map<String, Object>> items;
 
     public int getTotalCount() {

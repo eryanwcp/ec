@@ -1,7 +1,7 @@
 package com.eryansky.fastweixin.company.api.response;
 
 import com.eryansky.fastweixin.api.response.BaseResponse;
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 import java.util.Map;
@@ -14,9 +14,9 @@ import java.util.Map;
  */
 public class GetTagInfoResponse extends BaseResponse {
 
-    @JSONField(name = "userlist")
+    @JsonProperty("userlist")
     private List<Map<String, String>> users;
-    @JSONField(name = "partylist")
+    @JsonProperty("partylist")
     private List<Integer> partys;
 
     public List<Map<String, String>> getUsers() {

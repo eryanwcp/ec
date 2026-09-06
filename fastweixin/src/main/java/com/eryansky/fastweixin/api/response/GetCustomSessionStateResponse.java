@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.response;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 /**
@@ -13,13 +13,13 @@ public class GetCustomSessionStateResponse extends BaseResponse {
     /**
      * 正在接待的客服，为空表示没有人在接待
      */
-    @JSONField(name = "openid")
+    @JsonProperty("openid")
     private String openid;
 
     /**
      * 会话接入的时间
      */
-    @JSONField(name = "createtime")
+    @JsonProperty("createtime")
     private Long createtime;
 
     public GetCustomSessionStateResponse() {

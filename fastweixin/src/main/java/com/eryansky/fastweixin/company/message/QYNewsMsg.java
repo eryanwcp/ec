@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.company.message;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +15,7 @@ public class QYNewsMsg extends QYBaseMsg {
 
     private static final Integer MAX_ARTICLE_COUNT = 10;
 
-    @JSONField(name = "news")
+    @JsonProperty("news")
     private Map<String, Object> news;
 
     public QYNewsMsg() {

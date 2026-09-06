@@ -1,12 +1,11 @@
 package com.eryansky.fastweixin.api;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.eryansky.fastweixin.api.config.ApiConfig;
 import com.eryansky.fastweixin.api.response.BaseResponse;
 import com.eryansky.fastweixin.util.CollectionUtil;
 import com.eryansky.fastweixin.util.JSONUtil;
 import com.eryansky.fastweixin.util.StrUtil;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,9 +38,9 @@ public class SystemAPI extends BaseAPI {
         String url = BASE_API_URL + "cgi-bin/getcallbackip?access_token=#";
         BaseResponse r = executeGet(url);
         if (isSuccess(r.getErrcode())) {
-            JSONArray array = JSON.parseObject(r.getErrmsg()).getJSONArray("ip_list");
+            JsonNode array = JSONUtil.getJSONFromString(r.getErrmsg()).get("ip_list");
             result = CollectionUtil.newArrayList(array.size());
-            for (Object obj : array) result.add(obj.toString());
+            for (JsonNode node : array) result.add(node.asText());
         }
         return result;
     }

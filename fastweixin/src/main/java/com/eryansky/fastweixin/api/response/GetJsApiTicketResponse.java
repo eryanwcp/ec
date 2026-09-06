@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.response;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author daxiaoming
@@ -9,7 +9,7 @@ public class GetJsApiTicketResponse extends BaseResponse {
 
     private String ticket;
 
-    @JSONField(name = "expires_in")
+    @JsonProperty("expires_in")
     private Integer expiresIn;
 
     public String getTicket() {

@@ -2,7 +2,7 @@ package com.eryansky.fastweixin.company.api.response;/**
  * Created by Nottyjay on 2015/6/12.
  */
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.eryansky.fastweixin.api.response.BaseResponse;
 
 /**
@@ -12,15 +12,15 @@ import com.eryansky.fastweixin.api.response.BaseResponse;
  */
 public class GetQYSendMessageResponse extends BaseResponse {
 
-    @JSONField(name = "invaliduser")
+    @JsonProperty("invaliduser")
     private String invalidUser;
-    @JSONField(name = "invalidParty")
+    @JsonProperty("invalidParty")
     private String invalidParty;
-    @JSONField(name = "invalidtag")
+    @JsonProperty("invalidtag")
     private String invalidTag;
-    @JSONField(name = "msgid")
+    @JsonProperty("msgid")
     private String msgid;
-    @JSONField(name = "response_code")
+    @JsonProperty("response_code")
     private String responseCode;
 
     public String getInvalidUser() {

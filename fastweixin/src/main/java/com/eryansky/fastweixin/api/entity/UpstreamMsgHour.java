@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.api.entity;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 消息分送分时数据
@@ -9,13 +9,13 @@ import com.alibaba.fastjson.annotation.JSONField;
  */
 public class UpstreamMsgHour extends BaseDataCube {
 
-    @JSONField(name = "ref_hour")
+    @JsonProperty("ref_hour")
     private Integer refHour;
-    @JSONField(name = "msg_type")
+    @JsonProperty("msg_type")
     private Integer msgType;
-    @JSONField(name = "msg_user")
+    @JsonProperty("msg_user")
     private Integer msgUser;
-    @JSONField(name = "msg_count")
+    @JsonProperty("msg_count")
     private Integer msgCount;
 
     public Integer getRefHour() {

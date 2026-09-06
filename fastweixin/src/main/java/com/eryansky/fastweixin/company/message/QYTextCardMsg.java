@@ -1,6 +1,6 @@
 package com.eryansky.fastweixin.company.message;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Eryan
@@ -8,7 +8,7 @@ import com.alibaba.fastjson.annotation.JSONField;
  */
 public class QYTextCardMsg extends QYBaseMsg {
 
-    @JSONField(name = "textcard")
+    @JsonProperty("textcard")
     private TextCard textCard;
 
     public QYTextCardMsg() {
@@ -30,13 +30,13 @@ public class QYTextCardMsg extends QYBaseMsg {
 
     public static class TextCard {
 
-        @JSONField(name = "title")
+        @JsonProperty("title")
         private String title;
-        @JSONField(name = "description")
+        @JsonProperty("description")
         private String description;
-        @JSONField(name = "url")
+        @JsonProperty("url")
         private String url;
-        @JSONField(name = "btntxt")
+        @JsonProperty("btntxt")
         private String btnTxt;
 
         public TextCard(String title, String description, String url, String btnTxt) {
