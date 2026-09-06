@@ -186,10 +186,10 @@ public class RequestEncryptUtils {
         String encryptKey = WebUtils.getHeaderIgnoreCaseOrParameter(request, RequestEncryptUtils.ENCRYPT_KEY);
 
         try {
-            if ("AES".equals(encrypt)) {
+            if (CipherMode.AES.name().equals(encrypt)) {
                 byte[] decrypted = RequestEncryptUtils.decryptDataByRequest(encrypt, encryptKey, EncodeUtils.base64Decode(data));
                 return new String(decrypted, StandardCharsets.UTF_8);
-            } else if ("SM4".equals(encrypt)) {
+            } else if (CipherMode.SM4.name().equals(encrypt)) {
                 byte[] decrypted = RequestEncryptUtils.decryptDataByRequest(encrypt, encryptKey, EncodeUtils.hexDecode(data));
                 return new String(decrypted, StandardCharsets.UTF_8);
             } else if (CipherMode.BASE64.name().equalsIgnoreCase(encrypt)) {
