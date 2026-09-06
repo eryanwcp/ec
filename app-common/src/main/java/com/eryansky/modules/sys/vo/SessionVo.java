@@ -38,64 +38,72 @@ public class SessionVo implements Serializable {
         return id;
     }
 
-    public void setId(String id) {
+    public SessionVo setId(String id) {
         this.id = id;
+        return this;
     }
 
     public String getLoginUser() {
         return loginUser;
     }
 
-    public void setLoginUser(String loginUser) {
+    public SessionVo setLoginUser(String loginUser) {
         this.loginUser = loginUser;
+        return this;
     }
 
     public String getHost() {
         return host;
     }
 
-    public void setHost(String host) {
+    public SessionVo setHost(String host) {
         this.host = host;
+        return this;
     }
 
     public String getClientIP() {
         return clientIP;
     }
 
-    public void setClientIP(String clientIP) {
+    public SessionVo setClientIP(String clientIP) {
         this.clientIP = clientIP;
+        return this;
     }
 
     public Map<String, Object> getData() {
         return data;
     }
 
-    public void setData(Map<String, Object> data) {
+    public SessionVo setData(Map<String, Object> data) {
         this.data = data;
+        return this;
     }
 
     public Long getAccessCount() {
         return accessCount;
     }
 
-    public void setAccessCount(Long accessCount) {
+    public SessionVo setAccessCount(Long accessCount) {
         this.accessCount = accessCount;
+        return this;
     }
 
     public Long getTtl1() {
         return ttl1;
     }
 
-    public void setTtl1(Long ttl1) {
+    public SessionVo setTtl1(Long ttl1) {
         this.ttl1 = ttl1;
+        return this;
     }
 
     public Long getTtl2() {
         return ttl2;
     }
 
-    public void setTtl2(Long ttl2) {
+    public SessionVo setTtl2(Long ttl2) {
         this.ttl2 = ttl2;
+        return this;
     }
 
     @JsonFormat(pattern = DATE_TIME_FORMAT, timezone = TIMEZONE)
@@ -103,8 +111,9 @@ public class SessionVo implements Serializable {
         return createdTime;
     }
 
-    public void setCreatedTime(Date createdTime) {
+    public SessionVo setCreatedTime(Date createdTime) {
         this.createdTime = createdTime;
+        return this;
     }
 
     @JsonFormat(pattern = DATE_TIME_FORMAT, timezone = TIMEZONE)
@@ -112,7 +121,8 @@ public class SessionVo implements Serializable {
         return updateTime;
     }
 
-    public void setUpdateTime(Date updateTime) {
+    public SessionVo setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+        return this;
     }
 }

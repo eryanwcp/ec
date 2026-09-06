@@ -38,24 +38,27 @@ public class PasswordTip {
         return code;
     }
 
-    public void setCode(int code) {
+    public PasswordTip setCode(int code) {
         this.code = code;
+        return this;
     }
 
     public String getMsg() {
         return msg;
     }
 
-    public void setMsg(String msg) {
+    public PasswordTip setMsg(String msg) {
         this.msg = msg;
+        return this;
     }
 
     public String getUrl() {
         return url;
     }
 
-    public void setUrl(String url) {
+    public PasswordTip setUrl(String url) {
         this.url = url;
+        return this;
     }
 
     public boolean isTip() {
