@@ -577,8 +577,8 @@ public class DiskUtils {
 
     public static void makeZip(List<File> inFiles, String zipPath,
                                String encoding) throws Exception {
-        try (ZipOutputStream zipOut = new ZipOutputStream(new BufferedOutputStream(
-                new FileOutputStream(zipPath)))) {
+        try (FileOutputStream fos = new FileOutputStream(zipPath);
+             ZipOutputStream zipOut = new ZipOutputStream(fos)) {
             zipOut.setEncoding(encoding);
             doZipFile(zipOut, inFiles);
             zipOut.flush();
