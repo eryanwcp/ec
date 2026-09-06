@@ -17,15 +17,17 @@ public class TablePageDTO implements Serializable {
         return page;
     }
 
-    public void setPage(Page<Map<String, Object>> page) {
+    public TablePageDTO setPage(Page<Map<String, Object>> page) {
         this.page = page;
+        return this;
     }
 
     public List<TableColumnDTO> getColumns() {
         return columns;
     }
 
-    public void setColumns(List<TableColumnDTO> columns) {
+    public TablePageDTO setColumns(List<TableColumnDTO> columns) {
         this.columns = columns;
+        return this;
     }
 }
