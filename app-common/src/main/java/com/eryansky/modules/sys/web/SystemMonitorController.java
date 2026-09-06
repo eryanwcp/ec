@@ -35,6 +35,7 @@ import com.eryansky.modules.sys.vo.SessionVo;
 import com.eryansky.utils.*;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import jakarta.annotation.Resource;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -47,12 +48,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
@@ -66,7 +63,16 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "${adminPath}/sys/systemMonitor")
 public class SystemMonitorController extends SimpleController {
 
-    @jakarta.annotation.Resource(name = "defaultAsyncExecutor")
+    /**
+     * 系统日志在线查看读取的分页大小行数
+     */
+    private static final int LOG_PAGE_SIZE_DEFAULT = 5000;
+    /**
+     * 系统日志在线查看单次最大允许读取的行数
+     */
+    private static final int LOG_PAGE_SIZE_LIMIT = 200 * LOG_PAGE_SIZE_DEFAULT;
+
+    @Resource(name = "defaultAsyncExecutor")
     private Executor asyncExecutor;
 
     /**
@@ -87,7 +93,7 @@ public class SystemMonitorController extends SimpleController {
                 return renderString(response, Result.errorResult().setMsg(e.getMessage()));
             }
         }
-        return "modules/sys/systemMonitor";
+        return "modules/sys/systemMonitor.html";
     }
 
     /**
@@ -115,7 +121,7 @@ public class SystemMonitorController extends SimpleController {
             return renderString(response, page);
         }
         uiModel.addAttribute("page", page);
-        return "modules/sys/systemMonitor-cache";
+        return "modules/sys/systemMonitor-cache.html";
     }
 
     /**
@@ -145,7 +151,7 @@ public class SystemMonitorController extends SimpleController {
         }
         uiModel.addAttribute("region", region);
         uiModel.addAttribute("page", page);
-        return "modules/sys/systemMonitor-cacheDetail";
+        return "modules/sys/systemMonitor-cacheDetail.html";
     }
 
     /**
@@ -169,7 +175,7 @@ public class SystemMonitorController extends SimpleController {
         uiModel.addAttribute("object", object);
         uiModel.addAttribute("region", region);
         uiModel.addAttribute("key", key);
-        return "modules/sys/systemMonitor-cacheKeyDetail";
+        return "modules/sys/systemMonitor-cacheKeyDetail.html";
     }
 
     /**
@@ -187,7 +193,7 @@ public class SystemMonitorController extends SimpleController {
             for (String _cacheName : regions) {
                 CacheUtils.clearCache(_cacheName);
             }
-            AppConstants.SYS_INIT_TIME = System.currentTimeMillis();
+            AppConstants.updateSysInitTime();
         }
         addMessage(redirectAttributes, "操作成功！");
         return "redirect:" + AppConstants.getAdminPath() + "/sys/systemMonitor/cache?repage";
@@ -230,7 +236,7 @@ public class SystemMonitorController extends SimpleController {
 
         uiModel.addAttribute("region", region);
         uiModel.addAttribute("page", page);
-        return "modules/sys/systemMonitor-sessionCache";
+        return "modules/sys/systemMonitor-sessionCache.html";
     }
 
     private List<SessionVo> toSessionVo(List<String> keys) {
@@ -315,7 +321,7 @@ public class SystemMonitorController extends SimpleController {
             return renderString(response, page);
         }
         uiModel.addAttribute("page", page);
-        return "modules/sys/systemMonitor-queue";
+        return "modules/sys/systemMonitor-queue.html";
     }
 
     @RequiresPermissions("sys:systemMonitor:view")
@@ -325,7 +331,7 @@ public class SystemMonitorController extends SimpleController {
         Collection<String> queueList = CacheUtils.getCacheChannel().queueList(region);
         uiModel.addAttribute("region", region);
         uiModel.addAttribute("data", JsonMapper.toJsonString(queueList));
-        return "modules/sys/systemMonitor-queueDetail";
+        return "modules/sys/systemMonitor-queueDetail.html";
     }
 
     @RequiresPermissions("sys:systemMonitor:edit")
@@ -367,15 +373,26 @@ public class SystemMonitorController extends SimpleController {
                       @RequestParam(name = "showTotal", defaultValue = "false") boolean showTotal,
                       @RequestParam(name = "fileName", required = false) String fileName,
                       HttpServletRequest request, HttpServletResponse response, Model uiModel) {
-        Page<String> page = new Page<>(request, response, 5000);
+        Page<String> page = new Page<>(request, response, LOG_PAGE_SIZE_DEFAULT);
         if (showTotal) {
-            page.setPageSize(Page.PAGESIZE_ALL);
+            page.setPageSize(LOG_PAGE_SIZE_LIMIT);
+        } else if (page.getPageSize() > LOG_PAGE_SIZE_LIMIT) {
+            page.setPageSize(LOG_PAGE_SIZE_LIMIT);
         }
         String _logPath = AppConstants.getLogPath(findLogFilePath());//读取配置文件配置的路径
         File rootFile = new File(_logPath);
         File file = rootFile;
         if (StringUtils.isNotBlank(fileName)) {
-            file = new File(rootFile.getParentFile(), fileName);
+            file = new File(rootFile.getParentFile(), FileUtils.getFileName(fileName));
+            try {
+                if (!file.getCanonicalPath().startsWith(rootFile.getParentFile().getCanonicalPath())) {
+                    logger.warn("危险路径穿越尝试：IP={} Path={}", IpUtils.getIpAddr0(request), file.getAbsolutePath());
+                    throw new SystemException("危险注入！");
+                }
+            } catch (IOException e) {
+                logger.error("检验路径安全时发生异常", e);
+                throw new SystemException("非法路径拦截！");
+            }
         }
         if (WebUtils.isAjaxRequest(request)) {
             try {
@@ -385,11 +402,11 @@ public class SystemMonitorController extends SimpleController {
                     line = XsslHttpServletRequestWrapper.replaceXSS(line);
                     if (pretty) {
                         //先转义
-                        line = line.replaceAll("&", "&amp;")
-                                .replaceAll("<", "&lt;")
-                                .replaceAll(">", "&gt;")
-                                .replaceAll("\"", "&quot;")
-                                .replaceAll("\t", "&nbsp;");
+                        line = line.replace("&", "&amp;")
+                                .replace("<", "&lt;")
+                                .replace(">", "&gt;")
+                                .replace("\"", "&quot;")
+                                .replace("\t", "&nbsp;");
 
                         //处理等级
                         line = line.replace("] DEBUG", "] <span style='color: blue;'>DEBUG</span>")
@@ -424,7 +441,7 @@ public class SystemMonitorController extends SimpleController {
         uiModel.addAttribute("page", page);
         uiModel.addAttribute("fileNames", fileNames);
         uiModel.addAttribute("fileName", file.getName());
-        return "modules/sys/systemMonitor-log";
+        return "modules/sys/systemMonitor-log.html";
     }
 
     /**
@@ -514,6 +531,6 @@ public class SystemMonitorController extends SimpleController {
             map.put("queueRemainingCapacity", threadPoolExecutor.getQueue().remainingCapacity());
             return renderString(response, Result.successResult().setData(map));
         }
-        return "modules/sys/systemMonitor-asyncTask";
+        return "modules/sys/systemMonitor-asyncTask.html";
     }
 }

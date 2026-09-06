@@ -1,11 +1,13 @@
 package com.eryansky.core.rpc.provider;
 
 import com.eryansky.common.utils.StringUtils;
+import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.rpc.advice.EncryptRPCResponseBodyAdvice;
 import com.eryansky.core.rpc.utils.RPCUtils;
 import com.eryansky.core.rpc.utils.SerializerFactory;
 import com.eryansky.core.security.annotation.RestApi;
 import com.eryansky.encrypt.anotation.EncryptResponseBody;
+import com.eryansky.encrypt.util.RequestEncryptUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StreamUtils;
@@ -38,17 +40,17 @@ public class CommonHandlerUrl {
     }
 
     @RestApi
-    @EncryptResponseBody(defaultHandle = false,handle = EncryptRPCResponseBodyAdvice.HANDLE)
+    @EncryptResponseBody(handle = EncryptRPCResponseBodyAdvice.class)
     @ResponseBody
     /**
      *  拦截自定义请求的url，可以做成统一的处理器
      */
     public Object handlerUrl(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        String rpcService = request.getHeader(RPCUtils.HEADER_API_SERVICE_NAME);
-        String methodName = request.getHeader(RPCUtils.HEADER_API_SERVICE_METHOD);
-        String encrypt = request.getHeader(RPCUtils.HEADER_ENCRYPT);
-        String encryptKey = request.getHeader(RPCUtils.HEADER_ENCRYPT_KEY);
-        String serializer = request.getHeader(RPCUtils.HEADER_RPC_SERIALIZER);
+        String rpcService = WebUtils.getHeaderIgnoreCase(request, RPCUtils.HEADER_API_SERVICE_NAME);
+        String methodName = WebUtils.getHeaderIgnoreCase(request, RPCUtils.HEADER_API_SERVICE_METHOD);
+        String encrypt = WebUtils.getHeaderIgnoreCase(request, RPCUtils.HEADER_ENCRYPT);
+        String encryptKey = WebUtils.getHeaderIgnoreCase(request, RPCUtils.HEADER_ENCRYPT_KEY);
+        String serializer = WebUtils.getHeaderIgnoreCase(request, RPCUtils.HEADER_RPC_SERIALIZER);
 
         int contentLength = request.getContentLength();
         if (contentLength > MAX_BODY_SIZE) {
@@ -57,7 +59,7 @@ public class CommonHandlerUrl {
         byte[] data = StreamUtils.copyToByteArray(request.getInputStream());
         
         if (StringUtils.isNotBlank(encrypt)) {
-            data = RPCUtils.decryptDataByRequest(encrypt, encryptKey, data);
+            data = RequestEncryptUtils.decryptDataByRequest(encrypt, encryptKey, data);
         }
 
         Object[] params = (Object[]) SerializerFactory.getSerializer(serializer).deserialize(data);

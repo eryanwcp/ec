@@ -129,7 +129,7 @@ public class LogController extends SimpleController {
             return renderString(response, json, WebUtils.JSON_TYPE);
         }
         uiModel.addAttribute("startTime", DateUtils.formatDate(_startTime));
-        return "modules/sys/log";
+        return "modules/sys/log.html";
     }
 
 

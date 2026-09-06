@@ -39,7 +39,7 @@ public class EcServiceController extends SimpleController {
 
     @Logging(value = "'RPC服务'+#requestData.get(\"serviceName\").asText()+'.'+#requestData.get(\"serviceMethod\").asText()",logType = LogType.access,requestHeaders = true)
     @DecryptRequestBody()
-    @EncryptResponseBody(defaultHandle = false,handle = EncryptRPCResponseBodyAdvice.HANDLE)
+    @EncryptResponseBody(handle = EncryptRPCResponseBodyAdvice.class)
     @ResponseBody
     @PostMapping(value = {"service"})
     public R service(HttpServletRequest request, HttpServletResponse response, @RequestBody JsonNode requestData) {
@@ -47,7 +47,7 @@ public class EcServiceController extends SimpleController {
         R ecpResultBean = null;
         try {
             if (null == requestData) {
-                return R.rest(false).setMsg("参数错误：requestData");
+                return R.fail(false,"参数错误：requestData");
             }
             String serviceName = requestData.get("serviceName").asText();
             String serviceMethod = requestData.get("serviceMethod").asText();

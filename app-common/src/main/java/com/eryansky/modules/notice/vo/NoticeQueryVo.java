@@ -141,8 +141,9 @@ public class NoticeQueryVo implements Serializable {
         return isRead;
     }
 
-    public void setIsRead(String isRead) {
+    public NoticeQueryVo setIsRead(String isRead) {
         this.isRead = isRead;
+        return this;
     }
 
     public List<String> getPublishUserIds() {

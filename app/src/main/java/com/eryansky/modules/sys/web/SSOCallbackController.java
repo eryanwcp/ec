@@ -1,5 +1,6 @@
 package com.eryansky.modules.sys.web;
 
+import com.eryansky.common.utils.UserAgentUtils;
 import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.core.aop.annotation.Logging;
@@ -27,7 +28,7 @@ public class SSOCallbackController {
     /**
      * SSO服务器给客户端分配的那把密钥，两边要一致
      */
-    @Value("${system.sso.clientSecret:ecececececececececececececececec}")
+    @Value("${system.sso.clientSecret:65636563656365636563656365636563}")
     private String clientSecret;
 
     /**
@@ -106,6 +107,7 @@ public class SSOCallbackController {
         request.getSession(true).setAttribute("sso_user", payload);
 
         // 6. 302 回主页，URL 上不再带 token
-        response.sendRedirect(request.getContextPath() + AppConstants.getAdminPath());
+        boolean isMobile = UserAgentUtils.isMobile(request);
+        response.sendRedirect(request.getContextPath() + (isMobile ? AppConstants.getMobilePath() : AppConstants.getAdminPath()));
     }
 }

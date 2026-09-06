@@ -15,14 +15,18 @@ import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
+import com.eryansky.common.web.springmvc.StringSanitizeEditor;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.web.annotation.MobileValue;
 import com.eryansky.core.web.upload.FileUploadUtils;
 import com.eryansky.modules.disk.mapper.File;
 import com.eryansky.modules.notice.utils.NoticeConstants;
+import com.eryansky.modules.notice.utils.NoticeUtils;
+import com.eryansky.modules.notice.vo.NoticeReceiveInfoSimpleVo;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys.service.UserService;
+import com.eryansky.modules.sys.utils.DictionaryUtils;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -47,6 +51,7 @@ import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.utils.SelectType;
 import jakarta.annotation.Resource;
 import org.apache.commons.fileupload2.core.FileUploadSizeException;
+import org.jsoup.safety.Safelist;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -98,7 +103,7 @@ public class NoticeController extends SimpleController {
      */
     @Logging(logType = LogType.access, value = "通知管理")
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {""})
-    public ModelAndView list(String noticeId,
+    public ModelAndView list(@RequestParam(value = "noticeId", required = false) String noticeId,
                              @RequestParam(value = "objectType", required = false) String objectType,
                              @RequestParam(value = "objectId", required = false) String objectId,
                              @RequestParam(value = "title", required = false) String title,
@@ -107,7 +112,7 @@ public class NoticeController extends SimpleController {
                              @RequestParam(value = "receiveUserIds", required = false) List<String> receiveUserIds,
                              @RequestParam(value = "receiveOrganIds", required = false) List<String> receiveOrganIds,
                              @RequestParam(value = "receiveContactGroupIds", required = false) List<String> receiveContactGroupIds) {
-        ModelAndView modelAndView = new ModelAndView("modules/notice/notice");
+        ModelAndView modelAndView = new ModelAndView("modules/notice/notice.html");
         modelAndView.addObject("noticeId", noticeId);
         modelAndView.addObject("objectType", objectType);
         modelAndView.addObject("objectId", objectId);
@@ -182,7 +187,7 @@ public class NoticeController extends SimpleController {
     @Logging(logType = LogType.access, value = "通知管理-查看通知")
     @GetMapping(value = {"readInfo/{id}"})
     public ModelAndView readInfo(@PathVariable String id) {
-        ModelAndView modelAndView = new ModelAndView("modules/notice/notice-readInfo");
+        ModelAndView modelAndView = new ModelAndView("modules/notice/notice-readInfo.html");
         modelAndView.addObject("noticeId", id);
         return modelAndView;
     }
@@ -198,7 +203,7 @@ public class NoticeController extends SimpleController {
     @Mobile(value = MobileValue.ALL)
     @GetMapping(value = {"view/{id}"})
     public ModelAndView view(@PathVariable String id) {
-        ModelAndView modelAndView = new ModelAndView("modules/notice/notice-view");
+        ModelAndView modelAndView = new ModelAndView("modules/notice/notice-view.html");
         List<File> files = DiskUtils.findFilesByIds(noticeService.findFileIdsByNoticeId(id));
         Notice model = noticeService.get(id);
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
@@ -226,7 +231,7 @@ public class NoticeController extends SimpleController {
                               @RequestParam(value = "receiveOrganIds", required = false) List<String> receiveOrganIds,
                               @RequestParam(value = "receiveContactGroupIds", required = false) List<String> receiveContactGroupIds,
                               OperateType operateType) {
-        ModelAndView modelAndView = new ModelAndView("modules/notice/notice-input");
+        ModelAndView modelAndView = new ModelAndView("modules/notice/notice-input.html");
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         String loginUserId = sessionInfo.getUserId();
         List<File> files = Collections.emptyList();
@@ -262,14 +267,16 @@ public class NoticeController extends SimpleController {
 
         }
         modelAndView.addObject("files", files);
-        modelAndView.addObject("fileIds", _fileIds);
-        modelAndView.addObject("receiveUserIds", _receiveUserIds);
-        modelAndView.addObject("receiveOrganIds", _receiveOrganIds);
-        modelAndView.addObject("receiveContactGroupIds", _receiveContactGroupIds);
+        modelAndView.addObject("fileIds", null != _fileIds ? _fileIds : Collections.emptyList());
+        modelAndView.addObject("receiveUserIds", null != _receiveUserIds ? _receiveUserIds : Collections.emptyList());
+        modelAndView.addObject("receiveOrganIds", null != _receiveOrganIds ? _receiveOrganIds : Collections.emptyList());
+        modelAndView.addObject("receiveContactGroupIds", null != _receiveContactGroupIds ? _receiveContactGroupIds : Collections.emptyList());
         modelAndView.addObject("operateType", operateType);
         modelAndView.addObject("model", model);
 //        modelAndView.addObject("noticeTipChannels", MessageChannel.values());
         modelAndView.addObject("noticeTipChannels", NoticeConstants.getNoticeTipChannels());
+        modelAndView.addObject("dictionaryTypeCode", NoticeUtils.DIC_NOTICE);
+        modelAndView.addObject("noticeTypes", DictionaryUtils.getDictList(NoticeUtils.DIC_NOTICE));
         return modelAndView;
     }
 
@@ -301,6 +308,8 @@ public class NoticeController extends SimpleController {
     @Override
     protected void initBinder(WebDataBinder binder) {
         super.defaultWebDataBinder(binder);
+        super.setAllowedFields(binder);
+        binder.registerCustomEditor(String.class, new StringSanitizeEditor(true, Safelist.relaxed()));
     }
 
     /**
@@ -538,7 +547,7 @@ public class NoticeController extends SimpleController {
         Result result = null;
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         long noticeScopes = 0;
-        Page<NoticeReceiveInfo> page = new Page<>(request);
+        Page<NoticeReceiveInfoSimpleVo> page = new Page<>(request);
         page = noticeReceiveInfoService.findUserUnreadNotices(page, sessionInfo.getUserId());
         if (Collections3.isNotEmpty(page.getResult())) {
             noticeScopes = page.getTotalCount();
@@ -556,15 +565,11 @@ public class NoticeController extends SimpleController {
      */
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"myUnreadNotice"})
     @ResponseBody
-    public String myUnreadNotice(HttpServletRequest request, HttpServletResponse response) {
-        Result result = null;
+    public Result myUnreadNotice(HttpServletRequest request, HttpServletResponse response) {
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
-        Page<NoticeReceiveInfo> page = new Page<>(request);
+        Page<NoticeReceiveInfoSimpleVo> page = new Page<>(request);
         page = noticeReceiveInfoService.findUserUnreadNotices(page, sessionInfo.getUserId());
-        result = Result.successResult().setObj(page.getResult());
-        String json = JsonMapper.getInstance().toJson(result, NoticeReceiveInfo.class,
-                new String[]{"noticeId", "title"});
-        return json;
+        return Result.successResult().setObj(page.getResult());
     }
 
     /**

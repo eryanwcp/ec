@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" xmlns:th="http://www.thymeleaf.org"
+	  xmlns:shiro="http://www.eryansky.com/thymeleaf/shiro"
+	  xmlns:sitemesh="http://www.opensymphony.com/sitemesh/decorator">
+<head>
+	<title>序列号信息</title>
+	<!-- 装饰器配置 (沿用 SiteMesh) -->
+	<meta name="decorator" content="default_sys"/>
+	<script type="text/javascript" th:inline="javascript">
+		/*<![CDATA[*/
+		$(document).ready(function() {
+			$("#inputForm").validate({
+				submitHandler: function(form){
+					loading('正在提交，请稍等...');
+					form.submit();
+				},
+				errorContainer: "#messageBox",
+				errorPlacement: function(error, element) {
+					$("#messageBox").text("输入有误，请先更正。");
+					if (element.is(":checkbox")||element.is(":radio")||element.parent().is(".input-append")){
+						error.appendTo(element.parent().parent());
+					} else {
+						error.insertAfter(element);
+					}
+				}
+			});
+		});
+		/*]]>*/
+	</script>
+</head>
+<body>
+<ul class="nav nav-tabs" style="margin-bottom: 0;">
+	<li><a th:href="${ctxAdmin}+'/sys/systemSerialNumber'">序列号列表</a></li>
+	<li class="active"><a th:href="${ctxAdmin}+'/sys/systemSerialNumber/form?id='+${model.id ?: ''}">序列号<shiro:hasPermission name="sys:systemSerialNumber:edit">[[${model.id != null ? '修改':'添加'}]]</shiro:hasPermission><shiro:lacksPermission name="sys:systemSerialNumber:edit">查看</shiro:lacksPermission></a></li>
+</ul><br>
+	<form id="inputForm" th:action="${ctxAdmin}+'/sys/systemSerialNumber/save'" method="post" class="form-horizontal">
+		<input name="id" type="hidden" th:value="${model.id}"/>
+		<div th:replace="~{common/tags/message :: messageBox(content=${message})}"></div>
+		<div class="control-group">
+			<label class="control-label">APP标识：</label>
+			<div class="controls">
+				<input name="app"  maxlength="36" class="input-xxlarge" th:value="${model.app}"/>
+				<span class="help-inline">默认值：“1”</span>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">模块名称：</label>
+			<div class="controls">
+				<input name="moduleName" maxlength="200" class="input-xxlarge required" th:value="${model.moduleName}"/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">模块编码：</label>
+			<div class="controls">
+				<input name="moduleCode" maxlength="128" class="input-xxlarge required" th:value="${model.moduleCode}"/>
+			</div>
+		</div>
+
+		<div class="control-group">
+			<label class="control-label">模板：</label>
+			<div class="controls">
+				<textarea id="configTemplate" name="configTemplate" rows="4" maxlength="128" class="input-xxlarge required">[[${model.configTemplate}]]</textarea>
+				<span class="help-inline">“#” 为子序列间的分隔符。在每个子序列规则定义的内部，用 “@” 分为两部分，前面一部分（Str/DateTime/NumSeq/CustomStr）表明该子序列的类型，后面一部分是用于生成子序列串所需的信息。
+                <br>例如 “Str@ 国办发〔# DateTime@yyyy # Str@〕# NumSeq@0C0 # Str@”，“Str” 表示为固定字符串类型，固定字符串为 “国办发〔”；<br>
+                类似的 “DateTime@yyyy”，“DateTime” 表示时间日期类型，格式为四位的年代号，根据当前时间生成，格式：“yyyyMMddHHmmss”；<br>
+                “NumSeq@0C0”，“0C0”，“C”前部分为数值长度（默认为“0”，“0”表示长度为[当前最大值]的长度），“后半部分”表示补充字符（默认为：“0”）<br>
+                “CustomStr@param1”，“param1”表示自定义编码。
+            </span>
+			</div>
+		</div>
+
+		<div class="control-group">
+			<label class="control-label">当前最大值：</label>
+			<div class="controls">
+				<textarea name="maxSerial" rows="4" class="input-xxlarge">[[${model.maxSerial}]]</textarea>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">缓存大小：</label>
+			<div class="controls">
+				<input name="preMaxNum" maxlength="11" class="input-large digits" th:value="${model.preMaxNum}"/>
+				<span class="help-inline">预生成流水号数量</span>
+			</div>
+		</div>
+
+		<div class="control-group">
+			<label class="control-label">重置类型：</label>
+			<div class="controls">
+				<select name="resetType" class="input-medium">
+					<option th:each="item : ${resetTypes}"
+							th:value="${item.value}"
+							th:text="${item.description}"
+							th:selected="${item.value eq model.resetType}">
+					</option>
+				</select>
+			</div>
+		</div>
+
+		<div class="control-group">
+			<label class="control-label">备注：</label>
+			<div class="controls">
+				<textarea id="remark" name="remark" rows="4" maxlength="200" class="input-xxlarge">[[${model.remark}]]</textarea>
+			</div>
+		</div>
+		<div class="form-actions">
+			<shiro:hasPermission name="sys:systemSerialNumber:edit">
+				<input id="btnSubmit" class="btn btn-primary" type="submit" value="保 存"/>&nbsp;
+			</shiro:hasPermission>
+			<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>
+		</div>
+	</form>
+</body>
+</html>

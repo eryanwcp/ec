@@ -72,7 +72,7 @@ public class AreaController extends SimpleController {
         model.addAttribute("list", list);
         model.addAttribute("parentId", parentId);
         model.addAttribute("rootId", "0".equals(parentId) ? parentId : AreaUtils.get(parentId).getParentId());
-        return "modules/sys/areaList";
+        return "modules/sys/areaList.html";
     }
 
     @RequiresPermissions("sys:area:view")
@@ -97,10 +97,10 @@ public class AreaController extends SimpleController {
                 area.setCode(area.getParent().getCode() + StringUtils.leftPad(String.valueOf(size > 0 ? size : 1), 4, "0"));
             }
         }
-        model.addAttribute("area", area);
+        model.addAttribute("model", area);
 
         model.addAttribute("areas", AreaType.values());
-        return "modules/sys/areaForm";
+        return "modules/sys/areaForm.html";
     }
 
     @Override

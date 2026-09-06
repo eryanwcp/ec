@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--/*
+    定义片段: messageBox
+    字段说明文档：
+    content (String): 消息内容，必填
+    type (String): 消息类型，可选。默认根据内容自动判断。消息类型：info、success、warning、error、loading
+*/-->
+<div th:fragment="messageBox">
+  <div th:if="${content != null and content != ''}"
+       th:with="ctype=${type != null and type != '' ? type : (#strings.indexOf(content, '失败') == -1 ? 'success' : 'error')}"
+       id="messageBox"
+       class="alert hide"
+       th:classappend="'alert-' + ${ctype}">
+    <button type="button" data-dismiss="alert" class="close">×</button>
+    <span th:text="${content}"></span>
+  </div>
+  <script th:inline="javascript" th:if="${content != null and content != ''}">
+    /*<![CDATA[*/
+    var msgContent = [[${content}]];
+    var msgType = [[${type != null and type != '' ? type : (#strings.indexOf(content, '失败') == -1 ? 'success' : 'error')}]];
+    if (typeof $.jBox !== 'undefined') {
+      $.jBox.closeTip();
+      if (!$.jBox.tip.mess) {
+        $.jBox.tip.mess = 1;
+        $.jBox.tip(msgContent, msgType, {persistent: true, opacity: 0});
+        $("#messageBox").show();
+      }
+    }
+    /*]]>*/
+  </script>
+</div>
+</body>
+</html>

@@ -7,6 +7,7 @@ package com.eryansky.common.utils.io;
 
 import com.eryansky.common.exception.ServiceException;
 import com.eryansky.common.orm.Page;
+import com.eryansky.common.utils.DateUtils;
 import com.eryansky.common.utils.Identities;
 import com.eryansky.common.utils.StringUtils;
 import com.google.common.collect.Lists;
@@ -20,6 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -76,29 +78,17 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	 *            目标文件
 	 */
 	public static void copyFile(File src, File dst) {
+		if (src == null || !src.exists()) {
+			logger.error("源文件不存在");
+			return;
+		}
 		try {
-			try (FileOutputStream out = new FileOutputStream(dst);
-				 FileInputStream in = new FileInputStream(src)){
-				byte[] buffer = new byte[1024];
-				int len = 0;
-				while ((len = in.read(buffer)) > 0) {
-					out.write(buffer, 0, len);
-				}
-			} catch (Exception e) {
-				logger.error(e.getMessage(),e);
-				String dstpath = dst.getAbsolutePath();
-				if (dstpath.lastIndexOf("/") != -1) {
-					dstpath = dstpath.subSequence(0, dstpath.lastIndexOf("/"))
-							.toString();
-				} else {
-					dstpath = dstpath.subSequence(0, dstpath.lastIndexOf("\\"))
-							.toString();
-				}
-				createDirectory(dstpath);
-				copyFile(src, dst);
+			if (dst.getParentFile() != null && !dst.getParentFile().exists()) {
+				dst.getParentFile().mkdirs();
 			}
-		} catch (Exception e) {
-			logger.error(e.getMessage(),e);
+			Files.copy(src.toPath(), dst.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			logger.error("文件复制失败: {}", e.getMessage(), e);
 		}
 	}
 
@@ -154,18 +144,20 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	 * @param file
 	 */
 	public static void deleteDirectory(File file) {
-		if (file.exists()) { // 判断文件是否存在
-			if (file.isFile()) { // 判断是否是文件
-				file.delete(); // delete()方法 你应该知道 是删除的意思;
-			} else if (file.isDirectory()) { // 否则如果它是一个目录
-				File[] files = file.listFiles(); // 声明目录下所有的文件 files[];
-				for (int i = 0; i < files.length; i++) { // 遍历目录下所有的文件
-					deleteDirectory(files[i]); // 把每个文件 用这个方法进行迭代
+		if (file == null || !file.exists()) {
+			logger.warn("所删除的文件或目录不存在！");
+			return;
+		}
+		if (file.isDirectory()) {
+			File[] files = file.listFiles();
+			if (files != null) { // 增加非空校验
+				for (File child : files) {
+					deleteDirectory(child);
 				}
 			}
-			file.delete();
-		} else {
-			logger.warn("所删除的文件不存在！" );
+		}
+		if (!file.delete()) {
+			logger.warn("删除文件失败: {}", file.getAbsolutePath());
 		}
 	}
 
@@ -322,18 +314,26 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
      * @return
      */
     public static String readFile(File file, String charSet) {
-        StringBuffer sb = new StringBuffer();
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file),charSet))){
-            String data = null;
-            while((data = br.readLine())!=null){
-                sb.append(data).append("\n");
-            }
-        } catch (FileNotFoundException e) {
-            throw new ServiceException("找不到指定的文件", e);
-        } catch (IOException e) {
-            throw new ServiceException("读取文件内容时IO异常", e);
-        }
-        return sb.toString();
+		if (file == null || !file.exists()) {
+			throw new ServiceException("找不到指定的文件");
+		}
+		// 限制单文件读取上限（例如 10MB），防止 OOM
+//		if (file.length() > 10 * 1024 * 1024) {
+//			throw new ServiceException("文件大小超过允许的最大读取限制 (10MB)");
+//		}
+
+		StringBuilder sb = new StringBuilder(); // 替换为线程不安全但性能更好的 StringBuilder
+		try (BufferedReader br = new BufferedReader(
+				new InputStreamReader(new FileInputStream(file),
+						StringUtils.isNotBlank(charSet) ? charSet : StandardCharsets.UTF_8.name()))) {
+			String data;
+			while ((data = br.readLine()) != null) {
+				sb.append(data).append("\n");
+			}
+		} catch (IOException e) {
+			throw new ServiceException("读取文件内容时 IO 异常", e);
+		}
+		return sb.toString();
     }
 
 
@@ -365,9 +365,16 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	 */
 	public static List<String> findChildrenList(File dir, boolean searchDirs) {
 		List<String> files = Lists.newArrayList();
-		for (String subFiles : Objects.requireNonNull(dir.list())) {
-			File file = new File(dir + SEPARATOR + subFiles);
-			if (((searchDirs) && (file.isDirectory())) || ((!searchDirs) && (!file.isDirectory()))) {
+		if (dir == null || !dir.isDirectory()) {
+			return files;
+		}
+		String[] list = dir.list();
+		if (list == null) {
+			return files;
+		}
+		for (String subFile : list) {
+			File file = new File(dir, subFile);
+			if ((searchDirs && file.isDirectory()) || (!searchDirs && !file.isFile())) {
 				files.add(file.getName());
 			}
 		}
@@ -401,22 +408,68 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	}
 
 	/**
-	 * 根据图片Base64获取文件扩展名
-	 * @param imageBase64
-	 * @return
-	 * @author ThinkGem
+	 * 根据图片 Base64 及其文件头魔数（Magic Number）安全校验并获取文件扩展名
+	 *
+	 * @param imageBase64 Base64 格式字符串
+	 * @return 对应的文件后缀名，校验失败返回 null
 	 */
-	public static String getFileExtensionByImageBase64(String imageBase64){
-		String extension = null;
-		String type = StringUtils.substringBetween(imageBase64, "data:", ";base64,");
-		if (StringUtils.inStringIgnoreCase(type, "image/jpeg")){
-			extension = "jpg";
-		}else if (StringUtils.inStringIgnoreCase(type, "image/gif")){
-			extension = "gif";
-		}else{
-			extension = "png";
+	public static String getFileExtensionByImageBase64(String imageBase64) {
+		if (StringUtils.isBlank(imageBase64)) {
+			return null;
 		}
-		return extension;
+
+		try {
+			// 1. 去除数据前缀（如 data:image/png;base64,）
+			String base64Data = imageBase64;
+			if (imageBase64.contains(",")) {
+				base64Data = imageBase64.substring(imageBase64.indexOf(",") + 1);
+			}
+
+			// 2. 仅解码前 16 个字节，读取文件头部魔数（无需全面解码全量字节，性能极高）
+			byte[] headerBytes = Base64.decodeBase64(base64Data.length() > 32 ? base64Data.substring(0, 32) : base64Data);
+			if (headerBytes.length < 8) {
+				return null;
+			}
+
+			// 3. 将头部字节转换为 16 进制字符串进行魔数比对
+			String hexHeader = bytesToHex(headerBytes).toUpperCase();
+
+			if (hexHeader.startsWith("FFD8FF")) {
+				return "jpg";
+			} else if (hexHeader.startsWith("89504E47")) {
+				return "png";
+			} else if (hexHeader.startsWith("47494638")) {
+				return "gif";
+			} else if (hexHeader.contains("57454250")) { // WEBP (RIFF...WEBP)
+				return "webp";
+			} else if (hexHeader.startsWith("424D")) { // BMP
+				return "bmp";
+			}
+		} catch (Exception e) {
+			logger.error("解析图片 Base64 扩展名失败", e);
+		}
+
+		// 校验不通过，拒绝处理或返回 null
+		return null;
+	}
+
+	/**
+	 * 字节数组转 16 进制字符串
+	 */
+	private static String bytesToHex(byte[] src) {
+		StringBuilder stringBuilder = new StringBuilder();
+		if (src == null || src.length <= 0) {
+			return "";
+		}
+		for (byte b : src) {
+			int v = b & 0xFF;
+			String hv = Integer.toHexString(v);
+			if (hv.length() < 2) {
+				stringBuilder.append(0);
+			}
+			stringBuilder.append(hv);
+		}
+		return stringBuilder.toString();
 	}
 
 	/**
@@ -459,21 +512,26 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 	/**
 	 * 校验文件
 	 * @param filename
-	 * @param intenDedDir
+	 * @param intendedDir
 	 * @return
 	 * @throws IOException
 	 */
-	public String validateFilename(String filename,String intenDedDir) throws IOException {
+	public String validateFilename(String filename,String intendedDir) throws IOException {
 		File f = new File(filename);
 		String canonicalPath = f.getCanonicalPath();
 
-		File iD = new File(intenDedDir);
+		File iD = new File(intendedDir);
 		String canonicalID = iD.getCanonicalPath();
 
-		if(canonicalPath.startsWith(canonicalID)){
+		// 确保路径以分隔符结尾，防止前缀拼接攻击（例如 /var/log_bak 绕过 /var/log）
+		if (!canonicalID.endsWith(File.separator)) {
+			canonicalID += File.separator;
+		}
+
+		if (canonicalPath.startsWith(canonicalID) || canonicalPath.equals(iD.getCanonicalPath())) {
 			return canonicalPath;
-		}else{
-			throw new IllegalStateException("文件不再目标目录内容");
+		} else {
+			throw new SecurityException("非法文件路径访问: " + filename);
 		}
 	}
 

@@ -22,11 +22,15 @@ import com.eryansky.core.security.annotation.RequiresPermissions;
 import com.eryansky.core.security.annotation.RequiresRoles;
 import com.eryansky.core.security.annotation.RestApi;
 import com.eryansky.core.web.upload.FileUploadUtils;
+import com.eryansky.encrypt.anotation.DecryptRequestBody;
+import com.eryansky.encrypt.anotation.EncryptResponseBody;
+import com.eryansky.encrypt.util.RequestEncryptUtils;
 import com.eryansky.modules.disk.mapper.File;
 import com.eryansky.modules.sys.mapper.*;
 import com.eryansky.modules.sys.utils.DictionaryUtils;
 import com.eryansky.modules.sys.utils.PostUtils;
 import com.eryansky.modules.sys.utils.SecurePasswordUtils;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import com.eryansky.core.excels.ExcelUtils;
 import com.eryansky.core.excels.JsGridReportBase;
@@ -102,8 +106,7 @@ public class UserController extends SimpleController {
      * @return
      */
     @PostMapping(value = {"datagrid"})
-    @ResponseBody
-    public Datagrid<User> datagrid(String organId, String query, String userType) {
+    public String datagrid(String organId, String query, String userType,HttpServletRequest request,HttpServletResponse response) {
         Page<User> page = new Page<>(SpringMVCHolder.getRequest());
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         if (StringUtils.isBlank(organId)) {
@@ -121,7 +124,7 @@ public class UserController extends SimpleController {
 
         page = userService.findPage(page, organId, query, userType);
         Datagrid<User> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
-        return dg;
+        return renderString(response,JsonMapper.getInstance().toJsonWithExcludeProperties(dg, User.class,new String[]{"password", "originalPassword"}), WebUtils.JSON_TYPE);
     }
 
     /**
@@ -180,7 +183,9 @@ public class UserController extends SimpleController {
     @Logging(value = "用户管理-保存用户", data = "#JsonMapper.toJson(#user)",logType = LogType.operate)
     @PostMapping(value = {"save"}, produces = {MediaType.TEXT_HTML_VALUE})
     @ResponseBody
-    public Result save(@ModelAttribute("model") User user) {
+    public Result save(@ModelAttribute("model") User user,HttpServletRequest request,HttpServletResponse response){
+
+
         Result result = null;
         // 名称重复校验
         User nameCheckUser = userService.getUserByLoginName(user.getLoginName());
@@ -197,11 +202,14 @@ public class UserController extends SimpleController {
                 return result;
             }
             try {
-                user.setOriginalPassword(Encryption.encrypt(user.getPassword()));
+                String _newPassword = RequestEncryptUtils.decryptEncodeDataByRequest(request,user.getPassword());
+                user.setOriginalPassword(Encryption.encrypt(_newPassword));
+                user.setPassword(Encrypt.e(_newPassword));
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
+                return Result.errorResult().setMsg("服务器内部异常！");
             }
-            user.setPassword(Encrypt.e(user.getPassword()));
+
         } else {// 修改
             User superUser = userService.getSuperUser();
             SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
@@ -256,9 +264,49 @@ public class UserController extends SimpleController {
     @ResponseBody
     public Result passwordReset(@RequestParam(value = "userIds", required = true) List<String> userIds,
                                      @RequestParam(value = "newPassword", required = true) String newPassword,
-                                     @RequestParam(value = "tipMessage", defaultValue = "0") String tipMessage){
-        UserUtils.updateUserPasswordReset(userIds, newPassword,tipMessage);
+                                     @RequestParam(value = "tipMessage", defaultValue = "0") String tipMessage,
+                                HttpServletRequest request){
+        String _newPassword = null;
+        try {
+            _newPassword = RequestEncryptUtils.decryptEncodeDataByRequest(request,newPassword);
+        } catch (Exception e) {
+            return Result.errorResult();
+        }
+        UserUtils.updateUserPasswordReset(userIds, _newPassword,tipMessage);
         return Result.successResult();
+    }
+
+    /**
+     * 修改用户密码 批量、无需输入原密码.
+     *
+     * @param requestData
+     * @return
+     */
+    @DecryptRequestBody
+    @RequiresPermissions(logical = Logical.OR,value = {"sys:user:edit","sys:user:password:edit"})
+    @Logging(value = "用户管理-重置密码",data = "#JsonMapper.toJson(#userIds)", logType = LogType.operate)
+    @PostMapping(value = {"passwordResetV2"}, produces = {MediaType.TEXT_HTML_VALUE})
+    @ResponseBody
+    public Result passwordResetV2(@RequestBody JsonNode requestData,
+                                  HttpServletRequest request) {
+        List<String> userIds = Optional.ofNullable(requestData.get("userIds"))
+                .filter(JsonNode::isArray) // 确保它是数组
+                .map(node -> {
+                    List<String> list = new ArrayList<>();
+                    for (JsonNode item : node) {
+                        list.add(item.asText());
+                    }
+                    return list;
+                })
+                .orElse(Collections.emptyList());
+        String newPassword = Optional.ofNullable(requestData.get("newPassword"))
+                .map(JsonNode::asText)
+                .orElse(null);
+        String tipMessage = Optional.ofNullable(requestData.get("tipMessage"))
+                .map(JsonNode::asText)
+                .orElse(null);
+        request.setAttribute("ignoreEncrypt",true);
+        return passwordReset(userIds,newPassword,tipMessage,request) ;
     }
 
 
@@ -456,7 +504,6 @@ public class UserController extends SimpleController {
      * @return
      */
     @PostMapping(value = {"userList"})
-    @ResponseBody
     public String userList(String dataScope,
                            @RequestParam(value = "includeUserIds", required = false) List<String> includeUserIds,
                            @RequestParam(value = "excludeUserIds", required = false) List<String> excludeUserIds,
@@ -489,7 +536,7 @@ public class UserController extends SimpleController {
 
         String json = JsonMapper.getInstance().toJson(list, User.class,
                 new String[]{"id", "loginName","code","bizCode", "name", "sexView", "defaultOrganName", "companyName"});
-        return json;
+        return renderString(response,json, WebUtils.JSON_TYPE);
     }
 
     /**
@@ -605,18 +652,21 @@ public class UserController extends SimpleController {
                                         @RequestParam(value = "checkbox", defaultValue = "true") Boolean checkbox,
                                         @RequestParam(value = "cascade", defaultValue = "true") Boolean cascade,
                                         @RequestParam(value = "shortName", defaultValue = "false") Boolean shortName) {
-        List<TreeNode> treeNodes = shortName ? organService.findOrganUserTree(parentId, null, true, checkedUserIds, cascade, shortName) : organService.findOrganUserTree(parentId, checkedUserIds, cascade);
-        Post post = null;
-        if(StringUtils.isNotBlank(postCode) && StringUtils.isNotBlank(parentId) && !cascade){
-            post = PostUtils.getByCode(postCode);
-            if(null != post){
-                List<String> postOrganIds = organService.findAssociationOrganIdsByPostId(post.getId());
-                List<String> postUserIds = userService.findUserIdsByPostCode(postCode);
-                return treeNodes.stream().filter(v->{
-                    String nType = v.getAttribute("nType");
-                    if("o".equals(nType)){
+        List<TreeNode> treeNodes = Boolean.TRUE.equals(shortName)
+                ? organService.findOrganUserTree(parentId, null, true, checkedUserIds, cascade, shortName)
+                : organService.findOrganUserTree(parentId, checkedUserIds, cascade);
+
+        if (StringUtils.isNotBlank(postCode) && StringUtils.isNotBlank(parentId) && Boolean.FALSE.equals(cascade)) {
+            Post post = PostUtils.getByCode(postCode);
+            if (post != null) {
+                Set<String> postOrganIds = new HashSet<>(organService.findAssociationOrganIdsByPostId(post.getId()));
+                Set<String> postUserIds = new HashSet<>(userService.findUserIdsByPostCode(postCode));
+
+                return treeNodes.stream().filter(v -> {
+                    String nType = (String) v.getAttribute("nType");
+                    if ("o".equals(nType)) {
                         return postOrganIds.contains(v.getId());
-                    }else if("u".equals(nType)){
+                    } else if ("u".equals(nType)) {
                         return postUserIds.contains(v.getId());
                     }
                     return false;
@@ -722,6 +772,7 @@ public class UserController extends SimpleController {
      * @param loginName
      * @return
      */
+    @EncryptResponseBody
     @RequiresRoles(AppConstants.ROLE_SYSTEM_MANAGER)
     @Logging(value = "用户管理-查看密码", data = "#JsonMapper.toJson(#loginName)", logType = LogType.security)
     @PostMapping(value = "viewUserPassword")
@@ -866,6 +917,12 @@ public class UserController extends SimpleController {
     @ResponseBody
     @RestApi()
     public Result detail(@ModelAttribute("model") User model) {
+        if (model == null) {
+            return Result.errorResult().setMsg("用户不存在");
+        }
+        // 脱敏处理，置空敏感字段或转为 UserVO
+        model.setPassword(null);
+        model.setOriginalPassword(null);
         return Result.successResult().setObj(model);
     }
 }

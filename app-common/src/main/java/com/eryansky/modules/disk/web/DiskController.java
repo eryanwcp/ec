@@ -710,15 +710,24 @@ public class DiskController extends SimpleController {
         try {
             // 创建一个临时压缩文件， 文件流全部注入到这个文件中
             tempZipFile = new java.io.File(Identities.uuid() + "_temp.zip");
+            // 使用标准的系统临时目录创建临时文件，避免相对路径安全隐患
+            String tmpDir = System.getProperty("java.io.tmpdir");
+            tempZipFile = java.io.File.createTempFile(Identities.uuid() + "_download_temp.zip", tmpDir);
+
             DiskUtils.makeZip(fileList, tempZipFile.getAbsolutePath());
             String dName = "【批量下载】" + StringUtils.substringBeforeLast(FilenameUtils.getName(fileList.get(0).getName()),".") + "等.zip";
             DownloadFileUtils.downRangeFile(tempZipFile,dName,response,request);
 //            DownloadUtils.download(request, response, new FileInputStream(tempZipFile), dName);
         } catch (Exception e) {
+            logger.error("批量下载压缩失败: {}", e.getMessage(), e);
             throw e;
         } finally {
             if (tempZipFile != null && tempZipFile.isFile()) {
-                tempZipFile.delete();//删除临时Zip文件
+                try {
+                    java.nio.file.Files.deleteIfExists(tempZipFile.toPath());
+                } catch (IOException e) {
+                    logger.warn("无法删除临时文件: {}", tempZipFile.getAbsolutePath());
+                }
             }
         }
         return null;

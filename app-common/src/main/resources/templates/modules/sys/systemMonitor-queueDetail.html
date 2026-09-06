@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.eryansky.com/thymeleaf/shiro"
+      xmlns:sitemesh="http://www.opensymphony.com/sitemesh/decorator">
+<head>
+    <title>队列管理-队列数据-[[${key}]]</title>
+    <!-- 装饰器配置 (沿用 SiteMesh) -->
+    <meta name="decorator" content="default_sys"/>
+</head>
+<body>
+<ul class="nav nav-tabs">
+    <li><a th:href="${ctxAdmin} + '/sys/systemMonitor/queue'">队列管理</a></li>
+    <li class="active"><a th:href="${ctxAdmin}+'/sys/systemMonitor/queueDetail?region='+${region}">队列数据</a></li>
+</ul>
+<form id="searchForm" method="post" class="breadcrumb form-search">
+    [[${region}]]]
+</form>
+<div th:replace="~{common/tags/message :: messageBox(content=${message})}"></div>
+<div>[[${data}]]</div>
+</body>
+</html>

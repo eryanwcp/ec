@@ -5,6 +5,7 @@ import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.core.rpc.config.RestTemplateHolder;
 import com.eryansky.core.rpc.utils.RPCUtils;
 import com.eryansky.core.rpc.utils.SerializerFactory;
+import com.eryansky.encrypt.util.RequestEncryptUtils;
 import com.fasterxml.jackson.databind.JavaType;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
@@ -37,7 +38,7 @@ public class ConsumerExecutor {
 
                 byte[] data = byteResponse.getBody();
                 if (data != null && data.length > 0) {
-                    byte[] decryptedData = RPCUtils.decryptData(requestEncrypt, encryptRequestKey.getKey(), data);
+                    byte[] decryptedData = RequestEncryptUtils.decryptData(requestEncrypt, encryptRequestKey.getKey(), data);
                     return (T) SerializerFactory.getSerializer(serializer).deserialize(decryptedData);
                 }
                 log.debug("RPC请求成功，但返回的数据为空: {}", url);
@@ -119,7 +120,7 @@ public class ConsumerExecutor {
         }
 
         byte[] bytes = SerializerFactory.getSerializer(serializer).serialize(params);
-        byte[] data = RPCUtils.encryptData(encrypt, encryptRequestKey.getKey(), bytes);
+        byte[] data = RequestEncryptUtils.encryptData(encrypt, encryptRequestKey.getKey(), bytes);
 
         return new HttpEntity<>(data, httpHeaders);
     }

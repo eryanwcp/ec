@@ -11,6 +11,7 @@ import com.eryansky.common.utils.http.HttpPoolCompoents;
 import com.eryansky.common.web.filter.CustomHttpServletRequestWrapper;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.utils.WebUtils;
+import com.eryansky.core.security.annotation.RequiresUser;
 import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.AppUtils;
 import com.google.common.collect.Maps;
@@ -38,10 +39,12 @@ import java.util.Map;
 
 /**
  * 代理访问服务 (已迁移至 HttpClient 5.x)
+ * 白名单机制，无需登录授权
  *
  * @author Eryan
  * @date 2015-12-14
  */
+@RequiresUser(required = false)
 @Controller
 @RequestMapping(value = "${adminPath}/sys/proxy")
 public class ProxyController extends SimpleController {

@@ -17,6 +17,7 @@ import com.eryansky.modules.sys.mapper.Config;
 import com.eryansky.modules.sys.service.ConfigService;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Maps;
+import jakarta.annotation.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,7 +36,7 @@ import java.util.Map;
 @Controller
 @RequestMapping(value = "${adminPath}/sys/config")
 public class ConfigController extends SimpleController {
-    @jakarta.annotation.Resource
+    @Resource
     private ConfigService configService;
 
 

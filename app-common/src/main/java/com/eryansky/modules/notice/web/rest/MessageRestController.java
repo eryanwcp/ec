@@ -25,11 +25,6 @@ public class MessageRestController extends SimpleController {
     @Resource
     private SystemMessageAPI systemMessageAPI;
 
-    @Override
-    protected void initBinder(WebDataBinder binder) {
-        super.defaultWebDataBinder(binder);
-    }
-
     /**
      * 发送消息
      * @param data 参数说明:

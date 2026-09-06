@@ -21,12 +21,12 @@ import com.eryansky.modules.notice.service.MessageReceiveService;
 import com.eryansky.modules.notice.service.MessageSenderService;
 import com.eryansky.modules.notice.service.MessageService;
 import com.eryansky.modules.notice.task.MessageTask;
+import com.eryansky.modules.notice.vo.MessageReceiveSimpleVo;
 import com.eryansky.modules.sys._enum.YesOrNo;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.service.UserService;
 import com.eryansky.modules.sys.utils.UserUtils;
 import com.google.common.collect.Lists;
-import org.springframework.scheduling.annotation.Async;
 
 import java.util.Calendar;
 import java.util.Collection;
@@ -277,8 +277,8 @@ public class MessageUtils {
      * @param userId   用户ID
      * @return
      */
-    public static Page<MessageReceive> findUserMessages(String userId, int pageNo, int pageSize, String isRead) {
-        Page<MessageReceive> page = new Page<>(pageNo, pageSize);
+    public static Page<MessageReceiveSimpleVo> findUserMessages(String userId, int pageNo, int pageSize, String isRead) {
+        Page<MessageReceiveSimpleVo> page = new Page<>(pageNo, pageSize);
         return Static.messageReceiveService.findUserPage(page, userId, isRead);
     }
 
@@ -290,8 +290,8 @@ public class MessageUtils {
      * @param userId   用户ID
      * @return
      */
-    public static Page<MessageReceive> findUserMessages(String userId, int pageNo, int pageSize, String appId, String isRead, String isSend) {
-        Page<MessageReceive> page = new Page<>(pageNo, pageSize);
+    public static Page<MessageReceiveSimpleVo> findUserMessages(String userId, int pageNo, int pageSize, String appId, String isRead, String isSend) {
+        Page<MessageReceiveSimpleVo> page = new Page<>(pageNo, pageSize);
         return Static.messageReceiveService.findUserPage(page, appId, userId,isRead,isSend,null);
     }
 }

@@ -1,5 +1,6 @@
 package com.eryansky;
 
+import cn.hutool.json.JSON;
 import com.eryansky.common.orm.model.Parameter;
 import com.eryansky.common.utils.ThreadUtils;
 import com.eryansky.common.utils.encode.Encrypt;
@@ -12,6 +13,7 @@ import com.eryansky.modules.sys.utils.OrganUtils;
 import com.eryansky.modules.sys.utils.SystemSerialNumberUtils;
 import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.client.common.vo.ExtendAttr;
+import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Maps;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
@@ -41,7 +43,7 @@ public class ApplicationTests {
 
     @Test
     public void contextLoads() {
-
+        System.out.println(JsonMapper.toJsonString(AppConstants.getOauth2ClientList()));
     }
 
 

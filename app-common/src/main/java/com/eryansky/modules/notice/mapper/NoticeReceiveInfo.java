@@ -186,7 +186,7 @@ public class NoticeReceiveInfo extends BaseEntity<NoticeReceiveInfo> {
 
     private Notice getNotice() {
         if (this.notice == null && StringUtils.isNotBlank(this.noticeId)) {
-            return NoticeUtils.getNotice(this.noticeId);
+            this.notice = NoticeUtils.getNotice(this.noticeId);
         }
         return this.notice;
     }

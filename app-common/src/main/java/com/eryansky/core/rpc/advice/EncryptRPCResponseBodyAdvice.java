@@ -5,6 +5,7 @@ import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.core.rpc.utils.RPCUtils;
 import com.eryansky.core.rpc.utils.SerializerFactory;
 import com.eryansky.encrypt.anotation.EncryptResponseBody;
+import com.eryansky.encrypt.util.RequestEncryptUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.MethodParameter;
@@ -27,21 +28,20 @@ public class EncryptRPCResponseBodyAdvice implements ResponseBodyAdvice<Object> 
 
     private static final Logger log = LoggerFactory.getLogger(EncryptRPCResponseBodyAdvice.class);
 
-    public static final String ENCRYPT = "Encrypt";
-    public static final String ENCRYPT_KEY = "Encrypt-Key";
-    public static final String HANDLE = "RPC";
     @Override
     public boolean supports(MethodParameter returnType, Class converterType) {
-        EncryptResponseBody encrypt = returnType.getMethodAnnotation(EncryptResponseBody.class);
-        //如果带有注解且标记为验签，则进行验签操作
-        return null != encrypt && !encrypt.defaultHandle() && HANDLE.equals(encrypt.handle());
+        EncryptResponseBody annotation = returnType.getMethodAnnotation(EncryptResponseBody.class);
+        if (annotation == null) {
+            return false;
+        }
+        return Boolean.parseBoolean(annotation.enable()) && annotation.handle() == this.getClass();
     }
 
     @Override
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
         HttpHeaders headers = request.getHeaders();
-        String requestEncrypt = Collections3.getFirst(headers.get(ENCRYPT));
-        String requestEncryptKey = Collections3.getFirst(headers.get(ENCRYPT_KEY));
+        String requestEncrypt = Collections3.getFirst(headers.get(RequestEncryptUtils.ENCRYPT));
+        String requestEncryptKey = Collections3.getFirst(headers.get(RequestEncryptUtils.ENCRYPT_KEY));
         String requestSerializer = Collections3.getFirst(headers.get(RPCUtils.HEADER_RPC_SERIALIZER));
 
         // No encryption requested
@@ -55,7 +55,7 @@ public class EncryptRPCResponseBodyAdvice implements ResponseBodyAdvice<Object> 
         // Process encryption according to requested mode
         byte[] out;
         try {
-            out = RPCUtils.encryptDataByRequest(requestEncrypt, requestEncryptKey, payload);
+            out = RequestEncryptUtils.encryptDataByRequest(requestEncrypt, requestEncryptKey, payload);
         } catch (Exception e) {
             log.error("Failed to process encryption for mode {}", requestEncrypt, e);
             throw new RuntimeException(e);

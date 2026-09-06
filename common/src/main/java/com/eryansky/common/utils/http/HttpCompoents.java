@@ -220,7 +220,7 @@ public class HttpCompoents {
 
         if (httpRoutePlanner != null && StringUtils.isNotBlank(url)) {
             boolean isNonProxy = httpNonProxyHosts != null &&
-                    Arrays.stream(httpNonProxyHosts.split(",")).anyMatch(url::contains);
+                    Arrays.stream(httpNonProxyHosts.split("\\|")).anyMatch(url::contains);
             if (!isNonProxy) {
                 httpClientBuilder.setRoutePlanner(httpRoutePlanner);
                 if (credentialsProvider != null) {

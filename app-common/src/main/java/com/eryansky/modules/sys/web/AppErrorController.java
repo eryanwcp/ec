@@ -3,6 +3,7 @@ package com.eryansky.modules.sys.web;
 import com.eryansky.common.utils.UserAgentUtils;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.utils.net.IpUtils;
+import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -40,9 +41,9 @@ public class AppErrorController extends AbstractErrorController {
 
     private static final Logger logger = LoggerFactory.getLogger(AppErrorController.class);
 
-    @jakarta.annotation.Resource
+    @Resource
     private ErrorAttributes errorAttributes;
-    @jakarta.annotation.Resource
+    @Resource
     private ObjectProvider<ErrorViewResolver> errorViewResolvers;
 
     private final ErrorProperties errorProperties = new ErrorProperties();

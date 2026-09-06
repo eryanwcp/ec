@@ -3,16 +3,13 @@ var ctxAdmin = ctxAdmin;
 var ctxStatic = ctxStatic;
 var sysInitTime = sysInitTime;
 var isValidateCodeLogin = isValidateCodeLogin;
-var rememberMeCookieValue = rememberMeCookieValue;
-var needEncrypt = needEncrypt;
 var publicKey = publicKey;
-var SALT = SALT;
+var requestEncrypt = requestEncrypt;
 var securityToken = securityToken;
 var homePage = homePage;
 
-
 var $loginForm;
-var $password, $rememberMe;
+var $password;
 $(function () {
     $.backstretch([
         ctxStatic + '/js/images/bg1.jpg?_='+sysInitTime,
@@ -48,81 +45,45 @@ $(function () {
     });
 
     $password = $("#password");
-    $rememberMe = $("#rememberMe");
-
-    $rememberMe.prop("checked", rememberMeCookieValue == "" ? false : true);
-
-    $password.change(function(){
-        needEncrypt = true;
-    });
-
-    $rememberMe.click(function () {
-        var checked = $(this).prop('checked');
-        var _password = $password.val();
-        if(needEncrypt){
-            // _password = md5(md5(_password+SALT)+securityToken);
-            var encrypt = new JSEncrypt(); //创建加密实例
-            encrypt.setPublicKey(publicKey);
-            _password = encrypt.encrypt(_password);
-        }
-        if (checked) {
-            $.cookie('_password', _password, {
-                expires: 7
-            });
-            $.cookie('rememberMe', checked, {
-                expires: 7
-            });
-        } else {
-            $.cookie('_password', "", {
-                expires: 7
-            });
-            $.cookie('rememberMe', "", {
-                expires: 7
-            });
-        }
-    });
-
 });
 // 登录
 function login() {
     $("#messageBox2").addClass("hide");
-    $.cookie('loginName', $("#loginName").val(), {
-        expires: 7
-    });
-    var _password = $password.val();
-    if(needEncrypt){
-        // _password = md5(md5(_password+SALT)+securityToken);
-        var encrypt = new JSEncrypt(); //创建加密实例
-        encrypt.setPublicKey(publicKey);
-        _password = encrypt.encrypt(_password);
+    let encryptKey = '';
+    let requestEncryptKey = '';
+    let _password = $password.val();
+    if("SM4" === requestEncrypt){
+        encryptKey = Sm4Utils.generateSm4HexKey();
+        requestEncryptKey = RSAUtils.encryptHexString(encryptKey,publicKey);
+        _password = Sm4Utils.encrypt(_password,encryptKey);
+    }else if("AES" === requestEncrypt){
+        encryptKey = Cryptos.generateAesBase64Key();
+        requestEncryptKey = RSAUtils.encryptBase64String(encryptKey,publicKey);
+        _password = Cryptos.encrypt(_password,encryptKey);
     }
-    if ($rememberMe.prop("checked")) {
-        $.cookie('_password', _password, {
-            expires: 7
-        });
-    }
+
+
     $.ajax({
         url: ctxAdmin + '/login/login',
         type: 'post',
+        headers: {"Encrypt": requestEncrypt, "Encrypt-Key": requestEncryptKey},
         data: {
             client_id: $("#client_id").val(),
             redirect_uri: $("#redirect_uri").val(),
-            encrypt: 'RSA',
             loginName: $("#loginName").val(),
             password: _password,
             _csrf_token: securityToken,
             validateCode: $("#validateCode").val()
         },
         traditional: true,
-        async:false,
         dataType: 'json',
         success: function (data) {
-            if (data.code == 1) {
-                window.location = data.obj.homeUrl;
+            if (data.code === 1) {
+                window.location.href = data.obj.homeUrl;
                 //setTimeout(function(){//延时1秒 集群环境等待缓存同步
                 //    window.location = data.obj;
                 //},1000);
-            }else if (data.code == 6) {//需要设置密码
+            }else if (data.code === 6) {//需要设置密码
                 $("#loginError2").html(data.msg);
                 $("#messageBox2").removeClass("hide");
                 setTimeout(function(){
@@ -133,7 +94,7 @@ function login() {
                 refreshCheckCode();
                 $("#loginError2").html(data.msg);
                 $("#messageBox2").removeClass("hide");
-                if (data.obj != undefined && data.obj == true) {
+                if (data.obj !== undefined && data.obj === true) {
                     $(".validateCode").show();
                 }
             }
@@ -144,6 +105,6 @@ function login() {
 //刷新验证码
 function refreshCheckCode() {
     //加上随机时间 防止IE浏览器不请求数据
-    var url = ctx + '/servlet/ValidateCodeServlet?' + new Date().getTime();
+    const url = ctx + '/servlet/ValidateCodeServlet?' + new Date().getTime();
     $('#validateCodeImage').attr('src', url);
 }

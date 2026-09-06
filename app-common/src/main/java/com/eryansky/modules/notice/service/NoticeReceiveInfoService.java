@@ -9,25 +9,29 @@ import com.eryansky.common.exception.DaoException;
 import com.eryansky.common.exception.ServiceException;
 import com.eryansky.common.exception.SystemException;
 import com.eryansky.common.orm.Page;
+import com.eryansky.common.orm._enum.GenericEnumUtils;
 import com.eryansky.common.orm.model.Parameter;
 import com.eryansky.common.orm.mybatis.interceptor.BaseInterceptor;
 import com.eryansky.common.utils.DateUtils;
-import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
 import com.eryansky.core.orm.mybatis.service.CrudService;
+import com.eryansky.modules.disk.utils.DiskUtils;
 import com.eryansky.modules.notice._enum.NoticeMode;
 import com.eryansky.modules.notice._enum.NoticeReadMode;
 import com.eryansky.modules.notice.dao.NoticeReceiveInfoDao;
 import com.eryansky.modules.notice.mapper.Notice;
 import com.eryansky.modules.notice.mapper.NoticeReceiveInfo;
+import com.eryansky.modules.notice.utils.NoticeUtils;
 import com.eryansky.modules.notice.vo.NoticeQueryVo;
+import com.eryansky.modules.notice.vo.NoticeReceiveInfoSimpleVo;
 import com.eryansky.modules.sys._enum.YesOrNo;
+import com.eryansky.modules.sys.utils.DictionaryUtils;
+import com.eryansky.utils.AppConstants;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -48,28 +52,6 @@ public class NoticeReceiveInfoService extends CrudService<NoticeReceiveInfoDao, 
      * 我的通知 分页查询.
      *
      * @param page
-     * @param userId    用户ID
-     * @param isRead    是否阅读
-     * @param isReply   是否回复
-     * @param type      分类
-     * @param startTime 通知发布开始时间
-     * @param endTime   通知发布截止时间
-     * @return
-     */
-    public Page<NoticeReceiveInfo> findNoticePageByUserId(Page<NoticeReceiveInfo> page, String userId, String type, String isRead, String isReply, Date startTime, Date endTime) {
-        NoticeQueryVo noticeQueryVo = new NoticeQueryVo();
-        noticeQueryVo.setType(type);
-        noticeQueryVo.setIsRead(isRead);
-        noticeQueryVo.setIsReply(isReply);
-        noticeQueryVo.setStartTime(startTime);
-        noticeQueryVo.setEndTime(endTime);
-        return findReadNoticePage(page, new NoticeReceiveInfo(), userId, noticeQueryVo);
-    }
-
-    /**
-     * 我的通知 分页查询.
-     *
-     * @param page
      * @param userId        用户ID
      * @param noticeQueryVo 查询条件
      * @return
@@ -77,25 +59,16 @@ public class NoticeReceiveInfoService extends CrudService<NoticeReceiveInfoDao, 
      * @throws ServiceException
      * @throws DaoException
      */
-    public Page<NoticeReceiveInfo> findReadNoticePage(Page<NoticeReceiveInfo> page, NoticeReceiveInfo entity, String userId, NoticeQueryVo noticeQueryVo) {
+    public Page<NoticeReceiveInfoSimpleVo> findNoticePageByUserId(Page<NoticeReceiveInfoSimpleVo> page, String userId, NoticeQueryVo noticeQueryVo) {
         Assert.notNull(userId, "参数[userId]为空!");
         Parameter parameter = new Parameter();
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put("bizMode", NoticeMode.Effective.getValue());
-        if (noticeQueryVo != null && Collections3.isNotEmpty(noticeQueryVo.getPublishUserIds())) {
-            parameter.put("publishUserId", noticeQueryVo.getPublishUserIds().get(0));
-        }
         parameter.put("userId", userId);
         if (null != noticeQueryVo) {
             parameter.put("isTop", noticeQueryVo.getIsTop());
             parameter.put("type", noticeQueryVo.getType());
             parameter.put("isRead", noticeQueryVo.getIsRead());
-            parameter.put("isReply", noticeQueryVo.getIsReply());
-            parameter.put("title", noticeQueryVo.getTitle());
-            parameter.put("content", noticeQueryVo.getContent());
-//            if (Collections3.isNotEmpty(noticeQueryVo.getPublishUserIds())) {
-//                parameter.put("publishUserIds", noticeQueryVo.getPublishUserIds());
-//            }
 
             if (noticeQueryVo.getStartTime() != null) {
                 parameter.put("startTime", DateUtils.format(noticeQueryVo.getStartTime(), DateUtils.DATE_TIME_FORMAT));
@@ -104,25 +77,21 @@ public class NoticeReceiveInfoService extends CrudService<NoticeReceiveInfoDao, 
                 parameter.put("endTime", DateUtils.format(noticeQueryVo.getEndTime(), DateUtils.DATE_TIME_FORMAT));
             }
         }
-
-        entity.setEntityPage(page);
         parameter.put(BaseInterceptor.PAGE, page);
-        parameter.put("dbName", entity.getDbName());
-        page.autoResult(dao.findQueryList(parameter));
-
+        parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
+        page.autoResult(dao.findQueryListByUserId(parameter));
+        page.getResult().forEach(noticeReceiveInfo -> {
+            noticeReceiveInfo.setHeadImageUrl(DiskUtils.getFileUrl(noticeReceiveInfo.getHeadImage()));
+            noticeReceiveInfo.setTypeView(DictionaryUtils.getDictionaryNameByDV(NoticeUtils.DIC_NOTICE, noticeReceiveInfo.getType(), noticeReceiveInfo.getType()));
+            noticeReceiveInfo.setIsReadView(GenericEnumUtils.getDescriptionByValue(NoticeReadMode.class, noticeReceiveInfo.getIsRead(), noticeReceiveInfo.getIsRead()));
+            noticeReceiveInfo.setIsReplyView(GenericEnumUtils.getDescriptionByValue(YesOrNo.class, noticeReceiveInfo.getIsReply(), noticeReceiveInfo.getIsReply()));
+            noticeReceiveInfo.setIsNeedReplyView(GenericEnumUtils.getDescriptionByValue(YesOrNo.class, noticeReceiveInfo.getIsNeedReply(), noticeReceiveInfo.getIsNeedReply()));
+        });
         return page;
     }
 
-    public Page<NoticeReceiveInfo> findUserUnreadNotices(Page<NoticeReceiveInfo> page, String userId) {
-        NoticeReceiveInfo noticeReceiveInfo = new NoticeReceiveInfo();
-        noticeReceiveInfo.setUserId(userId);
-        noticeReceiveInfo.setIsRead(NoticeReadMode.unreaded.getValue());
-        Notice notice = new Notice();
-        notice.setBizMode(NoticeMode.Effective.getValue());
-        noticeReceiveInfo.setNotice(notice);
-        noticeReceiveInfo.setEntityPage(page);
-        page.autoResult(dao.findUserUnreadNotices(noticeReceiveInfo));
-        return page;
+    public Page<NoticeReceiveInfoSimpleVo> findUserUnreadNotices(Page<NoticeReceiveInfoSimpleVo> page, String userId) {
+        return findNoticePageByUserId(page, userId, new NoticeQueryVo().setIsRead(NoticeReadMode.unreaded.getValue()));
     }
 
     /**
@@ -186,12 +155,12 @@ public class NoticeReceiveInfoService extends CrudService<NoticeReceiveInfoDao, 
      * @param noticeId
      * @return
      */
-    public Page<NoticeReceiveInfo> findNoticeReceiveInfosByNoticeId(Page<NoticeReceiveInfo> page, String noticeId) {
+    public Page<NoticeReceiveInfoSimpleVo> findNoticeReceiveInfoPageByNoticeId(Page<NoticeReceiveInfoSimpleVo> page, String noticeId) {
         Parameter parameter = new Parameter();
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
-        parameter.put("noticeId", noticeId);
         parameter.put(BaseInterceptor.PAGE, page);
-        List<NoticeReceiveInfo> list = dao.findQueryList(parameter);
+        parameter.put("noticeId", noticeId);
+        List<NoticeReceiveInfoSimpleVo> list = dao.findQueryListByNoticeId(parameter);
         page.autoResult(list);
         return page;
     }

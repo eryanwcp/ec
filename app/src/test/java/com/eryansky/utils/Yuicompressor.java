@@ -10,6 +10,9 @@ import java.io.*;
 
 /**
  * 静态文件css/js文件压缩
+ * 替代方案：npm install -g esbuild
+ * esbuild app-common/src/main/resources/static/static/js/jsencrypt/encrypt.js --minify --outfile=app-common/src/main/resources/static/static/js/jsencrypt/encrypt.min.js
+ * esbuild index.js --bundle --minify --outfile=encrypt.all.min.js
  * @author Eryan
  * @date 2015-09-14 
  */
@@ -27,6 +30,7 @@ public class Yuicompressor {
             "app-common/src/main/resources/static/static/mobile/ImageUploader/js/",
 //            "app-common/src/main/resources/static/static/js/adminlte/dist/",
             "app-common/src/main/resources/static/static/js/jquery/jquery-extend.js",
+            "app-common/src/main/resources/static/static/js/jsencrypt/encrypt.js",
 //            "app-common/src/main/resources/static/static/js/adminlte/dist"
     };
 
@@ -48,7 +52,7 @@ public class Yuicompressor {
                 r(f);
             }else{
                 StringBuffer cmd = new StringBuffer();
-                cmd.append("java -jar app/src/test/java/yuicompressor-2.4.7.jar --charset utf-8 --type ");
+                cmd.append("java -jar app/src/test/java/yuicompressor-2.4.8.jar --charset utf-8 --type ");
                 String fileName = f.getAbsolutePath();
                 if(fileName.endsWith(".js")){
                     cmd.append("js ")

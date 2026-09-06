@@ -39,6 +39,9 @@ public class ShiroDialect extends AbstractProcessorDialect {
         processors.add(new LacksRoleAttrProcessor(dialectPrefix));
         processors.add(new LacksRoleElementProcessor(dialectPrefix));
 
+        processors.add(new IsAdminAttrProcessor(dialectPrefix));
+        processors.add(new LacksAdminAttrProcessor(dialectPrefix));
+
         processors.add(new HasAllPermissionsAttrProcessor(dialectPrefix));
         processors.add(new HasAllPermissionsElementProcessor(dialectPrefix));
 

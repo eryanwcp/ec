@@ -26,6 +26,7 @@ public class QuartzJobDetail extends BaseEntity<QuartzJobDetail> {
 	private Date prevFireTime;
 	private String triggerState;
 	private String remark;
+	private String query;
 
 	public String getJobName() {
 		return jobName;
@@ -133,5 +134,13 @@ public class QuartzJobDetail extends BaseEntity<QuartzJobDetail> {
 
 	public void setRemark(String remark) {
 		this.remark = remark;
+	}
+
+	public String getQuery() {
+		return query;
+	}
+
+	public void setQuery(String query) {
+		this.query = query;
 	}
 }

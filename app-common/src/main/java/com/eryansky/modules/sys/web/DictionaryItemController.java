@@ -20,6 +20,7 @@ import com.eryansky.modules.sys.service.DictionaryItemService;
 import com.eryansky.modules.sys.service.DictionaryService;
 import com.eryansky.utils.SelectType;
 import com.google.common.collect.Lists;
+import jakarta.annotation.Resource;
 import org.apache.commons.collections4.ListUtils;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -40,9 +41,9 @@ import java.util.List;
 @RequestMapping(value = "${adminPath}/sys/dictionaryItem")
 public class DictionaryItemController extends SimpleController {
 
-    @jakarta.annotation.Resource
+    @Resource
     private DictionaryItemService dictionaryItemService;
-    @jakarta.annotation.Resource
+    @Resource
     private DictionaryService dictionaryService;
 
     @ModelAttribute

@@ -95,8 +95,7 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
         if(null != sessionInfo){
             response.setHeader(ATTR_AUTHORIZATION, sessionInfo.getToken());
         }
-        String requestUrl = request.getRequestURI();
-        requestUrl = requestUrl.replaceAll("//","/");
+        String requestUrl = request.getRequestURI().replace("//","/");
         if(logger.isDebugEnabled()){
             logger.debug(request.getSession().getId() + ":" + request.getHeader("Authorization") + ":" + requestUrl);
         }

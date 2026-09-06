@@ -12,6 +12,7 @@ import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.web.annotation.MobileValue;
+import com.eryansky.modules.notice.vo.NoticeReceiveInfoSimpleVo;
 import com.eryansky.modules.sys.service.UserPasswordService;
 import com.eryansky.modules.sys.service.UserService;
 import com.eryansky.modules.sys.vo.PasswordTip;
@@ -20,10 +21,10 @@ import com.google.common.collect.Maps;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
 import com.eryansky.core.web.annotation.Mobile;
-import com.eryansky.modules.notice.mapper.NoticeReceiveInfo;
 import com.eryansky.modules.notice.service.NoticeReceiveInfoService;
 import com.eryansky.modules.notice.service.NoticeService;
 import com.eryansky.utils.AppConstants;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -43,13 +44,13 @@ import java.util.Map;
 @RequestMapping(value = "${adminPath}/portal")
 public class PortalController extends SimpleController {
 
-    @jakarta.annotation.Resource
+    @Resource
     private UserService userService;
-    @jakarta.annotation.Resource
+    @Resource
     private NoticeService noticeService;
-    @jakarta.annotation.Resource
+    @Resource
     private NoticeReceiveInfoService noticeReceiveInfoService;
-    @jakarta.annotation.Resource
+    @Resource
     private UserPasswordService userPasswordService;
 
 
@@ -86,7 +87,7 @@ public class PortalController extends SimpleController {
         // 当前登录用户
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         long noticeReceiveInfos = 0;
-        Page<NoticeReceiveInfo> page = new Page<>(request);
+        Page<NoticeReceiveInfoSimpleVo> page = new Page<>(request);
         page = noticeReceiveInfoService.findUserUnreadNotices(page, sessionInfo.getLoginName());
         if (Collections3.isNotEmpty(page.getResult())) {
             noticeReceiveInfos = page.getTotalCount();
@@ -140,8 +141,8 @@ public class PortalController extends SimpleController {
         ModelAndView modelAnView = new ModelAndView("layout/portal-notice");
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         if (sessionInfo != null) {
-            Page<NoticeReceiveInfo> page = new Page<>(SpringMVCHolder.getRequest());
-            page = noticeReceiveInfoService.findReadNoticePage(page, new NoticeReceiveInfo(), sessionInfo.getUserId(), null);
+            Page<NoticeReceiveInfoSimpleVo> page = new Page<>(SpringMVCHolder.getRequest());
+            page = noticeReceiveInfoService.findNoticePageByUserId(page,  sessionInfo.getUserId(), null);
             modelAnView.addObject("page", page);
 
         }

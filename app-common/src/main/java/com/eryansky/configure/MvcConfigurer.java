@@ -1,11 +1,12 @@
 package com.eryansky.configure;
 
+import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
-import com.eryansky.common.utils.jackson.XssDefaultJsonDeserializer;
-import com.eryansky.common.utils.jackson.XssDefaultJsonSerializer;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.core.dialect.dialect.ShiroDialect;
 import com.eryansky.core.security.interceptor.*;
+import com.eryansky.core.security.xss.XssJsonDeserializer;
+import com.eryansky.core.security.xss.XssJsonSerializer;
 import com.eryansky.core.web.interceptor.MobileInterceptor;
 import com.eryansky.modules.disk.extend.DISKManager;
 import com.eryansky.modules.disk.extend.IFileManager;
@@ -14,9 +15,16 @@ import com.eryansky.utils.AppUtils;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.collect.Lists;
 import jakarta.annotation.Resource;
+//import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.impl.routing.SystemDefaultRoutePlanner;
 import org.apache.hc.client5.http.ssl.*;
 import org.apache.hc.core5.reactor.ssl.SSLBufferMode;
 import org.apache.hc.core5.ssl.SSLContexts;
@@ -38,6 +46,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
 import javax.net.ssl.SSLContext;
+import java.net.ProxySelector;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -79,11 +88,15 @@ public class MvcConfigurer implements WebMvcConfigurer {
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new IpLimitInterceptor())
-                .addPathPatterns("/**")
-                .order(Ordered.HIGHEST_PRECEDENCE + 90);
+        //IP 限制拦截器
+        if(AppConstants.isLimitIpEnable()){
+            registry.addInterceptor(new IpLimitInterceptor())
+                    .addPathPatterns("/**")
+                    .order(Ordered.HIGHEST_PRECEDENCE + 88);
+        }
 
-        if (Boolean.TRUE.equals(AppConstants.isLimitUrlEnable())) {
+        // URL 限制拦截器
+        if (AppConstants.isLimitUrlEnable()) {
             registry.addInterceptor(new UrlLimitInterceptor())
                     .addPathPatterns("/**")
                     .order(Ordered.HIGHEST_PRECEDENCE + 90);
@@ -94,6 +107,7 @@ public class MvcConfigurer implements WebMvcConfigurer {
 //                .excludePathPatterns("/static/**")
 //                .order(Ordered.HIGHEST_PRECEDENCE + 100);
 
+        // Rest 权限拦截器
         if (AppConstants.getIsSystemRestEnable() && AppConstants.isRestDefaultInterceptorEnable()) {
             registry.addInterceptor(new RestDefaultAuthorityInterceptor())
                     .addPathPatterns("/rest/**")
@@ -101,29 +115,43 @@ public class MvcConfigurer implements WebMvcConfigurer {
         }
 
         List<String> dList = Lists.newArrayList("/jump.jsp", "/index.html", "/web/**", "/mweb/**", "/assets/**", "/icons/**", "/static/**", "/**/*.css", "/**/*.js", "/**/*.png", "/**/*.ico", "/**/*.json", "favicon**", "/userfiles/**", "/servlet/**", "/error/**", "/api/**", "/rest/**");
-
-        if (Boolean.TRUE.equals(AppConstants.isOauth2Enable())) {
+        //外部SSO OAuth2 拦截器
+        if (AppConstants.isOauth2SSOEnable()) {
+            List<String> includeList = AppConstants.getOauth2SSOIncludePathList();
+            List<String> cList = AppConstants.getOauth2SSOExcludePathList();
+            registry.addInterceptor(new SSOAuthorityOauth2Interceptor()).addPathPatterns(Collections3.aggregate(includeList, Lists.newArrayList("/**")))
+                    .excludePathPatterns(Collections3.aggregate(dList, cList))
+                    .order(Ordered.HIGHEST_PRECEDENCE + 192);
+        }
+        //内部 OAuth2 拦截器
+        if (AppConstants.isOauth2Enable()) {
+            List<String> includeList = AppConstants.getOauth2IncludePathList();
             List<String> cList = AppConstants.getOauth2ExcludePathList();
-            registry.addInterceptor(new AuthorityOauth2Interceptor()).addPathPatterns("/**")
+            registry.addInterceptor(new AuthorityOauth2Interceptor()).addPathPatterns(Collections3.aggregate(includeList, Lists.newArrayList("/**")))
                     .excludePathPatterns(Collections3.aggregate(dList, cList))
                     .order(Ordered.HIGHEST_PRECEDENCE + 195);
+
+
         }
 
-        List<String> authExcludePathList = AppConstants.getAuthExcludePathList();
-        AuthorityInterceptor authorityInterceptor = new AuthorityInterceptor();
-        String redirectURL = "/jump.jsp";
-        //开启SSO单点登录
-        if (AppConstants.getIsSSOEnable()) {
-            redirectURL = AppUtils.appendParaToUrlBuilder(AppConstants.getSSOIssuerUri(), "client_id", AppConstants.getSSOClientId())
-                    .append("redirect_uri", AppConstants.getSSOCallbackUrl()).toString();
+        // 主权限拦截器
+        if (AppConstants.isAuthEnable()) { // 建议增加总控制开关
+            AuthorityInterceptor authorityInterceptor = new AuthorityInterceptor();
+            String redirectURL = "/jump.jsp";
+            if (AppConstants.getIsSSOEnable()) {
+                redirectURL = AppUtils.appendParaToUrlBuilder(AppConstants.getSSOIssuerUri(), "client_id", AppConstants.getSSOClientId())
+                        .append("redirect_uri", AppConstants.getSSOCallbackUrl()).toString();
+            }
+            authorityInterceptor.setRedirectURL(redirectURL);
+
+            List<String> authExcludePathList = AppConstants.getAuthExcludePathList();
+            registry.addInterceptor(authorityInterceptor)
+                    .addPathPatterns("/**")
+                    .excludePathPatterns(Collections3.aggregate(dList, authExcludePathList))
+                    .order(Ordered.HIGHEST_PRECEDENCE + 200);
         }
 
-        authorityInterceptor.setRedirectURL(redirectURL);
-        registry.addInterceptor(authorityInterceptor).addPathPatterns("/**")
-                .excludePathPatterns(Collections3.aggregate(dList, authExcludePathList))
-                .order(Ordered.HIGHEST_PRECEDENCE + 200);
-
-
+        //移动端拦截器
         registry.addInterceptor(new MobileInterceptor())
                 .addPathPatterns("/**")
                 .excludePathPatterns(Lists.newArrayList("/static/**","/api/**","/rest/**"))
@@ -164,9 +192,9 @@ public class MvcConfigurer implements WebMvcConfigurer {
 
         SimpleModule module = new SimpleModule();
         // XSS反序列化
-        module.addDeserializer(String.class, new XssDefaultJsonDeserializer());
+        module.addDeserializer(String.class, new XssJsonDeserializer());
         // XSS序列化
-        module.addSerializer(String.class, new XssDefaultJsonSerializer());
+        module.addSerializer(String.class, new XssJsonSerializer());
 
         //序列换成json时,将所有的long变成string 因为js中得数字类型不能包含所有的java long值
 //      module.addSerializer(Long.class, ToStringSerializer.instance);
@@ -197,7 +225,6 @@ public class MvcConfigurer implements WebMvcConfigurer {
         return new DISKManager();
     }
 
-//
 //   @Bean
 //   public LayoutDialect layoutDialect() {
 //      return new LayoutDialect();
@@ -236,10 +263,13 @@ public class MvcConfigurer implements WebMvcConfigurer {
     private static final int POOL_MAX_PER_CONN = 256;
 
     //配置SSL, 使用RestTemplate访问https
-    public HttpComponentsClientHttpRequestFactory getRequestFactory(){
+    // 配置SSL, 使用RestTemplate访问https
+    public HttpComponentsClientHttpRequestFactory getRequestFactory() {
         try {
+            // 1. SSL 配置 (当前策略为信任所有证书)
             TrustStrategy trustStrategy = (x509Certificates, s) -> true;
-            SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null,trustStrategy).build();
+            SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, trustStrategy).build();
+
             TlsSocketStrategy tlsSocketStrategy = new DefaultClientTlsStrategy(
                     sslContext,
                     HttpsSupport.getSystemProtocols(),
@@ -254,18 +284,55 @@ public class MvcConfigurer implements WebMvcConfigurer {
 //                    .register(StandardCookieSpec.STRICT, cookieSpecFactory)
 //                    .build();
 
+            // 2. 配置连接池
+            PoolingHttpClientConnectionManager connectionManager = PoolingHttpClientConnectionManagerBuilder.create()
+                    .setTlsSocketStrategy(tlsSocketStrategy)
+                    .setMaxConnTotal(POOL_MAX_CONN)
+                    .setMaxConnPerRoute(POOL_MAX_PER_CONN)
+                    .build();
 
-            CloseableHttpClient httpClient = HttpClients.custom()
+            HttpClientBuilder clientBuilder = HttpClients.custom()
 //                    .disableCookieManagement()
 //                    .setDefaultCookieSpecRegistry(cookieSpecRegistry)
-                    .setConnectionManager(PoolingHttpClientConnectionManagerBuilder
-                    .create().setTlsSocketStrategy(tlsSocketStrategy).setMaxConnTotal(POOL_MAX_CONN).setMaxConnPerRoute(POOL_MAX_PER_CONN).build()).build();
+                    .setConnectionManager(connectionManager);
+
+            // 3. 处理代理与路由配置 (修复 setProxy 与 RoutePlanner 冲突的 Bug)
+            String proxyHost = System.getProperty("http.proxyHost");
+            String proxyPort = System.getProperty("http.proxyPort");
+
+            if (StringUtils.isNotBlank(proxyHost) && StringUtils.isNotBlank(proxyPort)) {
+
+                // 统一使用系统默认的路由规划器，它会自动读取系统属性中的 http(s).proxyHost 和 http.nonProxyHosts
+                clientBuilder.setRoutePlanner(new SystemDefaultRoutePlanner(ProxySelector.getDefault()));
+
+                // 处理自定义的代理身份认证
+                String proxyUser = System.getProperty("http.proxyUser");
+                String proxyPassword = System.getProperty("http.proxyPassword");
+
+                if (StringUtils.isNotBlank(proxyUser) && StringUtils.isNotBlank(proxyPassword)) {
+                    BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+                    org.apache.hc.core5.http.HttpHost proxy = new org.apache.hc.core5.http.HttpHost(proxyHost, Integer.parseInt(proxyPort));
+                    credentialsProvider.setCredentials(
+                            new AuthScope(proxy),
+                            new UsernamePasswordCredentials(proxyUser, proxyPassword.toCharArray())
+                    );
+                    clientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+                }
+            }
+
+            // 4. 构建 HttpClient 及 Factory
+            CloseableHttpClient httpClient = clientBuilder.build();
             HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
             requestFactory.setHttpClient(httpClient);
-            requestFactory.setConnectionRequestTimeout(10*1000);
+
+            // 设置从连接池获取连接的超时时间 (注: Spring 6/Boot 3 中推荐使用 Duration，这里保留原有的毫秒单位)
+            requestFactory.setConnectionRequestTimeout(10 * 1000);
+
             return requestFactory;
+
         } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
-            throw new RuntimeException(e);
+            // 优化：抛出带上下文信息的异常
+            throw new RuntimeException("初始化 HttpComponentsClientHttpRequestFactory 失败, SSL配置错误", e);
         }
     }
 

@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.eryansky</groupId>
         <artifactId>ec-parent</artifactId>
-        <version>4.3.20260624.03.fastjson</version>
+        <version>4.3.20260624.fastjson</version>
     </parent>
 
     <artifactId>ec-common</artifactId>
@@ -28,7 +28,7 @@
         <commons-email.version>1.6.0</commons-email.version>
         <commons-beanutils.version>1.11.0</commons-beanutils.version>
         <commons-net.version>3.13.0</commons-net.version>
-        <commons-collections4.version>4.5.0</commons-collections4.version>
+        <commons-collections4.version>4.6.0</commons-collections4.version>
         <commons-math3.version>3.6.1</commons-math3.version>
         <commons-codec.version>1.22.0</commons-codec.version>
         <commons-logging.version>1.4.0</commons-logging.version>
@@ -38,9 +38,10 @@
         <jsqlparser.version>4.6</jsqlparser.version>
         <cglib-nodep.version>3.3.0</cglib-nodep.version>
         <slf4j.version>2.0.18</slf4j.version>
-        <guava.version>33.6.0-jre</guava.version>
+        <guava.version>33.7.1-jre</guava.version>
         <dozer.version>7.0.0</dozer.version>
-        <freemarker.version>2.3.34</freemarker.version>
+        <freemarker.version>2.3.35</freemarker.version>
+        <jsoup.version>1.23.2</jsoup.version>
     </properties>
     <dependencies>
          <dependency>
@@ -261,7 +262,7 @@
         <dependency>
             <groupId>com.github.oshi</groupId>
             <artifactId>oshi-core</artifactId>
-            <version>7.4.4</version>
+            <version>7.6.0</version>
         </dependency>
 
         <dependency>
@@ -281,6 +282,11 @@
             <scope>compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>${jsoup.version}</version>
+        </dependency>
     </dependencies>
 
 

@@ -10,12 +10,12 @@ import com.eryansky.common.exception.SystemException;
 import com.eryansky.common.model.*;
 import com.eryansky.common.orm.Page;
 import com.eryansky.common.orm._enum.StatusState;
+import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.common.utils.Identities;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.UserAgentUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.encode.Encrypt;
-import com.eryansky.common.utils.encode.RSAUtils;
 import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.servlet.ValidateCodeServlet;
@@ -26,6 +26,7 @@ import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.security.annotation.PrepareOauth2;
 import com.eryansky.core.web.annotation.MobileValue;
 import com.eryansky.encrypt.config.EncryptProvider;
+import com.eryansky.encrypt.util.RequestEncryptUtils;
 import org.bouncycastle.util.encoders.Hex;
 import com.eryansky.modules.sys.service.ResourceService;
 import com.eryansky.modules.sys.service.UserPasswordService;
@@ -95,11 +96,9 @@ public class LoginController extends SimpleController {
         modelAndView.addObject("isValidateCodeLogin", isValidateCodeLogin);
         modelAndView.addObject("isMobile", UserAgentUtils.isMobile(request));
         String randomSecurityToken = Identities.randomBase62(64);
-        modelAndView.addObject("securityToken", randomSecurityToken);
-        modelAndView.addObject("publicKey", EncryptProvider.publicKeyBase64());
-        modelAndView.addObject("clientId", clientId);
-        modelAndView.addObject("redirectUri", redirectUri);
         WebUtils.setSessionAttribute(request, "securityToken", randomSecurityToken);
+        modelAndView.addObject("redirectUri", redirectUri);
+        modelAndView.addObject("clientId", clientId);
         return modelAndView;
     }
 
@@ -169,7 +168,7 @@ public class LoginController extends SimpleController {
         Map<String,Object> data = Maps.newHashMap();
         data.put("securityToken:",randomSecurityToken);
         data.put("publicKey",publicKey);
-        WebUtils.setSessionAttribute(request, "securityToken", randomSecurityToken);
+
         return Result.successResult().setObj(data);
     }
 
@@ -189,9 +188,7 @@ public class LoginController extends SimpleController {
      *
      * @param loginName    用户名
      * @param password     密码
-     * @param encrypt      加密
      * @param validateCode 验证码
-     * @param theme        主题
      * @param request
      * @return
      */
@@ -199,14 +196,15 @@ public class LoginController extends SimpleController {
     @RequiresUser(required = false)
     @ResponseBody
     @PostMapping(value = {"login"})
-    public Result login(@RequestParam(value = "client_id",required = false) String clientId,
-                        @RequestParam(value = "redirect_uri",required = false) String redirectUri,
-                        @RequestParam(required = true) String loginName,
-                        @RequestParam(required = true) String password,
-                        @RequestParam(defaultValue = "true") String encrypt,
+    public Result login(@RequestParam(name = "client_id",required = false) String clientId,
+                        @RequestParam(name = "redirect_uri",required = false) String redirectUri,
+                        @RequestParam(name = "loginName",required = true) String loginName,
+                        @RequestParam(name = "password", required = true) String password,
                         @RequestParam(name = "_csrf_token",required = true) String csrfToken,
-                        String validateCode,
-                        String theme, HttpServletRequest request, Model uiModel) {
+                        @RequestParam(name = "validateCode",required = false) String validateCode,
+                        HttpServletRequest request, HttpServletResponse response) {
+        String encrypt = WebUtils.getHeaderIgnoreCase(request, RequestEncryptUtils.ENCRYPT);
+        String encryptKey = WebUtils.getHeaderIgnoreCase(request,RequestEncryptUtils.ENCRYPT_KEY);
         //登录限制
         checkLoginLimit();
 
@@ -231,26 +229,21 @@ public class LoginController extends SimpleController {
             }
         }
 
-        String originPassword = password;
-        String _password = password;
-        if ("RSA".equals(encrypt)) {
-            originPassword = RSAUtils.decryptBase64String(_password,EncryptProvider.privateKeyBase64());
+        String originPassword = null;
+        try {
+            originPassword = RequestEncryptUtils.decryptEncodeDataByRequest(request,password);
+        } catch (Exception e) {
+            return Result.errorResult();
         }
-        if (!"true".equals(encrypt)) {
-            _password = Encrypt.e(originPassword);
-        }
-
-
+        String _password = Encrypt.e(originPassword);
 
         // 获取用户信息
-        User user = userService.getUserByLMP(loginName,loginName, _password,securityToken);
+        User user = userService.getUserByLMP(loginName,loginName, _password);
         boolean flag = null != user;
         if(null  == user && AppConstants.isdevMode()){
             user = userService.getUserByLoginName(loginName);
             flag = null != user;
         }
-
-
 
         if (!flag) {
             msg = "用户名或密码不正确!";
@@ -293,7 +286,7 @@ public class LoginController extends SimpleController {
             //将用户信息放入session中
             SessionInfo sessionInfo = SecurityUtils.putUserToSession(request, user);
             userService.login(sessionInfo.getUserId());
-            CacheUtils.remove("securityToken:"+request.getSession().getId());
+            WebUtils.setSessionAttribute(request, "securityToken", null);
             logger.info("用户登录系统：{} {}", user.getLoginName(), SpringMVCHolder.getIp());
 
             //设置调整URL 如果session中包含未被授权的URL 则跳转到该页面
@@ -305,7 +298,7 @@ public class LoginController extends SimpleController {
                 payload.put("userId", user.getId());
                 payload.put("username", user.getLoginName());
                 payload.put("mobile", user.getMobile());
-                payload.put("iss", "ec");
+                payload.put("iss", SpringContextHolder.getApplicationContext().getId());
                 payload.put("clientId", clientId);
                 payload.put("iat", System.currentTimeMillis());
                 payload.put("exp", System.currentTimeMillis() + 10 * 60 * 1000L);
@@ -322,7 +315,6 @@ public class LoginController extends SimpleController {
             }
             //返回
             Map<String, Object> data = Maps.newHashMap();
-            data.put("sessionInfo", sessionInfo);
             data.put("homeUrl", resultUrl);
             result = new Result(Result.SUCCESS, "用户验证通过!", data);
             isValidateCodeLogin(loginName, false, true);
