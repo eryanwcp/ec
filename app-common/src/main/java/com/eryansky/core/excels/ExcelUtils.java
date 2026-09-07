@@ -6,11 +6,10 @@
 package com.eryansky.core.excels;
 
 import com.eryansky.common.utils.StringUtils;
+import com.eryansky.common.utils.mapper.JsonMapper;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import delight.rhinosandox.RhinoSandbox;
 import delight.rhinosandox.RhinoSandboxes;
-import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
@@ -21,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
-import java.beans.PropertyDescriptor;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -45,28 +43,6 @@ import java.util.zip.ZipOutputStream;
 public class ExcelUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(ExcelUtils.class);
-
-    /**
-     * JavaBean转Map
-     * @param obj
-     * @return
-     */
-    public static Map<String, Object> beanToMap(Object obj) {
-        Map<String, Object> params = Maps.newHashMap();
-        try {
-            PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
-            PropertyDescriptor[] descriptors = propertyUtilsBean.getPropertyDescriptors(obj);
-            for (PropertyDescriptor descriptor : descriptors) {
-                String name = descriptor.getName();
-                if (!StringUtils.equals(name, "class")) {
-                    params.put(name, propertyUtilsBean.getNestedProperty(obj, name));
-                }
-            }
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        }
-        return params;
-    }
 
     /**
      * 创建普通表头

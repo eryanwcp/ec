@@ -206,7 +206,10 @@ public class MessageUtils {
         if (Collections3.isEmpty(messageChannels)) {
             model.setTipMessage(NoticeConstants.getMessageDefaultTipChannel());
         } else {
-            model.setTipMessage(Collections3.extractToString(messageChannels, "value", ","));
+            model.setTipMessage(messageChannels.stream()
+                    .map(MessageChannel::getValue)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.joining(",")));
         }
 
         model.setAppId(appId);

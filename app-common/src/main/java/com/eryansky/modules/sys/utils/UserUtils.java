@@ -8,7 +8,6 @@ package com.eryansky.modules.sys.utils;
 import com.eryansky.common.exception.ActionException;
 import com.eryansky.common.exception.ServiceException;
 import com.eryansky.common.spring.SpringContextHolder;
-import com.eryansky.common.utils.ConvertUtils;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.encode.Encrypt;
@@ -25,6 +24,8 @@ import com.google.common.collect.Lists;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author Eryan
@@ -581,7 +582,10 @@ public class UserUtils {
     public static String getUserNames(List<String> userIds) {
         if (Collections3.isNotEmpty(userIds)) {
             List<User> list = Static.userService.findUsersByIds(userIds);
-            return ConvertUtils.convertElementPropertyToString(list, "name", ",");
+            return list.stream()
+                    .map(User::getName)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.joining(","));
         }
         return null;
     }

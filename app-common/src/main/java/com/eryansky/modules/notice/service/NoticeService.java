@@ -275,7 +275,10 @@ public class NoticeService extends CrudService<NoticeDao, Notice> {
         if (Collections3.isEmpty(messageChannels)) {
             notice.setTipMessage(NoticeConstants.getNoticeDefaultTipChannel());
         } else {
-            notice.setTipMessage(Collections3.extractToString(messageChannels, "value", ","));
+            notice.setTipMessage(messageChannels.stream()
+                    .map(MessageChannel::getValue)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.joining(",")));
         }
         notice.setCreateTime(new Date());
         dao.insert(notice);

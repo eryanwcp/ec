@@ -37,6 +37,8 @@ import java.util.Map;
 public class ExceptionInterceptor implements HandlerExceptionResolver {
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
+    private static final JsonMapper jsonMapper = JsonMapper.getInstance();
+
     private final static String MSG_DETAIL = " 详细信息:";
     @Override
     public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
@@ -119,10 +121,20 @@ public class ExceptionInterceptor implements HandlerExceptionResolver {
             String encryptKey = WebUtils.getHeaderIgnoreCase(request,RequestEncryptUtils.ENCRYPT_KEY);
             if(StringUtils.isNotBlank(encrypt) && StringUtils.isNotBlank(encryptKey)){
                 try {
-                    byte[] encryptData = RequestEncryptUtils.encryptDataByRequest(encrypt,encryptKey,JsonMapper.getInstance().writeValueAsBytes(result));
-                    WebUtils.render(response, WebUtils.JSON_TYPE,encryptData);
+//                        if(result.getData() != null){
+//                            byte[] dataBytes = jsonMapper.writeValueAsBytes(result.getData());
+//                            String encryptedData = RequestEncryptUtils.encryptDataStringByRequest(encrypt, encryptKey, dataBytes);
+//                            result.setData(encryptedData);
+//                        }
+                    if(result.getObj() != null){
+                        byte[] objBytes = jsonMapper.writeValueAsBytes(result.getObj());
+                        String encryptedObj = RequestEncryptUtils.encryptDataStringByRequest(encrypt, encryptKey, objBytes);
+                        result.setObj(encryptedObj);
+                    }
+                    WebUtils.renderJson(response, result);
                 } catch (Exception e) {
-                    logger.error(e.getMessage(),e);
+                    logger.error("响应数据加密异常, URI: {}, EncryptType: {}, Error: {}",
+                            request.getRequestURI(), encrypt, e.getMessage(), e);
                     WebUtils.renderJson(response, result);
                 }
             }else{

@@ -351,8 +351,10 @@ public class UserController extends SimpleController {
         String defaultOrganComboboxData = JsonMapper.nonDefaultMapper().toJson(defaultOrganCombobox);
         logger.debug(defaultOrganComboboxData);
         uiModel.addAttribute("defaultOrganComboboxData", defaultOrganComboboxData);
-//        uiModel.addAttribute("organIds", Collections3.extractToList(defaultOrganCombobox,"value"));
-        uiModel.addAttribute("organIds", Collections3.extractToString(defaultOrganCombobox, "value", ","));
+        uiModel.addAttribute("organIds", defaultOrganCombobox.stream()
+                .map(Combobox::getValue)
+                .filter(Objects::nonNull)
+                .collect(Collectors.joining(",")));
         uiModel.addAttribute("model", model);
         return "modules/sys/user-organ";
     }
