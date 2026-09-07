@@ -196,6 +196,7 @@ public class MessageReceiveSimpleVo extends BaseEntity<MessageReceiveSimpleVo> {
     }
 
     public static class Message implements Serializable {
+        private String title;
         private String content;
         private String sendTime;
 
@@ -205,6 +206,14 @@ public class MessageReceiveSimpleVo extends BaseEntity<MessageReceiveSimpleVo> {
         public Message(String content, String sendTime) {
             this.content = content;
             this.sendTime = sendTime;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public void setTitle(String title) {
+            this.title = title;
         }
 
         public String getContent() {

@@ -15,7 +15,6 @@
  */
 package com.eryansky.j2cache.session;
 
-import com.eryansky.common.utils.reflection.BeanUtils;
 import com.eryansky.j2cache.lettuce.LettuceByteCodec;
 import com.eryansky.j2cache.util.SerializationUtils;
 import io.lettuce.core.AbstractRedisClient;
@@ -43,7 +42,6 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.stream.Collectors;
 
 /**
  * 缓存封装入口
@@ -411,8 +409,10 @@ public class CacheFacade extends RedisPubSubAdapter<String, String> implements C
                         if (sessionData == null) {
                             return false;
                         }
-                        String actualId = BeanUtils.getProperty(sessionData,"id");
-                        return session_id.equals(actualId);
+                        if (sessionData instanceof Identifiable identifiable) {
+                            return session_id.equals(identifiable.getId());
+                        }
+                        return false;
                     } catch (Exception e) {
                         // 捕获所有可能的异常（JSON解析、类型转换等），避免流式处理中断
                         logger.warn("解析SessionObject的id失败", e);

@@ -7,12 +7,12 @@ package com.eryansky.core.security;
 
 import com.eryansky.common.orm.persistence.AbstractBaseEntity;
 import com.eryansky.common.utils.StringUtils;
+import com.eryansky.common.utils.mapper.JsonMapper;
+import com.eryansky.j2cache.session.Identifiable;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.google.common.collect.Maps;
 import eu.bitwalker.useragentutils.DeviceType;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.*;
@@ -25,7 +25,7 @@ import java.util.*;
  */
 @JsonFilter(" ")
 @SuppressWarnings("serial")
-public class SessionInfo implements Serializable {
+public class SessionInfo implements Identifiable,Serializable {
 
     /**
      * ID
@@ -806,7 +806,7 @@ public class SessionInfo implements Serializable {
 
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this);
+        return JsonMapper.toJsonString(this);
     }
 
     @Override

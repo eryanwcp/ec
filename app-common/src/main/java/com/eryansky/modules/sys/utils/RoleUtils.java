@@ -6,13 +6,14 @@
 package com.eryansky.modules.sys.utils;
 
 import com.eryansky.common.spring.SpringContextHolder;
-import com.eryansky.common.utils.ConvertUtils;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.modules.sys.mapper.Role;
 import com.eryansky.modules.sys.service.RoleService;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author Eryan
@@ -78,7 +79,10 @@ public class RoleUtils {
     public static String getRoleNames(List<String> roleIds) {
         if (Collections3.isNotEmpty(roleIds)) {
             List<Role> list = Static.roleService.findRolesByIds(roleIds);
-            return ConvertUtils.convertElementPropertyToString(list, "name", ", ");
+            return list.stream()
+                    .map(Role::getName)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.joining(","));
         }
         return null;
     }
