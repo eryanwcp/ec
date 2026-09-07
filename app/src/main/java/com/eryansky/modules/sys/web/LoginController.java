@@ -203,8 +203,6 @@ public class LoginController extends SimpleController {
                         @RequestParam(name = "_csrf_token",required = true) String csrfToken,
                         @RequestParam(name = "validateCode",required = false) String validateCode,
                         HttpServletRequest request, HttpServletResponse response) {
-        String encrypt = WebUtils.getHeaderIgnoreCase(request, RequestEncryptUtils.ENCRYPT);
-        String encryptKey = WebUtils.getHeaderIgnoreCase(request,RequestEncryptUtils.ENCRYPT_KEY);
         //登录限制
         checkLoginLimit();
 
