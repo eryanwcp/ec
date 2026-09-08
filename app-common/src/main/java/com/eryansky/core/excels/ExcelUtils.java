@@ -156,7 +156,7 @@ public class ExcelUtils {
             } else {//JavaBean或Map类型
                 for (Object obj : list) {
                     row = new TableDataRow(td);
-                    Map<String, Object> map = (obj instanceof Map) ? (Map<String, Object>) obj : beanToMap(obj);
+                    Map<String, Object> map = (obj instanceof Map) ? (Map<String, Object>) obj : JsonMapper.getInstance().toMap(obj);
                     for (String key : fields) {
                         row.addCell(map.get(key));
                     }
