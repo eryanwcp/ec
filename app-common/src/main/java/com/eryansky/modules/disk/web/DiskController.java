@@ -52,6 +52,7 @@ import org.springframework.web.servlet.ModelAndView;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -708,12 +709,8 @@ public class DiskController extends SimpleController {
                                                HttpServletRequest request, List<File> fileList) throws Exception {
         java.io.File tempZipFile = null;
         try {
-            // 创建一个临时压缩文件， 文件流全部注入到这个文件中
-            tempZipFile = new java.io.File(Identities.uuid() + "_temp.zip");
-            // 使用标准的系统临时目录创建临时文件，避免相对路径安全隐患
-            String tmpDir = System.getProperty("java.io.tmpdir");
-            tempZipFile = java.io.File.createTempFile(Identities.uuid() + "_download_temp.zip", tmpDir);
-
+            Path tempPath = java.nio.file.Files.createTempFile(Identities.uuid() + "_download",".zip");
+            tempZipFile = tempPath.toFile();
             DiskUtils.makeZip(fileList, tempZipFile.getAbsolutePath());
             String dName = "【批量下载】" + StringUtils.substringBeforeLast(FilenameUtils.getName(fileList.get(0).getName()),".") + "等.zip";
             DownloadFileUtils.downRangeFile(tempZipFile,dName,response,request);
@@ -722,11 +719,10 @@ public class DiskController extends SimpleController {
             logger.error("批量下载压缩失败: {}", e.getMessage(), e);
             throw e;
         } finally {
-            if (tempZipFile != null && tempZipFile.isFile()) {
-                try {
-                    java.nio.file.Files.deleteIfExists(tempZipFile.toPath());
-                } catch (IOException e) {
-                    logger.warn("无法删除临时文件: {}", tempZipFile.getAbsolutePath());
+            if (tempZipFile != null && tempZipFile.exists()) {
+                boolean deleted = tempZipFile.delete();
+                if (!deleted) {
+                    tempZipFile.deleteOnExit();
                 }
             }
         }
