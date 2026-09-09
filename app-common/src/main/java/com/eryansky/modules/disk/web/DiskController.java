@@ -735,7 +735,7 @@ public class DiskController extends SimpleController {
      *
      * @return
      */
-    @RequiresPermissions("disk:disk:view")
+    @RequiresPermissions("disk:disk:edit")
     @Logging(logType = LogType.operate, value = "我的云盘-清空缓存目录")
     @PostMapping(value = {"clearTempDir"})
     @ResponseBody

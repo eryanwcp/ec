@@ -18,6 +18,7 @@ import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.common.web.springmvc.StringSanitizeEditor;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.aop.annotation.Logging;
+import com.eryansky.core.security._enum.Logical;
 import com.eryansky.core.web.annotation.MobileValue;
 import com.eryansky.core.web.upload.FileUploadUtils;
 import com.eryansky.modules.disk.mapper.File;
@@ -103,7 +104,7 @@ public class NoticeController extends SimpleController {
      */
     @Logging(logType = LogType.access, value = "通知管理")
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {""})
-    public ModelAndView list(String noticeId,
+    public ModelAndView list(@RequestParam(value = "noticeId", required = false) String noticeId,
                              @RequestParam(value = "objectType", required = false) String objectType,
                              @RequestParam(value = "objectId", required = false) String objectId,
                              @RequestParam(value = "title", required = false) String title,
@@ -441,6 +442,7 @@ public class NoticeController extends SimpleController {
     /**
      * 文件上传
      */
+    @RequiresPermissions(value = {"notice:edit","notice:publish"},logical = Logical.OR)
     @PostMapping(value = {"upload"})
     @ResponseBody
     public Result upload(@RequestParam(value = "uploadFile", required = false) MultipartFile multipartFile, String jsessionid) {
@@ -453,19 +455,11 @@ public class NoticeController extends SimpleController {
             FileUploadUtils.assertAllowed(multipartFile, FileUploadUtils.DEFAULT_ALLOWED_EXTENSION, AppConstants.getNoticeMaxUploadSize());
             file = DiskUtils.saveSystemFile(Notice.FOLDER_NOTICE, sessionInfo.getUserId(), multipartFile);
             result = Result.successResult().setObj(file).setMsg("文件上传成功！");
-        } catch (InvalidExtensionException e) {
-            exception = e;
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
-        } catch (FileUploadBase.FileSizeLimitExceededException e) {
+        } catch (FileNameLengthLimitExceededException | InvalidExtensionException |
+                 FileUploadBase.FileSizeLimitExceededException e) {
             exception = e;
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG);
-        } catch (FileNameLengthLimitExceededException e) {
-            exception = e;
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG);
-        } catch (ActionException e) {
-            exception = e;
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
-        } catch (IOException e) {
+        } catch (ActionException | IOException e) {
             exception = e;
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
         } finally {
@@ -492,6 +486,10 @@ public class NoticeController extends SimpleController {
     @PostMapping(value = {"delUpload"})
     @ResponseBody
     public Result delUpload(@ModelAttribute("model") Notice model, @RequestParam String fileId) {
+        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
+        if (!sessionInfo.isSuperUser() || !sessionInfo.getUserId().equals(model.getUserId())) {
+            return Result.errorResult().setMsg("无权操作此通知的附件");
+        }
         List<String> fileIds = new ArrayList<>(1);
         fileIds.add(fileId);
         noticeService.deleteNoticeFiles(model.getId(), fileIds);
