@@ -54,7 +54,7 @@ public class DictionaryItemController extends SimpleController {
             return new DictionaryItem();
         }
     }
-
+    @RequiresPermissions("sys:dictionary:view")
     @PostMapping(value = {"datagrid"})
     @ResponseBody
     public Datagrid<DictionaryItem> datagrid(DictionaryItem dictionaryItem, HttpServletRequest request, HttpServletResponse response) {
