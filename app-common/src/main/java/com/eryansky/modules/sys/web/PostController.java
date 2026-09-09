@@ -80,6 +80,7 @@ public class PostController extends SimpleController {
         return "modules/sys/post";
     }
 
+    @RequiresPermissions("sys:post:view")
     @PostMapping(value = {"datagrid"})
     @ResponseBody
     public String datagrid(String organId, String query, HttpServletRequest request) {
@@ -319,7 +320,6 @@ public class PostController extends SimpleController {
             Combobox combobox = new Combobox(r.getId(), r.getName());
             cList.add(combobox);
         }
-        System.out.println(JsonMapper.toJsonString(cList));
         return cList;
     }
 
@@ -330,6 +330,7 @@ public class PostController extends SimpleController {
      * @return
      * @throws Exception
      */
+    @RequiresPermissions("sys:post:view")
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"detail"})
     @ResponseBody
     public Result detail(@ModelAttribute("model") Post model) {

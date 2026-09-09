@@ -75,6 +75,7 @@ public class ResourceController extends SimpleController {
         return "modules/sys/resource";
     }
 
+    @RequiresPermissions("sys:resource:view")
     @PostMapping(value = {"treegrid"})
     @ResponseBody
     public Datagrid<Resource> treegrid(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -148,6 +149,7 @@ public class ResourceController extends SimpleController {
     /**
      * 资源树.
      */
+    @RequiresPermissions("sys:resource:view")
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"tree"})
     @ResponseBody
     public List<TreeNode> tree(String selectType) throws Exception {
@@ -253,6 +255,7 @@ public class ResourceController extends SimpleController {
      * @return
      * @throws Exception
      */
+    @RequiresPermissions("sys:resource:view")
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"detail"})
     @ResponseBody
     public Result detail(@ModelAttribute("model") Resource model) {
@@ -282,6 +285,7 @@ public class ResourceController extends SimpleController {
      * @return
      * @throws Exception
      */
+    @RequiresPermissions("sys:resource:view")
     @PostMapping(value = {"resourceRoleDatagrid/{resourceId}"})
     @ResponseBody
     public Datagrid<Role> resourceRoleDatagrid(@PathVariable String resourceId,HttpServletRequest request,HttpServletResponse response) {
@@ -332,6 +336,7 @@ public class ResourceController extends SimpleController {
      * @return
      * @throws Exception
      */
+    @RequiresPermissions("sys:resource:view")
     @PostMapping(value = {"resourceUserDatagrid/{resourceId}"})
     @ResponseBody
     public Datagrid resourceUserDatagrid(@PathVariable String resourceId,HttpServletRequest request,HttpServletResponse response) {

@@ -5,6 +5,7 @@
  */
 package com.eryansky.modules.sys.web;
 
+import com.eryansky.common.exception.ServiceException;
 import com.eryansky.common.model.Combobox;
 import com.eryansky.common.model.Datagrid;
 import com.eryansky.common.model.Result;
@@ -86,6 +87,7 @@ public class RoleController extends SimpleController {
         return "modules/sys/role";
     }
 
+    @RequiresPermissions("sys:role:view")
     @PostMapping(value = {"datagrid"})
     @ResponseBody
     public String datagrid(Role model) {
@@ -109,6 +111,7 @@ public class RoleController extends SimpleController {
      * @param model
      * @return
      */
+    @RequiresPermissions("sys:role:view")
     @GetMapping(value = {"input"})
     public String input(@ModelAttribute("model") Role model, Model uiModel) {
         if (StringUtils.isBlank(model.getId()) && !SecurityUtils.isCurrentUserAdmin()) {
@@ -220,12 +223,18 @@ public class RoleController extends SimpleController {
         // 合并源角色与目标角色的资源（含去重）
         List<String> allRoleIds = Lists.newArrayList(role.getId());
         if (roleIds != null) {
+            // 伪代码：校验当前用户是否拥有对目标角色的管理权限
+            for (String rid : roleIds) {
+                if (!SecurityUtils.isPermittedRole(rid)) {
+                    throw new ServiceException("无权复制角色[" + rid + "]的资源");
+                }
+            }
             allRoleIds.addAll(roleIds);
         }
-        List<Resource> resources = allRoleIds.stream()
+        Set<String> rIds = allRoleIds.stream()
                 .flatMap(rid -> resourceService.findResourcesByRoleId(rid).stream())
-                .collect(Collectors.toList());
-        Set<String> rIds = resources.stream().map(BaseEntity::getId).collect(Collectors.toSet());
+                .map(Resource::getId)
+                .collect(Collectors.toSet());
         roleService.saveRoleResources(role.getId(), rIds);
         return Result.successResult();
     }
@@ -250,6 +259,7 @@ public class RoleController extends SimpleController {
      * @param query 关键字
      * @return
      */
+    @RequiresPermissions("sys:role:view")
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"userDatagrid"})
     public String userDatagrid(@RequestParam(value = "roleId", required = true) String roleId,
                                String query,
@@ -476,6 +486,7 @@ public class RoleController extends SimpleController {
     /**
      * 角色树.
      */
+    @RequiresPermissions("sys:role:view")
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"tree"})
     @ResponseBody
     public List<TreeNode> tree(String selectType) {
@@ -502,6 +513,7 @@ public class RoleController extends SimpleController {
      * @return
      * @throws Exception
      */
+    @RequiresPermissions("sys:role:view")
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"detail"})
     @ResponseBody
     public Result detail(@ModelAttribute("model") Role model) {
