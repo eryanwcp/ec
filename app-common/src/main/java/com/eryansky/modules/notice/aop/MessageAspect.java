@@ -13,7 +13,6 @@ import com.eryansky.modules.notice.mapper.Notice;
 import com.eryansky.modules.notice.service.MessageReceiveService;
 import com.eryansky.modules.notice.service.MessageSenderService;
 import com.eryansky.modules.notice.utils.NoticeUtils;
-import com.eryansky.modules.notice.vo.MessageReceiveSimpleVo;
 import com.eryansky.modules.sys._enum.YesOrNo;
 import javax.annotation.Resource;
 import org.aspectj.lang.JoinPoint;
@@ -24,7 +23,6 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 消息、通知发布切面，由系统参照本示例实现

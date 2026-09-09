@@ -111,8 +111,17 @@
 
 	<select id="findByMessageId" resultType="MessageReceive">
 		SELECT
-		<include refid="messageReceiveColumns"/>
+		<include refid="messageReceiveColumns"/>,
+		m.app_id AS "appId",
+		m.content AS "content",
+		u.name AS "userName",
+		m.category AS "category",
+		m.title AS "title",
+		m.url AS "url",
+		m.send_time AS "sendTime"
 		FROM ${noticePrefix}t_notice_message_receive a
+		<include refid="messageReceiveJoins"/>
+		LEFT JOIN ${sysPrefix}t_sys_user u ON u.id = a.user_id
 		<where>
 			a.message_id = #{messageId}
 		</where>
