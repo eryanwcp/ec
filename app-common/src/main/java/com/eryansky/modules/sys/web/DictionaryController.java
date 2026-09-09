@@ -65,7 +65,7 @@ public class DictionaryController extends SimpleController {
     }
 
 
-
+    @RequiresPermissions("sys:dictionary:view")
     @GetMapping(value = {"input"})
     public ModelAndView input(@ModelAttribute Dictionary model) {
         ModelAndView modelAndView = new ModelAndView("modules/sys/dictionary-input");
@@ -194,6 +194,7 @@ public class DictionaryController extends SimpleController {
      *
      * @return
      */
+    @RequiresPermissions("sys:dictionary:view")
     @PostMapping(value = {"treegrid"})
     @ResponseBody
     public Datagrid<Dictionary> treegrid(Dictionary Dictionary, HttpServletRequest request, HttpServletResponse response) {

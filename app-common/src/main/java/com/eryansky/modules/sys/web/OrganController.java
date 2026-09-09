@@ -80,6 +80,7 @@ public class OrganController extends SimpleController {
     }
 
 
+    @RequiresPermissions("sys:organ:view")
     @PostMapping(value = {"treegrid"})
     @ResponseBody
     public String treegrid(String parentId) {
@@ -211,9 +212,20 @@ public class OrganController extends SimpleController {
      */
     @RequiresPermissions("sys:organ:edit")
     @Logging(value = "机构管理-删除机构",data = "#id", logType = LogType.operate)
-    @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"delete/{id}"})
+    @PostMapping(value = {"delete/{id}"})
     @ResponseBody
     public Result delete(@PathVariable String id) {
+        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
+        // 针对非超级管理员做权限范围检查
+        if (!sessionInfo.isSuperUser()) {
+            List<String> organIdList = organService.findOwnerAndChildIds(sessionInfo.getLoginCompanyId());
+            boolean hasPermission = null != organIdList.stream()
+                    .filter(v->v.equals(id)).findAny().orElse(null);
+            if (!hasPermission) {
+                throw new ActionException("越权操作：无权删除该机构或部门");
+            }
+        }
+
 //        organService.deleteById(id);
         organService.deleteOwnerAndChilds(id);
         return Result.successResult();
@@ -335,10 +347,10 @@ public class OrganController extends SimpleController {
         if (enumParentType != null) {
             if (enumParentType.equals(OrganType.organ)) {
                 OrganType[] rss = OrganType.values();
-                for (int i = 0; i < rss.length; i++) {
+                for (OrganType organType : rss) {
                     Combobox combobox = new Combobox();
-                    combobox.setValue(rss[i].getValue());
-                    combobox.setText(rss[i].getDescription());
+                    combobox.setValue(organType.getValue());
+                    combobox.setText(organType.getDescription());
                     cList.add(combobox);
                 }
             } else if (enumParentType.equals(OrganType.department)) {
@@ -355,7 +367,7 @@ public class OrganController extends SimpleController {
             cList.add(groupCombobox);
         }
         List<DictionaryItem> dictionaryItems = DictionaryUtils.getDictList(Organ.DIC_ORGAN_TYPE);
-        dictionaryItems.stream().forEach(v->cList.add(new Combobox(v.getCode(), v.getName())));
+        dictionaryItems.forEach(v->cList.add(new Combobox(v.getCode(), v.getName())));
         return cList;
     }
 
@@ -454,9 +466,8 @@ public class OrganController extends SimpleController {
     public List<TreeNode> provinceCityAreaData(Boolean shortName,HttpServletResponse response) {
         List<TreeNode> treeNodes = Lists.newArrayList();
         List<Area> list = areaService.findAreaUp();
-        for (int i = 0; i < list.size(); i++) {
-            Area e = list.get(i);
-            TreeNode treeNode = new TreeNode(e.getId(), null != shortName && shortName ? e.getShortName():e.getName());
+        for (Area e : list) {
+            TreeNode treeNode = new TreeNode(e.getId(), null != shortName && shortName ? e.getShortName() : e.getName());
             treeNode.setpId(e.getParentId());
             treeNodes.add(treeNode);
         }
@@ -532,6 +543,7 @@ public class OrganController extends SimpleController {
      * @param model
      * @return
      */
+    @RequiresPermissions("sys:organ:view")
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"detail"})
     @ResponseBody
     public Result detail(@ModelAttribute("model") Organ model) {

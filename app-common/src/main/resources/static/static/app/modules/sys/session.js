@@ -15,7 +15,7 @@ $(function () {
         });
     }
     $session_datagrid = $('#session_datagrid').datagrid({
-        url: ctxAdmin + '/sys/session/winthPermissionsOnLineSessions',
+        url: ctxAdmin + '/sys/session/withPermissionsOnLineSessions',
         fit: true,
         nowarp: false,
         border: false,

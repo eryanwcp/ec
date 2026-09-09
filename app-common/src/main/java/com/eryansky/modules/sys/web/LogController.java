@@ -139,6 +139,7 @@ public class LogController extends SimpleController {
      * @param log
      * @return
      */
+    @RequiresPermissions(value = "sys:log:view")
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"detail"})
     @ResponseBody
     public Result detail(@ModelAttribute("model") Log log) {

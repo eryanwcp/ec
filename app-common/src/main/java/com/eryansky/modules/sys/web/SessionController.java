@@ -58,7 +58,9 @@ public class SessionController extends SimpleController {
         Page<SessionInfo> page = new Page<>(request);
         page = SecurityUtils.findSessionInfoPage(page,null,query);
         Datagrid<SessionInfo> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
-        String json = SecurityUtils.isCurrentUserAdmin() ? JsonMapper.getInstance().toJson(dg):JsonMapper.getInstance().toJsonWithExcludeProperties(dg, SessionInfo.class, new String[]{"token","refreshToken"});
+        String json = JsonMapper.getInstance().toJson(dg,
+                SessionInfo.class,
+                new String[]{"id","loginName","name","ip","loginTime"});
         return renderString(response, json, WebUtils.JSON_TYPE);
     }
 
@@ -67,13 +69,16 @@ public class SessionController extends SimpleController {
      *
      * @return
      */
-    @PostMapping(value = {"winthPermissionsOnLineSessions"})
-    public String winthPermissionsOnLineSessions(HttpServletRequest request, HttpServletResponse response, String query) {
+    @RequiresPermissions("sys:session:view")
+    @PostMapping(value = {"withPermissionsOnLineSessions"})
+    public String withPermissionsOnLineSessions(HttpServletRequest request, HttpServletResponse response, String query) {
         Page<SessionInfo> page = new Page<>(request);
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         page = SecurityUtils.findSessionInfoPage(page,(sessionInfo.isSuperUser() || SecurityUtils.isPermittedMaxRoleDataScope()) ? null:sessionInfo.getLoginCompanyId(),query);
         Datagrid<SessionInfo> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
-        String json = SecurityUtils.isCurrentUserAdmin() ? JsonMapper.getInstance().toJson(dg):JsonMapper.getInstance().toJsonWithExcludeProperties(dg, SessionInfo.class, new String[]{"token","refreshToken"});
+        String json = JsonMapper.getInstance().toJson(dg,
+                SessionInfo.class,
+                new String[]{"id","sessionId","host","userType","loginName","name","mobileSensitive","mobile","ip","loginOrganName","systemDeviceType","deviceCode","appVersion","loginTime","updateTime"});
         return renderString(response, json, WebUtils.JSON_TYPE);
     }
     /**
@@ -112,6 +117,7 @@ public class SessionController extends SimpleController {
      * @param sessionId
      * @return
      */
+    @RequiresPermissions("sys:session:view")
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"detail"})
     public String detail(HttpServletResponse response,String sessionId) {
         SessionInfo sessionInfo = SecurityUtils.getSessionInfo(sessionId);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012-2024 https://www.eryansky.com
+ * Copyright (c) 2012-2026 https://www.eryansky.com
  * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -33,8 +33,8 @@ import com.eryansky.modules.sys.utils.PostUtils;
 import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.utils.SelectType;
 import com.google.common.collect.Lists;
+import javax.annotation.Resource;
 import org.apache.commons.lang3.Validate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -57,11 +57,11 @@ import java.util.Set;
 @RequestMapping(value = "${adminPath}/sys/post")
 public class PostController extends SimpleController {
 
-    @Autowired
+    @Resource
     private PostService postService;
-    @Autowired
+    @Resource
     private OrganService organService;
-    @Autowired
+    @Resource
     private UserService userService;
 
     @ModelAttribute("model")
@@ -80,6 +80,7 @@ public class PostController extends SimpleController {
         return "modules/sys/post";
     }
 
+    @RequiresPermissions("sys:post:view")
     @PostMapping(value = {"datagrid"})
     @ResponseBody
     public String datagrid(String organId, String query, HttpServletRequest request) {
@@ -319,7 +320,6 @@ public class PostController extends SimpleController {
             Combobox combobox = new Combobox(r.getId(), r.getName());
             cList.add(combobox);
         }
-        System.out.println(JsonMapper.toJsonString(cList));
         return cList;
     }
 
@@ -330,6 +330,7 @@ public class PostController extends SimpleController {
      * @return
      * @throws Exception
      */
+    @RequiresPermissions("sys:post:view")
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"detail"})
     @ResponseBody
     public Result detail(@ModelAttribute("model") Post model) {

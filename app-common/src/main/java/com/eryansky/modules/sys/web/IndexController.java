@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012-2024 https://www.eryansky.com
+ * Copyright (c) 2012-2026 https://www.eryansky.com
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -12,10 +12,10 @@ import com.eryansky.common.utils.UserAgentUtils;
 import com.eryansky.common.utils.encode.Encrypt;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
+import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
-import com.eryansky.core.security.annotation.PrepareOauth2;
 import com.eryansky.core.security.annotation.RequiresUser;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys._enum.UserPasswordUpdateType;
@@ -26,7 +26,7 @@ import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.modules.sys.vo.PasswordTip;
 import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.AppUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -39,15 +39,20 @@ import javax.servlet.http.HttpServletRequest;
  * @author Eryan
  * @date 2014-09-16 10:30
  */
-@PrepareOauth2
 @Controller
 @RequestMapping(value = "${adminPath}")
 public class IndexController extends SimpleController {
 
-    @Autowired
+    @Resource
     private UserService userService;
-    @Autowired
+    @Resource
     private UserPasswordService userPasswordService;
+
+    @GetMapping(value = {"headers"})
+    @ResponseBody
+    public Result headers(HttpServletRequest request) {
+        return Result.successResult().setData(WebUtils.getHeaders(request));
+    }
 
     @GetMapping(value = {""})
     public ModelAndView admin(HttpServletRequest request) {

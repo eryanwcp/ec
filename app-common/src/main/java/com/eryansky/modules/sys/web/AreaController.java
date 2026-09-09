@@ -252,6 +252,7 @@ public class AreaController extends SimpleController {
      * @return
      * @throws Exception
      */
+    @RequiresPermissions("sys:area:view")
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"detail"})
     @ResponseBody
     public Result detail(@ModelAttribute("model") Area model) {

@@ -14,7 +14,6 @@ import com.eryansky.common.orm.Page;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.web.springmvc.SimpleController;
-import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
@@ -33,7 +32,6 @@ import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.SelectType;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections4.ListUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -54,11 +52,11 @@ import java.util.List;
 @RequestMapping(value = "${adminPath}/sys/resource")
 public class ResourceController extends SimpleController {
 
-    @Autowired
+    @javax.annotation.Resource
     private ResourceService resourceService;
-    @Autowired
+    @javax.annotation.Resource
     private RoleService roleService;
-    @Autowired
+    @javax.annotation.Resource
     private UserService userService;
 
     @ModelAttribute("model")
@@ -77,6 +75,7 @@ public class ResourceController extends SimpleController {
         return "modules/sys/resource";
     }
 
+    @RequiresPermissions("sys:resource:view")
     @PostMapping(value = {"treegrid"})
     @ResponseBody
     public Datagrid<Resource> treegrid(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -150,6 +149,7 @@ public class ResourceController extends SimpleController {
     /**
      * 资源树.
      */
+    @RequiresPermissions("sys:resource:view")
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"tree"})
     @ResponseBody
     public List<TreeNode> tree(String selectType) throws Exception {
@@ -255,6 +255,7 @@ public class ResourceController extends SimpleController {
      * @return
      * @throws Exception
      */
+    @RequiresPermissions("sys:resource:view")
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"detail"})
     @ResponseBody
     public Result detail(@ModelAttribute("model") Resource model) {
@@ -284,6 +285,7 @@ public class ResourceController extends SimpleController {
      * @return
      * @throws Exception
      */
+    @RequiresPermissions("sys:resource:view")
     @PostMapping(value = {"resourceRoleDatagrid/{resourceId}"})
     @ResponseBody
     public Datagrid<Role> resourceRoleDatagrid(@PathVariable String resourceId,HttpServletRequest request,HttpServletResponse response) {
@@ -334,6 +336,7 @@ public class ResourceController extends SimpleController {
      * @return
      * @throws Exception
      */
+    @RequiresPermissions("sys:resource:view")
     @PostMapping(value = {"resourceUserDatagrid/{resourceId}"})
     @ResponseBody
     public Datagrid resourceUserDatagrid(@PathVariable String resourceId,HttpServletRequest request,HttpServletResponse response) {

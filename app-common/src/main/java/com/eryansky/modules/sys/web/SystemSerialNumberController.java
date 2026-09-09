@@ -120,7 +120,16 @@ public class SystemSerialNumberController extends SimpleController {
         binder.registerCustomEditor(MaxSerial.class, new PropertyEditorSupport() {
             @Override
             public void setAsText(String text) {
-                setValue(JsonMapper.getInstance().fromJson(text,MaxSerial.class));
+                if (StringUtils.isNotBlank(text)) {
+                    try {
+                        setValue(JsonMapper.getInstance().fromJson(text, MaxSerial.class));
+                    } catch (Exception e) {
+                        logger.error("MaxSerial JSON反序列化失败: ", e);
+                        setValue(null);
+                    }
+                } else {
+                    setValue(null);
+                }
             }
         });
     }
@@ -173,6 +182,7 @@ public class SystemSerialNumberController extends SimpleController {
      * @return
      * @throws Exception
      */
+    @RequiresPermissions("sys:systemSerialNumber:view")
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"detail"})
     @ResponseBody
     public Result detail(@ModelAttribute("model") SystemSerialNumber model) {

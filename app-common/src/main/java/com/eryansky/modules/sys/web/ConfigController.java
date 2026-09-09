@@ -56,11 +56,14 @@ public class ConfigController extends SimpleController {
         }
     }
 
+
+    @RequiresPermissions("sys:config:view")
     @GetMapping(value = {"input"})
     public String input() {
         return "modules/sys/config-input";
     }
 
+    @RequiresPermissions("sys:config:view")
     @PostMapping(value = {"datagrid"})
     @ResponseBody
     public Datagrid<Config> datagrid(Config model, HttpServletRequest request, HttpServletResponse response,

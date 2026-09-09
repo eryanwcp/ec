@@ -63,7 +63,7 @@ import java.util.List;
 @RequestMapping(value = "${adminPath}/sys/versionLog")
 public class VersionLogController extends SimpleController {
 
-    @Autowired
+    @javax.annotation.Resource
     private VersionLogService versionLogService;
 
 
@@ -92,6 +92,7 @@ public class VersionLogController extends SimpleController {
      * @param endTime   更新时间 - 截止时间
      * @return
      */
+    @RequiresPermissions("sys:versionLog:view")
     @PostMapping(value = {"datagrid"})
     @ResponseBody
     public Datagrid<VersionLog> datagrid(VersionLog model, HttpServletRequest request,
@@ -122,6 +123,7 @@ public class VersionLogController extends SimpleController {
      * @return
      * @throws Exception
      */
+    @RequiresPermissions("sys:versionLog:view")
     @GetMapping(value = {"input"})
     public ModelAndView input(@ModelAttribute("model") VersionLog model) {
         ModelAndView modelAndView = new ModelAndView("modules/sys/versionLog-input");
@@ -162,40 +164,27 @@ public class VersionLogController extends SimpleController {
     /**
      * 文件上传
      */
+    @RequiresPermissions("sys:versionLog:edit")
     @PostMapping(value = {"upload"})
     @ResponseBody
-    public static Result upload(@RequestParam(value = "uploadFile", required = false) MultipartFile multipartFile) {
+    public Result upload(@RequestParam(value = "uploadFile", required = false) MultipartFile multipartFile) {
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         if (null == sessionInfo) {
             return Result.errorResult().setMsg("未授权！");
         }
         Result result = null;
-        Exception exception = null;
         File file = null;
         try {
             FileUploadUtils.assertAllowed(multipartFile,FileUploadUtils.DEFAULT_ALLOWED_EXTENSION, AppConstants.getDiskMaxUploadSize());
             file = DiskUtils.saveSystemFile(VersionLog.FOLDER_VERSIONLOG, FolderType.NORMAL.getValue(), sessionInfo.getUserId(), multipartFile);
             result = Result.successResult().setObj(file).setMsg("文件上传成功！");
-        } catch (InvalidExtensionException e) {
-            exception = e;
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
-        } catch (FileUploadBase.FileSizeLimitExceededException e) {
-            exception = e;
+        } catch (InvalidExtensionException | ActionException | IOException |
+                 FileUploadBase.FileSizeLimitExceededException | FileNameLengthLimitExceededException e) {
+            logger.error(e.getMessage(),e);
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG);
-        } catch (FileNameLengthLimitExceededException e) {
-            exception = e;
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG);
-        } catch (ActionException e) {
-            exception = e;
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
-        } catch (IOException e) {
-            exception = e;
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
         } finally {
-            if (exception != null) {
-                if (file != null) {
-                    DiskUtils.deleteFile(file.getId());
-                }
+            if (file != null) {
+                DiskUtils.deleteFile(file.getId());
             }
         }
         return result;
@@ -262,12 +251,13 @@ public class VersionLogController extends SimpleController {
 
 
     /**
-     * 查看通知
+     * 查看详情
      *
-     * @param id 通知ID
+     * @param id ID
      * @return
      * @throws Exception
      */
+    @RequiresPermissions("sys:versionLog:view")
     @GetMapping(value = {"view/{id}"})
     public ModelAndView view(@PathVariable String id) {
         ModelAndView modelAndView = new ModelAndView("modules/sys/versionLog-view");
@@ -353,6 +343,7 @@ public class VersionLogController extends SimpleController {
      * @return
      * @throws Exception
      */
+    @RequiresPermissions("sys:versionLog:view")
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"detail"})
     @ResponseBody
     public Result detail(@ModelAttribute("model") VersionLog model) {

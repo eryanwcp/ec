@@ -412,6 +412,7 @@ public class UserController extends SimpleController {
      * 修复用户岗位数据 自动清理用户不在部门的岗位信息 仅保留当前部门岗位信息
      * @return
      */
+    @RequiresPermissions("sys:user:edit")
     @Logging(value = "用户管理-修复用户岗位数据", logType = LogType.operate)
     @GetMapping("fixUserPostData")
     @ResponseBody
@@ -483,14 +484,10 @@ public class UserController extends SimpleController {
             SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
             File file = DiskUtils.saveSystemFile(User.FOLDER_USER_PHOTO, sessionInfo.getUserId(), multipartFile);
             result = Result.successResult().setObj(file);
-        } catch (InvalidExtensionException e) {
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
-        } catch (FileUploadBase.FileSizeLimitExceededException e) {
+        } catch (IOException | InvalidExtensionException | FileUploadBase.FileSizeLimitExceededException |
+                 FileNameLengthLimitExceededException e) {
+            logger.error(e.getMessage(),e);
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG);
-        } catch (FileNameLengthLimitExceededException e) {
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG);
-        } catch (IOException e) {
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
         }
         return result;
     }
