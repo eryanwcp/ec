@@ -49,11 +49,21 @@ public class MessageReceiveController extends SimpleController {
 
     @ModelAttribute("model")
     public MessageReceive get(@RequestParam(required = false) String id,String messageId) {
+        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         if (StringUtils.isNotBlank(id)) {
-            return messageReceiveService.get(id);
+            MessageReceive messageReceive = messageReceiveService.get(id);
+            // 增加安全性校验：判断消息所属人是否为当前用户
+            if (messageReceive != null && sessionInfo != null && !StringUtils.isEquals(sessionInfo.getUserId(), messageReceive.getUserId())) {
+                return new MessageReceive(); // 或抛出无权限访问异常
+            }
+            return messageReceive;
         } else if (StringUtils.isNotBlank(messageId)) {
-            SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
-            return messageReceiveService.getUserMessageReceiveByMessageId(sessionInfo.getUserId(),messageId);
+            MessageReceive messageReceive = messageReceiveService.getUserMessageReceiveByMessageId(sessionInfo.getUserId(),messageId);
+            // 增加安全性校验：判断消息所属人是否为当前用户
+            if (messageReceive != null && sessionInfo != null && !StringUtils.isEquals(sessionInfo.getUserId(), messageReceive.getUserId())) {
+                return new MessageReceive(); // 或抛出无权限访问异常
+            }
+            return messageReceive;
         } else {
             return new MessageReceive();
         }
