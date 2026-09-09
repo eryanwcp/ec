@@ -152,33 +152,17 @@ public class NoticeReceiveController extends SimpleController {
         Result result = null;
         SessionInfo sessionInfo = SecurityUtils.getSessionInfo(jsessionid);
         sessionInfo = null != sessionInfo ? sessionInfo : SecurityUtils.getCurrentSessionInfo();
-        Exception exception = null;
         File file = null;
         try {
             FileUploadUtils.assertAllowed(multipartFile,FileUploadUtils.DEFAULT_ALLOWED_EXTENSION, AppConstants.getNoticeMaxUploadSize());
             file = DiskUtils.saveSystemFile(NoticeReceiveInfo.FOLDER_NOTICE_RECEIVE, sessionInfo.getUserId(), multipartFile);
             result = Result.successResult().setObj(file).setMsg("文件上传成功！");
-        } catch (InvalidExtensionException e) {
-            exception = e;
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
-        } catch (FileUploadSizeException e) {
-            exception = e;
+        } catch (ActionException | IOException e) {
+            logger.error(e.getMessage(), e);
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG);
-        } catch (FileNameLengthLimitExceededException e) {
-            exception = e;
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG);
-        } catch (ActionException e) {
-            exception = e;
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
-        } catch (IOException e) {
-            exception = e;
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
         } finally {
-            if (exception != null) {
-                logger.error(exception.getMessage(), exception);
-                if (file != null) {
-                    DiskUtils.deleteFile(file.getId());
-                }
+            if (file != null) {
+                DiskUtils.deleteFile(file.getId());
             }
         }
         return result;
@@ -193,7 +177,10 @@ public class NoticeReceiveController extends SimpleController {
     @GetMapping(value = {"replyInput"})
     public ModelAndView replyInput(@ModelAttribute("model") NoticeReceiveInfo model) {
         ModelAndView modelAndView = new ModelAndView("modules/notice/notice-reply-input.html");
-//        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
+        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
+        if (model == null || !sessionInfo.getUserId().equals(model.getUserId())) {
+            throw new ActionException("无权操作该记录或记录不存在！");
+        }
         String[] fs = StringUtils.split(model.getReplyFileIds(), ",");
         modelAndView.addObject("files", null == fs ? Collections.emptyList() : DiskUtils.findFilesByIds(Lists.newArrayList(fs)));
         modelAndView.addObject("fileIds", null == fs ? Collections.emptyList() : Lists.newArrayList(fs));
@@ -214,7 +201,10 @@ public class NoticeReceiveController extends SimpleController {
     @ResponseBody
     public Result replySave(@ModelAttribute("model") NoticeReceiveInfo model,
                             @RequestParam(value = "fileIds", required = false) List<String> fileIds) {
-//        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
+        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
+        if (model == null || !sessionInfo.getUserId().equals(model.getUserId())) {
+            throw new ActionException("无权操作该记录或记录不存在！");
+        }
         model.setIsReply(YesOrNo.YES.getValue());
         model.setReplyTime(Calendar.getInstance().getTime());
         model.setReplyFileIds(Collections3.convertToString(fileIds, ","));
@@ -232,6 +222,10 @@ public class NoticeReceiveController extends SimpleController {
     @PostMapping(value = "setRead")
     @ResponseBody
     public Result setRead(@ModelAttribute("model") NoticeReceiveInfo model) {
+        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
+        if (model == null || !sessionInfo.getUserId().equals(model.getUserId())) {
+            return Result.errorResult().setMsg("无权操作该记录或记录不存在！");
+        }
         noticeReceiveInfoService.updateReadById(model.getId());
         return Result.successResult();
     }
