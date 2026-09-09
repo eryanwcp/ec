@@ -481,6 +481,7 @@ public class NoticeController extends SimpleController {
      * @param fileId
      * @return
      */
+    @RequiresPermissions(value = {"notice:edit","notice:publish"},logical = Logical.OR)
     @Logging(logType = LogType.operate, value = "通知管理-删除附件")
     @PostMapping(value = {"delUpload"})
     @ResponseBody
