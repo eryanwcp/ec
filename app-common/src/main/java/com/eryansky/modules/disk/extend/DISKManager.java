@@ -109,7 +109,7 @@ public class DISKManager implements IFileManager {
     @Override
     public String getStorePath(Folder folder, String userId, String fileName) {
         String dir = DiskUtils.getDISKStoreDir(folder, userId);
-        String code = FileUploadUtils.encodingFilenamePrefix(userId, fileName);
+        String code = FileUploadUtils.encodingFilenamePrefix(fileName);
         // 使用 Path 处理路径拼接，避免不同操作系统的分隔符问题
         return Paths.get(dir, code + "_" + fileName).toString();
     }
