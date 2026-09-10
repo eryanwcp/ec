@@ -1,71 +1,130 @@
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans" xmlns:th="http://www.thymeleaf.org"
-      xmlns:shiro="http://www.eryansky.com/thymeleaf/shiro"
-      xmlns:sitemesh="http://www.opensymphony.com/sitemesh/decorator">
+      xmlns:shiro="http://www.eryansky.com/thymeleaf/shiro">
 <head>
-    <title>[[${model.title}]]</title>
-    <meta http-equiv="X-UA-Compatible" content="IE=EDGE;chrome=1" />
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge;chrome=1"/>
     <meta http-equiv="Cache-Control" content="no-store"/>
     <meta http-equiv="Pragma" content="no-cache"/>
     <meta http-equiv="Expires" content="0"/>
+    <title>[[${model.title}]]</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0 60px 0 30px;
+            overflow: hidden;
+        }
+        .notice-header {
+            width: 100%;
+            float: left;
+            margin: 10px 0;
+            padding: 8px 15px;
+            background-color: #f5f5f5;
+            border-top: 2px solid #000;
+            border-bottom: 2px solid #000;
+            box-sizing: border-box;
+        }
+        .notice-title {
+            text-align: center;
+            margin: 0 0 10px 0;
+        }
+        .notice-meta {
+            text-align: right;
+            color: #333;
+            font-size: 14px;
+        }
+        .notice-meta label {
+            font-weight: bold;
+        }
+        #content {
+            float: left;
+            width: 100%;
+            word-wrap: break-word;
+        }
+        .attachment-container {
+            float: left;
+            width: 100%;
+            border-top: 1px solid #000;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+        .attachment-item {
+            margin-bottom: 5px;
+        }
+        .attachment-link {
+            color: #0000ff;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        #annexFrame {
+            padding: 0;
+            border: 0;
+            width: 100%;
+            height: 0;
+            display: none;
+        }
+    </style>
+
     <script type="text/javascript" th:inline="javascript">
         /*<![CDATA[*/
         function init() {
-            var parentDIv = window.parent.document.getElementById("notice_view_iframe");
+            var parentDiv = window.parent.document.getElementById("notice_view_iframe");
             var contentY = document.getElementById("content");
-            if (parentDIv) {
-                parentDIv.style.height = document.body.clientHeight + "px";
-                var panelWidth = parseInt(parentDIv.parentNode.style.width);
-                var contentWidth = contentY.clientWidth + 60;
-                var setWidth = (contentWidth > panelWidth ? contentWidth: panelWidth);
-                parentDIv.style.width = setWidth + "px";
-                contentY.style.width = (setWidth - 200) + "px";
 
+            if (parentDiv && contentY) {
+                parentDiv.style.height = document.body.clientHeight + "px";
+                var panelWidth = parseInt(parentDiv.parentNode.style.width, 10) || 0;
+                var contentWidth = contentY.clientWidth + 60;
+                var setWidth = contentWidth > panelWidth ? contentWidth : panelWidth;
+
+                parentDiv.style.width = setWidth + "px";
+                contentY.style.width = (setWidth - 200) + "px";
             }
-            //修复Chrome浏览器不显示 border小于0.75pt的边框问题
+
+            // 修复 Chrome 浏览器不显示 border 小于 0.75pt 的问题
             var tdDoms = document.getElementsByTagName("td");
-            if (tdDoms) {
-                for (var i = 0; i < tdDoms.length; i++) {
-                    var border = tdDoms[i].style.border;
-                    if (border && border.indexOf("0.5pt") == 0) {
-                        tdDoms[i].style.border = border.replace("0.5pt", "0.75pt");
-                    }
+            for (var i = 0; i < tdDoms.length; i++) {
+                var border = tdDoms[i].style.border;
+                if (border && border.indexOf("0.5pt") === 0) {
+                    tdDoms[i].style.border = border.replace("0.5pt", "0.75pt");
                 }
             }
         }
+
         function _download(fileId) {
+            if (!fileId) return;
             var annexFrame = document.getElementById("annexFrame");
             annexFrame.src = ctxAdmin + '/disk/fileDownload/' + fileId;
         }
         /*]]>*/
     </script>
 </head>
-<body onload="init();" style="overflow: hidden;margin: 0px;">
-<div style="padding: 0px 60px 0px 30px;">
-    <div style="width:100%;float: left;margin-top:10px;margin-bottom:10px;padding: 8px 15px 8px;background-color: #f5f5f5;border-top:2px solid #000;border-bottom:2px solid #000;">
-        <div align="center">
-            <h3>[[${model.title}]]</h3>
-        </div>
-        <div align="right">
-            [ <label>发布部门：</label>[[${model.publishOrganName}]]&nbsp;&nbsp;<label>发布人：</label>[[${model.publishUserName}]]&nbsp;&nbsp;<label>发布时间：</label>[[${#dates.format(model.publishTime, 'yyyy-MM-dd HH:mm')}]]]
-        </div>
+<body onload="init();">
+<!-- 页头通知信息 -->
+<div class="notice-header">
+    <h3 class="notice-title">[[${model.title}]]</h3>
+    <div class="notice-meta">
+        [ <label>发布单位：</label>[[${model.publishOrganName}]]&nbsp;&nbsp;
+        <label>发布时间：</label>[[${#dates.format(model.publishTime, 'yyyy-MM-dd HH:mm')}]] ]
     </div>
-    <div id="content" style="float: left;" th:utext="${model.content}">
-    </div>
-    <br/>
-    <div th:if="${not #lists.isEmpty(files)}">
-        <div th:each="file,iStat : ${files}" th:id="${file.id}" style="float: left;width:100%;border-top:1px solid #000;padding-top:10px;margin-top:10px;">
-            <strong>附件列表：</strong>
-            <br/>
-            <span th:text="${iStat.index + 1}"></span>、
-            <a href="#"
-               onclick="_download([[${file.id}]]);"
-               style="color: #0000ff;"
-               th:text="${file.name}">文件名</a>&nbsp;&nbsp;
-        </div>
-    </div>
-    <iframe id="annexFrame" src="" frameborder="no" style="padding: 0;border: 0;width: 100%;height: 50px;"></iframe>
 </div>
+
+<!-- 通知正文 -->
+<div id="content" th:utext="${model.content}"></div>
+
+<!-- 附件列表 -->
+<div class="attachment-container" th:if="${not #lists.isEmpty(files)}">
+    <strong>附件列表：</strong>
+    <div class="attachment-item" th:each="file, iStat : ${files}" th:id="${file.id}">
+        <span th:text="${iStat.index + 1}">1</span>、
+        <a href="javascript:void(0);"
+           class="attachment-link"
+           th:onclick="|_download('${file.id}')|"
+           th:text="${file.name}">文件名</a>
+    </div>
+</div>
+
+<!-- 隐藏的下载 iframe -->
+<iframe id="annexFrame" name="annexFrame"></iframe>
 </body>
 </html>
