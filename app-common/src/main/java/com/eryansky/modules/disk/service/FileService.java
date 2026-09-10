@@ -191,12 +191,13 @@ public class FileService extends CrudService<FileDao, File> {
         }
         try {
             //检查文件是否被引用
-//            List<File> files = this.findByCode(file.getCode(), fileId);
-            if (deleteDiskFile && Collections3.isEmpty(this.findByCode(file.getCode(), fileId))) {
-                iFileManager.deleteFile(file.getFilePath());
-                logger.debug("删除文件：{}", new Object[]{file.getFilePath()});
-            }else{
-                logger.warn("文件被引用：{}，{}，未执行物理删除", new Object[]{file.getId(), file.getFilePath()});
+            if (deleteDiskFile) {
+                if(Collections3.isEmpty(this.findByCode(file.getCode(), fileId))){
+                    iFileManager.deleteFile(file.getFilePath());
+                    logger.debug("删除文件：{}", file.getFilePath());
+                }else{
+                    logger.warn("文件被引用：{}，{}，未执行物理删除", file.getId(), file.getFilePath());
+                }
             }
             delete(file);
         } catch (IOException e) {

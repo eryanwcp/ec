@@ -459,26 +459,17 @@ public class DiskController extends SimpleController {
 
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         Result result = null;
-        Exception exception = null;
         File file = null;
         try {
             FileUploadUtils.assertAllowed(multipartFile,FileUploadUtils.DEFAULT_ALLOWED_EXTENSION, AppConstants.getDiskMaxUploadSize());
             file = fileService.fileUpload(sessionInfo, folder, multipartFile);
             result = Result.successResult().setObj(file).setMsg("文件上传成功！");
-        } catch (InvalidExtensionException e) {
-            exception = e;
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
-        } catch (FileUploadSizeException e) {
-            exception = e;
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG);
         } catch (Exception e) {
-            exception = e;
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
+            logger.error(e.getMessage(),e);
+            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG);
         } finally {
-            if (exception != null) {
-                if (file != null) {
-                    DiskUtils.deleteFile(file.getId());
-                }
+            if (file != null) {
+                DiskUtils.deleteFile(file.getId());
             }
         }
         return result;
