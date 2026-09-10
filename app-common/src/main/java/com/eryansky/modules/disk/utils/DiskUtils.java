@@ -245,7 +245,7 @@ public class DiskUtils {
             FileNameLengthLimitExceededException, IOException {
         String fileName = getMultipartOriginalFilename(multipartFile);
         String _userId = StringUtils.isBlank(userId) ? User.SUPERUSER_ID : userId;
-        String code = FileUploadUtils.encodingFilenamePrefix(_userId + "", fileName);
+        String code = FileUploadUtils.encodingFilenamePrefix(fileName);
         Folder folder = checkAndSaveSystemFolderByCode(folderCode, _userId, folderType);
         String storeFilePath = Static.iFileManager.getStorePath(folder, _userId, fileName);
         File file = new File();
