@@ -18,8 +18,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartFile;
-
 import jakarta.servlet.http.HttpServletRequest;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -28,6 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -37,13 +38,10 @@ import java.util.Map;
  * <p>Version: 1.0
  */
 public class FileUploadUtils {
-
     // 默认大小 100M
     public static final long DEFAULT_MAX_SIZE = 100 * 1024 * 1024;
-
     // 默认上传的地址
     private static String defaultBaseDir = "disk";
-
     // 默认的文件名最大长度
     protected static final int DEFAULT_FILE_NAME_LENGTH = 200;
 
@@ -56,17 +54,16 @@ public class FileUploadUtils {
     };
 
     public static final String[] MEDIA_EXTENSION = {
-            "swf", "flv", "mp3", "wav", "wma", "wmv", "mid", "avi", "mpg", "asf", "rm", "rmvb"
+            "swf", "flv", "mp3", "wav", "wma", "wmv", "mid", "avi", "mpg", "asf", "rm", "rmvb", "mp4"
     };
 
     public static final String[] DEFAULT_ALLOWED_EXTENSION = {
             // 图片
             "jpg", "jpeg", "png", "gif", "bmp", "webp", "heic", "heif", "tif", "tiff", "ico",
             // word excel powerpoint
-            "doc", "docx", "xls", "xlsx", "ppt", "pptx", "wps", "et", "dps", "odt", "ods", "odp",
-            "txt", "csv", "rtf",
+            "doc", "docx", "xls", "xlsx", "ppt", "pptx", "wps", "et", "dps", "odt", "ods", "odp", "txt", "csv", "rtf",
             // 压缩文件
-            "rar", "zip", "gz", "bz2", "7z",
+            "rar", "zip", "gz", "bz2", "7z", "tar",
             // pdf
             "pdf", "ofd",
             // APP
@@ -74,45 +71,65 @@ public class FileUploadUtils {
     };
 
     /**
+     * 定义支持偏移量的 Magic Byte 签名结构
+     */
+    public static class MagicSignature {
+        public final int offset;          // 字节偏移量
+        public final String hexSignature; // 十六进制签名
+
+        public MagicSignature(int offset, String hexSignature) {
+            this.offset = offset;
+            this.hexSignature = hexSignature.toUpperCase(Locale.ENGLISH);
+        }
+
+        // 默认偏移量为 0 的便捷构造
+        public MagicSignature(String hexSignature) {
+            this(0, hexSignature);
+        }
+    }
+
+    /**
      * 常见文件 Magic Bytes (文件头魔数) 签名表
      */
-    private static final Map<String, String[]> MAGIC_BYTES_MAP = new HashMap<>();
+    private static final Map<String, List<MagicSignature>> MAGIC_BYTES_MAP = new HashMap<>();
 
     static {
         // 图片
-        MAGIC_BYTES_MAP.put("jpg", new String[]{"FFD8FF"});
-        MAGIC_BYTES_MAP.put("jpeg", new String[]{"FFD8FF"});
-        MAGIC_BYTES_MAP.put("png", new String[]{"89504E47"});
-        MAGIC_BYTES_MAP.put("gif", new String[]{"47494638"});
-        MAGIC_BYTES_MAP.put("bmp", new String[]{"424D"});
-        MAGIC_BYTES_MAP.put("webp", new String[]{"52494646"}); // RIFF header
-        MAGIC_BYTES_MAP.put("ico", new String[]{"00000100"});
-        MAGIC_BYTES_MAP.put("tif", new String[]{"49492A00", "4D4D002A"});
-        MAGIC_BYTES_MAP.put("tiff", new String[]{"49492A00", "4D4D002A"});
+        MAGIC_BYTES_MAP.put("jpg", Arrays.asList(new MagicSignature("FFD8FF")));
+        MAGIC_BYTES_MAP.put("jpeg", Arrays.asList(new MagicSignature("FFD8FF")));
+        MAGIC_BYTES_MAP.put("png", Arrays.asList(new MagicSignature("89504E47")));
+        MAGIC_BYTES_MAP.put("gif", Arrays.asList(new MagicSignature("47494638")));
+        MAGIC_BYTES_MAP.put("bmp", Arrays.asList(new MagicSignature("424D")));
+        MAGIC_BYTES_MAP.put("webp", Arrays.asList(new MagicSignature("52494646"))); // RIFF header
+        MAGIC_BYTES_MAP.put("ico", Arrays.asList(new MagicSignature("00000100")));
+        MAGIC_BYTES_MAP.put("tif", Arrays.asList(new MagicSignature("49492A00"), new MagicSignature("4D4D002A")));
+        MAGIC_BYTES_MAP.put("tiff", Arrays.asList(new MagicSignature("49492A00"), new MagicSignature("4D4D002A")));
 
         // 文档与压缩包
-        MAGIC_BYTES_MAP.put("pdf", new String[]{"25504446"}); // %PDF
-        MAGIC_BYTES_MAP.put("zip", new String[]{"504B0304", "504B0506", "504B0708"}); // PK..
-        MAGIC_BYTES_MAP.put("rar", new String[]{"526172211A0700", "526172211A0701"}); // Rar!
-        MAGIC_BYTES_MAP.put("7z", new String[]{"377ABCAF271C"});
-        MAGIC_BYTES_MAP.put("gz", new String[]{"1F8B"});
+        MAGIC_BYTES_MAP.put("pdf", Arrays.asList(new MagicSignature("25504446"))); // %PDF
+        MAGIC_BYTES_MAP.put("zip", Arrays.asList(new MagicSignature("504B0304"), new MagicSignature("504B0506"), new MagicSignature("504B0708"))); // PK..
+        MAGIC_BYTES_MAP.put("rar", Arrays.asList(new MagicSignature("526172211A0700"), new MagicSignature("526172211A0701"))); // Rar!
+        MAGIC_BYTES_MAP.put("7z", Arrays.asList(new MagicSignature("377ABCAF271C")));
+        MAGIC_BYTES_MAP.put("gz", Arrays.asList(new MagicSignature("1F8B")));
+        MAGIC_BYTES_MAP.put("tar", Arrays.asList(new MagicSignature(257, "7573746172"))); // tar 魔数带有257字节偏移
 
         // Office 文档 (OpenXML基于ZIP / OLE2二进制格式)
-        MAGIC_BYTES_MAP.put("docx", new String[]{"504B0304"});
-        MAGIC_BYTES_MAP.put("xlsx", new String[]{"504B0304"});
-        MAGIC_BYTES_MAP.put("pptx", new String[]{"504B0304"});
-        MAGIC_BYTES_MAP.put("apk", new String[]{"504B0304"});
-        MAGIC_BYTES_MAP.put("doc", new String[]{"D0CF11E0A1B11AE1"});
-        MAGIC_BYTES_MAP.put("xls", new String[]{"D0CF11E0A1B11AE1"});
-        MAGIC_BYTES_MAP.put("ppt", new String[]{"D0CF11E0A1B11AE1"});
-        MAGIC_BYTES_MAP.put("wps", new String[]{"D0CF11E0A1B11AE1"});
+        MAGIC_BYTES_MAP.put("docx", Arrays.asList(new MagicSignature("504B0304")));
+        MAGIC_BYTES_MAP.put("xlsx", Arrays.asList(new MagicSignature("504B0304")));
+        MAGIC_BYTES_MAP.put("pptx", Arrays.asList(new MagicSignature("504B0304")));
+        MAGIC_BYTES_MAP.put("apk", Arrays.asList(new MagicSignature("504B0304")));
+        MAGIC_BYTES_MAP.put("doc", Arrays.asList(new MagicSignature("D0CF11E0A1B11AE1")));
+        MAGIC_BYTES_MAP.put("xls", Arrays.asList(new MagicSignature("D0CF11E0A1B11AE1")));
+        MAGIC_BYTES_MAP.put("ppt", Arrays.asList(new MagicSignature("D0CF11E0A1B11AE1")));
+        MAGIC_BYTES_MAP.put("wps", Arrays.asList(new MagicSignature("D0CF11E0A1B11AE1")));
 
         // 音视频与 Flash
-        MAGIC_BYTES_MAP.put("mp3", new String[]{"494433", "FFFB", "FFF3", "FFF2"});
-        MAGIC_BYTES_MAP.put("wav", new String[]{"52494646"});
-        MAGIC_BYTES_MAP.put("avi", new String[]{"52494646"});
-        MAGIC_BYTES_MAP.put("swf", new String[]{"435753", "465753", "5A5753"});
-        MAGIC_BYTES_MAP.put("flv", new String[]{"464C56"});
+        MAGIC_BYTES_MAP.put("mp3", Arrays.asList(new MagicSignature("494433"), new MagicSignature("FFFB"), new MagicSignature("FFF3"), new MagicSignature("FFF2")));
+        MAGIC_BYTES_MAP.put("wav", Arrays.asList(new MagicSignature("52494646")));
+        MAGIC_BYTES_MAP.put("avi", Arrays.asList(new MagicSignature("52494646")));
+        MAGIC_BYTES_MAP.put("swf", Arrays.asList(new MagicSignature("435753"), new MagicSignature("465753"), new MagicSignature("5A5753")));
+        MAGIC_BYTES_MAP.put("flv", Arrays.asList(new MagicSignature("464C56")));
+        MAGIC_BYTES_MAP.put("mp4", Arrays.asList(new MagicSignature(4, "66747970"))); // mp4 'ftyp' 魔数带有4字节偏移
     }
 
     private static int counter = 0;
@@ -180,8 +197,9 @@ public class FileUploadUtils {
      * @param _prefix                   文件名前缀 建议在needDatePathAndRandomName为false时使用
      * @return 返回上传成功的文件名
      */
-    public static final String upload(HttpServletRequest request, String dir, MultipartFile file, String[] allowedExtension, long maxSize, boolean needDatePathAndRandomName, String _prefix)
-            throws InvalidExtensionException, FileUploadSizeException, IOException, FileNameLengthLimitExceededException {
+    public static final String upload(HttpServletRequest request, String dir, MultipartFile file, String[] allowedExtension,
+                                      long maxSize, boolean needDatePathAndRandomName, String _prefix) throws InvalidExtensionException, FileUploadSizeException, IOException, FileNameLengthLimitExceededException {
+
         String originalFilename = DiskUtils.getMultipartOriginalFilename(file);
         int fileNamelength = originalFilename.length();
         if (fileNamelength > FileUploadUtils.DEFAULT_FILE_NAME_LENGTH) {
@@ -190,6 +208,7 @@ public class FileUploadUtils {
 
         File desc = null;
         String filename = null;
+
         assertAllowed(file, allowedExtension, maxSize);
 
         if (request != null) {
@@ -200,13 +219,13 @@ public class FileUploadUtils {
             String fileBasePath = getBasePath(filename);
             desc = getAbsoluteFile(fileBasePath);
         }
-
         file.transferTo(desc);
         return filename;
     }
 
-    public static final String upload(HttpServletRequest request, String dir, File file, String[] allowedExtension, long maxSize, boolean needDatePathAndRandomName, String _prefix)
-            throws InvalidExtensionException, FileUploadSizeException, IOException, FileNameLengthLimitExceededException {
+    public static final String upload(HttpServletRequest request, String dir, File file, String[] allowedExtension,
+                                      long maxSize, boolean needDatePathAndRandomName, String _prefix) throws InvalidExtensionException, FileUploadSizeException, IOException, FileNameLengthLimitExceededException {
+
         int fileNamelength = file.getName().length();
         if (fileNamelength > FileUploadUtils.DEFAULT_FILE_NAME_LENGTH) {
             throw new FileNameLengthLimitExceededException(file.getName(), fileNamelength, FileUploadUtils.DEFAULT_FILE_NAME_LENGTH);
@@ -225,7 +244,6 @@ public class FileUploadUtils {
             String fileBasePath = getBasePath(filename);
             desc = getAbsoluteFile(fileBasePath);
         }
-
         if (!file.isDirectory()) {
             FileUtils.copyFile(file, desc);
         }
@@ -311,22 +329,24 @@ public class FileUploadUtils {
     /**
      * 提取文件名
      */
-    public static final String extractFilename(MultipartFile file, String baseDir, boolean needDatePathAndRandomName, String _prefix) throws UnsupportedEncodingException {
+    public static final String extractFilename(MultipartFile file, String baseDir, boolean needDatePathAndRandomName, String _prefix)
+            throws UnsupportedEncodingException {
         String fileAllName = DiskUtils.getMultipartOriginalFilename(file);
         return extractFilename(fileAllName, baseDir, needDatePathAndRandomName, _prefix);
     }
 
-    public static final String extractFilename(File file, String baseDir, boolean needDatePathAndRandomName, String _prefix) throws UnsupportedEncodingException {
+    public static final String extractFilename(File file, String baseDir, boolean needDatePathAndRandomName, String _prefix)
+            throws UnsupportedEncodingException {
         String fileAllName = file.getName();
         return extractFilename(fileAllName, baseDir, needDatePathAndRandomName, _prefix);
     }
 
-    public static final String extractFilename(String fileAllName, String baseDir, boolean needDatePathAndRandomName, String _prefix) throws UnsupportedEncodingException {
+    public static final String extractFilename(String fileAllName, String baseDir, boolean needDatePathAndRandomName, String _prefix)
+            throws UnsupportedEncodingException {
         int slashIndex = fileAllName.indexOf("/");
         if (slashIndex >= 0) {
             fileAllName = fileAllName.substring(slashIndex + 1);
         }
-
         if (StringUtils.isNotBlank(_prefix)) {
             fileAllName = _prefix + "_" + fileAllName;
         }
@@ -368,14 +388,11 @@ public class FileUploadUtils {
      */
     public static final void assertAllowed(MultipartFile file, String[] allowedExtension, long maxSize)
             throws InvalidExtensionException, FileUploadSizeException {
-
         String filename = DiskUtils.getMultipartOriginalFilename(file);
-
         // 【安全修复】防御空字节注入、目录遍历异常字符
         if (StringUtils.isBlank(filename) || filename.contains("../") || filename.contains("..\\") || filename.indexOf('\0') != -1) {
             throw new IllegalArgumentException("Invalid filename format.");
         }
-
         filename = FilenameUtils.getName(filename);
         String extension = FilenameUtils.getExtension(filename);
 
@@ -406,14 +423,11 @@ public class FileUploadUtils {
      */
     public static final void assertAllowed(File file, String[] allowedExtension, long maxSize)
             throws InvalidExtensionException, FileUploadSizeException {
-
         String filename = file.getName();
-
         // 【安全修复】防御空字节注入、目录遍历异常字符
         if (StringUtils.isBlank(filename) || filename.contains("../") || filename.contains("..\\") || filename.indexOf('\0') != -1) {
             throw new IllegalArgumentException("Invalid filename format.");
         }
-
         filename = FilenameUtils.getName(filename);
         String extension = FilenameUtils.getExtension(filename);
 
@@ -456,7 +470,7 @@ public class FileUploadUtils {
     }
 
     /**
-     * 读取 InputStream 前若干字节并校验是否匹配扩展名的 Magic Bytes 头部特征
+     * 读取 InputStream 前若干字节并校验是否匹配扩展名的 Magic Bytes 头部特征 (支持动态偏移量)
      *
      * @param inputStream 文件输入流
      * @param extension   扩展名
@@ -466,27 +480,58 @@ public class FileUploadUtils {
         if (inputStream == null || StringUtils.isBlank(extension)) {
             return false;
         }
+
         String ext = extension.toLowerCase(Locale.ENGLISH);
-        String[] signatures = MAGIC_BYTES_MAP.get(ext);
+        List<MagicSignature> signatures = MAGIC_BYTES_MAP.get(ext);
 
         // 未在魔数表中定义的类型（如 txt, csv 等无固定魔数的纯文本/数据文件），跳过魔数比对放行
-        if (signatures == null || signatures.length == 0) {
+        if (signatures == null || signatures.isEmpty()) {
             return true;
         }
 
         try {
-            byte[] header = new byte[16];
-            int bytesRead = inputStream.read(header, 0, header.length);
-            if (bytesRead < 2) {
+            // 1. 动态计算该文件类型需要读取的最大字节深度 (最大偏移量 + 签名长度)
+            int maxRequiredBytes = 0;
+            for (MagicSignature sig : signatures) {
+                int required = sig.offset + (sig.hexSignature.length() / 2);
+                if (required > maxRequiredBytes) {
+                    maxRequiredBytes = required;
+                }
+            }
+
+            // 2. 保证缓冲数组足够大（至少读取 64 字节，如果有大偏移量如 tar 则根据最大需求动态扩容）
+            int bufferSize = Math.max(64, maxRequiredBytes);
+            byte[] header = new byte[bufferSize];
+
+            // 3. 循环读取直到满足所需的字节数或流结束
+            int bytesRead = 0;
+            int read;
+            while (bytesRead < bufferSize && (read = inputStream.read(header, bytesRead, bufferSize - bytesRead)) != -1) {
+                bytesRead += read;
+            }
+
+            if (bytesRead == 0) {
                 return false;
             }
+
+            // 4. 将读取到的字节流转为十六进制字符串
             String fileHeaderHex = bytesToHex(header, bytesRead);
-            for (String signature : signatures) {
-                if (fileHeaderHex.startsWith(signature.toUpperCase(Locale.ENGLISH))) {
-                    return true;
+
+            // 5. 根据各个签名的【偏移量】精准比对
+            for (MagicSignature signature : signatures) {
+                int hexOffset = signature.offset * 2; // 字节偏移量转为16进制字符串偏移量 (1 byte = 2 hex chars)
+                String expectedHex = signature.hexSignature;
+
+                // 确保读取到的内容长度足够包含该签名
+                if (fileHeaderHex.length() >= hexOffset + expectedHex.length()) {
+                    String actualHex = fileHeaderHex.substring(hexOffset, hexOffset + expectedHex.length());
+                    if (actualHex.equals(expectedHex)) {
+                        return true;
+                    }
                 }
             }
             return false;
+
         } catch (IOException e) {
             LogUtils.logError("Read file magic bytes error", e);
             return false;
