@@ -92,12 +92,10 @@ public class LoginController extends SimpleController {
                                 @RequestParam(value = "client_id", required = false) String clientId,
                                 @RequestParam(value = "redirect_uri", required = false) String redirectUri) {
         ModelAndView modelAndView = new ModelAndView("login");
-        String loginName = CookieUtils.getCookie(SpringMVCHolder.getRequest(), "loginName");
         String ip = SpringMVCHolder.getIp();
 
-        // 校验用户名或客户端 IP 是否满足强制开启验证码的条件
-        boolean isValidateCodeLogin = isValidateCodeLogin(loginName, false, false)
-                || isValidateCodeLogin(ip, false, false);
+        // 校验客户端 IP 是否满足强制开启验证码的条件
+        boolean isValidateCodeLogin = isValidateCodeLogin(ip, false, false);
 
         modelAndView.addObject("isValidateCodeLogin", isValidateCodeLogin);
         modelAndView.addObject("isMobile", UserAgentUtils.isMobile(request));
@@ -137,7 +135,6 @@ public class LoginController extends SimpleController {
                 if (isFail) {
                     loginFailNum++;
                     CacheUtils.put("loginFailMap", key, loginFailNum);
-
                 }
                 return loginFailNum >= AppConstants.getLoginAgainSize();
             }
