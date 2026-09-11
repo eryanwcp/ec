@@ -378,9 +378,11 @@ public class LoginController extends SimpleController {
      *
      * @return
      */
-    @GetMapping(value = "sendLoginSms")
+    @PrepareOauth2(enable = false)
+    @RequiresUser(required = false)
+    @PostMapping(value = "sendLoginSms")
     @ResponseBody
-    public Result sendLoginSms() {
+    public Result sendLoginSms(@RequestParam(value = "loginName",required = true) String loginNameOrMobile) {
         return Result.errorResult().setMsg("暂未实现！");
     }
 
