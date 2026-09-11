@@ -227,7 +227,7 @@ public class NoticeController extends SimpleController {
      */
     @GetMapping(value = {"input"})
     public ModelAndView input(@ModelAttribute("model") Notice model,
-                              @RequestParam(value = "receiveUserIds", required = false) List<String> fileIds,
+                              @RequestParam(value = "fileIds", required = false) List<String> fileIds,
                               @RequestParam(value = "receiveUserIds", required = false) List<String> receiveUserIds,
                               @RequestParam(value = "receiveOrganIds", required = false) List<String> receiveOrganIds,
                               @RequestParam(value = "receiveContactGroupIds", required = false) List<String> receiveContactGroupIds,
@@ -248,6 +248,7 @@ public class NoticeController extends SimpleController {
             model.setFileIds(fileIds);
         } else if (!model.getIsNewRecord()) {//修改
             fileIds = noticeService.findFileIdsByNoticeId(model.getId());
+            _fileIds = fileIds;
             model.setFileIds(fileIds);
             files = DiskUtils.findFilesByIds(fileIds);
 
@@ -449,24 +450,17 @@ public class NoticeController extends SimpleController {
         Result result = null;
         SessionInfo sessionInfo = SecurityUtils.getSessionInfo(jsessionid);
         sessionInfo = null != sessionInfo ? sessionInfo : SecurityUtils.getCurrentSessionInfo();
-        Exception exception = null;
         File file = null;
         try {
             FileUploadUtils.assertAllowed(multipartFile, FileUploadUtils.DEFAULT_ALLOWED_EXTENSION, AppConstants.getNoticeMaxUploadSize());
             file = DiskUtils.saveSystemFile(Notice.FOLDER_NOTICE, sessionInfo.getUserId(), multipartFile);
             result = Result.successResult().setObj(file).setMsg("文件上传成功！");
-        } catch (FileUploadSizeException | FileNameLengthLimitExceededException e) {
-            exception = e;
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG);
-        } catch (ActionException | IOException e) {
-            exception = e;
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
         } finally {
-            if (exception != null) {
-                logger.error(exception.getMessage(), exception);
-                if (file != null) {
-                    DiskUtils.deleteFile(file.getId());
-                }
+            if (file != null) {
+                DiskUtils.deleteFile(file.getId());
             }
         }
         return result;

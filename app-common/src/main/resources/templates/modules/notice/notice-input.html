@@ -137,11 +137,13 @@
                     <div th:each="file,iStat : ${files}" th:id="${file.id}" style="font-size: 14px;">
                         <span th:text="${iStat.index + 1}"></span>、
                         <a href="#"
-                           onclick="loadOrOpen([[${file.id}]]);"
+                           th:data-id="${file.id}"
+                           onclick="_download(this.getAttribute('data-id'))"
                            style="color: #0000ff;"
                            th:text="${file.name}">文件名</a>&nbsp;&nbsp;
                         <a href="#"
-                           onclick="delUpload([[${file.id}]]);"
+                           th:data-id="${file.id}"
+                           onclick="'delUpload(this.getAttribute('data-id'));'"
                            style="color: red;">删除</a>
                     </div>
                 </div>

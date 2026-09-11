@@ -277,7 +277,6 @@ public class MobileIndexController extends SimpleController {
         if (null == sessionInfo) {
             return Result.errorResult().setMsg("未授权");
         }
-        Exception exception = null;
         File file = null;
         try {
             String _folderName = "IMAGE";//默认文件夹
@@ -324,27 +323,12 @@ public class MobileIndexController extends SimpleController {
             }
             file = DiskUtils.saveSystemFile(_folderName, FolderType.NORMAL.getValue(), sessionInfo.getUserId(), new CustomMultipartFile(tempFileName,bs));
             result = Result.successResult().setData(file).setMsg("文件上传成功！");
-        } catch (InvalidExtensionException e) {
-            exception = e;
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
-        } catch (FileUploadSizeException e) {
-            exception = e;
+        } catch (IOException | ActionException e) {
+            logger.error(e.getMessage(),e);
             result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG);
-        } catch (FileNameLengthLimitExceededException e) {
-            exception = e;
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG);
-        } catch (ActionException e) {
-            exception = e;
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
-        } catch (IOException e) {
-            exception = e;
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
         } finally {
-            if (exception != null) {
-                logger.error(exception.getMessage(),exception);
-                if (file != null) {
-                    DiskUtils.deleteFile(file.getId());
-                }
+            if (file != null) {
+                DiskUtils.deleteFile(file.getId());
             }
         }
         return result;
@@ -370,7 +354,6 @@ public class MobileIndexController extends SimpleController {
                               HttpServletRequest request, HttpServletResponse response) {
         Result result = null;
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
-        Exception exception = null;
         File file = null;
 
         try {
@@ -478,30 +461,12 @@ public class MobileIndexController extends SimpleController {
             file = DiskUtils.saveSystemFile(_folderName, FolderType.NORMAL.getValue(), sessionInfo.getUserId(), new CustomMultipartFile(tempFileName, uploadBytes));
             result = Result.successResult().setData(file).setMsg("文件上传成功！");
 
-        } catch (InvalidExtensionException e) {
-            exception = e;
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
-        } catch (FileUploadSizeException e) {
-            exception = e;
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG);
-        } catch (FileNameLengthLimitExceededException e) {
-            exception = e;
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG);
-        } catch (ActionException e) {
-            exception = e;
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
-        } catch (IOException e) {
-            exception = e;
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
         } catch (Exception e) {
-            exception = e;
-            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG + e.getMessage());
+            logger.error(e.getMessage(),e);
+            result = Result.errorResult().setMsg(DiskUtils.UPLOAD_FAIL_MSG);
         } finally {
-            if (exception != null) {
-                logger.error(exception.getMessage(), exception);
-                if (file != null) {
-                    DiskUtils.deleteFile(file);
-                }
+            if (file != null) {
+                DiskUtils.deleteFile(file);
             }
         }
         return result;
