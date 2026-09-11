@@ -121,7 +121,15 @@ public class FileUploadUtils {
         MAGIC_BYTES_MAP.put("doc", Arrays.asList(new MagicSignature("D0CF11E0A1B11AE1")));
         MAGIC_BYTES_MAP.put("xls", Arrays.asList(new MagicSignature("D0CF11E0A1B11AE1")));
         MAGIC_BYTES_MAP.put("ppt", Arrays.asList(new MagicSignature("D0CF11E0A1B11AE1")));
-        MAGIC_BYTES_MAP.put("wps", Arrays.asList(new MagicSignature("D0CF11E0A1B11AE1")));
+        MAGIC_BYTES_MAP.put("wps", Arrays.asList(new MagicSignature("D0CF11E0A1B11AE1"),new MagicSignature("504B0304")));
+        MAGIC_BYTES_MAP.put("et", Arrays.asList(
+                new MagicSignature("D0CF11E0A1B11AE1"),
+                new MagicSignature("504B0304")
+        ));
+        MAGIC_BYTES_MAP.put("dps", Arrays.asList(
+                new MagicSignature("D0CF11E0A1B11AE1"),
+                new MagicSignature("504B0304")
+        ));
 
         // 音视频与 Flash
         MAGIC_BYTES_MAP.put("mp3", Arrays.asList(new MagicSignature("494433"), new MagicSignature("FFFB"), new MagicSignature("FFF3"), new MagicSignature("FFF2")));
