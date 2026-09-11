@@ -357,6 +357,11 @@ public class FileUploadUtils {
     }
     /**
      * 是否允许文件上传 (MultipartFile)
+     * @param file
+     * @param allowedExtension
+     * @param maxSize
+     * @throws InvalidExtensionException
+     * @throws FileSizeLimitExceededException
      */
     public static void assertAllowed(MultipartFile file, String[] allowedExtension, long maxSize) throws FileSizeLimitExceededException, InvalidExtensionException {
         assertAllowed(file, allowedExtension, maxSize,false);
