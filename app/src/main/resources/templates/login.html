@@ -288,23 +288,23 @@
             <input type="hidden" id="redirect_uri" name="redirect_uri" th:value="${redirectUri}" />
 
             <div class="input-group">
-                <input type="text" id="loginName" placeholder="请输入账号 / 手机号" autocomplete="username" required />
+                <input type="text" id="loginName" name="loginName" placeholder="请输入账号 / 手机号" autocomplete="username" required />
             </div>
 
             <div class="input-group" id="pwd-group">
-                <input type="password" id="password" placeholder="请输入密码" autocomplete="current-password" />
+                <input type="password" id="password" name="password" placeholder="请输入密码" autocomplete="current-password" />
             </div>
 
             <div class="input-group" id="validateCode-group" style="display: none;">
                 <div class="sms-input-wrapper">
-                    <input type="text" id="validateCode" placeholder="请输入验证码" autocomplete="off" />
+                    <input type="text" id="validateCode" name="validateCode" placeholder="请输入验证码" autocomplete="off" />
                     <img id="validateCodeImg" onclick="refreshCheckCode();" height="38" style="cursor: pointer;" alt="验证码" />
                 </div>
             </div>
 
             <div class="input-group" id="sms-group" style="display: none;">
                 <div class="sms-input-wrapper">
-                    <input type="text" id="sms-code" placeholder="请输入 6 位验证码" autocomplete="one-time-code" />
+                    <input type="text" id="sms-code" name="code" placeholder="请输入 6 位验证码" autocomplete="one-time-code" />
                     <button type="button" id="send-sms-btn" class="send-sms-btn" onclick="sendSmsCode()">获取验证码</button>
                 </div>
             </div>
