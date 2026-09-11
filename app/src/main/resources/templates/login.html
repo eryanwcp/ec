@@ -478,7 +478,7 @@
     }
 
     function refreshCheckCode() {
-        const url = ctx + '/servlet/ValidateCodeServlet?' + new Date().getTime();
+        const url = ctx + '/servlet/ValidateCodeServlet?_=' + new Date().getTime();
         const validateCodeImg = document.getElementById("validateCodeImg");
         validateCodeImg.src = url;
     }
