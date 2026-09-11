@@ -91,7 +91,7 @@ public class LoginController extends SimpleController {
     public ModelAndView welcome(HttpServletRequest request,
                                 @RequestParam(value = "client_id", required = false) String clientId,
                                 @RequestParam(value = "redirect_uri", required = false) String redirectUri) {
-        ModelAndView modelAndView = new ModelAndView("login");
+        ModelAndView modelAndView = new ModelAndView("login.html");
         String ip = SpringMVCHolder.getIp();
 
         // 校验客户端 IP 是否满足强制开启验证码的条件
@@ -210,6 +210,9 @@ public class LoginController extends SimpleController {
         String publicKey = EncryptProvider.publicKeyBase64();
         return Result.successResult().setObj(publicKey);
     }
+
+
+
 
     /**
      * 登录验证
@@ -371,6 +374,37 @@ public class LoginController extends SimpleController {
     }
 
     /**
+     * 发送登录验证码
+     *
+     * @return
+     */
+    @GetMapping(value = "sendLoginSms")
+    @ResponseBody
+    public Result sendLoginSms() {
+        return Result.errorResult().setMsg("暂未实现！");
+    }
+
+    /**
+     * 登录（短信验证码）
+     * @param loginNameOrMobile 账号或手机号
+     * @param code 验证码
+     * @param request
+     * @param uiModel
+     * @return
+     */
+    @PrepareOauth2(enable = false)
+    @RequiresUser(required = false)
+    @ResponseBody
+    @PostMapping(value = {"smsLogin"})
+    public Result smsLogin(@RequestParam(value = "client_id",required = false) String clientId,
+                           @RequestParam(value = "redirect_uri",required = false) String redirectUri,
+                           @RequestParam(value = "loginName",required = true) String loginNameOrMobile,
+                           @RequestParam(name = "code",required = true) String code,
+                           HttpServletRequest request, Model uiModel) {
+        return Result.errorResult().setMsg("暂未实现！");
+    }
+
+    /**
      * 用户注销
      *
      * @param request
@@ -405,6 +439,7 @@ public class LoginController extends SimpleController {
         }
         return "redirect:/";
     }
+
 
     /**
      * 自动登录

@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.eryansky.com/thymeleaf/shiro">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <meta http-equiv="X-UA-Compatible" content="IE=EDGE;chrome=1" />
+    <meta name="renderer" content="webkit">
+    <link rel="shortcut icon" href="/static/img/favicon.ico" th:href="@{/static/img/favicon.ico}" />
+    <title>[[${T(com.eryansky.utils.AppConstants).getAppFullName()}]] - 登录</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #0284c7 100%);
+            color: #333;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 动态背景装饰 */
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(59, 130, 246, 0.2));
+            filter: blur(60px);
+            z-index: 1;
+        }
+
+        .bg-circle-1 {
+            width: 400px;
+            height: 400px;
+            top: -100px;
+            left: -100px;
+        }
+
+        .bg-circle-2 {
+            width: 500px;
+            height: 500px;
+            bottom: -150px;
+            right: -100px;
+        }
+
+        /* 顶部标题栏 */
+        .header {
+            margin-top: 30px;
+            text-align: center;
+            z-index: 2;
+        }
+
+        .header h1 {
+            color: #ffffff;
+            font-size: 26px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .header p {
+            color: #94a3b8;
+            font-size: 13px;
+            margin-top: 6px;
+            letter-spacing: 1px;
+        }
+
+        /* 登录双栏总容器 */
+        .login-card {
+            width: 780px;
+            max-width: 92vw;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(16px);
+            border-radius: 20px;
+            box-shadow: 0 20px 35px -5px rgba(0, 0, 0, 0.3), 0 10px 15px -6px rgba(0, 0, 0, 0.2);
+            z-index: 2;
+            margin: 20px 0;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* 左侧：固定二维码区域 */
+        .login-left-panel {
+            width: 320px;
+            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+            border-right: 1px solid #e2e8f0;
+            padding: 36px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .panel-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 20px;
+        }
+
+        .qr-box {
+            position: relative;
+            width: 190px;
+            height: 190px;
+            margin: 0 auto 16px;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .qr-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* 二维码失效遮罩层 */
+        .qr-mask {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.94);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(2px);
+        }
+
+        .qr-mask.active {
+            display: flex;
+        }
+
+        .qr-mask-icon {
+            width: 38px;
+            height: 38px;
+            background: #0284c7;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .qr-mask p {
+            font-size: 13px;
+            color: #0f172a;
+            font-weight: 600;
+        }
+
+        .qr-mask span {
+            font-size: 11px;
+            color: #0284c7;
+            margin-top: 4px;
+        }
+
+        .qr-tip {
+            font-size: 13px;
+            color: #475569;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .qr-tip span {
+            color: #0284c7;
+            font-weight: 600;
+        }
+
+        /* 客户端下载入口 */
+        .download-link-box {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #0284c7;
+            font-size: 12px;
+            text-decoration: none;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background-color: #e0f2fe;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .download-link-box:hover {
+            background-color: #bae6fd;
+        }
+
+        .download-link-box svg {
+            width: 14px;
+            height: 14px;
+            fill: #0284c7;
+        }
+
+        /* 右侧：账号/验证码登录表单区域 */
+        .login-right-panel {
+            flex: 1;
+            padding: 36px 36px 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* 账号登录 Tabs 切换（账号密码登录 | 验证码登录） */
+        .account-tabs {
+            display: flex;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 24px;
+        }
+
+        .account-tab-btn {
+            flex: 1;
+            padding: 10px 0;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.3s ease;
+        }
+
+        .account-tab-btn.active {
+            color: #0284c7;
+            border-bottom-color: #0284c7;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+            position: relative;
+        }
+
+        .input-group input {
+            width: 100%;
+            height: 44px;
+            padding: 0 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s ease;
+            background-color: #f8fafc;
+        }
+
+        .input-group input:focus {
+            border-color: #0284c7;
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+        }
+
+        .sms-input-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+
+        .sms-input-wrapper input {
+            flex: 1;
+        }
+
+        .send-sms-btn {
+            width: 110px;
+            height: 44px;
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            color: #334155;
+            font-size: 13px;
+            border-radius: 8px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .send-sms-btn:hover {
+            background: #e2e8f0;
+        }
+
+        .submit-btn {
+            width: 100%;
+            height: 44px;
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(2, 132, 199, 0.3);
+            transition: all 0.2s ease;
+            margin-top: 6px;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+
+        /* 底部版权信息 */
+        .footer {
+            margin-bottom: 20px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 13px;
+            z-index: 2;
+            line-height: 1.6;
+        }
+
+        .footer a {
+            color: #cbd5e1;
+            text-decoration: none;
+            margin: 0 8px;
+        }
+
+        .footer a:hover {
+            color: #fff;
+        }
+
+        /* 自定义 Toast 消息提示框组件 */
+        .toast-container {
+            position: fixed;
+            top: 124px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast-item {
+            min-width: 300px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            background: #ffffff;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1e293b;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: auto;
+        }
+
+        .toast-item.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .toast-info .toast-icon { background-color: #0284c7; }
+        .toast-success .toast-icon { background-color: #10b981; }
+        .toast-warning .toast-icon { background-color: #f59e0b; }
+        .toast-error .toast-icon { background-color: #ef4444; }
+
+        /* 响应式适配移动端：移动端变为上下排列 */
+        @media (max-width: 768px) {
+            .login-card {
+                flex-direction: column;
+                width: 90%;
+            }
+            .login-left-panel {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #e2e8f0;
+                padding: 24px;
+            }
+            .login-right-panel {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="bg-circle bg-circle-1"></div>
+<div class="bg-circle bg-circle-2"></div>
+
+<header class="header">
+    <h1>
+        <img th:src="@{/static/img/logo.png}" alt="logo" width="36" height="36">
+        [[${T(com.eryansky.utils.AppConstants).getAppFullName()}]]统一身份验证
+    </h1>
+    <p>Enterprise Unified Portal Access System</p>
+</header>
+<!-- 消息提示容器 -->
+<div id="toast-container" class="toast-container"></div>
+
+<!-- 主双栏卡片容器 -->
+<main class="login-card">
+
+    <!-- 左侧：固定二维码区域 -->
+    <div class="login-left-panel">
+        <div class="panel-title">扫码登录</div>
+        <div class="qr-box">
+            <img id="qr-img" alt="登录二维码">
+            <!-- 过期遮罩层 -->
+            <div id="qr-mask" class="qr-mask">
+                <div id="qr-mask-icon" class="qr-mask-icon">↻</div>
+                <p id="qr-mask-text">二维码已失效</p>
+                <span id="qr-mask-btn" onclick="refreshQRCode()">点击刷新</span>
+            </div>
+        </div>
+
+        <p class="qr-tip">请使用 <span>移动门户 APP</span> 扫码</p>
+
+        <div>
+            <a class="download-link-box" href="javascript:void(0)" onclick="downloadApp()">
+                <svg viewBox="0 0 24 24">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+                </svg>
+                下载移动门户 APP
+            </a>
+        </div>
+    </div>
+
+    <!-- 右侧：账号登录区域 (账号密码登录 | 验证码登录) -->
+    <div class="login-right-panel">
+        <div class="account-tabs">
+            <div class="account-tab-btn active" id="btn-pwd-mode" onclick="switchAccountMode('password')">账号密码登录</div>
+            <div class="account-tab-btn" id="btn-sms-mode" onclick="switchAccountMode('sms')">验证码登录</div>
+        </div>
+
+        <form id="login-form" onsubmit="handleLogin(event)">
+            <input type="hidden" id="client_id" name="client_id" th:value="${clientId}" />
+            <input type="hidden" id="redirect_uri" name="redirect_uri" th:value="${redirectUri}" />
+
+            <div class="input-group">
+                <input type="text" id="loginName" placeholder="请输入账号 / 手机号" required>
+            </div>
+
+            <div class="input-group" id="pwd-group">
+                <input type="password" id="password" placeholder="请输入密码">
+            </div>
+
+            <div class="input-group" id="validateCode-group" style="display: none;">
+                <div class="sms-input-wrapper">
+                    <input type="text" id="validateCode" placeholder="请输入验证码">
+                    <img id="validateCodeImg" th:src="${ctx}+'/servlet/ValidateCodeServlet'"
+                         onclick="refreshCheckCode();" height="38" style="cursor: pointer;"></img>
+                </div>
+            </div>
+
+            <div class="input-group" id="sms-group" style="display: none;">
+                <div class="sms-input-wrapper">
+                    <input type="text" id="sms-code" placeholder="请输入 6 位验证码">
+                    <button type="button" class="send-sms-btn" onclick="sendSmsCode()">获取验证码</button>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">登 录</button>
+        </form>
+    </div>
+
+</main>
+
+<footer class="footer">
+    <p>版权所有 &copy; 2013-[[${#dates.format(new java.util.Date().getTime(), 'yyyy')}]] [[${T(com.eryansky.utils.AppConstants).getAppProductName()}]] [[${T(com.eryansky.utils.AppConstants).getAppProductContact()}]]</p>
+</footer>
+
+<script th:src="@{/static/js/jsencrypt/encrypt.all.min.js}" type="text/javascript"></script>
+<script type="application/javascript" th:inline="javascript">
+    const ctx = /*[[${ctx}]]*/ '';
+    const ctxAdmin = /*[[${ctxAdmin}]]*/ '';
+    let isValidateCodeLogin = /*[[${isValidateCodeLogin}]]*/ '';
+    const securityToken = /*[[${securityToken}]]*/ '';
+    const publicKey = /*[[${publicKey}]]*/ '';
+    const requestEncrypt = /*[[${requestEncrypt}]]*/ '';
+
+    let currentAccountMode = 'password';
+
+    /* ------------------ Toast 消息通知 ------------------ */
+    function showToast(message, type = 'info', duration = 3000) {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast-item toast-${type}`;
+        const iconMap = { info: 'ℹ', success: '✓', warning: '!', error: '✕' };
+
+        toast.innerHTML = `
+                <div class="toast-icon">${iconMap[type] || 'ℹ'}</div>
+                <div>${message}</div>
+            `;
+        container.appendChild(toast);
+        requestAnimationFrame(() => { toast.classList.add('show'); });
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                if (container.contains(toast)) container.removeChild(toast);
+            }, 300);
+        }, duration);
+    }
+
+    function showQrMask(icon, title, btnText, clickable = true) {
+        const mask = document.getElementById('qr-mask');
+        document.getElementById('qr-mask-icon').innerText = icon;
+        document.getElementById('qr-mask-text').innerText = title;
+        const btn = document.getElementById('qr-mask-btn');
+        btn.innerText = btnText;
+
+        if (clickable) {
+            btn.onclick = refreshQRCode;
+            btn.style.cursor = 'pointer';
+        } else {
+            btn.onclick = null;
+            btn.style.cursor = 'default';
+        }
+        mask.classList.add('active');
+    }
+
+    function hideQrMask() {
+        document.getElementById('qr-mask').classList.remove('active');
+    }
+
+    /* ------------------ 表单与模式切换 ------------------ */
+    function switchAccountMode(mode) {
+        currentAccountMode = mode;
+        const btnPwd = document.getElementById('btn-pwd-mode');
+        const btnSms = document.getElementById('btn-sms-mode');
+        const pwdGroup = document.getElementById('pwd-group');
+        const smsGroup = document.getElementById('sms-group');
+        const validateCodeGroup = document.getElementById('validateCode-group');
+        const pwdInput = document.getElementById('password');
+        const smsInput = document.getElementById('sms-code');
+
+        if (mode === 'password') {
+            btnPwd.classList.add('active');
+            btnSms.classList.remove('active');
+            pwdGroup.style.display = 'block';
+            smsGroup.style.display = 'none';
+            if (isValidateCodeLogin) {
+                validateCodeGroup.style.display = 'block';
+            }
+            pwdInput.setAttribute('required', 'true');
+            smsInput.removeAttribute('required');
+        } else {
+            btnSms.classList.add('active');
+            btnPwd.classList.remove('active');
+            pwdGroup.style.display = 'none';
+            smsGroup.style.display = 'block';
+            validateCodeGroup.style.display = 'none';
+            smsInput.setAttribute('required', 'true');
+            pwdInput.removeAttribute('required');
+        }
+    }
+
+    async function sendSmsCode() {
+        const loginName = document.getElementById('loginName').value.trim();
+        if (!loginName) {
+            showToast('请先输入手机号！', 'warning');
+            return;
+        }
+        const params = new URLSearchParams();
+        params.append('loginName', loginName);
+        await fetch(ctxAdmin + "/login/sendLoginSms", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params,
+        }).then(response => response.json())
+            .then(data => {
+                if (data.code === 1) {
+                    showToast(data['msg'], 'success');
+                } else {
+                    showToast(data['msg'], 'error');
+                }
+            }).catch(error => console.error(error));
+    }
+
+    async function handleLogin(e) {
+        e.preventDefault();
+        const client_id = document.getElementById('client_id').value;
+        const redirect_uri = document.getElementById('redirect_uri').value;
+        const loginName = document.getElementById('loginName').value;
+        const validateCodeDom = document.getElementById('validateCode');
+        const validateCodeGroup = document.getElementById('validateCode-group');
+        let encryptKey = '';
+        let requestEncryptKey = '';
+
+        if (currentAccountMode === 'password') {
+            let _password = document.getElementById('password').value;
+            if ("SM4" === requestEncrypt) {
+                encryptKey = Sm4Utils.generateSm4HexKey();
+                requestEncryptKey = RSAUtils.encryptHexString(encryptKey, publicKey);
+                _password = Sm4Utils.encrypt(_password, encryptKey);
+            } else if ("AES" === requestEncrypt) {
+                encryptKey = Cryptos.generateAesBase64Key();
+                requestEncryptKey = RSAUtils.encryptBase64String(encryptKey, publicKey);
+                _password = Cryptos.encrypt(_password, encryptKey);
+            }
+
+            const params = new URLSearchParams();
+            params.append('loginName', loginName);
+            params.append('password', _password);
+            params.append('validateCode', validateCodeDom ? validateCodeDom.value : '');
+            params.append('_csrf_token', securityToken);
+            params.append('client_id', client_id);
+            params.append('redirect_uri', redirect_uri);
+
+            fetch(ctxAdmin + "/login/login", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Encrypt': requestEncrypt,
+                    'Encrypt-Key': requestEncryptKey
+                },
+                body: params,
+            }).then(response => response.json())
+                .then(data => {
+                    if (data.code === 1) {
+                        window.location.href = data['obj'] || (ctxAdmin + '/dwp');
+                    } else if (data.code === 6) {
+                        showToast(data['msg'], 'error');
+                        setTimeout(function () {
+                            window.location.href = data['obj']['url'];
+                        }, 3000);
+                    } else {
+                        showToast(data['msg'], 'error');
+                        if (validateCodeDom) validateCodeDom.value = '';
+                        refreshCheckCode();
+                        if (data.obj !== undefined && data.obj === true) {
+                            isValidateCodeLogin = true;
+                            validateCodeGroup.style.display = 'block';
+                        }
+                    }
+                }).catch(error => console.error(error));
+        } else {
+            const code = document.getElementById('sms-code').value;
+            const params = new URLSearchParams();
+            params.append('loginName', loginName);
+            params.append('code', code);
+            params.append('_csrf_token', securityToken);
+            params.append('client_id', client_id);
+            params.append('redirect_uri', redirect_uri);
+
+            await fetch(ctxAdmin + "/login/smsLogin", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params,
+            }).then(response => response.json())
+                .then(data => {
+                    if (data.code === 1) {
+                        window.location.href = data['obj'] || (ctxAdmin + '/dwp');
+                    } else {
+                        showToast(data['msg'], 'error');
+                    }
+                }).catch(error => console.error(error));
+        }
+    }
+
+    function refreshCheckCode() {
+        const url = ctx + '/servlet/ValidateCodeServlet?' + new Date().getTime();
+        const validateCodeImg = document.getElementById("validateCodeImg");
+        validateCodeImg.src = url;
+    }
+
+
+    const validateCodeGroup = document.getElementById('validateCode-group');
+    if (isValidateCodeLogin) {
+        validateCodeGroup.style.display = 'block';
+    } else {
+        validateCodeGroup.style.display = 'none';
+    }
+</script>
+</body>
+
+</html>
