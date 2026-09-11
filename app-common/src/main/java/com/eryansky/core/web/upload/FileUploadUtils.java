@@ -26,6 +26,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
 import java.util.*;
 
 /**
@@ -354,12 +355,24 @@ public class FileUploadUtils {
         Date now = new Date();
         return DateFormatUtils.format(now, "MM");
     }
+    /**
+     * 是否允许文件上传 (MultipartFile)
+     */
+    public static void assertAllowed(MultipartFile file, String[] allowedExtension, long maxSize) throws FileSizeLimitExceededException, InvalidExtensionException {
+        assertAllowed(file, allowedExtension, maxSize,false);
+    }
 
     /**
      * 是否允许文件上传 (MultipartFile)
      * 包含扩展名校验、文件大小校验以及核心的 Magic Bytes (文件二进制头魔数) 真实校验
+     * @param file
+     * @param allowedExtension
+     * @param maxSize
+     * @param checkMagicBytes 是否开启文件二进制头魔数校验
+     * @throws InvalidExtensionException
+     * @throws FileSizeLimitExceededException
      */
-    public static void assertAllowed(MultipartFile file, String[] allowedExtension, long maxSize)
+    public static void assertAllowed(MultipartFile file, String[] allowedExtension, long maxSize,boolean checkMagicBytes)
             throws InvalidExtensionException, FileSizeLimitExceededException {
 
         String filename = DiskUtils.getMultipartOriginalFilename(file);
@@ -382,22 +395,46 @@ public class FileUploadUtils {
         if (maxSize != -1 && size > maxSize) {
             throw new FileSizeLimitExceededException("not allowed upload size", maxSize, size);
         }
-
         // 3. 【Apache Tika 智能类型校验】
-        try (InputStream is = file.getInputStream()) {
-            if (!checkMagicBytes(is, extension, filename)) {
+        if(checkMagicBytes){
+            try (InputStream is = file.getInputStream()) {
+                if (!checkMagicBytes(is, extension, filename)) {
+                    throwInvalidExtensionException(allowedExtension, extension, filename);
+                }
+            } catch (IOException e) {
+                LogUtils.logError("Failed to check magic bytes for file: " + filename, e);
                 throwInvalidExtensionException(allowedExtension, extension, filename);
             }
-        } catch (IOException e) {
-            LogUtils.logError("Failed to check magic bytes for file: " + filename, e);
-            throwInvalidExtensionException(allowedExtension, extension, filename);
         }
+
     }
 
     /**
      * 是否允许文件上传 (File)
+     * 包含扩展名校验、文件大小校验以及核心的 Magic Bytes (文件二进制头魔数) 真实校验
+     * @param file
+     * @param allowedExtension
+     * @param maxSize
+     * @throws InvalidExtensionException
+     * @throws FileSizeLimitExceededException
      */
     public static void assertAllowed(File file, String[] allowedExtension, long maxSize)
+            throws InvalidExtensionException, FileSizeLimitExceededException {
+        assertAllowed(file, allowedExtension, maxSize, true);
+    }
+
+
+    /**
+     * 是否允许文件上传 (File)
+     * 包含扩展名校验、文件大小校验以及核心的 Magic Bytes (文件二进制头魔数) 真实校验
+     * @param file
+     * @param allowedExtension
+     * @param maxSize
+     * @param checkMagicBytes 是否开启文件二进制头魔数校验
+     * @throws InvalidExtensionException
+     * @throws FileSizeLimitExceededException
+     */
+    public static void assertAllowed(File file, String[] allowedExtension, long maxSize,boolean checkMagicBytes)
             throws InvalidExtensionException, FileSizeLimitExceededException {
 
         String filename = file.getName();
@@ -419,14 +456,17 @@ public class FileUploadUtils {
         }
 
         // 3. 【Apache Tika 智能类型校验】
-        try (InputStream is = new FileInputStream(file)) {
-            if (!checkMagicBytes(is, extension, filename)) {
+        if(checkMagicBytes){
+            try (InputStream is = Files.newInputStream(file.toPath())) {
+                if (!checkMagicBytes(is, extension, filename)) {
+                    throwInvalidExtensionException(allowedExtension, extension, filename);
+                }
+            } catch (IOException e) {
+                LogUtils.logError("Failed to check magic bytes for file: " + filename, e);
                 throwInvalidExtensionException(allowedExtension, extension, filename);
             }
-        } catch (IOException e) {
-            LogUtils.logError("Failed to check magic bytes for file: " + filename, e);
-            throwInvalidExtensionException(allowedExtension, extension, filename);
         }
+
     }
 
     /**
