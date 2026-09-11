@@ -128,15 +128,13 @@ public class LoginController extends SimpleController {
                     return false;
                 }
                 Integer loginFailNum = CacheUtils.get("loginFailMap", key);
-                if (loginFailNum == null) {
-                    loginFailNum = 0;
-                }
+                int failCount = (loginFailNum == null) ? 0 : loginFailNum;
 
                 if (isFail) {
-                    loginFailNum++;
-                    CacheUtils.put("loginFailMap", key, loginFailNum);
+                    failCount++;
+                    CacheUtils.put("loginFailMap", key, failCount);
                 }
-                return loginFailNum >= AppConstants.getLoginAgainSize();
+                return failCount >= AppConstants.getLoginAgainSize();
             }
         });
     }
@@ -524,62 +522,28 @@ public class LoginController extends SimpleController {
     }
 
     private List<SiderbarMenu> resourcesToSiderbarMenu(Collection<Resource> resources) {
-        List<SiderbarMenu> tempMenus = Lists.newArrayList();
         if (Collections3.isEmpty(resources)) {
-            return tempMenus;
+            return Collections.emptyList();
         }
+
+        Map<String, SiderbarMenu> menuMap = new LinkedHashMap<>();
         for (Resource r : resources) {
-            tempMenus.add(resourceToSiderbarMenu(r));
+            SiderbarMenu menu = resourceToSiderbarMenu(r);
+            menuMap.put(menu.getId(), menu);
         }
-        List<SiderbarMenu> tempTreeNodes = Lists.newArrayList();
-        Map<String, SiderbarMenu> tempMap = Maps.newLinkedHashMap();
-        for (SiderbarMenu treeNode : tempMenus) {
-            tempMap.put(treeNode.getId(), treeNode);
-            tempTreeNodes.add(treeNode);
-        }
-        Set<String> keyIds = tempMap.keySet();
-        Set<String> removeKeyIds = Sets.newHashSet();
-        Iterator<String> iteratorKey = keyIds.iterator();
-        while (iteratorKey.hasNext()) {
-            String key = iteratorKey.next();
-            SiderbarMenu treeNode = null;
-            for (SiderbarMenu treeNode1 : tempTreeNodes) {
-                if (treeNode1.getId().equals(key)) {
-                    treeNode = treeNode1;
-                    break;
-                }
-            }
-            if (null != treeNode && StringUtils.isNotBlank(treeNode.getpId())) {
-                SiderbarMenu pTreeNode = getParentSiderbarMenu(treeNode.getpId(), tempTreeNodes);
-                if (pTreeNode != null) {
-                    for (SiderbarMenu treeNode2 : tempTreeNodes) {
-                        if (treeNode2.getId().equals(pTreeNode.getId())) {
-                            treeNode2.addChild(treeNode);
-                            removeKeyIds.add(treeNode.getId());
-                            break;
-                        }
-                    }
-                }
+
+        List<SiderbarMenu> rootMenus = new ArrayList<>();
+        for (SiderbarMenu menu : menuMap.values()) {
+            String pId = menu.getpId();
+            SiderbarMenu parent = StringUtils.isNotBlank(pId) ? menuMap.get(pId) : null;
+
+            if (parent != null) {
+                parent.addChild(menu);
+            } else {
+                rootMenus.add(menu);
             }
         }
-        if (Collections3.isNotEmpty(removeKeyIds)) {
-            keyIds.removeAll(removeKeyIds);
-        }
-        List<SiderbarMenu> result = Lists.newArrayList();
-        keyIds = tempMap.keySet();
-        iteratorKey = keyIds.iterator();
-        while (iteratorKey.hasNext()) {
-            String _key = iteratorKey.next();
-            SiderbarMenu treeNode = null;
-            for (SiderbarMenu treeNode4 : tempTreeNodes) {
-                if (treeNode4.getId().equals(_key)) {
-                    treeNode = treeNode4;
-                    result.add(treeNode);
-                    break;
-                }
-            }
-        }
-        return result;
+        return rootMenus;
     }
 
     private SiderbarMenu resourceToSiderbarMenu(Resource resource) {
