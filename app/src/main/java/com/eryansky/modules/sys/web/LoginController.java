@@ -379,7 +379,7 @@ public class LoginController extends SimpleController {
     @PostMapping(value = "sendLoginSms")
     @ResponseBody
     public Result sendLoginSms(@RequestParam(value = "loginName",required = true) String loginNameOrMobile) {
-        return Result.errorResult().setMsg("暂未实现！");
+        return Result.successResult().setMsg("模拟实现！");
     }
 
     /**
