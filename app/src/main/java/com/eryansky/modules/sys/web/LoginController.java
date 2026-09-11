@@ -262,10 +262,11 @@ public class LoginController extends SimpleController {
                 return Result.errorResult().setMsg(VALIDATECODE_TIP).setObj(isValidateCodeLogin);
             }
             if (!ValidateCodeServlet.validate(request, validateCode)) {
+                msg = "验证码不正确或验证码已过期!";
                 // 验证码输入错误：累加账号与 IP 计数
                 isValidateCodeLogin(loginName, true, false);
                 isValidateCodeLogin(ip, true, false);
-                return Result.errorResult().setMsg("验证码不正确或验证码已过期!").setObj(isValidateCodeLogin);
+                return Result.errorResult().setMsg(msg).setObj(isValidateCodeLogin);
             }
         }
 
@@ -557,17 +558,6 @@ public class LoginController extends SimpleController {
         menu.setUrl(url);
         menu.addAttribute("type", resource.getType());
         return menu;
-    }
-
-    private SiderbarMenu getParentSiderbarMenu(String parentId, Collection<SiderbarMenu> menus) {
-        SiderbarMenu t = null;
-        for (SiderbarMenu menu : menus) {
-            if (parentId.equals(menu.getId())) {
-                t = menu;
-                break;
-            }
-        }
-        return t;
     }
 
     /**
