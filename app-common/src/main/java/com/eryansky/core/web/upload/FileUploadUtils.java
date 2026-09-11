@@ -16,6 +16,7 @@ import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededExcepti
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.tika.Tika;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,13 +26,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 文件上传工具类
@@ -45,6 +40,9 @@ public class FileUploadUtils {
     private static String defaultBaseDir = "disk";
     // 默认的文件名最大长度
     protected static final int DEFAULT_FILE_NAME_LENGTH = 200;
+
+    // 单例复用 Tika 实例（内部线程安全）
+    private static final Tika TIKA = new Tika();
 
     public static final String[] IMAGE_EXTENSION = {
             "jpg", "jpeg", "png", "gif", "bmp", "webp", "heic", "heif", "tif", "tiff", "ico"
@@ -61,7 +59,7 @@ public class FileUploadUtils {
     public static final String[] DEFAULT_ALLOWED_EXTENSION = {
             // 图片
             "jpg", "jpeg", "png", "gif", "bmp", "webp", "heic", "heif", "tif", "tiff", "ico",
-            // word excel powerpoint
+            // word excel powerpoint wps
             "doc", "docx", "xls", "xlsx", "ppt", "pptx", "wps", "et", "dps", "odt", "ods", "odp", "txt", "csv", "rtf",
             // 压缩文件
             "rar", "zip", "gz", "bz2", "7z", "tar",
@@ -72,73 +70,60 @@ public class FileUploadUtils {
     };
 
     /**
-     * 定义支持偏移量的 Magic Byte 签名结构
+     * 扩展名与允许的 MIME 类型映射关系表
+     * 当 Tika 检测出的 MIME 类型在列表中时判定合法
      */
-    public static class MagicSignature {
-        public final int offset;          // 字节偏移量
-        public final String hexSignature; // 十六进制签名
-
-        public MagicSignature(int offset, String hexSignature) {
-            this.offset = offset;
-            this.hexSignature = hexSignature.toUpperCase(Locale.ENGLISH);
-        }
-
-        // 默认偏移量为 0 的便捷构造
-        public MagicSignature(String hexSignature) {
-            this(0, hexSignature);
-        }
-    }
-
-    /**
-     * 常见文件 Magic Bytes (文件头魔数) 签名表
-     */
-    private static final Map<String, List<MagicSignature>> MAGIC_BYTES_MAP = new HashMap<>();
+    private static final Map<String, Set<String>> EXTENSION_MIME_MAP = new HashMap<>();
 
     static {
-        // 图片
-        MAGIC_BYTES_MAP.put("jpg", Arrays.asList(new MagicSignature("FFD8FF")));
-        MAGIC_BYTES_MAP.put("jpeg", Arrays.asList(new MagicSignature("FFD8FF")));
-        MAGIC_BYTES_MAP.put("png", Arrays.asList(new MagicSignature("89504E47")));
-        MAGIC_BYTES_MAP.put("gif", Arrays.asList(new MagicSignature("47494638")));
-        MAGIC_BYTES_MAP.put("bmp", Arrays.asList(new MagicSignature("424D")));
-        MAGIC_BYTES_MAP.put("webp", Arrays.asList(new MagicSignature("52494646"))); // RIFF header
-        MAGIC_BYTES_MAP.put("ico", Arrays.asList(new MagicSignature("00000100")));
-        MAGIC_BYTES_MAP.put("tif", Arrays.asList(new MagicSignature("49492A00"), new MagicSignature("4D4D002A")));
-        MAGIC_BYTES_MAP.put("tiff", Arrays.asList(new MagicSignature("49492A00"), new MagicSignature("4D4D002A")));
+        // 图片类
+        registerMimeTypes("jpg", "image/jpeg");
+//        registerMimeTypes("jpg", "image/jpeg","image/png","image/png","image/gif","image/bmp","image/x-ms-bmp","image/webp","image/x-icon", "image/vnd.microsoft.icon","image/tiff");//兼容写法
+        registerMimeTypes("jpeg", "image/jpeg");
+        registerMimeTypes("png", "image/png");
+        registerMimeTypes("gif", "image/gif");
+        registerMimeTypes("bmp", "image/bmp", "image/x-ms-bmp");
+        registerMimeTypes("webp", "image/webp");
+        registerMimeTypes("ico", "image/x-icon", "image/vnd.microsoft.icon");
+        registerMimeTypes("tif", "image/tiff");
+        registerMimeTypes("tiff", "image/tiff");
 
-        // 文档与压缩包
-        MAGIC_BYTES_MAP.put("pdf", Arrays.asList(new MagicSignature("25504446"))); // %PDF
-        MAGIC_BYTES_MAP.put("zip", Arrays.asList(new MagicSignature("504B0304"), new MagicSignature("504B0506"), new MagicSignature("504B0708"))); // PK..
-        MAGIC_BYTES_MAP.put("rar", Arrays.asList(new MagicSignature("526172211A0700"), new MagicSignature("526172211A0701"))); // Rar!
-        MAGIC_BYTES_MAP.put("7z", Arrays.asList(new MagicSignature("377ABCAF271C")));
-        MAGIC_BYTES_MAP.put("gz", Arrays.asList(new MagicSignature("1F8B")));
-        MAGIC_BYTES_MAP.put("tar", Arrays.asList(new MagicSignature(257, "7573746172"))); // tar 魔数带有257字节偏移
+        // 文档类
+        registerMimeTypes("pdf", "application/pdf");
+        registerMimeTypes("doc", "application/msword", "application/x-tika-msoffice");
+        registerMimeTypes("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/zip");
+        registerMimeTypes("xls", "application/vnd.ms-excel", "application/x-tika-msoffice");
+        registerMimeTypes("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/zip");
+        registerMimeTypes("ppt", "application/vnd.ms-powerpoint", "application/x-tika-msoffice");
+        registerMimeTypes("pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "application/zip");
 
-        // Office 文档 (OpenXML基于ZIP / OLE2二进制格式)
-        MAGIC_BYTES_MAP.put("docx", Arrays.asList(new MagicSignature("504B0304")));
-        MAGIC_BYTES_MAP.put("xlsx", Arrays.asList(new MagicSignature("504B0304")));
-        MAGIC_BYTES_MAP.put("pptx", Arrays.asList(new MagicSignature("504B0304")));
-        MAGIC_BYTES_MAP.put("apk", Arrays.asList(new MagicSignature("504B0304")));
-        MAGIC_BYTES_MAP.put("doc", Arrays.asList(new MagicSignature("D0CF11E0A1B11AE1")));
-        MAGIC_BYTES_MAP.put("xls", Arrays.asList(new MagicSignature("D0CF11E0A1B11AE1")));
-        MAGIC_BYTES_MAP.put("ppt", Arrays.asList(new MagicSignature("D0CF11E0A1B11AE1")));
-        MAGIC_BYTES_MAP.put("wps", Arrays.asList(new MagicSignature("D0CF11E0A1B11AE1"),new MagicSignature("504B0304")));
-        MAGIC_BYTES_MAP.put("et", Arrays.asList(
-                new MagicSignature("D0CF11E0A1B11AE1"),
-                new MagicSignature("504B0304")
-        ));
-        MAGIC_BYTES_MAP.put("dps", Arrays.asList(
-                new MagicSignature("D0CF11E0A1B11AE1"),
-                new MagicSignature("504B0304")
-        ));
+        // WPS 专属与兼容支持
+        registerMimeTypes("wps", "application/kswps", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/x-tika-msoffice", "application/zip");
+        registerMimeTypes("et", "application/kset", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/x-tika-msoffice", "application/zip");
+        registerMimeTypes("dps", "application/ksdps", "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "application/x-tika-msoffice", "application/zip");
+
+        // 压缩包与归档类
+        registerMimeTypes("zip", "application/zip", "application/x-zip-compressed");
+        registerMimeTypes("rar", "application/x-rar-compressed", "application/vnd.rar");
+        registerMimeTypes("7z", "application/x-7z-compressed");
+        registerMimeTypes("tar", "application/x-tar");
+        registerMimeTypes("gz", "application/gzip", "application/x-gzip");
 
         // 音视频与 Flash
-        MAGIC_BYTES_MAP.put("mp3", Arrays.asList(new MagicSignature("494433"), new MagicSignature("FFFB"), new MagicSignature("FFF3"), new MagicSignature("FFF2")));
-        MAGIC_BYTES_MAP.put("wav", Arrays.asList(new MagicSignature("52494646")));
-        MAGIC_BYTES_MAP.put("avi", Arrays.asList(new MagicSignature("52494646")));
-        MAGIC_BYTES_MAP.put("swf", Arrays.asList(new MagicSignature("435753"), new MagicSignature("465753"), new MagicSignature("5A5753")));
-        MAGIC_BYTES_MAP.put("flv", Arrays.asList(new MagicSignature("464C56")));
-        MAGIC_BYTES_MAP.put("mp4", Arrays.asList(new MagicSignature(4, "66747970"))); // mp4 'ftyp' 魔数带有4字节偏移
+        registerMimeTypes("mp3", "audio/mpeg", "audio/mp3");
+        registerMimeTypes("mp4", "video/mp4");
+        registerMimeTypes("wav", "audio/wav", "audio/x-wav");
+        registerMimeTypes("avi", "video/x-msvideo");
+        registerMimeTypes("flv", "video/x-flv");
+        registerMimeTypes("swf", "application/x-shockwave-flash");
+
+        // 应用安装包
+        registerMimeTypes("apk", "application/vnd.android.package-archive", "application/zip");
+    }
+
+    private static void registerMimeTypes(String extension, String... mimeTypes) {
+        EXTENSION_MIME_MAP.computeIfAbsent(extension.toLowerCase(Locale.ENGLISH), k -> new HashSet<>())
+                .addAll(Arrays.asList(mimeTypes));
     }
 
     private static int counter = 0;
@@ -153,32 +138,17 @@ public class FileUploadUtils {
 
     /**
      * 以默认配置进行文件上传
-     *
-     * @param request 当前请求
-     * @param file    上传的文件
-     * @param result  添加出错信息
-     * @return 上传成功的文件路径/名称
      */
     public static String upload(HttpServletRequest request, MultipartFile file, BindingResult result) {
         return upload(request, file, result, DEFAULT_ALLOWED_EXTENSION);
     }
 
-
     /**
      * 以默认配置进行文件上传
-     *
-     * @param request          当前请求
-     * @param file             上传的文件
-     * @param result           添加出错信息
-     * @param allowedExtension 允许上传的文件类型
-     * @return
      */
     public static String upload(HttpServletRequest request, MultipartFile file, BindingResult result, String[] allowedExtension) {
         try {
             return upload(request, getDefaultBaseDir(), file, allowedExtension, DEFAULT_MAX_SIZE, true, null);
-        } catch (IOException e) {
-            LogUtils.logError("file upload error", e);
-            result.reject("upload.server.error");
         } catch (InvalidExtensionException.InvalidImageExtensionException e) {
             result.reject("upload.not.allow.image.extension");
         } catch (InvalidExtensionException.InvalidFlashExtensionException e) {
@@ -191,21 +161,15 @@ public class FileUploadUtils {
             result.reject("upload.exceed.maxSize");
         } catch (FileNameLengthLimitExceededException e) {
             result.reject("upload.filename.exceed.length");
+        } catch (IOException e) {
+            LogUtils.logError("file upload error", e);
+            result.reject("upload.server.error");
         }
         return null;
     }
 
     /**
-     * 文件上传
-     *
-     * @param request                   当前请求 从请求中提取 应用上下文根
-     * @param dir                       当request不为空,入参为相对应用的基目录;当为空时,入参为除配置路径外的文件夹相对路径
-     * @param file                      上传的文件
-     * @param allowedExtension          允许的文件类型 null 表示允许所有
-     * @param maxSize                   最大上传的大小 -1 表示不限制
-     * @param needDatePathAndRandomName 是否需要日期目录和随机文件名前缀
-     * @param _prefix                   文件名前缀 建议在needDatePathAndRandomName为false时使用
-     * @return 返回上传成功的文件名
+     * 文件上传 (MultipartFile)
      */
     public static String upload(HttpServletRequest request, String dir, MultipartFile file, String[] allowedExtension, long maxSize, boolean needDatePathAndRandomName, String _prefix)
             throws InvalidExtensionException, IOException, FileNameLengthLimitExceededException, FileSizeLimitExceededException {
@@ -419,9 +383,9 @@ public class FileUploadUtils {
             throw new FileSizeLimitExceededException("not allowed upload size", maxSize, size);
         }
 
-        // 3. 【核心安全修复】Magic Bytes 真实文件头部二进制校验
+        // 3. 【Apache Tika 智能类型校验】
         try (InputStream is = file.getInputStream()) {
-            if (!checkMagicBytes(is, extension)) {
+            if (!checkMagicBytes(is, extension, filename)) {
                 throwInvalidExtensionException(allowedExtension, extension, filename);
             }
         } catch (IOException e) {
@@ -437,12 +401,9 @@ public class FileUploadUtils {
             throws InvalidExtensionException, FileSizeLimitExceededException {
 
         String filename = file.getName();
-
-        // 【安全修复】防御空字节注入、目录遍历异常字符
         if (StringUtils.isBlank(filename) || filename.contains("../") || filename.contains("..\\") || filename.indexOf('\0') != -1) {
             throw new IllegalArgumentException("Invalid filename format.");
         }
-
         filename = FilenameUtils.getName(filename);
         String extension = FilenameUtils.getExtension(filename);
 
@@ -457,9 +418,9 @@ public class FileUploadUtils {
             throw new FileSizeLimitExceededException("not allowed upload size", maxSize, size);
         }
 
-        // 3. 【核心安全修复】Magic Bytes 真实文件头部二进制校验
-        try (InputStream is = Files.newInputStream(file.toPath())) {
-            if (!checkMagicBytes(is, extension)) {
+        // 3. 【Apache Tika 智能类型校验】
+        try (InputStream is = new FileInputStream(file)) {
+            if (!checkMagicBytes(is, extension, filename)) {
                 throwInvalidExtensionException(allowedExtension, extension, filename);
             }
         } catch (IOException e) {
@@ -485,91 +446,49 @@ public class FileUploadUtils {
     }
 
     /**
-     * 读取 InputStream 前若干字节并校验是否匹配扩展名的 Magic Bytes 头部特征 (支持动态偏移量)
+     * 使用 Apache Tika 校验流的真实 MIME 类型与扩展名是否相符
      *
-     * @param inputStream 文件输入流
-     * @param extension   扩展名
-     * @return true: 匹配或未配置 Magic Bytes (放行文本等无魔数类型); false: 文件类型伪造
+     * @param inputStream 文件流
+     * @param extension   文件扩展名
+     * @param filename    原始文件名（辅助 Tika 提高检测准确度）
+     * @return true校验通过，false校验失败
      */
-    public static boolean checkMagicBytes(InputStream inputStream, String extension) {
+    public static boolean checkMagicBytes(InputStream inputStream, String extension, String filename) {
         if (inputStream == null || StringUtils.isBlank(extension)) {
             return false;
         }
 
         String ext = extension.toLowerCase(Locale.ENGLISH);
-        List<MagicSignature> signatures = MAGIC_BYTES_MAP.get(ext);
+        Set<String> allowedMimes = EXTENSION_MIME_MAP.get(ext);
 
-        // 未在魔数表中定义的类型（如 txt, csv 等无固定魔数的纯文本/数据文件），跳过魔数比对放行
-        if (signatures == null || signatures.isEmpty()) {
+        // 1. 对于未配置 MIME 校验规则的扩展名（例如 txt, csv 等无魔数文件），直接放行
+        if (allowedMimes == null || allowedMimes.isEmpty()) {
             return true;
         }
 
         try {
-            // 1. 动态计算该文件类型需要读取的最大字节深度 (最大偏移量 + 签名长度)
-            int maxRequiredBytes = 0;
-            for (MagicSignature sig : signatures) {
-                int required = sig.offset + (sig.hexSignature.length() / 2);
-                if (required > maxRequiredBytes) {
-                    maxRequiredBytes = required;
-                }
-            }
+            // 2. 利用 Tika 自动探测二进制文件的真实 MIME 类型
+            // 传入 filename 可以提供后缀线索，提高分析容器类文件（如 epub, zip, office 等）的效率
+            String detectedMimeType = TIKA.detect(inputStream, filename);
 
-            // 2. 保证缓冲数组足够大（至少读取 64 字节，如果有大偏移量如 tar 则根据最大需求动态扩容）
-            int bufferSize = Math.max(64, maxRequiredBytes);
-            byte[] header = new byte[bufferSize];
-
-            // 3. 循环读取直到满足所需的字节数或流结束
-            int bytesRead = 0;
-            int read;
-            while (bytesRead < bufferSize && (read = inputStream.read(header, bytesRead, bufferSize - bytesRead)) != -1) {
-                bytesRead += read;
-            }
-
-            if (bytesRead == 0) {
+            if (StringUtils.isBlank(detectedMimeType)) {
                 return false;
             }
 
-            // 4. 将读取到的字节流转为十六进制字符串
-            String fileHeaderHex = bytesToHex(header, bytesRead);
-
-            // 5. 根据各个签名的【偏移量】精准比对
-            for (MagicSignature signature : signatures) {
-                int hexOffset = signature.offset * 2; // 字节偏移量转为16进制字符串偏移量 (1 byte = 2 hex chars)
-                String expectedHex = signature.hexSignature;
-
-                // 确保读取到的内容长度足够包含该签名
-                if (fileHeaderHex.length() >= hexOffset + expectedHex.length()) {
-                    String actualHex = fileHeaderHex.substring(hexOffset, hexOffset + expectedHex.length());
-                    if (actualHex.equals(expectedHex)) {
-                        return true;
-                    }
-                }
-            }
-            return false;
+            // 3. 判断探测出来的 MIME 是否在扩展名允许列表中
+            return allowedMimes.contains(detectedMimeType.toLowerCase(Locale.ENGLISH));
 
         } catch (IOException e) {
-            LogUtils.logError("Read file magic bytes error", e);
+            LogUtils.logError("Tika detect file error", e);
             return false;
         }
     }
 
     /**
-     * 字节数组转 Hex 字符串
+     * 兼容重载：无需文件名入参的魔数校验接口
      */
-    private static String bytesToHex(byte[] src, int length) {
-        StringBuilder stringBuilder = new StringBuilder();
-        if (src == null || length <= 0) {
-            return "";
-        }
-        for (int i = 0; i < length; i++) {
-            int v = src[i] & 0xFF;
-            String hv = Integer.toHexString(v).toUpperCase(Locale.ENGLISH);
-            if (hv.length() < 2) {
-                stringBuilder.append('0');
-            }
-            stringBuilder.append(hv);
-        }
-        return stringBuilder.toString();
+    public static boolean checkMagicBytes(InputStream inputStream, String extension) {
+        return checkMagicBytes(inputStream, extension, null);
     }
 
     /**
