@@ -63,7 +63,7 @@ function uploadify() {
 
 
 
-function loadOrOpen(fileId) {
+function _download(fileId) {
     $('#annexFrame').attr('src', ctxAdmin + '/disk/fileDownload/' + fileId);
 }
 
