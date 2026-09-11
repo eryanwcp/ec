@@ -572,7 +572,7 @@ public class FileUploadUtils {
      * @param allowedExtension 允许的扩展名列表
      * @return 是否允许
      */
-    public static final boolean isAllowedExtension(String extension, String[] allowedExtension) {
+    public static boolean isAllowedExtension(String extension, String[] allowedExtension) {
         if (StringUtils.isBlank(extension) || allowedExtension == null) {
             return false;
         }
@@ -585,7 +585,7 @@ public class FileUploadUtils {
      * @param request HTTP 请求
      * @return 实际存储根路径
      */
-    public static final String extractUploadDir(HttpServletRequest request) {
+    public static String extractUploadDir(HttpServletRequest request) {
         return request.getSession().getServletContext().getRealPath("/");
     }
 
@@ -596,7 +596,7 @@ public class FileUploadUtils {
      * @param fileName 相对或绝对文件名
      * @throws IOException
      */
-    public static final void delete(HttpServletRequest request, String fileName) throws IOException {
+    public static void delete(HttpServletRequest request, String fileName) throws IOException {
         if (StringUtils.isEmpty(fileName)) {
             return;
         }
