@@ -32,6 +32,7 @@ import com.eryansky.core.web.annotation.Mobile;
 import com.eryansky.core.web.annotation.MobileValue;
 import com.eryansky.encrypt.config.EncryptProvider;
 import com.eryansky.encrypt.util.RequestEncryptUtils;
+import com.eryansky.j2cache.lock.DefaultLockCallback;
 import com.eryansky.modules.sys.mapper.Resource;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.service.ResourceService;
@@ -121,20 +122,26 @@ public class LoginController extends SimpleController {
         if (StringUtils.isBlank(key)) {
             return false;
         }
+        return CacheUtils.getCacheChannel().lock("loginFailMap", 5, 10, new DefaultLockCallback<Boolean>(false, false) {
+            @Override
+            public Boolean handleObtainLock() {
+                if (clean) {
+                    CacheUtils.remove("loginFailMap",key);
+                    return false;
+                }
+                Integer loginFailNum = CacheUtils.get("loginFailMap",key);
+                if (loginFailNum == null) {
+                    loginFailNum = 0;
+                }
 
-        Integer loginFailNum = CacheUtils.get("loginFailMap",key);
-        if (loginFailNum == null) {
-            loginFailNum = 0;
-        }
-        if (isFail) {
-            loginFailNum++;
-            CacheUtils.put("loginFailMap",key,loginFailNum);
-        }
-        if (clean) {
-            CacheUtils.remove("loginFailMap",key);
-            return false;
-        }
-        return loginFailNum >= AppConstants.getLoginAgainSize();
+                if (isFail) {
+                    loginFailNum++;
+                    CacheUtils.put("loginFailMap",key,loginFailNum);
+
+                }
+                return loginFailNum >= AppConstants.getLoginAgainSize();
+            }
+        });
     }
 
     /**
@@ -162,7 +169,11 @@ public class LoginController extends SimpleController {
         if (StringUtils.isBlank(loginName)) {
             return;
         }
-        if (null != AppConstants.getLimitUserWhiteList().stream().filter(v -> StringUtils.simpleWildcardMatch(v, loginName.toUpperCase())).findAny().orElse(null)) {
+
+        boolean isWhitelisted = AppConstants.getLimitUserWhiteList().stream()
+                .anyMatch(v -> StringUtils.simpleWildcardMatch(v, loginName.toUpperCase()));
+
+        if (isWhitelisted) {
             return;
         }
         int maxSize = AppConstants.getSessionUserMaxSize();
@@ -188,7 +199,7 @@ public class LoginController extends SimpleController {
         String randomSecurityToken = Identities.randomBase62(64);
         String publicKey = EncryptProvider.publicKeyBase64();
         Map<String, Object> data = Maps.newHashMap();
-        data.put("securityToken:", randomSecurityToken);
+        data.put("securityToken", randomSecurityToken);
         data.put("publicKey", publicKey);
         return Result.successResult().setObj(data);
     }
