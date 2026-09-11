@@ -85,7 +85,6 @@ public class LoginController extends SimpleController {
      * @return
      */
     @PrepareOauth2(enable = false)
-    @Mobile(value = MobileValue.ALL)
     @RequiresUser(required = false)
     @GetMapping(value = {"welcome", ""})
     public ModelAndView welcome(HttpServletRequest request,
@@ -102,6 +101,7 @@ public class LoginController extends SimpleController {
 
         String randomSecurityToken = Identities.randomBase62(64);
         WebUtils.setSessionAttribute(request, "securityToken", randomSecurityToken);
+        modelAndView.addObject("securityToken", randomSecurityToken);
         modelAndView.addObject("redirectUri", redirectUri);
         modelAndView.addObject("clientId", clientId);
         return modelAndView;
@@ -260,7 +260,7 @@ public class LoginController extends SimpleController {
         boolean isValidateCodeLogin = isValidateCodeLogin(loginName, false, false)
                 || isValidateCodeLogin(ip, false, false);
 
-        if (isValidateCodeLogin && UserAgentUtils.isComputer(request)) {
+        if (isValidateCodeLogin) {
             if (StringUtils.isBlank(validateCode)) {
                 return Result.errorResult().setMsg(VALIDATECODE_TIP).setObj(isValidateCodeLogin);
             }
@@ -364,7 +364,7 @@ public class LoginController extends SimpleController {
 
             // 返回成功并清理对应账户和 IP 的登录失败计数
             Map<String, Object> data = Maps.newHashMap();
-            data.put("homeUrl", resultUrl);
+            data.put("url", resultUrl);
             result = new Result(Result.SUCCESS, "用户验证通过!", data);
 
             isValidateCodeLogin(loginName, false, true);

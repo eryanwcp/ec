@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.eryansky.com/thymeleaf/shiro">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,14 +15,11 @@
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         }
-
-        html,
-        body {
+        html, body {
             width: 100%;
             height: 100vh;
             overflow: hidden;
         }
-
         body {
             min-height: 100vh;
             display: flex;
@@ -35,7 +31,6 @@
             position: relative;
             overflow-x: hidden;
         }
-
         /* 动态背景装饰 */
         .bg-circle {
             position: absolute;
@@ -44,28 +39,24 @@
             filter: blur(60px);
             z-index: 1;
         }
-
         .bg-circle-1 {
             width: 400px;
             height: 400px;
             top: -100px;
             left: -100px;
         }
-
         .bg-circle-2 {
             width: 500px;
             height: 500px;
             bottom: -150px;
             right: -100px;
         }
-
         /* 顶部标题栏 */
         .header {
-            margin-top: 30px;
+            margin-top: 40px;
             text-align: center;
             z-index: 2;
         }
-
         .header h1 {
             color: #ffffff;
             font-size: 26px;
@@ -76,169 +67,37 @@
             justify-content: center;
             gap: 12px;
         }
-
         .header p {
             color: #94a3b8;
             font-size: 13px;
             margin-top: 6px;
             letter-spacing: 1px;
         }
-
-        /* 登录双栏总容器 */
+        /* 单栏登录卡片容器 */
         .login-card {
-            width: 780px;
-            max-width: 92vw;
+            width: 420px;
+            max-width: 90vw;
             background: rgba(255, 255, 255, 0.96);
             backdrop-filter: blur(16px);
             border-radius: 20px;
             box-shadow: 0 20px 35px -5px rgba(0, 0, 0, 0.3), 0 10px 15px -6px rgba(0, 0, 0, 0.2);
             z-index: 2;
             margin: 20px 0;
-            display: flex;
             overflow: hidden;
         }
-
-        /* 左侧：固定二维码区域 */
-        .login-left-panel {
-            width: 320px;
-            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-            border-right: 1px solid #e2e8f0;
-            padding: 36px 24px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            flex-shrink: 0;
-        }
-
-        .panel-title {
-            font-size: 17px;
-            font-weight: 600;
-            color: #0f172a;
-            margin-bottom: 20px;
-        }
-
-        .qr-box {
-            position: relative;
-            width: 190px;
-            height: 190px;
-            margin: 0 auto 16px;
-            padding: 10px;
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            background: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-            overflow: hidden;
-        }
-
-        .qr-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        /* 二维码失效遮罩层 */
-        .qr-mask {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.94);
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            backdrop-filter: blur(2px);
-        }
-
-        .qr-mask.active {
-            display: flex;
-        }
-
-        .qr-mask-icon {
-            width: 38px;
-            height: 38px;
-            background: #0284c7;
-            color: #fff;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            margin-bottom: 8px;
-        }
-
-        .qr-mask p {
-            font-size: 13px;
-            color: #0f172a;
-            font-weight: 600;
-        }
-
-        .qr-mask span {
-            font-size: 11px;
-            color: #0284c7;
-            margin-top: 4px;
-        }
-
-        .qr-tip {
-            font-size: 13px;
-            color: #475569;
-            margin-bottom: 16px;
-            line-height: 1.5;
-        }
-
-        .qr-tip span {
-            color: #0284c7;
-            font-weight: 600;
-        }
-
-        /* 客户端下载入口 */
-        .download-link-box {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            color: #0284c7;
-            font-size: 12px;
-            text-decoration: none;
-            padding: 6px 14px;
-            border-radius: 20px;
-            background-color: #e0f2fe;
-            transition: all 0.2s ease;
-            font-weight: 500;
-        }
-
-        .download-link-box:hover {
-            background-color: #bae6fd;
-        }
-
-        .download-link-box svg {
-            width: 14px;
-            height: 14px;
-            fill: #0284c7;
-        }
-
-        /* 右侧：账号/验证码登录表单区域 */
+        /* 账号/验证码登录表单区域 */
         .login-right-panel {
-            flex: 1;
             padding: 36px 36px 30px;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
-
-        /* 账号登录 Tabs 切换（账号密码登录 | 验证码登录） */
+        /* 账号登录 Tabs 切换 */
         .account-tabs {
             display: flex;
             border-bottom: 2px solid #e2e8f0;
             margin-bottom: 24px;
         }
-
         .account-tab-btn {
             flex: 1;
             padding: 10px 0;
@@ -251,17 +110,14 @@
             margin-bottom: -2px;
             transition: all 0.3s ease;
         }
-
         .account-tab-btn.active {
             color: #0284c7;
             border-bottom-color: #0284c7;
         }
-
         .input-group {
             margin-bottom: 18px;
             position: relative;
         }
-
         .input-group input {
             width: 100%;
             height: 44px;
@@ -273,22 +129,18 @@
             transition: all 0.2s ease;
             background-color: #f8fafc;
         }
-
         .input-group input:focus {
             border-color: #0284c7;
             background-color: #fff;
             box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
         }
-
         .sms-input-wrapper {
             display: flex;
             gap: 10px;
         }
-
         .sms-input-wrapper input {
             flex: 1;
         }
-
         .send-sms-btn {
             width: 110px;
             height: 44px;
@@ -301,11 +153,9 @@
             white-space: nowrap;
             transition: all 0.2s;
         }
-
         .send-sms-btn:hover {
             background: #e2e8f0;
         }
-
         .submit-btn {
             width: 100%;
             height: 44px;
@@ -320,12 +170,10 @@
             transition: all 0.2s ease;
             margin-top: 6px;
         }
-
         .submit-btn:hover {
             opacity: 0.95;
             transform: translateY(-1px);
         }
-
         /* 底部版权信息 */
         .footer {
             margin-bottom: 20px;
@@ -335,17 +183,14 @@
             z-index: 2;
             line-height: 1.6;
         }
-
         .footer a {
             color: #cbd5e1;
             text-decoration: none;
             margin: 0 8px;
         }
-
         .footer a:hover {
             color: #fff;
         }
-
         /* 自定义 Toast 消息提示框组件 */
         .toast-container {
             position: fixed;
@@ -358,7 +203,6 @@
             gap: 10px;
             pointer-events: none;
         }
-
         .toast-item {
             min-width: 300px;
             padding: 12px 20px;
@@ -376,12 +220,10 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             pointer-events: auto;
         }
-
         .toast-item.show {
             opacity: 1;
             transform: translateY(0);
         }
-
         .toast-icon {
             width: 20px;
             height: 20px;
@@ -393,23 +235,14 @@
             color: #fff;
             flex-shrink: 0;
         }
-
         .toast-info .toast-icon { background-color: #0284c7; }
         .toast-success .toast-icon { background-color: #10b981; }
         .toast-warning .toast-icon { background-color: #f59e0b; }
         .toast-error .toast-icon { background-color: #ef4444; }
 
-        /* 响应式适配移动端：移动端变为上下排列 */
         @media (max-width: 768px) {
             .login-card {
-                flex-direction: column;
                 width: 90%;
-            }
-            .login-left-panel {
-                width: 100%;
-                border-right: none;
-                border-bottom: 1px solid #e2e8f0;
-                padding: 24px;
             }
             .login-right-panel {
                 padding: 24px;
@@ -417,9 +250,7 @@
         }
     </style>
 </head>
-
 <body>
-
 <div class="bg-circle bg-circle-1"></div>
 <div class="bg-circle bg-circle-2"></div>
 
@@ -430,38 +261,12 @@
     </h1>
     <p>Enterprise Unified Portal Access System</p>
 </header>
+
 <!-- 消息提示容器 -->
 <div id="toast-container" class="toast-container"></div>
 
-<!-- 主双栏卡片容器 -->
+<!-- 主卡片容器（单栏布局） -->
 <main class="login-card">
-
-    <!-- 左侧：固定二维码区域 -->
-    <div class="login-left-panel">
-        <div class="panel-title">扫码登录</div>
-        <div class="qr-box">
-            <img id="qr-img" alt="登录二维码">
-            <!-- 过期遮罩层 -->
-            <div id="qr-mask" class="qr-mask">
-                <div id="qr-mask-icon" class="qr-mask-icon">↻</div>
-                <p id="qr-mask-text">二维码已失效</p>
-                <span id="qr-mask-btn" onclick="refreshQRCode()">点击刷新</span>
-            </div>
-        </div>
-
-        <p class="qr-tip">请使用 <span>移动门户 APP</span> 扫码</p>
-
-        <div>
-            <a class="download-link-box" href="javascript:void(0)" onclick="downloadApp()">
-                <svg viewBox="0 0 24 24">
-                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
-                </svg>
-                下载移动门户 APP
-            </a>
-        </div>
-    </div>
-
-    <!-- 右侧：账号登录区域 (账号密码登录 | 验证码登录) -->
     <div class="login-right-panel">
         <div class="account-tabs">
             <div class="account-tab-btn active" id="btn-pwd-mode" onclick="switchAccountMode('password')">账号密码登录</div>
@@ -516,7 +321,6 @@
 
     let currentAccountMode = 'password';
 
-    /* ------------------ Toast 消息通知 ------------------ */
     function showToast(message, type = 'info', duration = 3000) {
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
@@ -537,26 +341,6 @@
         }, duration);
     }
 
-    function showQrMask(icon, title, btnText, clickable = true) {
-        const mask = document.getElementById('qr-mask');
-        document.getElementById('qr-mask-icon').innerText = icon;
-        document.getElementById('qr-mask-text').innerText = title;
-        const btn = document.getElementById('qr-mask-btn');
-        btn.innerText = btnText;
-
-        if (clickable) {
-            btn.onclick = refreshQRCode;
-            btn.style.cursor = 'pointer';
-        } else {
-            btn.onclick = null;
-            btn.style.cursor = 'default';
-        }
-        mask.classList.add('active');
-    }
-
-    function hideQrMask() {
-        document.getElementById('qr-mask').classList.remove('active');
-    }
 
     /* ------------------ 表单与模式切换 ------------------ */
     function switchAccountMode(mode) {
@@ -593,7 +377,7 @@
     async function sendSmsCode() {
         const loginName = document.getElementById('loginName').value.trim();
         if (!loginName) {
-            showToast('请先输入手机号！', 'warning');
+            showToast('请输入账号/手机号', 'warning');
             return;
         }
         const params = new URLSearchParams();
@@ -653,7 +437,7 @@
             }).then(response => response.json())
                 .then(data => {
                     if (data.code === 1) {
-                        window.location.href = data['obj'] || (ctxAdmin + '/dwp');
+                        window.location.href = data['obj']['url'] || (ctxAdmin);
                     } else if (data.code === 6) {
                         showToast(data['msg'], 'error');
                         setTimeout(function () {
@@ -685,7 +469,7 @@
             }).then(response => response.json())
                 .then(data => {
                     if (data.code === 1) {
-                        window.location.href = data['obj'] || (ctxAdmin + '/dwp');
+                        window.location.href = data['obj'] || (ctxAdmin);
                     } else {
                         showToast(data['msg'], 'error');
                     }
