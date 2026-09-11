@@ -122,21 +122,21 @@ public class LoginController extends SimpleController {
         if (StringUtils.isBlank(key)) {
             return false;
         }
-        return CacheUtils.getCacheChannel().lock("loginFailMap", 5, 10, new DefaultLockCallback<Boolean>(false, false) {
+        return CacheUtils.getCacheChannel().lock("loginFailMap:" + key, 5, 10, new DefaultLockCallback<Boolean>(false, false) {
             @Override
             public Boolean handleObtainLock() {
                 if (clean) {
-                    CacheUtils.remove("loginFailMap",key);
+                    CacheUtils.remove("loginFailMap", key);
                     return false;
                 }
-                Integer loginFailNum = CacheUtils.get("loginFailMap",key);
+                Integer loginFailNum = CacheUtils.get("loginFailMap", key);
                 if (loginFailNum == null) {
                     loginFailNum = 0;
                 }
 
                 if (isFail) {
                     loginFailNum++;
-                    CacheUtils.put("loginFailMap",key,loginFailNum);
+                    CacheUtils.put("loginFailMap", key, loginFailNum);
 
                 }
                 return loginFailNum >= AppConstants.getLoginAgainSize();
