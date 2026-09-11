@@ -135,7 +135,6 @@ public class LoginController extends SimpleController {
                 if (isFail) {
                     loginFailNum++;
                     CacheUtils.put("loginFailMap", key, loginFailNum);
-
                 }
                 return loginFailNum >= AppConstants.getLoginAgainSize();
             }
