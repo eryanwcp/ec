@@ -6,7 +6,6 @@
 package com.eryansky.modules.notice.mapper;
 
 import com.eryansky.common.utils.collections.Collections3;
-import com.eryansky.core.security.xss.XssIgnore;
 import com.eryansky.modules.disk.utils.DiskUtils;
 import com.eryansky.modules.notice._enum.MessageChannel;
 import com.eryansky.modules.sys._enum.YesOrNo;
@@ -44,7 +43,6 @@ public class Notice extends DataEntity<Notice> {
     /**
      * 通知公告标题
      */
-    @XssIgnore
     private String title;
     /**
      * 标题图
@@ -57,7 +55,6 @@ public class Notice extends DataEntity<Notice> {
     /**
      * 通知公告内容
      */
-    @XssIgnore
     private String content;
     /**
      * 附件

@@ -5,7 +5,6 @@
  */
 package com.eryansky.modules.notice.mapper;
 
-import com.eryansky.core.security.xss.XssIgnore;
 import com.eryansky.modules.notice._enum.MessageChannel;
 import com.eryansky.modules.notice._enum.MessageType;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -42,7 +41,6 @@ public class Message extends DataEntity<Message> {
     /**
      * 标题
      */
-    @XssIgnore
     private String title;
     /**
      * 链接
@@ -56,7 +54,6 @@ public class Message extends DataEntity<Message> {
     /**
      * 内容
      */
-    @XssIgnore
     private String content;
     /**
      * 消息状态 {@link MessageMode}

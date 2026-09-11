@@ -48,23 +48,24 @@ public class EncryptResultResponseBodyAdvice implements ResponseBodyAdvice<Resul
         HttpServletRequest servletRequest = servletServerHttpRequest.getServletRequest();
         String requestEncrypt = WebUtils.getHeaderIgnoreCaseOrParameter(servletRequest,RequestEncryptUtils.ENCRYPT);
         String requestEncryptKey = WebUtils.getHeaderIgnoreCaseOrParameter(servletRequest,RequestEncryptUtils.ENCRYPT_KEY);
-        try {
-            if(body.getData() != null){
-                byte[] dataBytes = jsonMapper.writeValueAsBytes(body.getData());
-                String encryptedData = RequestEncryptUtils.encryptDataStringByRequest(requestEncrypt, requestEncryptKey, dataBytes);
-                body.setData(encryptedData);
+        if(StringUtils.isNotBlank(requestEncrypt)){
+            try {
+                if(body.getData() != null){
+                    byte[] dataBytes = jsonMapper.writeValueAsBytes(body.getData());
+                    String encryptedData = RequestEncryptUtils.encryptDataStringByRequest(requestEncrypt, requestEncryptKey, dataBytes);
+                    body.setData(encryptedData);
+                }
+                if(body.getObj() != null){
+                    byte[] objBytes = jsonMapper.writeValueAsBytes(body.getObj());
+                    String encryptedObj = RequestEncryptUtils.encryptDataStringByRequest(requestEncrypt, requestEncryptKey, objBytes);
+                    body.setObj(encryptedObj);
+                }
+            } catch (Exception e) {
+                log.error("响应数据加密异常, URI: {}, EncryptType: {}, Error: {}",
+                        servletRequest.getRequestURI(), requestEncrypt, e.getMessage(), e);
+                throw new IllegalStateException("响应数据加密失败: " + e.getMessage(), e);
             }
-            if(body.getObj() != null){
-                byte[] objBytes = jsonMapper.writeValueAsBytes(body.getObj());
-                String encryptedObj = RequestEncryptUtils.encryptDataStringByRequest(requestEncrypt, requestEncryptKey, objBytes);
-                body.setObj(encryptedObj);
-            }
-        } catch (Exception e) {
-            log.error("响应数据加密异常, URI: {}, EncryptType: {}, Error: {}",
-                    servletRequest.getRequestURI(), requestEncrypt, e.getMessage(), e);
-            throw new IllegalStateException("响应数据加密失败: " + e.getMessage(), e);
         }
-
         return body;  
     }
 
