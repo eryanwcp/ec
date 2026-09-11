@@ -9,245 +9,48 @@
     <link rel="shortcut icon" href="/static/img/favicon.ico" th:href="@{/static/img/favicon.ico}" />
     <title>[[${T(com.eryansky.utils.AppConstants).getAppFullName()}]] - 登录</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        }
-        html, body {
-            width: 100%;
-            height: 100vh;
-            overflow: hidden;
-        }
-        body {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #0284c7 100%);
-            color: #333;
-            position: relative;
-            overflow-x: hidden;
-        }
+        * {box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+        html, body {width: 100%; height: 100vh; overflow: hidden; }
+        body {min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #0284c7 100%); color: #333; position: relative; overflow-x: hidden; }
         /* 动态背景装饰 */
-        .bg-circle {
-            position: absolute;
-            border-radius: 50%;
-            background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(59, 130, 246, 0.2));
-            filter: blur(60px);
-            z-index: 1;
-        }
-        .bg-circle-1 {
-            width: 400px;
-            height: 400px;
-            top: -100px;
-            left: -100px;
-        }
-        .bg-circle-2 {
-            width: 500px;
-            height: 500px;
-            bottom: -150px;
-            right: -100px;
-        }
+        .bg-circle {position: absolute; border-radius: 50%; background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(59, 130, 246, 0.2)); filter: blur(60px); z-index: 1; }
+        .bg-circle-1 {width: 400px; height: 400px; top: -100px; left: -100px; }
+        .bg-circle-2 {width: 500px; height: 500px; bottom: -150px; right: -100px; }
         /* 顶部标题栏 */
-        .header {
-            margin-top: 40px;
-            text-align: center;
-            z-index: 2;
-        }
-        .header h1 {
-            color: #ffffff;
-            font-size: 26px;
-            font-weight: 600;
-            letter-spacing: 2px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-        }
-        .header p {
-            color: #94a3b8;
-            font-size: 13px;
-            margin-top: 6px;
-            letter-spacing: 1px;
-        }
+        .header {margin-top: 40px; text-align: center; z-index: 2; }
+        .header h1 {color: #ffffff; font-size: 26px; font-weight: 600; letter-spacing: 2px; display: flex; align-items: center; justify-content: center; gap: 12px; }
+        .header p {color: #94a3b8; font-size: 13px; margin-top: 6px; letter-spacing: 1px; }
         /* 单栏登录卡片容器 */
-        .login-card {
-            width: 420px;
-            max-width: 90vw;
-            background: rgba(255, 255, 255, 0.96);
-            backdrop-filter: blur(16px);
-            border-radius: 20px;
-            box-shadow: 0 20px 35px -5px rgba(0, 0, 0, 0.3), 0 10px 15px -6px rgba(0, 0, 0, 0.2);
-            z-index: 2;
-            margin: 20px 0;
-            overflow: hidden;
-        }
+        .login-card {width: 420px; max-width: 90vw; background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(16px); border-radius: 20px; box-shadow: 0 20px 35px -5px rgba(0, 0, 0, 0.3), 0 10px 15px -6px rgba(0, 0, 0, 0.2); z-index: 2; margin: 20px 0; overflow: hidden; }
         /* 账号/验证码登录表单区域 */
-        .login-right-panel {
-            padding: 36px 36px 30px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
+        .login-right-panel {padding: 36px 36px 30px; display: flex; flex-direction: column; justify-content: center; }
         /* 账号登录 Tabs 切换 */
-        .account-tabs {
-            display: flex;
-            border-bottom: 2px solid #e2e8f0;
-            margin-bottom: 24px;
-        }
-        .account-tab-btn {
-            flex: 1;
-            padding: 10px 0;
-            text-align: center;
-            font-size: 16px;
-            font-weight: 600;
-            color: #64748b;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            margin-bottom: -2px;
-            transition: all 0.3s ease;
-        }
-        .account-tab-btn.active {
-            color: #0284c7;
-            border-bottom-color: #0284c7;
-        }
-        .input-group {
-            margin-bottom: 18px;
-            position: relative;
-        }
-        .input-group input {
-            width: 100%;
-            height: 44px;
-            padding: 0 14px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 14px;
-            outline: none;
-            transition: all 0.2s ease;
-            background-color: #f8fafc;
-        }
-        .input-group input:focus {
-            border-color: #0284c7;
-            background-color: #fff;
-            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
-        }
-        .sms-input-wrapper {
-            display: flex;
-            gap: 10px;
-        }
-        .sms-input-wrapper input {
-            flex: 1;
-        }
-        .send-sms-btn {
-            width: 110px;
-            height: 44px;
-            background: #f1f5f9;
-            border: 1px solid #cbd5e1;
-            color: #334155;
-            font-size: 13px;
-            border-radius: 8px;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.2s;
-        }
-        .send-sms-btn:hover {
-            background: #e2e8f0;
-        }
-        .submit-btn {
-            width: 100%;
-            height: 44px;
-            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 6px -1px rgba(2, 132, 199, 0.3);
-            transition: all 0.2s ease;
-            margin-top: 6px;
-        }
-        .submit-btn:hover {
-            opacity: 0.95;
-            transform: translateY(-1px);
-        }
+        .account-tabs {display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 24px; }
+        .account-tab-btn {flex: 1; padding: 10px 0; text-align: center; font-size: 16px; font-weight: 600; color: #64748b; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.3s ease; }
+        .account-tab-btn.active {color: #0284c7; border-bottom-color: #0284c7; }
+        .input-group {margin-bottom: 18px; position: relative; }
+        .input-group input {width: 100%; height: 44px; padding: 0 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; transition: all 0.2s ease; background-color: #f8fafc; }
+        .input-group input:focus {border-color: #0284c7; background-color: #fff; box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15); }
+        .sms-input-wrapper {display: flex; gap: 10px; }
+        .sms-input-wrapper input {flex: 1; }
+        .send-sms-btn {width: 110px; height: 44px; background: #f1f5f9; border: 1px solid #cbd5e1; color: #334155; font-size: 13px; border-radius: 8px; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+        .send-sms-btn:hover {background: #e2e8f0; }
+        .submit-btn {width: 100%; height: 44px; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 6px -1px rgba(2, 132, 199, 0.3); transition: all 0.2s ease; margin-top: 6px; }
+        .submit-btn:hover {opacity: 0.95; transform: translateY(-1px); }
         /* 底部版权信息 */
-        .footer {
-            margin-bottom: 20px;
-            text-align: center;
-            color: #94a3b8;
-            font-size: 13px;
-            z-index: 2;
-            line-height: 1.6;
-        }
-        .footer a {
-            color: #cbd5e1;
-            text-decoration: none;
-            margin: 0 8px;
-        }
-        .footer a:hover {
-            color: #fff;
-        }
+        .footer {margin-bottom: 20px; text-align: center; color: #94a3b8; font-size: 13px; z-index: 2; line-height: 1.6; }
+        .footer a {color: #cbd5e1; text-decoration: none; margin: 0 8px; }
+        .footer a:hover {color: #fff; }
         /* 自定义 Toast 消息提示框组件 */
-        .toast-container {
-            position: fixed;
-            top: 124px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            pointer-events: none;
-        }
-        .toast-item {
-            min-width: 300px;
-            padding: 12px 20px;
-            border-radius: 8px;
-            background: #ffffff;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-            font-weight: 500;
-            color: #1e293b;
-            opacity: 0;
-            transform: translateY(-20px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            pointer-events: auto;
-        }
-        .toast-item.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        .toast-icon {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            color: #fff;
-            flex-shrink: 0;
-        }
+        .toast-container {position: fixed; top: 124px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast-item {min-width: 300px; padding: 12px 20px; border-radius: 8px; background: #ffffff; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.05); display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; color: #1e293b; opacity: 0; transform: translateY(-20px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: auto; }
+        .toast-item.show {opacity: 1; transform: translateY(0); }
+        .toast-icon {width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #fff; flex-shrink: 0; }
         .toast-info .toast-icon { background-color: #0284c7; }
         .toast-success .toast-icon { background-color: #10b981; }
         .toast-warning .toast-icon { background-color: #f59e0b; }
         .toast-error .toast-icon { background-color: #ef4444; }
-
-        @media (max-width: 768px) {
-            .login-card {
-                width: 90%;
-            }
-            .login-right-panel {
-                padding: 24px;
-            }
-        }
+        @media (max-width: 768px) {.login-card {width: 90%; } .login-right-panel {padding: 24px; } }
     </style>
 </head>
 <body>
@@ -288,8 +91,7 @@
             <div class="input-group" id="validateCode-group" style="display: none;">
                 <div class="sms-input-wrapper">
                     <input type="text" id="validateCode" placeholder="请输入验证码">
-                    <img id="validateCodeImg" th:src="${ctx}+'/servlet/ValidateCodeServlet'"
-                         onclick="refreshCheckCode();" height="38" style="cursor: pointer;"></img>
+                    <img id="validateCodeImg" onclick="refreshCheckCode();" height="38" style="cursor: pointer;"></img>
                 </div>
             </div>
 
@@ -303,7 +105,6 @@
             <button type="submit" class="submit-btn">登 录</button>
         </form>
     </div>
-
 </main>
 
 <footer class="footer">
@@ -314,7 +115,7 @@
 <script type="application/javascript" th:inline="javascript">
     const ctx = /*[[${ctx}]]*/ '';
     const ctxAdmin = /*[[${ctxAdmin}]]*/ '';
-    let isValidateCodeLogin = /*[[${isValidateCodeLogin}]]*/ '';
+    let isValidateCodeLogin = /*[[${isValidateCodeLogin}]]*/ false;
     const securityToken = /*[[${securityToken}]]*/ '';
     const publicKey = /*[[${publicKey}]]*/ '';
     const requestEncrypt = /*[[${requestEncrypt}]]*/ '';
@@ -326,13 +127,16 @@
         const toast = document.createElement('div');
         toast.className = `toast-item toast-${type}`;
         const iconMap = { info: 'ℹ', success: '✓', warning: '!', error: '✕' };
-
         toast.innerHTML = `
                 <div class="toast-icon">${iconMap[type] || 'ℹ'}</div>
                 <div>${message}</div>
             `;
         container.appendChild(toast);
-        requestAnimationFrame(() => { toast.classList.add('show'); });
+
+        requestAnimationFrame(() => {
+            toast.classList.add('show');
+        });
+
         setTimeout(() => {
             toast.classList.remove('show');
             setTimeout(() => {
@@ -341,15 +145,36 @@
         }, duration);
     }
 
-
     /* ------------------ 表单与模式切换 ------------------ */
+
+    /**
+     * 统一根据当前模式与 isValidateCodeLogin 控制验证码的显隐及校验
+     */
+    function updateValidateCodeVisibility() {
+        const validateCodeGroup = document.getElementById('validateCode-group');
+        const validateCodeInput = document.getElementById('validateCode');
+        const shouldShow = (currentAccountMode === 'password') && Boolean(isValidateCodeLogin);
+
+        if (validateCodeGroup) {
+            validateCodeGroup.style.display = shouldShow ? 'block' : 'none';
+        }
+        if (validateCodeInput) {
+            if (shouldShow) {
+                refreshCheckCode();
+                validateCodeInput.setAttribute('required', 'true');
+            } else {
+                validateCodeInput.removeAttribute('required');
+                validateCodeInput.value = '';
+            }
+        }
+    }
+
     function switchAccountMode(mode) {
         currentAccountMode = mode;
         const btnPwd = document.getElementById('btn-pwd-mode');
         const btnSms = document.getElementById('btn-sms-mode');
         const pwdGroup = document.getElementById('pwd-group');
         const smsGroup = document.getElementById('sms-group');
-        const validateCodeGroup = document.getElementById('validateCode-group');
         const pwdInput = document.getElementById('password');
         const smsInput = document.getElementById('sms-code');
 
@@ -358,9 +183,7 @@
             btnSms.classList.remove('active');
             pwdGroup.style.display = 'block';
             smsGroup.style.display = 'none';
-            if (isValidateCodeLogin) {
-                validateCodeGroup.style.display = 'block';
-            }
+
             pwdInput.setAttribute('required', 'true');
             smsInput.removeAttribute('required');
         } else {
@@ -368,10 +191,12 @@
             btnPwd.classList.remove('active');
             pwdGroup.style.display = 'none';
             smsGroup.style.display = 'block';
-            validateCodeGroup.style.display = 'none';
+
             smsInput.setAttribute('required', 'true');
             pwdInput.removeAttribute('required');
         }
+
+        updateValidateCodeVisibility();
     }
 
     async function sendSmsCode() {
@@ -402,7 +227,7 @@
         const redirect_uri = document.getElementById('redirect_uri').value;
         const loginName = document.getElementById('loginName').value;
         const validateCodeDom = document.getElementById('validateCode');
-        const validateCodeGroup = document.getElementById('validateCode-group');
+
         let encryptKey = '';
         let requestEncryptKey = '';
 
@@ -445,11 +270,10 @@
                         }, 3000);
                     } else {
                         showToast(data['msg'], 'error');
-                        if (validateCodeDom) validateCodeDom.value = '';
-                        refreshCheckCode();
+                        // 登录失败触发验证码开启
                         if (data.obj !== undefined && data.obj === true) {
                             isValidateCodeLogin = true;
-                            validateCodeGroup.style.display = 'block';
+                            updateValidateCodeVisibility();
                         }
                     }
                 }).catch(error => console.error(error));
@@ -478,19 +302,14 @@
     }
 
     function refreshCheckCode() {
-        const url = ctx + '/servlet/ValidateCodeServlet?_=' + new Date().getTime();
         const validateCodeImg = document.getElementById("validateCodeImg");
-        validateCodeImg.src = url;
+        if (validateCodeImg) {
+            validateCodeImg.src = ctx + '/servlet/ValidateCodeServlet?_=' + new Date().getTime();
+        }
     }
 
-
-    const validateCodeGroup = document.getElementById('validateCode-group');
-    if (isValidateCodeLogin) {
-        validateCodeGroup.style.display = 'block';
-    } else {
-        validateCodeGroup.style.display = 'none';
-    }
+    // 页面首次载入时更新图形验证码状态
+    updateValidateCodeVisibility();
 </script>
 </body>
-
 </html>
