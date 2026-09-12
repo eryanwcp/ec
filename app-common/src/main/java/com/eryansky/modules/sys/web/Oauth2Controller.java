@@ -40,7 +40,7 @@ public class Oauth2Controller {
     private static final Logger log = LoggerFactory.getLogger(Oauth2Controller.class);
     private static final long DEFAULT_EXPIRE_SECONDS = 7200L;
     private static final long DEFAULT_EXPIRE_SSO_SECONDS = 600L;
-    private static final String CACHE_PKCE_CODE_STORE = "cache_sso_pkce_code_store";
+    private static final String CACHE_PKCE_CODE_STORE = "cache_pkce_code_store";
 
     /**
      * OAuth 2.1 Authorization Code 流程第一步：获取 authorization_code
