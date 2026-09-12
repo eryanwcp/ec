@@ -149,7 +149,7 @@ public class Oauth2RestController {
             }
         } else {
             // === 模式 B：传统 Client Credentials 模式（完全保留原系统校验规则） ===
-            if (!StringUtils.isEquals(clientSecret, oAuth2Client.getClientSecret())) {
+            if (StringUtils.isBlank(clientSecret) || !StringUtils.isEquals(clientSecret, oAuth2Client.getClientSecret())) {
                 return R.fail("未授权或认证未通过客户端：" + clientId);
             }
         }
