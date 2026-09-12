@@ -6,13 +6,13 @@ import com.eryansky.common.utils.Identities;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.utils.mapper.JsonMapper;
-import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.core.security.annotation.PrepareOauth2;
 import com.eryansky.core.security.annotation.RequiresUser;
 import com.eryansky.core.security.jwt.JWTUtils;
 import com.eryansky.j2cache.lock.DefaultLockCallback;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.utils.UserUtils;
+import com.eryansky.modules.sys.vo.CodeChallengeInfo;
 import com.eryansky.modules.sys.vo.OAuth2Client;
 import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.CacheUtils;
@@ -44,48 +44,6 @@ public class Oauth2Controller {
     private static final String CACHE_PKCE_CODE_STORE = "cache_sso_pkce_code_store";
 
     /**
-     * PKCE 授权码元数据 DTO
-     */
-    public static class CodeChallengeInfo implements Serializable {
-        private static final long serialVersionUID = 1L;
-
-        private String clientId;
-        private String codeChallenge;
-        private String codeChallengeMethod;
-        private String redirectUri;
-        private long expireTime;
-
-        public CodeChallengeInfo() {}
-
-        public CodeChallengeInfo(String clientId, String codeChallenge, String codeChallengeMethod, String redirectUri, long ttlSeconds) {
-            this.clientId = clientId;
-            this.codeChallenge = codeChallenge;
-            this.codeChallengeMethod = StringUtils.defaultIfBlank(codeChallengeMethod, "S256");
-            this.redirectUri = redirectUri;
-            this.expireTime = System.currentTimeMillis() + (ttlSeconds * 1000L);
-        }
-
-        public String getClientId() { return clientId; }
-        public void setClientId(String clientId) { this.clientId = clientId; }
-
-        public String getCodeChallenge() { return codeChallenge; }
-        public void setCodeChallenge(String codeChallenge) { this.codeChallenge = codeChallenge; }
-
-        public String getCodeChallengeMethod() { return codeChallengeMethod; }
-        public void setCodeChallengeMethod(String codeChallengeMethod) { this.codeChallengeMethod = codeChallengeMethod; }
-
-        public String getRedirectUri() { return redirectUri; }
-        public void setRedirectUri(String redirectUri) { this.redirectUri = redirectUri; }
-
-        public long getExpireTime() { return expireTime; }
-        public void setExpireTime(long expireTime) { this.expireTime = expireTime; }
-
-        public boolean isExpired() {
-            return System.currentTimeMillis() > expireTime;
-        }
-    }
-
-    /**
      * OAuth 2.1 Authorization Code 流程第一步：获取 authorization_code
      */
     @GetMapping("authorize")
@@ -106,12 +64,6 @@ public class Oauth2Controller {
         OAuth2Client oAuth2Client = findClient(clientId);
         if (oAuth2Client == null) {
             return buildOAuthError(HttpStatus.UNAUTHORIZED, "unauthorized_client", "未授权或不存在的客户端：" + clientId);
-        }
-
-        // 3. IP 白名单校验
-        String ip = SpringMVCHolder.getIp();
-        if (!validateIP(oAuth2Client, ip)) {
-            return buildOAuthError(HttpStatus.FORBIDDEN, "access_denied", "未授权访问终端 IP: " + ip);
         }
 
         // 4. OAuth 2.1：精确匹配校验 Redirect URI
@@ -162,12 +114,6 @@ public class Oauth2Controller {
             return buildOAuthError(HttpStatus.UNAUTHORIZED, "unauthorized_client", "未授权或不存在的客户端：" + clientId);
         }
 
-
-        // 4. IP 白名单校验
-        String ip = SpringMVCHolder.getIp();
-        if (!validateIP(oAuth2Client, ip)) {
-            return buildOAuthError(HttpStatus.FORBIDDEN, "access_denied", "未授权访问终端 IP: " + ip);
-        }
 
         // 5. 安全原子提取授权码（一次性兑换，防止重放攻击）
         CodeChallengeInfo challengeInfo = CacheUtils.getCacheChannel().lock(
@@ -224,11 +170,6 @@ public class Oauth2Controller {
         OAuth2Client oAuth2Client = findClient(clientId);
         if (oAuth2Client == null) {
             return R.fail("未配置授权终端：" + clientId);
-        }
-
-        String ip = SpringMVCHolder.getIp();
-        if (!validateIP(oAuth2Client, ip)) {
-            return R.fail("未授权访问终端：" + clientId + "，IP:" + ip);
         }
 
         boolean verify = JWTUtils.verify(token, clientId, oAuth2Client.getClientSecret());
@@ -295,20 +236,6 @@ public class Oauth2Controller {
         return registeredUris.contains(redirectUri);
     }
 
-    /**
-     * IP 白名单检查辅助方法
-     */
-    private boolean validateIP(OAuth2Client oAuth2Client, String ip) {
-        if (oAuth2Client == null) {
-            return false;
-        }
-        Collection<String> configWhiteList = oAuth2Client.getClientIps();
-        if (!CollectionUtils.isEmpty(configWhiteList)) {
-            return configWhiteList.stream()
-                    .anyMatch(v -> "*".equals(v) || com.eryansky.j2cache.util.IpUtils.checkIPMatching(v, ip));
-        }
-        return true;
-    }
 
     private OAuth2Client findClient(String clientId) {
         if (StringUtils.isBlank(clientId)) {
