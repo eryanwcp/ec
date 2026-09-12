@@ -10,24 +10,25 @@ import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.core.security.annotation.RequiresUser;
 import com.eryansky.core.security.annotation.RestApi;
 import com.eryansky.core.security.jwt.JWTUtils;
+import com.eryansky.j2cache.lock.DefaultLockCallback;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.modules.sys.vo.OAuth2Client;
 import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.CacheUtils;
 import com.google.common.collect.Maps;
+import com.google.common.hash.Hashing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.security.oauth2.server.servlet.OAuth2AuthorizationServerJwtAutoConfiguration;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.*;
 
 /**
- * 系统内置 OAuth2 认证 Controller（支持传统客户端凭证 & PKCE 扩展方案）
+ * 系统内置 OAuth2 认证 Controller（符合 RFC 7636 PKCE 标准与规范化响应）
  */
 @RequiresUser(required = false)
 @RestApi()
@@ -37,44 +38,43 @@ public class Oauth2RestController {
 
     private static final Logger log = LoggerFactory.getLogger(Oauth2RestController.class);
 
-    /**
-     * 默认 Access Token 有效期 (单位：秒)
-     */
     private static final long DEFAULT_EXPIRE_SECONDS = 7200L;
-    /**
-     * 默认 单点登录Token 有效期 (单位：秒)
-     */
     private static final long DEFAULT_EXPIRE_SSO_SECONDS = 600L;
-
-    /**
-     * 存储 PKCE 授权码信息缓存key
-     */
     private static final String CACHE_PKCE_CODE_STORE = "cache_sso_pkce_code_store";
 
-    public static class CodeChallengeInfo {
-        private final String clientId;
-        private final String codeChallenge;
-        private final String codeChallengeMethod;
-        private final long expireTime;
+    /**
+     * PKCE 授权码元数据 DTO（实现 Serializable，保障多级缓存/Redis 序列化兼容）
+     */
+    public static class CodeChallengeInfo implements Serializable {
+        private static final long serialVersionUID = 1L;
 
-        public CodeChallengeInfo(String clientId, String codeChallenge, String codeChallengeMethod, long ttlSeconds) {
+        private String clientId;
+        private String codeChallenge;
+        private String codeChallengeMethod;
+        private String redirectUri;
+        private long expireTime;
+
+        // 无参构造函数保障 JSON 反序列化
+        public CodeChallengeInfo() {}
+
+        public CodeChallengeInfo(String clientId, String codeChallenge, String codeChallengeMethod, String redirectUri, long ttlSeconds) {
             this.clientId = clientId;
             this.codeChallenge = codeChallenge;
-            this.codeChallengeMethod = codeChallengeMethod;
+            this.codeChallengeMethod = StringUtils.defaultIfBlank(codeChallengeMethod, "S256");
+            this.redirectUri = redirectUri;
             this.expireTime = System.currentTimeMillis() + (ttlSeconds * 1000L);
         }
 
-        public String getClientId() {
-            return clientId;
-        }
-
-        public String getCodeChallenge() {
-            return codeChallenge;
-        }
-
-        public String getCodeChallengeMethod() {
-            return codeChallengeMethod;
-        }
+        public String getClientId() { return clientId; }
+        public void setClientId(String clientId) { this.clientId = clientId; }
+        public String getCodeChallenge() { return codeChallenge; }
+        public void setCodeChallenge(String codeChallenge) { this.codeChallenge = codeChallenge; }
+        public String getCodeChallengeMethod() { return codeChallengeMethod; }
+        public void setCodeChallengeMethod(String codeChallengeMethod) { this.codeChallengeMethod = codeChallengeMethod; }
+        public String getRedirectUri() { return redirectUri; }
+        public void setRedirectUri(String redirectUri) { this.redirectUri = redirectUri; }
+        public long getExpireTime() { return expireTime; }
+        public void setExpireTime(long expireTime) { this.expireTime = expireTime; }
 
         public boolean isExpired() {
             return System.currentTimeMillis() > expireTime;
@@ -82,102 +82,115 @@ public class Oauth2RestController {
     }
 
     /**
-     * PKCE 流程第一步：获取授权码 authorization_code
+     * PKCE 流程第一步：获取 authorization_code
      */
     @GetMapping("authorize")
     public R<Map<String, Object>> authorize(
             @RequestParam("client_id") String clientId,
             @RequestParam("code_challenge") String codeChallenge,
-            @RequestParam(value = "code_challenge_method", defaultValue = "S256") String codeChallengeMethod) {
+            @RequestParam(value = "code_challenge_method", defaultValue = "S256") String codeChallengeMethod,
+            @RequestParam(value = "redirect_uri", required = false) String redirectUri) {
 
-        // 1. 校验 Client 是否注册
         OAuth2Client oAuth2Client = findClient(clientId);
         if (oAuth2Client == null) {
-            return R.fail("未授权或不存在的客户端：" + clientId);
+            return buildOAuthError("unauthorized_client", "未授权或不存在的客户端：" + clientId);
         }
 
-        // 2. PKCE 参数合法性校验
         if (StringUtils.isBlank(codeChallenge)) {
-            return R.fail("PKCE 模式下 code_challenge 不能为空！");
+            return buildOAuthError("invalid_request", "PKCE 模式下 code_challenge 不能为空！");
         }
         if (!"S256".equalsIgnoreCase(codeChallengeMethod) && !"plain".equalsIgnoreCase(codeChallengeMethod)) {
-            return R.fail("不支持的 code_challenge_method，仅支持 S256 或 plain");
+            return buildOAuthError("invalid_request", "不支持的 code_challenge_method，仅支持 S256 或 plain");
         }
 
-        // 3. 生成授权码，绑定 code_challenge（缓存 5 分钟有效）
+        // 生成授权码（有效期 5 分钟）
         String code = Identities.uuid7();
-        CacheUtils.put(CACHE_PKCE_CODE_STORE, code, new CodeChallengeInfo(clientId, codeChallenge, codeChallengeMethod, 300));
+        CodeChallengeInfo info = new CodeChallengeInfo(clientId, codeChallenge, codeChallengeMethod, redirectUri, 300);
+        CacheUtils.put(CACHE_PKCE_CODE_STORE, code, info);
 
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>(2);
         result.put("code", code);
         return R.ok(result);
     }
 
     /**
-     * Access Token 认证授权（兼容传统 Client Credentials 与 PKCE Authorization Code 模式）
+     * 第二步：换取 Access Token
      */
     @PostMapping("accessToken")
     public R<Map<String, Object>> accessToken(
             @RequestParam("client_id") String clientId,
             @RequestParam(value = "client_secret", required = false) String clientSecret,
             @RequestParam(value = "code", required = false) String code,
-            @RequestParam(value = "code_verifier", required = false) String codeVerifier) {
+            @RequestParam(value = "code_verifier", required = false) String codeVerifier,
+            @RequestParam(value = "redirect_uri", required = false) String redirectUri) {
 
-        // 1. 获取并检查 Client 配置
         OAuth2Client oAuth2Client = findClient(clientId);
-
         if (oAuth2Client == null) {
-            return R.fail("未授权或不存在的客户端：" + clientId);
+            return buildOAuthError("unauthorized_client", "未授权或不存在的客户端：" + clientId);
         }
 
-        // 2. 路由校验模式：PKCE 动态验证 或 传统静态 client_secret 校验
+        // 路由校验机制
         if (StringUtils.isNotBlank(code)) {
-            // === 模式 A：PKCE 授权码模式 ===
+            // === 模式 A：PKCE 动态验证 ===
             // 严格执行一次性兑换（取出即删除，防止授权码重放攻击）
-            CodeChallengeInfo challengeInfo = CacheUtils.get(CACHE_PKCE_CODE_STORE, code);
-            CacheUtils.remove(CACHE_PKCE_CODE_STORE, code);
+            CodeChallengeInfo challengeInfo = CacheUtils.getCacheChannel().lock(CACHE_PKCE_CODE_STORE + ":" + code, 5, 10, new DefaultLockCallback<CodeChallengeInfo>(null, null) {
+                @Override
+                public CodeChallengeInfo handleObtainLock() {
+                    CodeChallengeInfo challengeInfo = CacheUtils.get(CACHE_PKCE_CODE_STORE, code);
+                    if (challengeInfo != null) {
+                        CacheUtils.remove(CACHE_PKCE_CODE_STORE, code);
+                    }
+                    return challengeInfo;
+                }
+            });
+
             if (challengeInfo == null || challengeInfo.isExpired() || !StringUtils.isEquals(challengeInfo.getClientId(), clientId)) {
-                return R.fail("无效或已过期的 authorization_code！");
+                return buildOAuthError("invalid_grant", "无效或已过期的 authorization_code！");
+            }
+
+            // 安全性增强：比对 redirect_uri
+            if (StringUtils.isNotBlank(challengeInfo.getRedirectUri()) && !StringUtils.isEquals(challengeInfo.getRedirectUri(), redirectUri)) {
+                return buildOAuthError("invalid_grant", "redirect_uri 与授权时不匹配！");
             }
 
             if (StringUtils.isBlank(codeVerifier)) {
-                return R.fail("PKCE 校验必须提供 code_verifier！");
+                return buildOAuthError("invalid_request", "PKCE 模式下必须提供 code_verifier！");
             }
 
             if (!verifyCodeVerifier(codeVerifier, challengeInfo.getCodeChallenge(), challengeInfo.getCodeChallengeMethod())) {
-                return R.fail("PKCE 校验失败：code_verifier 不匹配！");
+                return buildOAuthError("invalid_grant", "PKCE 校验失败：code_verifier 不匹配！");
             }
         } else {
-            // === 模式 B：传统 Client Credentials 模式（完全保留原系统校验规则） ===
-            if (StringUtils.isBlank(clientSecret) || !StringUtils.isEquals(clientSecret, oAuth2Client.getClientSecret())) {
-                return R.fail("未授权或认证未通过客户端：" + clientId);
+            // === 模式 B：传统凭证模式 ===
+            if (!StringUtils.isEquals(clientSecret, oAuth2Client.getClientSecret())) {
+                return buildOAuthError("invalid_client", "客户端认证未通过：client_secret 错误");
             }
         }
 
-        // 3. IP 白名单校验（完全保持原有防护逻辑）
+        // IP 白名单安全检验
         String ip = SpringMVCHolder.getIp();
         R<Boolean> checkIpR = checkIP(oAuth2Client, ip);
         if (!checkIpR.isSuccess()) {
-            return R.fail("未授权访问终端：" + clientId + "，IP:" + ip);
+            return buildOAuthError("unauthorized_client", "未授权访问终端：" + clientId + "，IP:" + ip);
         }
 
-        // 4. 签发 Token 并返回 JSON
+        // 签发标准 JWT 令牌
         try {
             String token = JWTUtils.sign(clientId, oAuth2Client.getClientSecret(), DEFAULT_EXPIRE_SECONDS * 1000);
 
-            Map<String, Object> map = new HashMap<>();
+            Map<String, Object> map = new HashMap<>(4);
             map.put("access_token", token);
             map.put("token_type", "Bearer");
             map.put("expires_in", DEFAULT_EXPIRE_SECONDS);
             return R.ok(map);
         } catch (Exception e) {
             log.error("生成 OAuth2 Token 失败, clientId: {}, error: {}", clientId, e.getMessage(), e);
-            return R.fail("Token 生成失败！");
+            return buildOAuthError("server_error", "Token 生成失败！");
         }
     }
 
     /**
-     * 用户单点登录 Token 发放（完全保持原代码不动）
+     * 单点登录 Token 发放
      */
     @PostMapping("ssoToken")
     public R<Map<String, Object>> ssoToken(@RequestParam("access_token") String token, @RequestParam(value = "user_code") String userCode) {
@@ -190,39 +203,56 @@ public class Oauth2RestController {
         if (!verify) {
             return R.fail("访问凭证失效：" + token);
         }
-        Map<String, Object> payload = Maps.newHashMap();
+
         User user = UserUtils.getUserByLoginNameOrMobile(userCode);
         if (user == null) {
             return R.fail("用户不存在：" + userCode);
         }
+
+        Map<String, Object> payload = Maps.newHashMap();
         payload.put("userId", user.getId());
-        payload.put("username", user.getLoginName()); // 必选字段
+        payload.put("username", user.getLoginName());
         payload.put("mobile", user.getMobile());
-        payload.put("iss", SpringContextHolder.getApplicationContext().getId()); // 必选字段
-        payload.put("clientId", clientId); // 必选字段
+        payload.put("iss", SpringContextHolder.getApplicationContext().getId());
+        payload.put("clientId", clientId);
         payload.put("iat", System.currentTimeMillis());
-        payload.put("exp", System.currentTimeMillis() + DEFAULT_EXPIRE_SSO_SECONDS * 1000L); // 必选字段
-        String ssoToken = JsonMapper.toJsonString(payload);
-        String encryptSsoToken = null;
+        payload.put("exp", System.currentTimeMillis() + DEFAULT_EXPIRE_SSO_SECONDS * 1000L);
+
         try {
-            encryptSsoToken = Sm4Utils.encrypt(oAuth2Client.getClientSecret(), ssoToken);
+            String ssoToken = JsonMapper.toJsonString(payload);
+            String encryptSsoToken = Sm4Utils.encrypt(oAuth2Client.getClientSecret(), ssoToken);
+
+            Map<String, Object> map = Maps.newHashMap();
+            map.put("sso_token", encryptSsoToken);
+            map.put("expire", DEFAULT_EXPIRE_SSO_SECONDS);
+            return R.ok(map);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            log.error("生成 SSO Token 失败，userCode: {}, error: {}", userCode, e.getMessage(), e);
             return R.fail("服务器内部异常！");
         }
-        Map<String, Object> map = Maps.newHashMap();
-        payload.put("sso_token", encryptSsoToken);
-        payload.put("expire", DEFAULT_EXPIRE_SSO_SECONDS);
-        return R.ok(map);
     }
 
     /**
-     * 检查IP是否授权
-     *
-     * @param oAuth2Client
-     * @param ip
-     * @return
+     * 基于 Guava 的高吞吐 PKCE 摘要匹配算法
      */
+    private boolean verifyCodeVerifier(String codeVerifier, String codeChallenge, String method) {
+        if ("plain".equalsIgnoreCase(method)) {
+            return StringUtils.isEquals(codeVerifier, codeChallenge);
+        }
+        if ("S256".equalsIgnoreCase(method)) {
+            try {
+                // 使用 Guava Hashing，避免线程安全锁开销与 MessageDigest 实例频繁创建
+                byte[] hash = Hashing.sha256().hashString(codeVerifier, StandardCharsets.US_ASCII).asBytes();
+                String calculatedChallenge = Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
+                return StringUtils.isEquals(calculatedChallenge, codeChallenge);
+            } catch (Exception e) {
+                log.error("计算 PKCE SHA-256 Challenge 异常", e);
+                return false;
+            }
+        }
+        return false;
+    }
+
     private R<Boolean> checkIP(OAuth2Client oAuth2Client, String ip) {
         if (oAuth2Client == null) {
             return R.rest(false);
@@ -238,11 +268,8 @@ public class Oauth2RestController {
         return R.rest(true);
     }
 
-    /**
-     * 内部辅助：检索 Client
-     */
     private OAuth2Client findClient(String clientId) {
-        if(StringUtils.isBlank(clientId)){
+        if (StringUtils.isBlank(clientId)) {
             return null;
         }
         List<OAuth2Client> oAuth2Clients = AppConstants.getOauth2ClientList();
@@ -256,23 +283,12 @@ public class Oauth2RestController {
     }
 
     /**
-     * 内部辅助：依照 RFC 7636 规范检验 PKCE verifier
+     * 遵循 RFC 6749 的 OAuth2 标准错误响应构建器
      */
-    private boolean verifyCodeVerifier(String codeVerifier, String codeChallenge, String method) {
-        if ("plain".equalsIgnoreCase(method)) {
-            return StringUtils.isEquals(codeVerifier, codeChallenge);
-        }
-        if ("S256".equalsIgnoreCase(method)) {
-            try {
-                MessageDigest digest = MessageDigest.getInstance("SHA-256");
-                byte[] hash = digest.digest(codeVerifier.getBytes(StandardCharsets.US_ASCII));
-                String calculatedChallenge = Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
-                return StringUtils.isEquals(calculatedChallenge, codeChallenge);
-            } catch (Exception e) {
-                log.error("计算 PKCE SHA-256 Challenge 异常", e);
-                return false;
-            }
-        }
-        return false;
+    private R<Map<String, Object>> buildOAuthError(String error, String errorDescription) {
+        Map<String, Object> errorMap = new HashMap<>(2);
+        errorMap.put("error", error);
+        errorMap.put("error_description", errorDescription);
+        return R.fail(errorMap,errorDescription);
     }
 }
