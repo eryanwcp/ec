@@ -96,6 +96,13 @@ public class Oauth2RestController {
             return buildOAuthError("unauthorized_client", "未授权或不存在的客户端：" + clientId);
         }
 
+        // IP 白名单安全检验
+        String ip = SpringMVCHolder.getIp();
+        R<Boolean> checkIpR = checkIP(oAuth2Client, ip);
+        if (!checkIpR.isSuccess()) {
+            return buildOAuthError("unauthorized_client", "未授权访问终端：" + clientId + "，IP:" + ip);
+        }
+
         if (StringUtils.isBlank(codeChallenge)) {
             return buildOAuthError("invalid_request", "PKCE 模式下 code_challenge 不能为空！");
         }
