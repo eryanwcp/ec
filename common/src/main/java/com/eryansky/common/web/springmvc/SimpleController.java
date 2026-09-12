@@ -1,5 +1,5 @@
 /**
- *  Copyright (c) 2012-2024 https://www.eryansky.com
+ *  Copyright (c) 2012-2026 https://www.eryansky.com
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -9,9 +9,9 @@ import com.eryansky.common.utils.BeanValidators;
 import com.eryansky.common.utils.DateUtils;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.utils.WebUtils;
+import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.ui.Model;
@@ -41,7 +41,7 @@ public abstract class SimpleController{
     /**
      * 验证Bean实例对象
      */
-    @Autowired(required = false)
+    @Resource
     protected Validator validator;
 
 
