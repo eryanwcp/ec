@@ -9,7 +9,6 @@ import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.core.security.annotation.PrepareOauth2;
 import com.eryansky.core.security.annotation.RequiresUser;
-import com.eryansky.core.security.annotation.RestApi;
 import com.eryansky.core.security.jwt.JWTUtils;
 import com.eryansky.j2cache.lock.DefaultLockCallback;
 import com.eryansky.modules.sys.mapper.User;
@@ -111,7 +110,7 @@ public class Oauth2Controller {
 
         // 3. IP 白名单校验
         String ip = SpringMVCHolder.getIp();
-        if (!checkIP(oAuth2Client, ip)) {
+        if (!validateIP(oAuth2Client, ip)) {
             return buildOAuthError(HttpStatus.FORBIDDEN, "access_denied", "未授权访问终端 IP: " + ip);
         }
 
@@ -166,7 +165,7 @@ public class Oauth2Controller {
 
         // 4. IP 白名单校验
         String ip = SpringMVCHolder.getIp();
-        if (!checkIP(oAuth2Client, ip)) {
+        if (!validateIP(oAuth2Client, ip)) {
             return buildOAuthError(HttpStatus.FORBIDDEN, "access_denied", "未授权访问终端 IP: " + ip);
         }
 
@@ -228,7 +227,7 @@ public class Oauth2Controller {
         }
 
         String ip = SpringMVCHolder.getIp();
-        if (!checkIP(oAuth2Client, ip)) {
+        if (!validateIP(oAuth2Client, ip)) {
             return R.fail("未授权访问终端：" + clientId + "，IP:" + ip);
         }
 
@@ -299,7 +298,7 @@ public class Oauth2Controller {
     /**
      * IP 白名单检查辅助方法
      */
-    private boolean checkIP(OAuth2Client oAuth2Client, String ip) {
+    private boolean validateIP(OAuth2Client oAuth2Client, String ip) {
         if (oAuth2Client == null) {
             return false;
         }
