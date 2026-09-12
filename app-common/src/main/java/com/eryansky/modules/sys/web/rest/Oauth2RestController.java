@@ -206,6 +206,14 @@ public class Oauth2RestController {
         if (oAuth2Client == null) {
             return R.fail("未配置授权终端：" + clientId);
         }
+
+        // IP 白名单安全检验
+        String ip = SpringMVCHolder.getIp();
+        R<Boolean> checkIpR = checkIP(oAuth2Client, ip);
+        if (!checkIpR.isSuccess()) {
+            return buildOAuthError("unauthorized_client", "未授权访问终端：" + clientId + "，IP:" + ip);
+        }
+
         boolean verify = JWTUtils.verify(token, clientId, oAuth2Client.getClientSecret());
         if (!verify) {
             return R.fail("访问凭证失效：" + token);
