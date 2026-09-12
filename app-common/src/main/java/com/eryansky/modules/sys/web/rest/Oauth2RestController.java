@@ -133,7 +133,9 @@ public class Oauth2RestController {
         // 2. 路由校验模式：PKCE 动态验证 或 传统静态 client_secret 校验
         if (StringUtils.isNotBlank(code)) {
             // === 模式 A：PKCE 授权码模式 ===
-            CodeChallengeInfo challengeInfo = CacheUtils.get(CACHE_PKCE_CODE_STORE, code); // 严格执行一次性兑换
+            // 严格执行一次性兑换（取出即删除，防止授权码重放攻击）
+            CodeChallengeInfo challengeInfo = CacheUtils.get(CACHE_PKCE_CODE_STORE, code);
+            CacheUtils.remove(CACHE_PKCE_CODE_STORE, code);
             if (challengeInfo == null || challengeInfo.isExpired() || !StringUtils.isEquals(challengeInfo.getClientId(), clientId)) {
                 return R.fail("无效或已过期的 authorization_code！");
             }
