@@ -21,7 +21,6 @@ import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.servlet.ValidateCodeServlet;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
-import com.eryansky.common.web.utils.CookieUtils;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.security.SecurityType;
 import com.eryansky.core.security.SecurityUtils;
