@@ -25,7 +25,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -55,31 +54,31 @@ public class Oauth2Controller {
             @RequestParam(value = "code_challenge_method", defaultValue = "S256") String codeChallengeMethod,
             @RequestParam(value = "state", required = false) String state) {
 
-        // 1. 响应类型必须为 code
+        // 1. 响应类型校验：OAuth 2.1 仅支持 code 授权模式
         if (!"code".equals(responseType)) {
             return buildOAuthError(HttpStatus.BAD_REQUEST, "unsupported_response_type", "response_type 必须为 code");
         }
 
-        // 2. 检查客户端合法性
+        // 2. 客户端有效性校验
         OAuth2Client oAuth2Client = findClient(clientId);
         if (oAuth2Client == null) {
             return buildOAuthError(HttpStatus.UNAUTHORIZED, "unauthorized_client", "未授权或不存在的客户端：" + clientId);
         }
 
-        // 4. OAuth 2.1：精确匹配校验 Redirect URI
+        // 3. OAuth 2.1 要求精确匹配 Redirect URI
         if (!validateRedirectUri(oAuth2Client, redirectUri)) {
             return buildOAuthError(HttpStatus.BAD_REQUEST, "invalid_request", "redirect_uri 校验失败或未匹配注册地址");
         }
 
-        // 5. OAuth 2.1 强校验 PKCE 参数（必须提供 code_challenge，且推荐 S256）
+        // 4. OAuth 2.1 强制启用 PKCE，且只推荐 S256 算法
         if (StringUtils.isBlank(codeChallenge)) {
-            return buildOAuthError(HttpStatus.BAD_REQUEST, "invalid_request", "OAuth 2.1 规范强制要求提供 code_challenge！");
+            return buildOAuthError(HttpStatus.BAD_REQUEST, "invalid_request", "OAuth 2.1 规范强制要求提供 code_challenge");
         }
         if (!"S256".equalsIgnoreCase(codeChallengeMethod)) {
             return buildOAuthError(HttpStatus.BAD_REQUEST, "invalid_request", "仅支持 S256 算法的 code_challenge_method");
         }
 
-        // 6. 生成授权码（有效期 5 分钟）并存入缓存
+        // 5. 生成授权码（有效期 5 分钟）并存入缓存
         String code = Identities.uuid7();
         CodeChallengeInfo info = new CodeChallengeInfo(clientId, codeChallenge, codeChallengeMethod, redirectUri, 300);
         CacheUtils.put(CACHE_PKCE_CODE_STORE, code, info);
@@ -99,23 +98,29 @@ public class Oauth2Controller {
     public ResponseEntity<Map<String, Object>> accessToken(
             @RequestParam(value = "grant_type", defaultValue = "authorization_code") String grantType,
             @RequestParam("client_id") String clientId,
+            @RequestParam(value = "client_secret", required = false) String clientSecret,
             @RequestParam("code") String code,
             @RequestParam("code_verifier") String codeVerifier,
             @RequestParam("redirect_uri") String redirectUri) {
 
-        // 1. 校验 grant_type
+        // 1. grant_type 校验
         if (!"authorization_code".equals(grantType)) {
             return buildOAuthError(HttpStatus.BAD_REQUEST, "unsupported_grant_type", "不支持的 grant_type，仅支持 authorization_code");
         }
 
-        // 2. 检查客户端合法性
+        // 2. 客户端存在性校验
         OAuth2Client oAuth2Client = findClient(clientId);
         if (oAuth2Client == null) {
             return buildOAuthError(HttpStatus.UNAUTHORIZED, "unauthorized_client", "未授权或不存在的客户端：" + clientId);
         }
 
+        // 3. 机密客户端身份认证：若配置了 clientSecret 则必须一致（公共客户端传递空值可通过）
+        if (StringUtils.isNotBlank(oAuth2Client.getClientSecret())
+                && !StringUtils.isEquals(clientSecret, oAuth2Client.getClientSecret())) {
+            return buildOAuthError(HttpStatus.UNAUTHORIZED, "invalid_client", "客户端凭证校验失败：client_secret 不匹配");
+        }
 
-        // 5. 安全原子提取授权码（一次性兑换，防止重放攻击）
+        // 4. 安全分布式锁原子提取授权码（一次性兑换，杜绝重放）
         CodeChallengeInfo challengeInfo = CacheUtils.getCacheChannel().lock(
                 CACHE_PKCE_CODE_STORE + ":" + code, 5, 10,
                 new DefaultLockCallback<CodeChallengeInfo>(null, null) {
@@ -133,12 +138,12 @@ public class Oauth2Controller {
             return buildOAuthError(HttpStatus.BAD_REQUEST, "invalid_grant", "无效或已过期的 authorization_code！");
         }
 
-        // 6. OAuth 2.1 严格比对 redirect_uri
+        // 5. 严格比对换取 Token 时的 redirect_uri 与 authorize 阶段传入的 URI 是否一致
         if (!StringUtils.isEquals(challengeInfo.getRedirectUri(), redirectUri)) {
             return buildOAuthError(HttpStatus.BAD_REQUEST, "invalid_grant", "redirect_uri 与授权阶段不一致！");
         }
 
-        // 7. PKCE code_verifier 校验
+        // 6. PKCE code_verifier 校验
         if (StringUtils.isBlank(codeVerifier)) {
             return buildOAuthError(HttpStatus.BAD_REQUEST, "invalid_request", "必须提供 code_verifier！");
         }
@@ -146,14 +151,13 @@ public class Oauth2Controller {
             return buildOAuthError(HttpStatus.BAD_REQUEST, "invalid_grant", "PKCE 校验失败：code_verifier 验证未通过！");
         }
 
-        // 8. 签发标准 JWT 令牌
+        // 7. 签发 JWT Access Token
         try {
             String token = JWTUtils.sign(clientId, oAuth2Client.getClientSecret(), DEFAULT_EXPIRE_SECONDS * 1000);
             Map<String, Object> tokenResponse = new HashMap<>(4);
             tokenResponse.put("access_token", token);
             tokenResponse.put("token_type", "Bearer");
             tokenResponse.put("expires_in", DEFAULT_EXPIRE_SECONDS);
-
             return ResponseEntity.ok(tokenResponse);
         } catch (Exception e) {
             log.error("生成 OAuth2 Token 失败, clientId: {}, error: {}", clientId, e.getMessage(), e);
@@ -205,7 +209,7 @@ public class Oauth2Controller {
     }
 
     /**
-     * PKCE SHA-256 (S256) 摘要匹配计算
+     * PKCE SHA-256 (S256) 摘要计算校验
      */
     private boolean verifyCodeVerifier(String codeVerifier, String codeChallenge, String method) {
         if ("S256".equalsIgnoreCase(method)) {
@@ -222,20 +226,18 @@ public class Oauth2Controller {
     }
 
     /**
-     * 校验 Redirect URI（精确全匹配）
+     * 校验 Redirect URI（精确匹配）
      */
     private boolean validateRedirectUri(OAuth2Client client, String redirectUri) {
         if (StringUtils.isBlank(redirectUri) || client == null) {
             return false;
         }
-        // 假定 client.getRedirectUris() 返回客户端注册的所有精确 URI 列表
         Collection<String> registeredUris = client.getRedirectUris();
         if (CollectionUtils.isEmpty(registeredUris)) {
             return false;
         }
         return registeredUris.contains(redirectUri);
     }
-
 
     private OAuth2Client findClient(String clientId) {
         if (StringUtils.isBlank(clientId)) {
