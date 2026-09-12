@@ -148,7 +148,6 @@ public class Oauth2Controller {
     public ResponseEntity<Map<String, Object>> accessToken(
             @RequestParam(value = "grant_type", defaultValue = "authorization_code") String grantType,
             @RequestParam("client_id") String clientId,
-            @RequestParam(value = "client_secret", required = false) String clientSecret,
             @RequestParam("code") String code,
             @RequestParam("code_verifier") String codeVerifier,
             @RequestParam("redirect_uri") String redirectUri) {
@@ -164,11 +163,6 @@ public class Oauth2Controller {
             return buildOAuthError(HttpStatus.UNAUTHORIZED, "unauthorized_client", "未授权或不存在的客户端：" + clientId);
         }
 
-        // 3. 机密客户端校验 client_secret（如果是机密客户端）
-        if (StringUtils.isNotBlank(oAuth2Client.getClientSecret())
-                && !StringUtils.isEquals(clientSecret, oAuth2Client.getClientSecret())) {
-            return buildOAuthError(HttpStatus.UNAUTHORIZED, "invalid_client", "客户端认证失败：client_secret 错误");
-        }
 
         // 4. IP 白名单校验
         String ip = SpringMVCHolder.getIp();
