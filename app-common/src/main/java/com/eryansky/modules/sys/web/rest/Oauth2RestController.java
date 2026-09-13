@@ -72,7 +72,7 @@ public class Oauth2RestController {
             return R.ok(map);
         } catch (Exception e) {
             log.error("生成 OAuth2 Token 失败, clientId: {}, error: {}", clientId, e.getMessage(), e);
-            R.fail("Token 生成失败！");
+            return R.fail("Token 生成失败！");
         }
     }
 
