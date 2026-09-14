@@ -148,8 +148,6 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
             if (!defaultApiKey.equals(apiKey)) {
                 notPermittedPermission(request, response, requestUrl, "未授权访问:Header['" + RPCUtils.HEADER_X_API_KEY + "']=" + apiKey, metadata.defaultEncryptResponseBody);
                 return false;
-            }else {
-                request.getSession().setAttribute("loginUser", "内部系统[" + (applicationId != null ? applicationId : ip) + "]");
             }
         }
         // AccessToken 认证
