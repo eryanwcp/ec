@@ -60,7 +60,7 @@ public class SessionController extends SimpleController {
         Datagrid<SessionInfo> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
         String json = JsonMapper.getInstance().toJson(dg,
                 SessionInfo.class,
-                new String[]{"id","loginName","name","ip","loginTime"});
+                new String[]{"id","sessionId","loginName","name","ip","loginTime"});
         return renderString(response, json, WebUtils.JSON_TYPE);
     }
 
