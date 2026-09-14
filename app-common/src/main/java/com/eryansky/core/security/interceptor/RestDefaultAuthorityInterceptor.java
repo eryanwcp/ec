@@ -50,7 +50,8 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
     public static final String SESSION_KEY_REST_AUTHORITY = "REST_AUTHORITY";
     public static final String SESSION_TAG_NAME = "loginUser";
     public static final String SYSTEM_PREFIX_NAME = "内部系统";
-    public static final String ACCESS_TOKEN = "access_token";
+    public static final String PARAM_ACCESS_TOKEN = "access_token";
+    public static final String HEADER_ACCESS_TOEKN = "Access-Token";
 
     /**
      * Rest 权限注解解析结果缓存，避免重复反射
@@ -134,11 +135,11 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
         // 2. 认证类型与密钥校验
         String authType = WebUtils.getHeaderIgnoreCase(request, RPCUtils.HEADER_AUTH_TYPE);
         String encrypt = WebUtils.getHeaderIgnoreCase(request, RPCUtils.HEADER_ENCRYPT);
-        String apiKey = WebUtils.getHeaderIgnoreCase(request, RPCUtils.HEADER_X_API_KEY);
+        String accessToken = WebUtils.getHeaderIgnoreCaseOrParameter(request,HEADER_ACCESS_TOEKN, PARAM_ACCESS_TOKEN);
         String applicationId = WebUtils.getHeaderIgnoreCase(request, RPCUtils.HEADER_APPLICATION_ID);
-
         // 内置 Auth 认证
         if (RPCUtils.AUTH_TYPE.equals(authType)) {
+            String apiKey = WebUtils.getHeaderIgnoreCase(request, RPCUtils.HEADER_X_API_KEY);
             if (apiKey == null) {
                 notPermittedPermission(request, response, requestUrl, "未识别参数:Header['" + RPCUtils.HEADER_X_API_KEY + "']", metadata.defaultEncryptResponseBody);
                 return false;
@@ -150,10 +151,9 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
             }
         }
         // AccessToken 认证
-        else if ("accessToken".equals(authType)) {
-            String accessToken = WebUtils.getHeaderIgnoreCaseOrParameter(request, ACCESS_TOKEN);
+        else if ("accessToken".equals(authType) || StringUtils.isNotBlank(accessToken)) {
             if (accessToken == null) {
-                notPermittedPermission(request, response, requestUrl, "未识别参数:Header['" + ACCESS_TOKEN + "']", metadata.defaultEncryptResponseBody);
+                notPermittedPermission(request, response, requestUrl, "未识别参数:Header['" + HEADER_ACCESS_TOEKN + "']", metadata.defaultEncryptResponseBody);
                 return false;
             }
 
