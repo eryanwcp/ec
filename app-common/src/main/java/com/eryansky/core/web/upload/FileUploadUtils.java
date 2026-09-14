@@ -7,6 +7,7 @@ package com.eryansky.core.web.upload;
 
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.encode.Encrypt;
+import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.core.security.LogUtils;
 import com.eryansky.core.web.upload.exception.FileNameLengthLimitExceededException;
 import com.eryansky.core.web.upload.exception.InvalidExtensionException;
@@ -17,6 +18,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.tika.Tika;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,13 +33,14 @@ import java.nio.file.Files;
 import java.util.*;
 
 /**
- * 文件上传工具类
+ * 文件上传工具类（Apache Tika 智能类型识别版）
  * <p>Date: 2014-5-5 下午8:32
- * <p>Version: 1.0
+ * <p>Version: 2.0
  */
 public class FileUploadUtils {
     // 默认大小 100M
     public static final long DEFAULT_MAX_SIZE = 100 * 1024 * 1024;
+    private static final Logger log = LoggerFactory.getLogger(FileUploadUtils.class);
     // 默认上传的地址
     private static String defaultBaseDir = "disk";
     // 默认的文件名最大长度
@@ -517,12 +521,16 @@ public class FileUploadUtils {
             String detectedMimeType = TIKA.detect(inputStream, filename);
 
             if (StringUtils.isBlank(detectedMimeType)) {
+                log.warn("Tika failed to detect MIME type for file. filename={}, extension={}", filename, ext);
                 return false;
             }
 
             // 3. 判断探测出来的 MIME 是否在扩展名允许列表中
-            return allowedMimes.contains(detectedMimeType.toLowerCase(Locale.ENGLISH));
-
+            boolean isMatched = allowedMimes.contains(detectedMimeType.toLowerCase(Locale.ENGLISH));
+            if(!isMatched){
+                log.warn("File MIME type mismatch detected! filename={}, extension={}, detectedMime={}, allowedMimes={}",filename,ext,detectedMimeType, JsonMapper.toJsonString(allowedMimes));
+            }
+            return isMatched;
         } catch (IOException e) {
             LogUtils.logError("Tika detect file error", e);
             return false;
