@@ -593,20 +593,6 @@ public class LoginController extends SimpleController {
         return menu;
     }
 
-    /**
-     * 当前在线用户
-     *
-     * @throws Exception
-     */
-    @PostMapping(value = {"onlineDatagrid"})
-    @ResponseBody
-    public Datagrid<SessionInfo> onlineDatagrid(HttpServletRequest request) throws Exception {
-        Page<SessionInfo> page = new Page<>(request);
-        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
-        page = SecurityUtils.findSessionInfoPage(page, sessionInfo.isSuperUser() ? null : sessionInfo.getLoginCompanyId());
-        Datagrid<SessionInfo> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
-        return dg;
-    }
 
     /**
      * 桌面版 开始菜单
