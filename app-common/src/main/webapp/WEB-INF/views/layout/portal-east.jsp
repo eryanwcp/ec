@@ -12,7 +12,7 @@ $(function() {
 	});
 	
 	$('#layout_east_onlineDatagrid').datagrid({
-		url : '${ctxAdmin}/login/onlineDatagrid',
+		url : '${ctxAdmin}/sys/session/onLineSessions',
 		fit : true,
 		fitColumns : true,
 		nowarp : false,
