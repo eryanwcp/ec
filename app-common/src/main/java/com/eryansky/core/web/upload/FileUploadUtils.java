@@ -134,8 +134,6 @@ public class FileUploadUtils {
                 .addAll(Arrays.asList(mimeTypes));
     }
 
-    private static int counter = 0;
-
     public static void setDefaultBaseDir(String defaultBaseDir) {
         FileUploadUtils.defaultBaseDir = defaultBaseDir;
     }
@@ -327,7 +325,7 @@ public class FileUploadUtils {
     }
 
     public static String encodingFilenamePrefix(String filename) {
-        filename = Encrypt.hash(filename + System.nanoTime() + counter++);
+        filename = Encrypt.hash(filename + System.nanoTime());
         return filename;
     }
 
