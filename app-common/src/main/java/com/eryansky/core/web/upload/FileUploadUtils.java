@@ -24,11 +24,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartFile;
 import jakarta.servlet.http.HttpServletRequest;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -97,6 +93,8 @@ public class FileUploadUtils {
         registerMimeTypes("ico", "image/x-icon", "image/vnd.microsoft.icon");
         registerMimeTypes("tif", "image/tiff");
         registerMimeTypes("tiff", "image/tiff");
+        registerMimeTypes("heic", "image/heic", "image/heif");
+        registerMimeTypes("heif", "image/heic", "image/heif");
 
         // 文档类
         registerMimeTypes("pdf", "application/pdf");
@@ -478,11 +476,13 @@ public class FileUploadUtils {
         if (allowedMimes == null || allowedMimes.isEmpty()) {
             return true;
         }
-
+        // 标记并重置流指针，防止 Tika 读取后影响后续文件保存
+        InputStream markableStream = inputStream.markSupported() ? inputStream : new BufferedInputStream(inputStream);
+        markableStream.mark(8192); // 预留 8KB 探测缓冲区
         try {
             // 2. 利用 Tika 自动探测二进制文件的真实 MIME 类型
             // 传入 filename 可以提供后缀线索，提高分析容器类文件（如 epub, zip, office 等）的效率
-            String detectedMimeType = TIKA.detect(inputStream, filename);
+            String detectedMimeType = TIKA.detect(markableStream, filename);
 
             if (StringUtils.isBlank(detectedMimeType)) {
                 log.warn("Tika failed to detect MIME type for file. filename={}, extension={}", filename, ext);
@@ -498,6 +498,13 @@ public class FileUploadUtils {
         } catch (IOException e) {
             LogUtils.logError("Tika detect file error", e);
             return false;
+        } finally {
+            try {
+                // 恢复流指针到初始位置
+                markableStream.reset();
+            } catch (IOException e) {
+                log.error("Failed to reset input stream after Tika detection", e);
+            }
         }
     }
 
@@ -523,12 +530,15 @@ public class FileUploadUtils {
         if (StringUtils.isEmpty(fileName)) {
             return;
         }
+        // 清理路径中的非法字符/相对路径，防止路径穿越攻击
+        String safeFileName = FilenameUtils.getName(fileName);
+
         File desc = null;
         if (request == null) {
-            String fileAbsoluteName = getBasePath(fileName);
+            String fileAbsoluteName = getBasePath(safeFileName);
             desc = getAbsoluteFile(fileAbsoluteName);
         } else {
-            desc = getAbsoluteFile(extractUploadDir(request), fileName);
+            desc = getAbsoluteFile(extractUploadDir(request), safeFileName);
         }
         if (desc.exists()) {
             desc.delete();
