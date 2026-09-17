@@ -85,7 +85,7 @@ public class UserDeviceService extends PCrudService<UserDeviceDao, UserDevice, S
      */
     public String resolveDeviceId(String deviceCode, String ua,String ip) {
         // 1. 优先使用客户端传入的明确设备编码（App 端或前端生成的 UUID）
-        if (StringUtils.isNotBlank(deviceCode)) {
+        if (StringUtils.isNotBlank(deviceCode) && !StringUtils.isEquals(deviceCode,ua)) {
             return deviceCode;
         }
 
