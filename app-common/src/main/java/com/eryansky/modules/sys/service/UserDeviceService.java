@@ -7,6 +7,7 @@ package com.eryansky.modules.sys.service;
 
 import com.eryansky.common.orm.Page;
 import com.eryansky.common.orm.model.Parameter;
+import com.eryansky.common.orm.mybatis.interceptor.BaseInterceptor;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.encode.Encrypt;
@@ -15,6 +16,7 @@ import com.eryansky.core.orm.mybatis.entity.DataEntity;
 import com.eryansky.core.security.SessionInfo;
 import com.eryansky.modules.sys._enum.YesOrNo;
 import com.eryansky.modules.sys.vo.GeoIP;
+import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Lists;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -41,6 +43,7 @@ public class UserDeviceService extends PCrudService<UserDeviceDao, UserDevice, S
     public List<UserDevice> findByUserId(String userId, String deviceId) {
         Parameter parameter = Parameter.newParameter();
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
+        parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
         parameter.put("userId", userId);
         parameter.put("deviceId", deviceId);
         return dao.findByUserId(parameter);
@@ -48,8 +51,9 @@ public class UserDeviceService extends PCrudService<UserDeviceDao, UserDevice, S
 
 
     public Page<UserDevice> findPageByUserId(Page<UserDevice> page, String userId, String deviceId, String query) {
-        Parameter parameter = Parameter.newParameter();
+        Parameter parameter = Parameter.newPageParameter(page);
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
+        parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
         parameter.put("userId", userId);
         parameter.put("deviceId", deviceId);
         parameter.put("query", query);
