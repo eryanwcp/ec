@@ -174,6 +174,24 @@
         </div>
 
         <div class="control-group">
+            <label class="control-label">用户登录设备信息：</label>
+            <div class="controls">
+                <label><input name="system.security.device.record.enable" type="radio" value="true"/>启用</label>
+                <label><input name="system.security.device.record.enable" type="radio" value="false"/>禁用</label>
+                <span class="help-inline">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;记录用户登录设备信息，包括设备编码、IP等</span>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">用户登录设备预警：</label>
+            <div class="controls">
+                <label><input name="system.security.device.risk.enable" type="radio" value="true"/>启用</label>
+                <label><input name="system.security.device.risk.enable" type="radio" value="false"/>禁用</label>
+                <span class="help-inline">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;新设备登录预警</span>
+            </div>
+        </div>
+
+
+        <div class="control-group">
             <label class="control-label">日志保留时间：</label>
             <div class="controls">
                 <input name="system.logKeepTime" type="number" min="0" max="9999" class="input-small"/>
