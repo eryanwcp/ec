@@ -1,7 +1,8 @@
 /**
-*  Copyright (c) XXX有限公司 2013-2026 https://github.com/eryanwcp/ec
-*
-*/
+ * Copyright (c) 2012-2026 https://www.eryansky.com
+ * <p/>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ */
 package com.eryansky.modules.sys.service;
 
 import com.eryansky.common.orm.model.Parameter;
