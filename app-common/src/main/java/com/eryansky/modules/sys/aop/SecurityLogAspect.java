@@ -62,23 +62,6 @@ public class SecurityLogAspect {
     @Resource
     private SecurityTask securityTask;
 
-    /**
-     * 登录增强
-     *
-     * @param joinPoint 切入点
-     */
-    @After("execution(* com.eryansky.modules.sys.service.UserService.beforeLogin(..))")
-    public void beforeLogin(JoinPoint joinPoint) {
-        if(!AppConstants.isUserDeviceRiskEnable()){
-            return;
-        }
-        Object[] args = joinPoint.getArgs();
-        String loginName  = (String) args[0];
-        String deviceCode  = (String) args[1];
-        String ip  = (String) args[2];
-        String userAgent  = (String) args[3];
-        securityTask.checkRiskUserDevice(loginName,deviceCode,ip,userAgent);
-    }
 
     /**
      * 登录增强
