@@ -67,6 +67,11 @@ public class UserDevice extends PDataEntity<UserDevice, String> {
      */
     private String extendAttr;
 
+    /**
+     * 自定义查询条件
+     */
+    private String query;
+
     public UserDevice() {
 
     }
@@ -175,4 +180,11 @@ public class UserDevice extends PDataEntity<UserDevice, String> {
         return this.extendAttr;
     }
 
+    public String getQuery() {
+        return query;
+    }
+
+    public void setQuery(String query) {
+        this.query = query;
+    }
 }

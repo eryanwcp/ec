@@ -5,6 +5,7 @@
  */
 package com.eryansky.modules.sys.service;
 
+import com.eryansky.common.orm.Page;
 import com.eryansky.common.orm.model.Parameter;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
@@ -44,6 +45,22 @@ public class UserDeviceService extends PCrudService<UserDeviceDao, UserDevice, S
         parameter.put("deviceId", deviceId);
         return dao.findByUserId(parameter);
     }
+
+
+    public Page<UserDevice> findPageByUserId(Page<UserDevice> page, String userId, String deviceId, String query) {
+        Parameter parameter = Parameter.newParameter();
+        parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
+        parameter.put("userId", userId);
+        parameter.put("deviceId", deviceId);
+        parameter.put("query", query);
+        return page.setResult(dao.findByUserId(parameter));
+    }
+
+    public Page<UserDevice> findPage(Page<UserDevice> page, UserDevice entity) {
+        entity.setEntityPage(page);
+        return page.setResult(dao.findList(entity));
+    }
+
 
     /**
      * 检查设备是否登录过
