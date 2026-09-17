@@ -12,6 +12,7 @@ import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.encode.Encrypt;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.utils.net.IpUtils;
+import com.eryansky.common.web.utils.CookieUtils;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
 import com.eryansky.core.security._enum.DeviceType;
@@ -51,6 +52,28 @@ public class UserDeviceService extends PCrudService<UserDeviceDao, UserDevice, S
     }
 
     /**
+     * 获取或生成唯一设备标识 deviceId
+     */
+    public String resolveDeviceId(HttpServletRequest request, String deviceCode, String ua) {
+        // 1. 优先使用客户端传入的明确设备编码（App 端或前端生成的 UUID）
+        if (StringUtils.isNotBlank(deviceCode)) {
+            return deviceCode;
+        }
+
+        // 2. Web/H5 端兜底：尝试从 Cookie 中获取已有设备标识
+        String deviceCookie = CookieUtils.getCookie(request, "DEVICE_ID");
+        if (StringUtils.isNotBlank(deviceCookie)) {
+            return deviceCookie;
+        }
+
+        // 3. 极弱兜底：结合 IP + UA 组合生成防重碰撞的设备指纹（仅作为无Cookie场景下的备用标识）
+        String clientIp = IpUtils.getIpAddr0(request);
+        String rawFingerprint = String.format("%s|%s", StringUtils.defaultString(clientIp), StringUtils.defaultString(ua));
+
+        return Encrypt.md5(rawFingerprint);
+    }
+
+    /**
      * 保存或更新用户设备登录记录
      *
      * @param userId   用户ID
@@ -61,10 +84,11 @@ public class UserDeviceService extends PCrudService<UserDeviceDao, UserDevice, S
     public UserDevice saveOrUpdate(String userId, String userName, HttpServletRequest request) {
         String ua = UserAgentUtils.getHTTPUserAgent(request);
         String deviceCode_s = WebUtils.getParameter(request, "deviceCode");
+
         String platform_s = WebUtils.getParameter(request, "platform");
 
         // 1. 确定设备唯一标识 deviceId
-        String deviceId = StringUtils.isNotBlank(deviceCode_s) ? deviceCode_s : Encrypt.md5(ua);
+        String deviceId = resolveDeviceId(request, deviceCode_s, ua);
 
         // 2. 确定设备类型 deviceType 与设备名称 deviceName
         String deviceType;
