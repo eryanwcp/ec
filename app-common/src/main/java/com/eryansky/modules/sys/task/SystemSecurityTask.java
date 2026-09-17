@@ -84,11 +84,15 @@ public class SystemSecurityTask {
      * 构建报警消息文本
      */
     private String buildAlertMessage(String eventType, String loginName, String ip, String userAgent) {
-        GeoIP geoIP = ipService.getLocationByIp(ip);
-        String locationStr = Optional.ofNullable(geoIP)
-                .map(GeoIP::toFormatLocation)
-                .map(loc -> "[" + loc + "]")
-                .orElse("");
+        String locationStr = "";
+        if(AppConstants.isIpGeoEnable()){
+            GeoIP geoIP = ipService.getLocationByIp(ip);
+            locationStr = Optional.ofNullable(geoIP)
+                    .map(GeoIP::toFormatLocation)
+                    .map(loc -> "[" + loc + "]")
+                    .orElse("");
+        }
+
 
         return String.format("%s安全提醒：%s时间：%s，用户：%s，IP：%s%s，设备：%s",
                 SpringContextHolder.getApplicationContext().getId(),

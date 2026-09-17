@@ -560,6 +560,18 @@ public class AppConstants extends SysConstants {
 
 
     /**
+     * 是否启用外部IP服务
+     *
+     * @return
+     */
+    public static Boolean isIpGeoEnable() {
+        String code = "system.security.ipGeo.enable";
+        String value = getConfigValue(code, "false");
+        return Boolean.valueOf(value);
+    }
+
+
+    /**
      * 应用文件 磁盘绝对路径
      *
      * @return
