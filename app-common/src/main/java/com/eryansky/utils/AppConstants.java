@@ -564,8 +564,8 @@ public class AppConstants extends SysConstants {
      *
      * @return
      */
-    public static Boolean isIpGeoEnable() {
-        String code = "system.security.ipGeo.enable";
+    public static Boolean isGeoIpEnable() {
+        String code = "system.security.geoip.enable";
         String value = getConfigValue(code, "false");
         return Boolean.valueOf(value);
     }

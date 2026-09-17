@@ -149,6 +149,7 @@ public class ConfigController extends SimpleController {
             "system.security.limit.ip.blacklist",
             "system.security.device.record.enable",
             "system.security.device.risk.enable",
+            "system.security.geoip.enable",
             "system.security.proxy.enable",
             "system.security.proxy.whitelist",
             "system.security.SerializerTypeCheck.disallowClasses",

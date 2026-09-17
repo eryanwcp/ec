@@ -13,8 +13,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Transactional(value = DBConfigurer.TX_MANAGER_NAME,readOnly = true)
 @Service
 public class IpService {
@@ -35,7 +33,7 @@ public class IpService {
             return local;
         }
 
-        if(AppConstants.isIpGeoEnable()){
+        if(AppConstants.isGeoIpEnable()){
             try {
                 String response = HttpCompoents.getInstance().get(BASE_API_URL + "/geoip/" + ip);
                 return JsonMapper.getInstance().fromJson(response, GeoIP.class);

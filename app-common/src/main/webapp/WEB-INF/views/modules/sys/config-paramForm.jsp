@@ -189,7 +189,14 @@
                 <span class="help-inline">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;新设备登录预警</span>
             </div>
         </div>
-
+        <div class="control-group">
+            <label class="control-label">IP位置信息识别：</label>
+            <div class="controls">
+                <label><input name="system.security.geoip.enable" type="radio" value="true"/>启用</label>
+                <label><input name="system.security.geoip.enable" type="radio" value="false"/>禁用</label>
+                <span class="help-inline">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;依赖外部互联网IP服务</span>
+            </div>
+        </div>
 
         <div class="control-group">
             <label class="control-label">日志保留时间：</label>
