@@ -8,7 +8,6 @@ package com.eryansky.modules.sys.web;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.eryansky.common.exception.SystemException;
 import com.eryansky.common.model.*;
-import com.eryansky.common.orm.Page;
 import com.eryansky.common.orm._enum.StatusState;
 import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.common.utils.Identities;
@@ -28,8 +27,6 @@ import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
 import com.eryansky.core.security.annotation.PrepareOauth2;
 import com.eryansky.core.security.annotation.RequiresUser;
-import com.eryansky.core.web.annotation.Mobile;
-import com.eryansky.core.web.annotation.MobileValue;
 import com.eryansky.encrypt.config.EncryptProvider;
 import com.eryansky.encrypt.util.RequestEncryptUtils;
 import com.eryansky.j2cache.lock.DefaultLockCallback;
@@ -88,13 +85,12 @@ public class LoginController extends SimpleController {
      * @return
      */
     @PrepareOauth2(enable = false)
-    @Mobile(value = MobileValue.ALL)
     @RequiresUser(required = false)
     @GetMapping(value = {"welcome", ""})
     public ModelAndView welcome(HttpServletRequest request,
                                 @RequestParam(value = "client_id", required = false) String clientId,
                                 @RequestParam(value = "redirect_uri", required = false) String redirectUri) {
-        ModelAndView modelAndView = new ModelAndView("login");
+        ModelAndView modelAndView = new ModelAndView("login.html");
         String ip = SpringMVCHolder.getIp();
 
         // 校验客户端 IP 是否满足强制开启验证码的条件
@@ -105,6 +101,7 @@ public class LoginController extends SimpleController {
 
         String randomSecurityToken = Identities.randomBase62(64);
         WebUtils.setSessionAttribute(request, "securityToken", randomSecurityToken);
+        modelAndView.addObject("securityToken", randomSecurityToken);
         modelAndView.addObject("redirectUri", redirectUri);
         modelAndView.addObject("clientId", clientId);
         return modelAndView;
@@ -221,6 +218,9 @@ public class LoginController extends SimpleController {
         return Result.successResult().setObj(publicKey);
     }
 
+
+
+
     /**
      * 登录验证
      *
@@ -267,7 +267,7 @@ public class LoginController extends SimpleController {
         boolean isValidateCodeLogin = isValidateCodeLogin(loginName, false, false)
                 || isValidateCodeLogin(ip, false, false);
 
-        if (isValidateCodeLogin && UserAgentUtils.isComputer(request)) {
+        if (isValidateCodeLogin) {
             if (StringUtils.isBlank(validateCode)) {
                 return Result.errorResult().setMsg(VALIDATECODE_TIP).setObj(isValidateCodeLogin);
             }
@@ -378,6 +378,39 @@ public class LoginController extends SimpleController {
             isValidateCodeLogin(ip, false, true);
         }
         return result;
+    }
+
+    /**
+     * 发送登录验证码
+     *
+     * @return
+     */
+    @PrepareOauth2(enable = false)
+    @RequiresUser(required = false)
+    @PostMapping(value = "sendLoginSms")
+    @ResponseBody
+    public Result sendLoginSms(@RequestParam(value = "loginName",required = true) String loginNameOrMobile) {
+        return Result.successResult().setMsg("模拟实现！");
+    }
+
+    /**
+     * 登录（短信验证码）
+     * @param loginNameOrMobile 账号或手机号
+     * @param code 验证码
+     * @param request
+     * @param uiModel
+     * @return
+     */
+    @PrepareOauth2(enable = false)
+    @RequiresUser(required = false)
+    @ResponseBody
+    @PostMapping(value = {"smsLogin"})
+    public Result smsLogin(@RequestParam(value = "client_id",required = false) String clientId,
+                           @RequestParam(value = "redirect_uri",required = false) String redirectUri,
+                           @RequestParam(value = "loginName",required = true) String loginNameOrMobile,
+                           @RequestParam(name = "code",required = true) String code,
+                           HttpServletRequest request, Model uiModel) {
+        return Result.errorResult().setMsg("暂未实现！");
     }
 
     /**
