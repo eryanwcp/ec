@@ -30,9 +30,9 @@ import java.util.stream.Collectors;
  * @date 2026-09-17
  */
 @Component
-public class SecurityTask {
+public class SystemSecurityTask {
 
-    private static final Logger logger = LoggerFactory.getLogger(SecurityTask.class);
+    private static final Logger logger = LoggerFactory.getLogger(SystemSecurityTask.class);
 
     @Resource
     private UserDeviceService userDeviceService;

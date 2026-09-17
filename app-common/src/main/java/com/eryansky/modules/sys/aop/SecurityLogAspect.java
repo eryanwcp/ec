@@ -18,7 +18,7 @@ import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys.event.SysLogEvent;
 import com.eryansky.modules.sys.mapper.Log;
 import com.eryansky.modules.sys.service.UserService;
-import com.eryansky.modules.sys.task.SecurityTask;
+import com.eryansky.modules.sys.task.SystemSecurityTask;
 import com.eryansky.utils.AppConstants;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -46,7 +46,7 @@ public class SecurityLogAspect {
     private static final Logger logger = LoggerFactory.getLogger(SecurityLogAspect.class);
 
     @Resource
-    private SecurityTask securityTask;
+    private SystemSecurityTask systemSecurityTask;
 
     /**
      * 登录增强
@@ -61,11 +61,11 @@ public class SecurityLogAspect {
 
             // 异常设备登录预警
             if (AppConstants.isUserDeviceRiskEnable()) {
-                securityTask.checkRiskUserDevice(sessionInfo);
+                systemSecurityTask.checkRiskUserDevice(sessionInfo);
             }
             // 保存登录设备信息
             if (AppConstants.isUserDeviceRecordEnable()) {
-                securityTask.saveOrUpdateUserDevice(sessionInfo);
+                systemSecurityTask.saveOrUpdateUserDevice(sessionInfo);
             }
         }
     }
