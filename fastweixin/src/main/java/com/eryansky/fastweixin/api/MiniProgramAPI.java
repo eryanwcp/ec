@@ -694,7 +694,7 @@ public class MiniProgramAPI extends BaseAPI {
                 response.setErrcode(String.valueOf(statusCode));
                 response.setErrmsg("请求失败");
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOG.error("获取体验版二维码IO异常", e);
             response.setErrcode("-1");
             response.setErrmsg("IO异常: " + e.getMessage());
@@ -753,7 +753,7 @@ public class MiniProgramAPI extends BaseAPI {
                 response.setErrcode(String.valueOf(statusCode));
                 response.setErrmsg("请求失败");
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOG.error("获取小程序码IO异常", e);
             response.setErrcode("-1");
             response.setErrmsg("IO异常: " + e.getMessage());
