@@ -647,6 +647,126 @@ public class MiniProgramAPI extends BaseAPI {
         return JSONUtil.toBean(resultJson, BaseResponse.class);
     }
 
+    // ========================= 动态消息相关 =========================
+
+    /**
+     * 创建动态消息活动ID
+     * 接口地址: POST /cgi-bin/message/wxopen/activityid/create
+     *
+     * 动态消息是一种可以更新内容的消息类型，适用于拼团、砍价等需要实时更新状态的场景。
+     * 创建成功后，可以使用返回的activity_id发送或更新动态消息。
+     * activity_id默认有效期24小时。
+     *
+     * @return 包含activity_id和过期时间的响应对象
+     */
+    public CreateActivityIdResponse createActivityId() {
+        LOG.debug("创建动态消息活动ID......");
+        String url = BASE_API_URL + "cgi-bin/message/wxopen/activityid/create?access_token=#";
+        BaseResponse r = executePost(url, "{}");
+        String resultJson = isSuccess(r.getErrcode()) ? r.getErrmsg() : r.toJsonString();
+        return JSONUtil.toBean(resultJson, CreateActivityIdResponse.class);
+    }
+
+    /**
+     * 创建动态消息活动ID（指定unionid）
+     * 接口地址: POST /cgi-bin/message/wxopen/activityid/create
+     *
+     * @param unionid 为指定用户创建activity_id
+     * @return 包含activity_id和过期时间的响应对象
+     */
+    public CreateActivityIdResponse createActivityId(String unionid) {
+        LOG.debug("创建动态消息活动ID(指定unionid)......");
+        String url = BASE_API_URL + "cgi-bin/message/wxopen/activityid/create?access_token=#";
+        Map<String, String> params = new HashMap<>();
+        if (unionid != null) {
+            params.put("unionid", unionid);
+        }
+        BaseResponse r = executePost(url, JSONUtil.toJson(params));
+        String resultJson = isSuccess(r.getErrcode()) ? r.getErrmsg() : r.toJsonString();
+        return JSONUtil.toBean(resultJson, CreateActivityIdResponse.class);
+    }
+
+    /**
+     * 发送或更新动态消息
+     * 接口地址: POST /cgi-bin/message/wxopen/updatablemsg/send
+     *
+     * 动态消息分为两种状态：
+     * - target_state=0: 未开始状态，显示参与人数和上限人数
+     * - target_state=1: 已开始/已结束状态，显示跳转小程序的按钮
+     *
+     * @param activityId   动态消息ID，通过createActivityId获取
+     * @param targetState  目标状态：0-未开始，1-已开始/已结束
+     * @param templateInfo 模板信息，根据target_state传入不同的参数列表
+     * @return 操作结果
+     */
+    public BaseResponse setUpdatableMsg(String activityId, Integer targetState, UpdatableMsgTemplateInfo templateInfo) {
+        BeanUtil.requireNonNull(activityId, "activityId is null");
+        BeanUtil.requireNonNull(targetState, "targetState is null");
+        BeanUtil.requireNonNull(templateInfo, "templateInfo is null");
+        
+        LOG.debug("发送/更新动态消息......");
+        String url = BASE_API_URL + "cgi-bin/message/wxopen/updatablemsg/send?access_token=#";
+        
+        Map<String, Object> params = new HashMap<>();
+        params.put("activity_id", activityId);
+        params.put("target_state", targetState);
+        params.put("template_info", templateInfo);
+        
+        BaseResponse r = executePost(url, JSONUtil.toJson(params));
+        String resultJson = isSuccess(r.getErrcode()) ? r.getErrmsg() : r.toJsonString();
+        return JSONUtil.toBean(resultJson, BaseResponse.class);
+    }
+
+    /**
+     * 发送动态消息（未开始状态）
+     * 便捷方法，用于创建"未开始"状态的动态消息，显示参与人数和上限人数。
+     *
+     * @param activityId  动态消息ID
+     * @param memberCount 当前参与人数
+     * @param roomLimit   上限人数
+     * @return 操作结果
+     */
+    public BaseResponse setUpdatableMsgNotStarted(String activityId, int memberCount, int roomLimit) {
+        BeanUtil.requireNonNull(activityId, "activityId is null");
+        
+        LOG.debug("发送动态消息(未开始状态)......");
+        
+        // 构建未开始状态的参数列表
+        java.util.List<UpdatableMsgTemplateInfo.ParameterItem> paramList = new java.util.ArrayList<>();
+        paramList.add(UpdatableMsgTemplateInfo.ParameterItem.memberCount(memberCount));
+        paramList.add(UpdatableMsgTemplateInfo.ParameterItem.roomLimit(roomLimit));
+        
+        UpdatableMsgTemplateInfo templateInfo = new UpdatableMsgTemplateInfo(paramList);
+        
+        return setUpdatableMsg(activityId, 0, templateInfo);
+    }
+
+    /**
+     * 发送动态消息（已开始/已结束状态）
+     * 便捷方法，用于更新为"已开始"或"已结束"状态，显示跳转小程序的按钮。
+     *
+     * @param activityId  动态消息ID
+     * @param pagePath    点击消息进入小程序的页面路径，例如："pages/index/index?id=123"
+     * @param versionType 小程序版本：developer-开发版，trial-体验版，release-正式版
+     * @return 操作结果
+     */
+    public BaseResponse setUpdatableMsgStarted(String activityId, String pagePath, String versionType) {
+        BeanUtil.requireNonNull(activityId, "activityId is null");
+        BeanUtil.requireNonNull(pagePath, "pagePath is null");
+        BeanUtil.requireNonNull(versionType, "versionType is null");
+        
+        LOG.debug("发送动态消息(已开始/已结束状态)......");
+        
+        // 构建已开始状态的参数列表
+        java.util.List<UpdatableMsgTemplateInfo.ParameterItem> paramList = new java.util.ArrayList<>();
+        paramList.add(UpdatableMsgTemplateInfo.ParameterItem.path(pagePath));
+        paramList.add(UpdatableMsgTemplateInfo.ParameterItem.versionType(versionType));
+        
+        UpdatableMsgTemplateInfo templateInfo = new UpdatableMsgTemplateInfo(paramList);
+        
+        return setUpdatableMsg(activityId, 1, templateInfo);
+    }
+
     // ========================= 内部方法 =========================
 
     /**
