@@ -19,6 +19,7 @@ import com.eryansky.modules.sys.event.SysLogEvent;
 import com.eryansky.modules.sys.mapper.Log;
 import com.eryansky.modules.sys.service.UserDeviceService;
 import com.eryansky.modules.sys.service.UserService;
+import com.eryansky.modules.sys.task.SecurityTask;
 import jakarta.annotation.Resource;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
@@ -30,6 +31,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import jakarta.servlet.http.HttpServletRequest;
+
 import java.util.Date;
 
 /**
@@ -45,7 +47,8 @@ public class SecurityLogAspect {
     private static final Logger logger = LoggerFactory.getLogger(SecurityLogAspect.class);
 
     @Resource
-    private UserDeviceService userDeviceService;
+    private SecurityTask securityTask;
+
     /**
      * 登录增强
      *
@@ -56,11 +59,8 @@ public class SecurityLogAspect {
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         if (sessionInfo != null) {
             saveLog(sessionInfo, joinPoint, SecurityType.login); //保存日志
-            try {
-                userDeviceService.saveOrUpdate(sessionInfo.getUserId(),sessionInfo.getName(),SpringMVCHolder.getRequest());
-            } catch (Exception e) {
-                logger.error(e.getMessage(),e);
-            }
+            //保存登录设备信息
+            securityTask.saveOrUpdateUserDevice(sessionInfo);
         }
     }
 
@@ -121,16 +121,16 @@ public class SecurityLogAspect {
             log.setModule(className + "-" + methodName);
             log.setIp(sessionInfo.getIp());
             log.setTitle(securityType.getDescription());
-            log.setAction(null != request ? request.getMethod(): StringUtils.EMPTY);
+            log.setAction(null != request ? request.getMethod() : StringUtils.EMPTY);
             log.setUserAgent(sessionInfo.getUserAgent());
             log.setDeviceType(sessionInfo.getDeviceType());
             log.setBrowserType(sessionInfo.getBrowserType());
             log.setOperTime(new Date());
             ExtendAttr extendAttr = new ExtendAttr();
-            extendAttr.put("userType",sessionInfo.getUserType());
-            extendAttr.put("userName",sessionInfo.getName());
-            extendAttr.put("userLoginName",sessionInfo.getLoginName());
-            extendAttr.put("userMobile",sessionInfo.getMobile());
+            extendAttr.put("userType", sessionInfo.getUserType());
+            extendAttr.put("userName", sessionInfo.getName());
+            extendAttr.put("userLoginName", sessionInfo.getLoginName());
+            extendAttr.put("userMobile", sessionInfo.getMobile());
             extendAttr.put("requestData", null != request ? JsonMapper.toJsonString(request.getParameterMap()) : null);
             extendAttr.put("requestHeaders", null != request ? JsonMapper.toJsonString(WebUtils.getHeaders(request)) : null);
             log.setExtendAttr(extendAttr);
