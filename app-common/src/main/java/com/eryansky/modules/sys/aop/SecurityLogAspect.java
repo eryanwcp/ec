@@ -7,19 +7,28 @@ package com.eryansky.modules.sys.aop;
 
 import com.eryansky.client.common.vo.ExtendAttr;
 import com.eryansky.common.spring.SpringContextHolder;
+import com.eryansky.common.utils.DateUtils;
 import com.eryansky.common.utils.StringUtils;
+import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.common.web.utils.WebUtils;
+import com.eryansky.core.orm.mybatis.entity.BaseEntity;
 import com.eryansky.core.security.SecurityType;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
+import com.eryansky.modules.notice.utils.MessageUtils;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys.event.SysLogEvent;
 import com.eryansky.modules.sys.mapper.Log;
+import com.eryansky.modules.sys.mapper.User;
+import com.eryansky.modules.sys.mapper.UserDevice;
 import com.eryansky.modules.sys.service.UserDeviceService;
 import com.eryansky.modules.sys.service.UserService;
 import com.eryansky.modules.sys.task.SecurityTask;
+import com.eryansky.modules.sys.utils.UserUtils;
+import com.eryansky.utils.AppConstants;
+import com.google.common.collect.Lists;
 import jakarta.annotation.Resource;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
@@ -33,6 +42,10 @@ import org.springframework.stereotype.Component;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 /**
  * 使用AspectJ实现登录登出日志AOP
@@ -45,7 +58,7 @@ import java.util.Date;
 public class SecurityLogAspect {
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityLogAspect.class);
-
+    private final ThreadLocal<String> sysLogThreadLocal = new ThreadLocal<>();
     @Resource
     private SecurityTask securityTask;
 
@@ -54,13 +67,37 @@ public class SecurityLogAspect {
      *
      * @param joinPoint 切入点
      */
+    @After("execution(* com.eryansky.modules.sys.service.UserService.beforeLogin(..))")
+    public void beforeLogin(JoinPoint joinPoint) {
+        if(!AppConstants.isUserDeviceRiskEnable()){
+            return;
+        }
+        Object[] args = joinPoint.getArgs();
+        String loginName  = (String) args[0];
+        String deviceCode  = (String) args[1];
+        String ip  = (String) args[2];
+        String userAgent  = (String) args[3];
+        securityTask.checkRiskUserDevice(loginName,deviceCode,ip,userAgent);
+    }
+
+    /**
+     * 登录增强
+     *
+     * @param joinPoint 切入点
+     */
     @After("execution(* com.eryansky.modules.sys.service.UserService.login(..))")
-    public void afterLoginLog(JoinPoint joinPoint) {
+    public void afterLogin(JoinPoint joinPoint) {
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         if (sessionInfo != null) {
             saveLog(sessionInfo, joinPoint, SecurityType.login); //保存日志
             //保存登录设备信息
-            securityTask.saveOrUpdateUserDevice(sessionInfo);
+            if(AppConstants.isUserDeviceRecordEnable()){
+                securityTask.saveOrUpdateUserDevice(sessionInfo);
+            }
+
+            if(AppConstants.isUserDeviceRiskEnable()){
+                securityTask.checkRiskUserDevice(sessionInfo);
+            }
         }
     }
 

@@ -7,22 +7,15 @@ package com.eryansky.modules.sys.service;
 
 import com.eryansky.common.orm.model.Parameter;
 import com.eryansky.common.utils.StringUtils;
-import com.eryansky.common.utils.UserAgentUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.encode.Encrypt;
 import com.eryansky.common.utils.mapper.JsonMapper;
-import com.eryansky.common.utils.net.IpUtils;
-import com.eryansky.common.web.utils.CookieUtils;
-import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
 import com.eryansky.core.security.SessionInfo;
-import com.eryansky.core.security._enum.DeviceType;
 import com.eryansky.modules.sys._enum.YesOrNo;
 import com.eryansky.modules.sys.vo.GeoIP;
-import com.eryansky.utils.AppUtils;
 import com.google.common.collect.Lists;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 import com.eryansky.modules.sys.mapper.UserDevice;
 import com.eryansky.modules.sys.dao.UserDeviceDao;
@@ -52,6 +45,20 @@ public class UserDeviceService extends PCrudService<UserDeviceDao, UserDevice, S
         return dao.findByUserId(parameter);
     }
 
+    /**
+     * 检查设备是否登录过
+     * @param userId
+     * @param deviceCode
+     * @param ip
+     * @param userAgent
+     * @return
+     */
+    public UserDevice checkExist(String userId,String deviceCode,String ip,String userAgent) {
+        String deviceId = resolveDeviceId(deviceCode, userAgent, ip);
+
+        List<UserDevice> userDevices = findByUserId(userId, deviceId);
+        return Collections3.isNotEmpty(userDevices) ? userDevices.get(0) : null;
+    }
     /**
      * 获取或生成唯一设备标识 deviceId
      */

@@ -2008,13 +2008,18 @@ public class UserService extends CrudService<UserDao, User> {
         return t;
     }
     /**
+     * 登录前置
+     */
+    public void beforeLogin(String loginName,String ip,String deviceCode,String userAgent) {
+        logger.debug("loginName：{}，ip：{}，deviceCode：{}，userAgent：{}。", loginName, ip, deviceCode, userAgent);
+    }
+
+    /**
      * 登录
      */
     public void login(String userId) {
-        logger.debug("login {}", new Object[]{userId});
-
+        logger.debug("userId {}", new Object[]{userId});
     }
-
 
     /**
      * 注销 空操 可提供切面使用

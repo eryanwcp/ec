@@ -18,6 +18,7 @@ import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.encode.Encrypt;
 import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.common.utils.mapper.JsonMapper;
+import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.servlet.ValidateCodeServlet;
 import com.eryansky.common.web.springmvc.SimpleController;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
@@ -35,6 +36,7 @@ import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.service.ResourceService;
 import com.eryansky.modules.sys.service.UserPasswordService;
 import com.eryansky.modules.sys.service.UserService;
+import com.eryansky.modules.sys.task.SecurityTask;
 import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.modules.sys.vo.PasswordTip;
 import com.eryansky.utils.AppConstants;
@@ -70,6 +72,8 @@ public class LoginController extends SimpleController {
     private UserPasswordService userPasswordService;
     @jakarta.annotation.Resource
     private ResourceService resourceService;
+    @jakarta.annotation.Resource
+    private SecurityTask securityTask;
 
     private static final int RESULT_CODE_APP_VERSION_ERROR = 5; // APP版本禁止登录
     private static final int RESULT_CODE_DEVICE_ERROR = 4;      // 移动设备校验错误码
@@ -175,6 +179,13 @@ public class LoginController extends SimpleController {
             if (sessionUser >= maxSize) {
                 throw new SystemException("系统当前登录用户数量过多，请稍后再试！");
             }
+        }
+        if(AppConstants.isUserDeviceRiskEnable()){
+            HttpServletRequest request = SpringMVCHolder.getRequest();
+            String deviceCode = WebUtils.getParameter(request,"deviceCode");
+            String ip = IpUtils.getIpAddr0(request);
+            String userAgent = UserAgentUtils.getHTTPUserAgent(request);
+            securityTask.checkRiskUserDevice(loginName,deviceCode,ip,userAgent);
         }
     }
 
