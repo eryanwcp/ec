@@ -3,6 +3,7 @@ package com.eryansky.modules.sys.service;
 import com.eryansky.common.utils.http.HttpCompoents;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.utils.net.IpUtils;
+import com.eryansky.configure.DBConfigurer;
 import com.eryansky.modules.sys.vo.GeoIP;
 import com.eryansky.utils.CacheConstants;
 import org.apache.commons.lang3.StringUtils;
@@ -11,7 +12,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Transactional(readOnly = true)
+@Transactional(value = DBConfigurer.TX_MANAGER_NAME,readOnly = true)
 @Service
 public class IpService {
 
