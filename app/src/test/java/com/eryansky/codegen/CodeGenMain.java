@@ -27,7 +27,7 @@ public class CodeGenMain {
         List<Table> tables = null;
         Builder builder = null;
         DataSource db = null;
-        String t = "t_sys_config";//表 通配"%"
+        String t = "t_sys_user_device";//表 通配"%"
         Table table = null;
         try {
             db = DbFactory.create(dbConfig);

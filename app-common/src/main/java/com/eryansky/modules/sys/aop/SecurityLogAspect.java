@@ -17,8 +17,9 @@ import com.eryansky.core.security.SessionInfo;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys.event.SysLogEvent;
 import com.eryansky.modules.sys.mapper.Log;
+import com.eryansky.modules.sys.service.UserDeviceService;
 import com.eryansky.modules.sys.service.UserService;
-import com.eryansky.utils.SpringUtils;
+import jakarta.annotation.Resource;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
@@ -43,6 +44,8 @@ public class SecurityLogAspect {
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityLogAspect.class);
 
+    @Resource
+    private UserDeviceService userDeviceService;
     /**
      * 登录增强
      *
@@ -53,6 +56,11 @@ public class SecurityLogAspect {
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         if (sessionInfo != null) {
             saveLog(sessionInfo, joinPoint, SecurityType.login); //保存日志
+            try {
+                userDeviceService.saveOrUpdate(sessionInfo.getUserId(),sessionInfo.getName(),SpringMVCHolder.getRequest());
+            } catch (Exception e) {
+                logger.error(e.getMessage(),e);
+            }
         }
     }
 
