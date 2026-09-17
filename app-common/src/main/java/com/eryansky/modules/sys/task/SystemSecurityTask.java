@@ -94,14 +94,14 @@ public class SystemSecurityTask {
         }
 
 
-        return String.format("%s安全提醒：%s时间：%s，用户：%s，IP：%s%s，设备：%s",
-                SpringContextHolder.getApplicationContext().getId(),
+        return String.format("安全提醒：%s时间：%s，用户：%s，IP：%s%s，设备：%s，应用：%s",
                 eventType,
                 DateUtils.getDateTime(),
                 loginName,
                 ip,
                 locationStr,
-                userAgent);
+                userAgent,
+                SpringContextHolder.getApplicationContext().getId());
     }
 
     /**
