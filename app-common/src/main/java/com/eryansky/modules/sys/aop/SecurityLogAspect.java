@@ -73,13 +73,14 @@ public class SecurityLogAspect {
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         if (sessionInfo != null) {
             saveLog(sessionInfo, joinPoint, SecurityType.login); //保存日志
+            //异常设备登录预警
+            if(AppConstants.isUserDeviceRiskEnable()){
+                securityTask.checkRiskUserDevice(sessionInfo);
+            }
+
             //保存登录设备信息
             if(AppConstants.isUserDeviceRecordEnable()){
                 securityTask.saveOrUpdateUserDevice(sessionInfo);
-            }
-
-            if(AppConstants.isUserDeviceRiskEnable()){
-                securityTask.checkRiskUserDevice(sessionInfo);
             }
         }
     }
