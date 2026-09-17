@@ -1,5 +1,6 @@
 package com.eryansky.modules.sys.task;
 
+import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.common.utils.DateUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.core.orm.mybatis.entity.BaseEntity;
@@ -89,7 +90,8 @@ public class SystemSecurityTask {
                 .map(loc -> "[" + loc + "]")
                 .orElse("");
 
-        return String.format("安全提醒：%s时间：%s，用户：%s，IP：%s%s,设备：%s",
+        return String.format("%s安全提醒：%s时间：%s，用户：%s，IP：%s%s,设备：%s",
+                SpringContextHolder.getApplicationContext().getId(),
                 eventType,
                 DateUtils.getCurrentDateTime(),
                 loginName,
