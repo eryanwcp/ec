@@ -23,6 +23,10 @@ public class UserDevice extends PDataEntity<UserDevice, String> {
      */
     private String userName;
     /**
+     * 用户类型
+     */
+    private String userType;
+    /**
      * 设备名称
      */
     private String deviceName;
@@ -81,6 +85,14 @@ public class UserDevice extends PDataEntity<UserDevice, String> {
 
     public String getUserName() {
         return this.userName;
+    }
+
+    public String getUserType() {
+        return userType;
+    }
+
+    public void setUserType(String userType) {
+        this.userType = userType;
     }
 
     public void setDeviceName(String deviceName) {

@@ -118,6 +118,7 @@ public class UserDeviceService extends PCrudService<UserDeviceDao, UserDevice, S
         // 6. 填充实体字段
         entity.setUserId(sessionInfo.getUserId());
         entity.setUserName(StringUtils.defaultString(sessionInfo.getName(), sessionInfo.getUserId()));
+        entity.setUserType(sessionInfo.getUserType());
         entity.setIps(JsonMapper.getInstance().toJson(updatedIps));
         entity.setLocation(location);
         entity.setDeviceId(deviceId);
