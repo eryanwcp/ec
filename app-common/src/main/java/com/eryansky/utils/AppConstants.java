@@ -537,6 +537,41 @@ public class AppConstants extends SysConstants {
     }
 
     /**
+     * 记录用户登录设备信息
+     *
+     * @return
+     */
+    public static Boolean isUserDeviceRecordEnable() {
+        String code = "system.security.device.record.enable";
+        String value = getConfigValue(code, "false");
+        return Boolean.valueOf(value);
+    }
+
+    /**
+     * 风险设备登录提醒
+     *
+     * @return
+     */
+    public static Boolean isUserDeviceRiskEnable() {
+        String code = "system.security.device.risk.enable";
+        String value = getConfigValue(code, "false");
+        return Boolean.valueOf(value);
+    }
+
+
+    /**
+     * 是否启用外部IP服务
+     *
+     * @return
+     */
+    public static Boolean isGeoIpEnable() {
+        String code = "system.security.geoip.enable";
+        String value = getConfigValue(code, "false");
+        return Boolean.valueOf(value);
+    }
+
+
+    /**
      * 应用文件 磁盘绝对路径
      *
      * @return

@@ -53,6 +53,7 @@ public class CacheConstants {
     public static final String CACHE_OrganDao = "com.eryansky.modules.sys.dao.OrganDao";
     public static final String CACHE_UserDao = "com.eryansky.modules.sys.dao.UserDao";
     public static final String CACHE_ResourceDao = "com.eryansky.modules.sys.dao.ResourceDao";
+    public static final String CACHE_GEO_IP = "cache_geoIP";
 
 	
 }

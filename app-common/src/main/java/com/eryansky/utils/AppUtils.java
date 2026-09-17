@@ -11,6 +11,7 @@ import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.UserAgentUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.encode.EncodeUtils;
+import com.eryansky.common.utils.encode.Encrypt;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.common.web.utils.WebUtils;
@@ -719,5 +720,20 @@ public class AppUtils {
             return authorization.substring(6).trim();
         }
         return authorization.trim();
+    }
+
+    /**
+     * 获取或生成唯一设备标识 deviceId
+     */
+    public static String resolveDeviceId(String deviceCode, String ua,String ip) {
+        // 1. 优先使用客户端传入的明确设备编码（App 端或前端生成的 UUID）
+        if (StringUtils.isNotBlank(deviceCode) && !StringUtils.isEquals(deviceCode,ua)) {
+            return deviceCode;
+        }
+
+        // 2. 极弱兜底：结合 IP + UA 组合生成防重碰撞的设备指纹（仅作为无Cookie场景下的备用标识）
+        String rawFingerprint = String.format("%s|%s", StringUtils.defaultString(ip), StringUtils.defaultString(ua));
+
+        return Encrypt.md5(rawFingerprint);
     }
 }

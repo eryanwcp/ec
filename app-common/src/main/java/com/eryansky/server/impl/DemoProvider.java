@@ -9,14 +9,14 @@ import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.service.UserService;
 import com.eryansky.server.DemoAPI;
 import com.google.common.collect.Maps;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
 @RPCProvider
-//@Component
+@Component
 public class DemoProvider implements DemoAPI {
 
     @Resource

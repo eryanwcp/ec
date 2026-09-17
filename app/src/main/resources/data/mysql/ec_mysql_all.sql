@@ -24252,6 +24252,36 @@ CREATE TABLE `t_sys_log_history`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COMMENT = '审计日志历史' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
+-- Table structure for t_sys_user_device
+-- ----------------------------
+DROP TABLE IF EXISTS `t_sys_user_device`;
+CREATE TABLE `t_sys_user_device`  (
+  `id` varchar(36)  NOT NULL COMMENT '主键ID UUID',
+  `status` char(1) DEFAULT NULL COMMENT '状态 正常/删除/审核/锁定 0/1/2/3',
+  `version` int(11) DEFAULT NULL COMMENT '版本号',
+  `create_user` varchar(36) DEFAULT NULL COMMENT '创建者',
+  `create_time` datetime(0) DEFAULT NULL COMMENT '创建时间',
+  `update_user` varchar(36) DEFAULT NULL COMMENT '更新者',
+  `update_time` datetime(0) DEFAULT NULL COMMENT '更新时间',
+  `user_id` varchar(36) DEFAULT NULL COMMENT '用户ID',
+  `user_name` varchar(64) DEFAULT NULL COMMENT '用户名称',
+  `user_type` varchar(36) DEFAULT NULL COMMENT '用户名称',
+  `device_name` varchar(255) DEFAULT NULL COMMENT '设备名称',
+  `device_id` varchar(64) DEFAULT NULL COMMENT '设备唯一标识/指纹',
+  `device_type` varchar(36) DEFAULT NULL COMMENT '设备类型',
+  `ips` varchar(2048) DEFAULT NULL COMMENT '历史登录IP集合信息',
+  `location` varchar(256) DEFAULT NULL COMMENT '最近登录地理位置',
+  `login_count` int(11) NOT NULL DEFAULT 1 COMMENT '成功登录次数',
+  `is_common` char(1) NOT NULL DEFAULT 0 COMMENT '是否为常见设备: 0-否, 1-是',
+  `first_login_time` datetime(0) NOT NULL COMMENT '首次使用时间',
+  `last_login_time` datetime(0) NOT NULL COMMENT '最后登录时间',
+  `extend_attr` varchar(2048) DEFAULT NULL COMMENT '自定义扩展数据 {\'key1\':Object,\'key2\':Object}',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `user_id`(`user_id`) USING BTREE,
+  INDEX `create_time`(`create_time`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COMMENT = '用户登录设备' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
 -- Table structure for t_sys_organ
 -- ----------------------------
 DROP TABLE IF EXISTS `t_sys_organ`;
