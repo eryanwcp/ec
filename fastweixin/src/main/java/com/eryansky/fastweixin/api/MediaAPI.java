@@ -7,6 +7,7 @@ import com.eryansky.fastweixin.api.response.BaseResponse;
 import com.eryansky.fastweixin.api.response.DownloadMediaResponse;
 import com.eryansky.fastweixin.api.response.UploadImgResponse;
 import com.eryansky.fastweixin.api.response.UploadMediaResponse;
+import com.eryansky.fastweixin.util.BeanUtil;
 import com.eryansky.fastweixin.util.JSONUtil;
 import com.eryansky.fastweixin.util.NetWorkCenter;
 import com.eryansky.fastweixin.util.StreamUtil;
@@ -52,7 +53,7 @@ public class MediaAPI extends BaseAPI {
      */
     public UploadMediaResponse uploadMedia(MediaType type, File file) {
         UploadMediaResponse response;
-        String url = "http://file.api.weixin.qq.com/cgi-bin/media/upload?access_token=#&type=" + type.toString();
+        String url = BASE_API_URL + "cgi-bin/media/upload?access_token=#&type=" + type.toString();
         BaseResponse r = executePost(url, null, file);
         response = JSONUtil.toBean(r.getErrmsg(), UploadMediaResponse.class);
         return response;
@@ -86,6 +87,27 @@ public class MediaAPI extends BaseAPI {
     }
 
     /**
+     * 上传群发视频素材
+     * 上传视频后得到media_id，用于群发消息
+     *
+     * @param mediaId     上传后的临时素材media_id
+     * @param title       视频标题
+     * @param description 视频描述
+     * @return 包含media_id的响应
+     */
+    public UploadMediaResponse uploadVideoForMassSend(String mediaId, String title, String description) {
+        BeanUtil.requireNonNull(mediaId, "mediaId is null");
+        LOG.debug("上传群发视频素材......");
+        String url = BASE_API_URL + "cgi-bin/media/uploadvideo?access_token=#";
+        Map<String, String> params = new HashMap<>();
+        params.put("media_id", mediaId);
+        params.put("title", title);
+        params.put("description", description);
+        BaseResponse r = executePost(url, JSONUtil.toJson(params));
+        return JSONUtil.toBean(r.getErrmsg(), UploadMediaResponse.class);
+    }
+
+    /**
      * 下载资源，HttpClient5 重构版
      *
      * @param mediaId 微信提供的资源唯一标识
@@ -93,7 +115,7 @@ public class MediaAPI extends BaseAPI {
      */
     public DownloadMediaResponse downloadMedia(String mediaId) {
         DownloadMediaResponse response = new DownloadMediaResponse();
-        String url = "http://file.api.weixin.qq.com/cgi-bin/media/get?access_token=" + this.config.getAccessToken() + "&media_id=" + mediaId;
+        String url = BASE_API_URL + "cgi-bin/media/get?access_token=" + this.config.getAccessToken() + "&media_id=" + mediaId;
 
         // HttpClient5 超时配置
         RequestConfig config = RequestConfig.custom()

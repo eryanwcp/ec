@@ -1,5 +1,6 @@
 package com.eryansky.fastweixin.api.config;
 
+import com.eryansky.fastweixin.api.response.GetStableTokenResponse;
 import com.eryansky.fastweixin.api.response.GetTokenResponse;
 import com.eryansky.fastweixin.handle.ApiConfigChangeHandle;
 import com.eryansky.fastweixin.api.response.GetJsApiTicketResponse;
@@ -157,6 +158,46 @@ public class ApiConfig extends Observable implements Serializable {
     public ApiConfig removeAllHandle() {
         super.deleteObservers();
         return this;
+    }
+
+    /**
+     * 获取稳定版接口调用凭据（stable_token）
+     * 相比普通access_token，stable_token具有以下优势：
+     * 1. 有效期内重复调用返回相同结果，避免频繁刷新
+     * 2. 支持强制刷新模式，旧的access_token在5分钟内仍有效
+     * 3. 更适合分布式场景
+     *
+     * @param forceRefresh 是否强制刷新
+     * @return 稳定版access_token
+     */
+    public String getStableAccessToken(boolean forceRefresh) {
+        LOG.debug("获取稳定版access_token......");
+        String url = "https://api.weixin.qq.com/cgi-bin/stable_token";
+        String json = String.format("{\"grant_type\":\"client_credential\",\"appid\":\"%s\",\"secret\":\"%s\",\"force_refresh\":%s}",
+                this.appid, this.secret, forceRefresh);
+
+        final String[] result = new String[]{null};
+        NetWorkCenter.post(url, json, (resultCode, resultJson) -> {
+            if (HttpStatus.SC_OK == resultCode) {
+                GetStableTokenResponse response = JSONUtil.toBean(resultJson, GetStableTokenResponse.class);
+                if (response.getAccessToken() != null) {
+                    result[0] = response.getAccessToken();
+                    LOG.debug("获取稳定版access_token成功: {}", response.getAccessToken());
+                } else {
+                    LOG.warn("获取稳定版access_token失败: {}", resultJson);
+                }
+            }
+        });
+        return result[0];
+    }
+
+    /**
+     * 获取稳定版接口调用凭据（普通模式）
+     *
+     * @return 稳定版access_token
+     */
+    public String getStableAccessToken() {
+        return getStableAccessToken(false);
     }
 
     /**

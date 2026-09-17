@@ -109,5 +109,18 @@ public class TemplateMsgAPI extends BaseAPI {
         return JSONUtil.toBean(resultJson, BaseResponse.class);
     }
 
+    /**
+     * 获取设置的行业信息
+     * 接口地址: GET /cgi-bin/template/get_industry
+     *
+     * @return 行业信息（primary_industry和secondary_industry）
+     */
+    public BaseResponse getIndustry() {
+        LOG.debug("获取设置的行业信息......");
+        String url = BASE_API_URL + "cgi-bin/template/get_industry?access_token=#";
+        BaseResponse r = executeGet(url);
+        String resultJson = isSuccess(r.getErrcode()) ? r.getErrmsg() : r.toJsonString();
+        return JSONUtil.toBean(resultJson, BaseResponse.class);
+    }
 
 }

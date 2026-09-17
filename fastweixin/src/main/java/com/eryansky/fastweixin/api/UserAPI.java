@@ -5,6 +5,7 @@ import com.eryansky.fastweixin.api.entity.UserInfo;
 import com.eryansky.fastweixin.api.enums.ResultType;
 import com.eryansky.fastweixin.api.response.*;
 import com.eryansky.fastweixin.exception.WeixinException;
+import com.eryansky.fastweixin.api.response.GetBlackListResponse;
 import com.eryansky.fastweixin.util.BeanUtil;
 import com.eryansky.fastweixin.util.CollectionUtil;
 import com.eryansky.fastweixin.util.JSONUtil;
@@ -280,6 +281,72 @@ public class UserAPI extends BaseAPI {
         Map<String, Object> param = new HashMap<String, Object>();
         param.put("openid_list", openidList);
         param.put("tagid", tagId);
+        BaseResponse response = executePost(url, JSONUtil.toJson(param));
+        return ResultType.get(response.getErrcode());
+    }
+
+    // ========================= 黑名单管理 =========================
+
+    /**
+     * 获取公众号的黑名单列表
+     * 接口地址: POST /cgi-bin/tags/members/getblacklist
+     *
+     * @param nextOpenid 当 begin_openid 为空时，默认从开始拉取。
+     * @return 黑名单用户列表响应
+     */
+    public GetBlackListResponse getBlackList(String nextOpenid) {
+        LOG.debug("获取黑名单列表.....");
+        String url = BASE_API_URL + "cgi-bin/tags/members/getblacklist?access_token=#";
+        Map<String, String> param = new HashMap<String, String>();
+        param.put("begin_openid", nextOpenid == null ? "" : nextOpenid);
+        BaseResponse r = executePost(url, JSONUtil.toJson(param));
+        String resultJson = isSuccess(r.getErrcode()) ? r.getErrmsg() : r.toJsonString();
+        return JSONUtil.toBean(resultJson, GetBlackListResponse.class);
+    }
+
+    /**
+     * 获取公众号的黑名单列表（从头开始）
+     *
+     * @return 黑名单用户列表响应
+     */
+    public GetBlackListResponse getBlackList() {
+        return getBlackList(null);
+    }
+
+    /**
+     * 批量拉黑用户
+     * 接口地址: POST /cgi-bin/tags/members/batchblacklist
+     *
+     * @param openidList 需要拉黑的用户openid列表，一次拉黑最多20个
+     * @return 操作结果
+     */
+    public ResultType batchBlackList(List<String> openidList) {
+        if (CollectionUtil.isEmpty(openidList)) {
+            throw new WeixinException("openId列表为空");
+        }
+        LOG.debug("批量拉黑用户.....");
+        String url = BASE_API_URL + "cgi-bin/tags/members/batchblacklist?access_token=#";
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("openid_list", openidList);
+        BaseResponse response = executePost(url, JSONUtil.toJson(param));
+        return ResultType.get(response.getErrcode());
+    }
+
+    /**
+     * 批量取消拉黑用户
+     * 接口地址: POST /cgi-bin/tags/members/batchunblacklist
+     *
+     * @param openidList 需要取消拉黑的用户openid列表，一次最多20个
+     * @return 操作结果
+     */
+    public ResultType batchUnblackList(List<String> openidList) {
+        if (CollectionUtil.isEmpty(openidList)) {
+            throw new WeixinException("openId列表为空");
+        }
+        LOG.debug("批量取消拉黑用户.....");
+        String url = BASE_API_URL + "cgi-bin/tags/members/batchunblacklist?access_token=#";
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("openid_list", openidList);
         BaseResponse response = executePost(url, JSONUtil.toJson(param));
         return ResultType.get(response.getErrcode());
     }

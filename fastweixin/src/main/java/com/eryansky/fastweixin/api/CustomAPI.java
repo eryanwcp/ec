@@ -251,7 +251,7 @@ public class CustomAPI extends BaseAPI {
      */
     public GetCustomSessionStateResponse getSession(String openid) {
         LOG.debug("获取客户会话状态....");
-        String url = BASE_API_URL + "customservice/kfsession/getsession?access_token=#&openid"+openid;
+        String url = BASE_API_URL + "customservice/kfsession/getsession?access_token=#&openid=" + openid;
         BaseResponse r = executeGet(url);
         String resultJson = isSuccess(r.getErrcode()) ? r.getErrmsg() : r.toJsonString();
         GetCustomSessionStateResponse response = JSONUtil.toBean(resultJson, GetCustomSessionStateResponse.class);

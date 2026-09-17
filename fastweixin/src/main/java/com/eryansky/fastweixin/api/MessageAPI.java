@@ -75,10 +75,159 @@ public class MessageAPI extends BaseAPI {
             image.put("media_id", msg.getMediaId());
             params.put("image", image);
         }else if(message instanceof VideoMsg){
-            // TODO 此处方法特别
+            params.put("msgtype", "mpvideo");
+            VideoMsg msg = (VideoMsg)message;
+            Map<String, Object> video = new HashMap<String, Object>();
+            video.put("media_id", msg.getMediaId());
+            params.put("mpvideo", video);
         }
         BaseResponse response = executePost(url, JSONUtil.toJson(params));
         return JSONUtil.toBean(response.getErrmsg(), GetSendMessageResponse.class);
+    }
+
+    /**
+     * 根据标签群发消息
+     * 接口地址: POST /cgi-bin/message/mass/sendall
+     *
+     * @param message 消息主体
+     * @param isToAll 是否发送给全部用户
+     * @param tagId   标签ID
+     * @return 群发结果
+     */
+    public GetSendMessageResponse sendMessageToUserByTag(BaseMsg message, boolean isToAll, Integer tagId){
+        BeanUtil.requireNonNull(message, "message is null");
+        LOG.debug("按标签群发消息......");
+        String url = BASE_API_URL + "cgi-bin/message/mass/sendall?access_token=#";
+        final Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> filterMap = new HashMap<String, Object>();
+        filterMap.put("is_to_all", isToAll);
+        if(!isToAll){
+            BeanUtil.requireNonNull(tagId, "tagId is null");
+            filterMap.put("tag_id", tagId);
+        }
+        params.put("filter", filterMap);
+        if(message instanceof MpNewsMsg){
+            params.put("msgtype", "mpnews");
+            MpNewsMsg msg = (MpNewsMsg)message;
+            Map<String, Object> mpNews = new HashMap<String, Object>();
+            mpNews.put("media_id", msg.getMediaId());
+            params.put("mpnews", mpNews);
+        }else if(message instanceof TextMsg){
+            params.put("msgtype", "text");
+            TextMsg msg = (TextMsg)message;
+            Map<String, Object> text = new HashMap<String, Object>();
+            text.put("content", msg.getContent());
+            params.put("text", text);
+        }else if(message instanceof VoiceMsg){
+            params.put("msgtype", "voice");
+            VoiceMsg msg = (VoiceMsg)message;
+            Map<String, Object> voice = new HashMap<String, Object>();
+            voice.put("media_id", msg.getMediaId());
+            params.put("voice", voice);
+        }else if(message instanceof ImageMsg){
+            params.put("msgtype", "image");
+            ImageMsg msg = (ImageMsg)message;
+            Map<String, Object> image = new HashMap<String, Object>();
+            image.put("media_id", msg.getMediaId());
+            params.put("image", image);
+        }else if(message instanceof VideoMsg){
+            params.put("msgtype", "mpvideo");
+            VideoMsg msg = (VideoMsg)message;
+            Map<String, Object> video = new HashMap<String, Object>();
+            video.put("media_id", msg.getMediaId());
+            params.put("mpvideo", video);
+        }
+        BaseResponse response = executePost(url, JSONUtil.toJson(params));
+        return JSONUtil.toBean(response.getErrmsg(), GetSendMessageResponse.class);
+    }
+
+    /**
+     * 删除群发
+     * 接口地址: POST /cgi-bin/message/mass/delete
+     *
+     * @param msgId  发送出去的消息ID
+     * @param articleIdx 要删除的文章在图文消息中的位置，第一篇图文消息为0，仅填写0时，默认会删除该文章的所有图文
+     * @return 删除结果
+     */
+    public ResultType deleteSendMessage(Long msgId, Integer articleIdx) {
+        BeanUtil.requireNonNull(msgId, "msgId is null");
+        LOG.debug("删除群发消息......");
+        String url = BASE_API_URL + "cgi-bin/message/mass/delete?access_token=#";
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("msg_id", msgId);
+        if (articleIdx != null) {
+            params.put("article_idx", articleIdx);
+        }
+        BaseResponse response = executePost(url, JSONUtil.toJson(params));
+        return ResultType.get(response.getErrcode());
+    }
+
+    /**
+     * 查询群发消息发送状态
+     * 接口地址: POST /cgi-bin/message/mass/get
+     *
+     * @param msgId 群发消息后返回的消息id
+     * @return 查询结果
+     */
+    public BaseResponse getSendStatus(Long msgId) {
+        BeanUtil.requireNonNull(msgId, "msgId is null");
+        LOG.debug("查询群发消息发送状态......");
+        String url = BASE_API_URL + "cgi-bin/message/mass/get?access_token=#";
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("msg_id", msgId);
+        BaseResponse r = executePost(url, JSONUtil.toJson(params));
+        String resultJson = isSuccess(r.getErrcode()) ? r.getErrmsg() : r.toJsonString();
+        return JSONUtil.toBean(resultJson, BaseResponse.class);
+    }
+
+    /**
+     * 预览群发消息
+     * 接口地址: POST /cgi-bin/message/mass/preview
+     *
+     * @param message 消息主体
+     * @param toUser  预览接收者openid
+     * @return 预览结果
+     */
+    public ResultType previewSendMessage(BaseMsg message, String toUser) {
+        BeanUtil.requireNonNull(message, "message is null");
+        BeanUtil.requireNonNull(toUser, "toUser is null");
+        LOG.debug("预览群发消息......");
+        String url = BASE_API_URL + "cgi-bin/message/mass/preview?access_token=#";
+        final Map<String, Object> params = new HashMap<String, Object>();
+        params.put("touser", toUser);
+        if(message instanceof MpNewsMsg){
+            params.put("msgtype", "mpnews");
+            MpNewsMsg msg = (MpNewsMsg)message;
+            Map<String, Object> mpNews = new HashMap<String, Object>();
+            mpNews.put("media_id", msg.getMediaId());
+            params.put("mpnews", mpNews);
+        }else if(message instanceof TextMsg){
+            params.put("msgtype", "text");
+            TextMsg msg = (TextMsg)message;
+            Map<String, Object> text = new HashMap<String, Object>();
+            text.put("content", msg.getContent());
+            params.put("text", text);
+        }else if(message instanceof VoiceMsg){
+            params.put("msgtype", "voice");
+            VoiceMsg msg = (VoiceMsg)message;
+            Map<String, Object> voice = new HashMap<String, Object>();
+            voice.put("media_id", msg.getMediaId());
+            params.put("voice", voice);
+        }else if(message instanceof ImageMsg){
+            params.put("msgtype", "image");
+            ImageMsg msg = (ImageMsg)message;
+            Map<String, Object> image = new HashMap<String, Object>();
+            image.put("media_id", msg.getMediaId());
+            params.put("image", image);
+        }else if(message instanceof VideoMsg){
+            params.put("msgtype", "mpvideo");
+            VideoMsg msg = (VideoMsg)message;
+            Map<String, Object> video = new HashMap<String, Object>();
+            video.put("media_id", msg.getMediaId());
+            params.put("mpvideo", video);
+        }
+        BaseResponse response = executePost(url, JSONUtil.toJson(params));
+        return ResultType.get(response.getErrcode());
     }
 
     /**

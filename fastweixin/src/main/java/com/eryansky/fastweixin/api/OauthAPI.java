@@ -11,8 +11,8 @@ import com.eryansky.fastweixin.util.StrUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 /**
  * 网页授权API
@@ -40,12 +40,7 @@ public class OauthAPI extends BaseAPI {
         BeanUtil.requireNonNull(redirectUrl, "redirectUrl is null");
         BeanUtil.requireNonNull(scope, "scope is null");
         String userState = StrUtil.isBlank(state) ? "STATE" : state;
-        String url = null;
-        try {
-            url = URLEncoder.encode(redirectUrl, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            LOG.error("异常", e);
-        }
+        String url = URLEncoder.encode(redirectUrl, StandardCharsets.UTF_8);
         StringBuilder stringBuilder = new StringBuilder("https://open.weixin.qq.com/connect/oauth2/authorize?");
         stringBuilder.append("appid=").append(this.config.getAppid())
                 .append("&redirect_uri=").append(url)
