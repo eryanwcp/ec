@@ -5,12 +5,15 @@ import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.configure.DBConfigurer;
 import com.eryansky.modules.sys.vo.GeoIP;
+import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.CacheConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Transactional(value = DBConfigurer.TX_MANAGER_NAME,readOnly = true)
 @Service
@@ -32,11 +35,13 @@ public class IpService {
             return local;
         }
 
-        try {
-            String response = HttpCompoents.getInstance().get(BASE_API_URL + "/geoip/" + ip);
-            return JsonMapper.getInstance().fromJson(response, GeoIP.class);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
+        if(AppConstants.isIpGeoEnable()){
+            try {
+                String response = HttpCompoents.getInstance().get(BASE_API_URL + "/geoip/" + ip);
+                return JsonMapper.getInstance().fromJson(response, GeoIP.class);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
         }
 
         GeoIP unknown = new GeoIP();

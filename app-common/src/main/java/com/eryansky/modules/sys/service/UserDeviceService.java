@@ -115,13 +115,10 @@ public class UserDeviceService extends PCrudService<UserDeviceDao, UserDevice, S
 
 
         // 3. 获取客户端 IP 及位置信息
-        String location = null;
-        if(AppConstants.isIpGeoEnable()){
-            GeoIP geoIP = ipService.getLocationByIp(ip);
-            location = Optional.ofNullable(geoIP)
-                    .map(GeoIP::toFormatLocation)
-                    .orElse(null);
-        }
+        GeoIP geoIP = ipService.getLocationByIp(ip);
+        String location = Optional.ofNullable(geoIP)
+                .map(GeoIP::toFormatLocation)
+                .orElse(null);
 
         // 4. 查询是否存在历史设备记录
         List<UserDevice> userDevices = findByUserId(sessionInfo.getUserId(), deviceId);
