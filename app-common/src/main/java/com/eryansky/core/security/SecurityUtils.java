@@ -544,7 +544,8 @@ public class SecurityUtils {
             logger.debug("putUserToSession:{}", sessionId);
         }
         SessionInfo sessionInfo = userToSessionInfo(null,user);
-        sessionInfo.setIp(IpUtils.getIpAddr0(request));
+        String ip = IpUtils.getIpAddr0(request);
+        sessionInfo.setIp(ip);
         sessionInfo.addAttribute("clientIPs",IpUtils.getIpAddr(request));
         sessionInfo.setUserAgent(UserAgentUtils.getHTTPUserAgent(request));
 
@@ -569,8 +570,11 @@ public class SecurityUtils {
         String appVersion_s = WebUtils.getParameter(request, "appVersion");
         String deviceCode_s = WebUtils.getParameter(request, "deviceCode");
         String platform_s = WebUtils.getParameter(request, "platform");
+        String userAgent = UserAgentUtils.getHTTPUserAgent(request);
+        String deviceId = AppUtils.resolveDeviceId(deviceCode_s, userAgent, ip);
+
         sessionInfo.setAppVersion(appVersion_s);
-        sessionInfo.setDeviceCode(deviceCode_s);
+        sessionInfo.setDeviceCode(deviceId);
         sessionInfo.setDeviceType(StringUtils.isNotBlank(platform_s) ? platform_s:UserAgentUtils.getDeviceType(request).toString());
         setOrRefreshSessionInfoToken(sessionInfo,user.getPassword());
         sessionInfo.setSessionId(sessionId);
@@ -589,7 +593,6 @@ public class SecurityUtils {
             logger.error(e.getMessage());
         }
 
-        String userAgent = UserAgentUtils.getHTTPUserAgent(request);
         boolean likeIOS = AppUtils.likeIOS(userAgent);
         boolean likeAndroid = AppUtils.likeAndroid(userAgent);
         if (likeIOS) {

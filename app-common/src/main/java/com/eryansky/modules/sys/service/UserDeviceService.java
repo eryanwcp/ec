@@ -10,13 +10,13 @@ import com.eryansky.common.orm.model.Parameter;
 import com.eryansky.common.orm.mybatis.interceptor.BaseInterceptor;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
-import com.eryansky.common.utils.encode.Encrypt;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
 import com.eryansky.core.security.SessionInfo;
 import com.eryansky.modules.sys._enum.YesOrNo;
 import com.eryansky.modules.sys.vo.GeoIP;
 import com.eryansky.utils.AppConstants;
+import com.eryansky.utils.AppUtils;
 import com.google.common.collect.Lists;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -75,25 +75,12 @@ public class UserDeviceService extends PCrudService<UserDeviceDao, UserDevice, S
      * @return
      */
     public UserDevice checkExist(String userId,String deviceCode,String ip,String userAgent) {
-        String deviceId = resolveDeviceId(deviceCode, userAgent, ip);
+        String deviceId = AppUtils.resolveDeviceId(deviceCode, userAgent, ip);
 
         List<UserDevice> userDevices = findByUserId(userId, deviceId);
         return Collections3.isNotEmpty(userDevices) ? userDevices.get(0) : null;
     }
-    /**
-     * 获取或生成唯一设备标识 deviceId
-     */
-    public String resolveDeviceId(String deviceCode, String ua,String ip) {
-        // 1. 优先使用客户端传入的明确设备编码（App 端或前端生成的 UUID）
-        if (StringUtils.isNotBlank(deviceCode) && !StringUtils.isEquals(deviceCode,ua)) {
-            return deviceCode;
-        }
 
-        // 2. 极弱兜底：结合 IP + UA 组合生成防重碰撞的设备指纹（仅作为无Cookie场景下的备用标识）
-        String rawFingerprint = String.format("%s|%s", StringUtils.defaultString(ip), StringUtils.defaultString(ua));
-
-        return Encrypt.md5(rawFingerprint);
-    }
 
     /**
      * 保存或更新用户设备登录记录
@@ -107,7 +94,7 @@ public class UserDeviceService extends PCrudService<UserDeviceDao, UserDevice, S
         String ip = sessionInfo.getIp();
 
         // 1. 确定设备唯一标识 deviceId
-        String deviceId = resolveDeviceId(deviceCode_s, ua,ip);
+        String deviceId = AppUtils.resolveDeviceId(deviceCode_s, ua,ip);
 
         // 2. 确定设备类型 deviceType 与设备名称 deviceName
         String deviceType = sessionInfo.getSystemDeviceType();
