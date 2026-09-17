@@ -2,6 +2,7 @@ package com.eryansky.modules.sys.service;
 
 import com.eryansky.common.utils.http.HttpCompoents;
 import com.eryansky.common.utils.mapper.JsonMapper;
+import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.modules.sys.vo.GeoIP;
 import com.eryansky.utils.CacheConstants;
 import org.apache.commons.lang3.StringUtils;
@@ -23,7 +24,7 @@ public class IpService {
      */
     @Cacheable(value = {CacheConstants.CACHE_GEO_IP})
     public GeoIP getLocationByIp(String ip) {
-        if (StringUtils.isBlank(ip) || "127.0.0.1".equals(ip) || "localhost".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip)) {
+        if (StringUtils.isBlank(ip) || IpUtils.isInternalAddr(ip)) {
             GeoIP local = new GeoIP();
             local.setCountry("局域网");
             return local;
