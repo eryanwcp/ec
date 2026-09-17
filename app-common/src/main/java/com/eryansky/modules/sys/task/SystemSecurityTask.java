@@ -93,7 +93,7 @@ public class SystemSecurityTask {
         return String.format("%s安全提醒：%s时间：%s，用户：%s，IP：%s%s,设备：%s",
                 SpringContextHolder.getApplicationContext().getId(),
                 eventType,
-                DateUtils.getCurrentDateTime(),
+                DateUtils.getDateTime(),
                 loginName,
                 ip,
                 locationStr,
