@@ -7,29 +7,21 @@ package com.eryansky.modules.sys.aop;
 
 import com.eryansky.client.common.vo.ExtendAttr;
 import com.eryansky.common.spring.SpringContextHolder;
-import com.eryansky.common.utils.DateUtils;
 import com.eryansky.common.utils.StringUtils;
-import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.common.web.utils.WebUtils;
-import com.eryansky.core.orm.mybatis.entity.BaseEntity;
 import com.eryansky.core.security.SecurityType;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
-import com.eryansky.modules.notice.utils.MessageUtils;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys.event.SysLogEvent;
 import com.eryansky.modules.sys.mapper.Log;
-import com.eryansky.modules.sys.mapper.User;
-import com.eryansky.modules.sys.mapper.UserDevice;
-import com.eryansky.modules.sys.service.UserDeviceService;
 import com.eryansky.modules.sys.service.UserService;
 import com.eryansky.modules.sys.task.SecurityTask;
-import com.eryansky.modules.sys.utils.UserUtils;
 import com.eryansky.utils.AppConstants;
-import com.google.common.collect.Lists;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
@@ -39,13 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import java.util.Date;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 /**
  * 使用AspectJ实现登录登出日志AOP
@@ -58,10 +44,9 @@ import java.util.stream.Collectors;
 public class SecurityLogAspect {
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityLogAspect.class);
-    private final ThreadLocal<String> sysLogThreadLocal = new ThreadLocal<>();
+
     @Resource
     private SecurityTask securityTask;
-
 
     /**
      * 登录增强
@@ -72,14 +57,14 @@ public class SecurityLogAspect {
     public void afterLogin(JoinPoint joinPoint) {
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         if (sessionInfo != null) {
-            saveLog(sessionInfo, joinPoint, SecurityType.login); //保存日志
-            //异常设备登录预警
-            if(AppConstants.isUserDeviceRiskEnable()){
+            saveLog(sessionInfo, joinPoint, SecurityType.login); // 保存日志
+
+            // 异常设备登录预警
+            if (AppConstants.isUserDeviceRiskEnable()) {
                 securityTask.checkRiskUserDevice(sessionInfo);
             }
-
-            //保存登录设备信息
-            if(AppConstants.isUserDeviceRecordEnable()){
+            // 保存登录设备信息
+            if (AppConstants.isUserDeviceRecordEnable()) {
                 securityTask.saveOrUpdateUserDevice(sessionInfo);
             }
         }
@@ -90,19 +75,16 @@ public class SecurityLogAspect {
      *
      * @param joinPoint 切入点
      */
-    @Before("execution(* com.eryansky.modules.sys.service.UserService.*logout(..))")
+    @Before("execution(* com.eryansky.modules.sys.service.UserService.logout(..))")
     public void beforeLogoutLog(JoinPoint joinPoint) {
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         if (sessionInfo != null) {
             Object[] args = joinPoint.getArgs();
             SecurityType securityType = SecurityType.logout;
-            if (args != null && args.length >= 2) {
-                if (args[1] instanceof SecurityType) {
-                    securityType = (SecurityType) args[1];
-                }
+            if (args != null && args.length >= 2 && args[1] instanceof SecurityType) {
+                securityType = (SecurityType) args[1];
             }
-
-            saveLog(sessionInfo, joinPoint, securityType); //保存日志
+            saveLog(sessionInfo, joinPoint, securityType); // 保存日志
         }
     }
 
@@ -116,10 +98,9 @@ public class SecurityLogAspect {
      */
     public void saveLog(SessionInfo sessionInfo, JoinPoint joinPoint, SecurityType securityType) {
         long start = System.currentTimeMillis();
-        long end = 0L;
-        // 执行方法名
-        String methodName = null;
-        String className = null;
+
+        String methodName;
+        String className;
         if (joinPoint != null) {
             methodName = joinPoint.getSignature().getName();
             className = joinPoint.getTarget().getClass().getSimpleName();
@@ -127,14 +108,14 @@ public class SecurityLogAspect {
             className = UserService.class.getSimpleName();
             methodName = "logout";
         }
-        String user = null;
+
         HttpServletRequest request = null;
         try {
             request = SpringMVCHolder.getRequest();
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("获取HttpServletRequest异常: {}", e.getMessage(), e);
         }
-        // 执行方法所消耗的时间
+
         try {
             Log log = new Log();
             log.setType(LogType.security.getValue());
@@ -142,29 +123,33 @@ public class SecurityLogAspect {
             log.setModule(className + "-" + methodName);
             log.setIp(sessionInfo.getIp());
             log.setTitle(securityType.getDescription());
-            log.setAction(null != request ? request.getMethod() : StringUtils.EMPTY);
+            log.setAction(request != null ? request.getMethod() : StringUtils.EMPTY);
             log.setUserAgent(sessionInfo.getUserAgent());
             log.setDeviceType(sessionInfo.getDeviceType());
             log.setBrowserType(sessionInfo.getBrowserType());
             log.setOperTime(new Date());
+
             ExtendAttr extendAttr = new ExtendAttr();
             extendAttr.put("userType", sessionInfo.getUserType());
             extendAttr.put("userName", sessionInfo.getName());
             extendAttr.put("userLoginName", sessionInfo.getLoginName());
             extendAttr.put("userMobile", sessionInfo.getMobile());
-            extendAttr.put("requestData", null != request ? JsonMapper.toJsonString(request.getParameterMap()) : null);
-            extendAttr.put("requestHeaders", null != request ? JsonMapper.toJsonString(WebUtils.getHeaders(request)) : null);
+            extendAttr.put("requestData", request != null ? JsonMapper.toJsonString(request.getParameterMap()) : null);
+            extendAttr.put("requestHeaders", request != null ? JsonMapper.toJsonString(WebUtils.getHeaders(request)) : null);
             log.setExtendAttr(extendAttr);
-            end = System.currentTimeMillis();
-            long opTime = end - start;
-            log.setActionTime(String.valueOf(opTime));
+
+            long end = System.currentTimeMillis();
+            log.setActionTime(String.valueOf(end - start));
             log.prePersist();
+
             SpringContextHolder.publishEvent(new SysLogEvent(log));
+
             if (logger.isDebugEnabled()) {
-                logger.debug("用户:{},操作类：{},操作方法：{},耗时：{}ms.", new Object[]{user, className, methodName, end - start});
+                logger.debug("用户:{}({}), 操作类:{}, 操作方法:{}, 耗时:{}ms.",
+                        sessionInfo.getName(), sessionInfo.getLoginName(), className, methodName, end - start);
             }
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("保存安全日志失败: {}", e.getMessage(), e);
         }
     }
 }
