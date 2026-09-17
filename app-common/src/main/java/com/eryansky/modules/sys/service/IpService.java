@@ -26,6 +26,7 @@ public class IpService {
     public GeoIP getLocationByIp(String ip) {
         if (StringUtils.isBlank(ip) || IpUtils.isInternalAddr(ip)) {
             GeoIP local = new GeoIP();
+            local.setIp(ip);
             local.setCountry("局域网");
             return local;
         }
@@ -38,6 +39,7 @@ public class IpService {
         }
 
         GeoIP unknown = new GeoIP();
+        unknown.setIp(ip);
         unknown.setCountry("未知区域");
         return unknown;
     }
