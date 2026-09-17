@@ -24265,7 +24265,7 @@ CREATE TABLE `t_sys_user_device`  (
   `update_time` datetime(0) DEFAULT NULL COMMENT '更新时间',
   `user_id` varchar(36) DEFAULT NULL COMMENT '用户ID',
   `user_name` varchar(36) DEFAULT NULL COMMENT '用户名称',
-  `device_namme` varchar(255) DEFAULT NULL COMMENT '设备名称',
+  `device_name` varchar(255) DEFAULT NULL COMMENT '设备名称',
   `device_id` varchar(255) DEFAULT NULL COMMENT '设备唯一标识/指纹',
   `device_type` varchar(255) DEFAULT NULL COMMENT '设备类型',
   `ips` varchar(1024) DEFAULT NULL COMMENT '历史登录IP集合信息',

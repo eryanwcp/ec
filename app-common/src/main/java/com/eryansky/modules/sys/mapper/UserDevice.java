@@ -6,8 +6,6 @@ package com.eryansky.modules.sys.mapper;
 
 
 import com.eryansky.core.orm.mybatis.entity.PDataEntity;
-import com.eryansky.common.utils.jackson.LongJsonSerializer;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * 用户登录设备
@@ -27,7 +25,7 @@ public class UserDevice extends PDataEntity<UserDevice, String> {
     /**
      * 设备名称
      */
-    private String deviceNamme;
+    private String deviceName;
     /**
      * 设备唯一标识/指纹
      */
@@ -85,12 +83,12 @@ public class UserDevice extends PDataEntity<UserDevice, String> {
         return this.userName;
     }
 
-    public void setDeviceNamme(String deviceNamme) {
-        this.deviceNamme = deviceNamme;
+    public void setDeviceName(String deviceName) {
+        this.deviceName = deviceName;
     }
 
-    public String getDeviceNamme() {
-        return this.deviceNamme;
+    public String getDeviceName() {
+        return this.deviceName;
     }
 
     public void setDeviceId(String deviceId) {
