@@ -65,6 +65,7 @@ public class SecurityLogAspect {
             }
             // 保存登录设备信息
             if (AppConstants.isUserDeviceRecordEnable()) {
+//                systemSecurityTask.saveOrUpdateUserDevice(SpringContextHolder.getApplicationContext().getId(),sessionInfo);
                 systemSecurityTask.saveOrUpdateUserDevice(sessionInfo);
             }
         }

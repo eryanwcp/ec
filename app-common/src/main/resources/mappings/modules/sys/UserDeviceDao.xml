@@ -10,6 +10,7 @@
         a.update_user AS "updateUser",
         a.update_time AS "updateTime",
         a.version AS "version",
+        a.app_id AS "appId",
         a.user_id AS "userId",
         a.user_name AS "userName",
         a.user_type AS "userType",
@@ -38,6 +39,9 @@
         FROM t_sys_user_device a
         <where>
             a.status = #{status}
+            <if test="appId != null and appId !=''">
+                AND a.app_id = #{appId}
+            </if>
             <if test="query !=null and query !=''" >
                 AND (
                 a.user_id = #{query}
@@ -92,6 +96,7 @@
             <if test="query !=null and query !=''" >
                 AND (
                 a.user_id = #{query}
+                OR a.app_id = #{query}
                 OR a.device_id = #{query}
                 OR a.location LIKE
                 <choose>
@@ -122,6 +127,9 @@
                     <otherwise>'%'+#{query}+'%'</otherwise>
                 </choose>
                 )
+            </if>
+            <if test="appId != null and appId !=''">
+                AND a.app_id = #{appId}
             </if>
             <if test="deviceType != null and deviceType !=''">
                 AND a.device_type = #{deviceType}
@@ -171,6 +179,9 @@
         <where>
             a.status = #{status}
             AND a.user_id = #{userId}
+            <if test="appId != null and appId !=''">
+                AND a.app_id = #{appId}
+            </if>
             <if test="deviceId != null and deviceId !=''">
                 AND a.device_id = #{deviceId}
             </if>
@@ -218,6 +229,7 @@
                                       create_time,
                                       update_user,
                                       update_time,
+                                      app_id,
                                       user_id,
                                       user_name,
                                       user_type,
@@ -238,6 +250,7 @@
                 #{createTime},
                 #{updateUser},
                 #{updateTime},
+                #{appId},
                 #{userId},
                 #{userName},
                 #{userType},
@@ -262,6 +275,7 @@
         create_time,
         update_user,
         update_time,
+        app_id,
         user_id,
         user_name,
         user_type,
@@ -284,6 +298,7 @@
             #{item.createTime},
             #{item.updateUser},
             #{item.updateTime},
+            #{item.appId},
             #{item.userId},
             #{item.userName},
             #{item.userType},
@@ -307,6 +322,7 @@
             version          = version + 1,
             update_user      = #{updateUser},
             update_time      = #{updateTime},
+            app_id          = #{appId},
             user_id          = #{userId},
             user_name        = #{userName},
             user_type        = #{userType},

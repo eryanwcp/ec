@@ -254,7 +254,7 @@ public class LoginController extends SimpleController {
         // 3. CSRF校验
         String securityToken = (String) WebUtils.getSessionAttribute(request, "securityToken");
         if (!StringUtils.equals(csrfToken, securityToken)) {
-            return Result.errorResult().setMsg("非法请求！").setObj(false);
+            return Result.errorResult().setMsg("非法请求，请稍后再试！").setObj(false);
         }
 
         Result result = null;

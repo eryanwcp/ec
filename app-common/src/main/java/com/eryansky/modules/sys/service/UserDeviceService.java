@@ -9,10 +9,12 @@ import com.eryansky.common.orm.Page;
 import com.eryansky.common.orm._enum.GenericEnumUtils;
 import com.eryansky.common.orm.model.Parameter;
 import com.eryansky.common.orm.mybatis.interceptor.BaseInterceptor;
+import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.common.utils.DateUtils;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.mapper.JsonMapper;
+import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
 import com.eryansky.core.security.SessionInfo;
 import com.eryansky.modules.sys._enum.DeviceType;
@@ -41,22 +43,23 @@ public class UserDeviceService extends PCrudService<UserDeviceDao, UserDevice, S
     @Resource
     private IpService ipService;
 
-    public List<UserDevice> findByUserId(String userId, String deviceId) {
+    public List<UserDevice> findByUserId(String appId,String userId, String deviceId) {
         Parameter parameter = Parameter.newParameter();
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
+        parameter.put("appId", appId);
         parameter.put("userId", userId);
         parameter.put("deviceId", deviceId);
         return dao.findByUserId(parameter);
     }
 
 
-    public Page<UserDevice> findPageByUserId(Page<UserDevice> page, String userId, String deviceId, String query) {
+    public Page<UserDevice> findPageByUserId(String appId,Page<UserDevice> page, String userId, String query) {
         Parameter parameter = Parameter.newPageParameter(page);
         parameter.put(DataEntity.FIELD_STATUS, DataEntity.STATUS_NORMAL);
         parameter.put(BaseInterceptor.DB_NAME, AppConstants.getJdbcType());
+        parameter.put("appId", appId);
         parameter.put("userId", userId);
-        parameter.put("deviceId", deviceId);
         parameter.put("query", query);
         return page.setResult(dao.findByUserId(parameter));
     }
@@ -72,14 +75,13 @@ public class UserDeviceService extends PCrudService<UserDeviceDao, UserDevice, S
                                      Date endLastLoginTime) {
         Parameter parameter = Parameter.newPageParameter(page);
         parameter.put(DataEntity.FIELD_STATUS,DataEntity.STATUS_NORMAL);
+        parameter.put("appId",entity.getAppId());
         parameter.put("query",entity.getQuery());
         parameter.put("deviceType",entity.getDeviceType());
         parameter.put("beginLastLoginTime",beginLastLoginTime != null ? DateUtils.getDateStart(beginLastLoginTime):null);
         parameter.put("endLastLoginTime",endLastLoginTime != null ? DateUtils.getDateEnd(endLastLoginTime):null);
         return page.setResult(dao.findQueryList(parameter));
     }
-
-
 
 
     /**
@@ -91,12 +93,24 @@ public class UserDeviceService extends PCrudService<UserDeviceDao, UserDevice, S
      * @return
      */
     public UserDevice checkExist(String userId,String deviceCode,String ip,String userAgent) {
-        String deviceId = AppUtils.resolveDeviceId(deviceCode, userAgent, ip);
-
-        List<UserDevice> userDevices = findByUserId(userId, deviceId);
-        return Collections3.isNotEmpty(userDevices) ? userDevices.get(0) : null;
+        return checkExist(null,userId,deviceCode,ip,userAgent);
     }
 
+
+    /**
+     * 检查设备是否登录过
+     * @param userId
+     * @param deviceCode
+     * @param ip
+     * @param userAgent
+     * @return
+     */
+    public UserDevice checkExist(String appId,String userId,String deviceCode,String ip,String userAgent) {
+        String deviceId = AppUtils.resolveDeviceId(deviceCode, userAgent, ip);
+
+        List<UserDevice> userDevices = findByUserId(appId,userId, deviceId);
+        return Collections3.isNotEmpty(userDevices) ? userDevices.get(0) : null;
+    }
 
     /**
      * 保存或更新用户设备登录记录
@@ -105,6 +119,16 @@ public class UserDeviceService extends PCrudService<UserDeviceDao, UserDevice, S
      * @return UserDevice
      */
     public UserDevice saveOrUpdate(SessionInfo sessionInfo) {
+        return saveOrUpdate(null,sessionInfo);
+    }
+    /**
+     * 保存或更新用户设备登录记录
+     *
+     * @param sessionInfo  登录会话信息
+     * @param appId  应用ID
+     * @return UserDevice
+     */
+    public UserDevice saveOrUpdate(String appId,SessionInfo sessionInfo) {
         String ua = sessionInfo.getUserAgent();
         String deviceCode_s = sessionInfo.getDeviceCode();
         String ip = sessionInfo.getIp();
@@ -124,7 +148,7 @@ public class UserDeviceService extends PCrudService<UserDeviceDao, UserDevice, S
                 .orElse(null);
 
         // 4. 查询是否存在历史设备记录
-        List<UserDevice> userDevices = findByUserId(sessionInfo.getUserId(), deviceId);
+        List<UserDevice> userDevices = findByUserId(appId,sessionInfo.getUserId(), deviceId);
         UserDevice entity = Collections3.isNotEmpty(userDevices) ? userDevices.get(0) : null;
 
         if (entity == null) {
@@ -140,6 +164,7 @@ public class UserDeviceService extends PCrudService<UserDeviceDao, UserDevice, S
         List<String> updatedIps = Collections3.aggregate(existIps, Lists.newArrayList(ip));
 
         // 6. 填充实体字段
+        entity.setAppId(appId);
         entity.setUserId(sessionInfo.getUserId());
         entity.setUserName(StringUtils.defaultString(sessionInfo.getName(), sessionInfo.getUserId()));
         entity.setUserType(sessionInfo.getUserType());

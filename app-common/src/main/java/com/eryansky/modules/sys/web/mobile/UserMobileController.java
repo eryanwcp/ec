@@ -6,6 +6,7 @@ import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.encode.*;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.web.springmvc.SimpleController;
+import com.eryansky.common.web.springmvc.SpringMVCHolder;
 import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.security.SecurityUtils;
@@ -112,7 +113,7 @@ public class UserMobileController extends SimpleController {
         }
 
         if (null == model) {
-            logger.error("{} {} {}",id,loginName,token);
+            logger.error("{} {} {} {}", SpringMVCHolder.getIp(),id,loginName,token);
             throw new ActionException("非法请求！");
         }
 

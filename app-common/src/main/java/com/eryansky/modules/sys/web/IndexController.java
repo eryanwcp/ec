@@ -112,7 +112,7 @@ public class IndexController extends SimpleController {
         }
 
         if (null == model) {
-            logger.error("{} {} {} {}",fromLogin,fromExtend,extendUrl,token);
+            logger.error("{} {} {} {} {}",SpringMVCHolder.getIp(),fromLogin,fromExtend,extendUrl,token);
             throw new ActionException("非法请求！");
         }
 
