@@ -78,7 +78,7 @@ public class UserDeviceController extends SimpleController {
                 String title = "用户设备列表";
                 String[] hearders = new String[]{"用户ID", "用户名称", "用户类型", "设备标识",
                         "设备名称", "设备类型", "登录次数", "是否为常用设备",
-                        "最近登录位置", "最近登录IP", "首次登录时间", "最后登录时间"};// 表头数组
+                        "最近登录位置", "登录IP", "首次登录时间", "最后登录时间"};// 表头数组
                 String[] fields = new String[]{"userId", "userName", "userTypeView", "deviceId",
                         "deviceName", "deviceTypeView", "loginCount", "isCommonView",
                         "location", "ips", "firstLoginTime", "lastLoginTime"};// 对象属性数组
