@@ -22,4 +22,6 @@ public interface UserDeviceDao extends PCrudDao<UserDevice,String> {
 
     List<UserDevice> findByUserId(Parameter parameter);
 
+    List<UserDevice> findQueryList(Parameter parameter);
+
 }

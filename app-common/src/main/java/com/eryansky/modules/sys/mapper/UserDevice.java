@@ -5,7 +5,12 @@
 package com.eryansky.modules.sys.mapper;
 
 
+import com.eryansky.common.orm._enum.GenericEnumUtils;
 import com.eryansky.core.orm.mybatis.entity.PDataEntity;
+import com.eryansky.modules.sys._enum.DeviceType;
+import com.eryansky.modules.sys._enum.UserType;
+import com.eryansky.modules.sys._enum.YesOrNo;
+import com.eryansky.modules.sys.utils.DictionaryUtils;
 
 /**
  * 用户登录设备
@@ -180,6 +185,24 @@ public class UserDevice extends PDataEntity<UserDevice, String> {
         return this.extendAttr;
     }
 
+    public String getIsCommonView() {
+        YesOrNo e = YesOrNo.getByValue(isCommon);
+        return null != e ? e.getDescription():isCommon;
+    }
+
+    public String getDeviceTypeView() {
+        DeviceType e = DeviceType.getByValue(deviceType);
+        return null != e ? e.getDescription():deviceType;
+    }
+
+    public String getUserTypeView() {
+        String typeView = GenericEnumUtils.getDescriptionByValue(UserType.class,userType,null);
+        if(null == typeView){
+            typeView = DictionaryUtils.getDictionaryNameByDC(User.DIC_USER_TYPE,userType,userType);
+        }
+        return typeView;
+    }
+
     public String getQuery() {
         return query;
     }
@@ -187,4 +210,6 @@ public class UserDevice extends PDataEntity<UserDevice, String> {
     public void setQuery(String query) {
         this.query = query;
     }
+
+
 }
