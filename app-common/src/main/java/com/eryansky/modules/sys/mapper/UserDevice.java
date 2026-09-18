@@ -18,7 +18,10 @@ import com.eryansky.modules.sys.utils.DictionaryUtils;
  * @date 2026-09-16
  */
 public class UserDevice extends PDataEntity<UserDevice, String> {
-
+    /**
+     * 应用ID
+     */
+    private String appId;
     /**
      * 用户ID
      */
@@ -79,6 +82,14 @@ public class UserDevice extends PDataEntity<UserDevice, String> {
 
     public UserDevice() {
 
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
     }
 
     public String getUserId() {

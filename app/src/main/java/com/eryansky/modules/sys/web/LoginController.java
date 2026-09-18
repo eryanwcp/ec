@@ -255,7 +255,7 @@ public class LoginController extends SimpleController {
         // 3. CSRF校验
         String securityToken = (String) WebUtils.getSessionAttribute(request, "securityToken");
         if (!StringUtils.equals(csrfToken, securityToken)) {
-            return Result.errorResult().setMsg("非法请求！").setObj(false);
+            return Result.errorResult().setMsg("非法请求，请稍后再试！").setObj(false);
         }
 
         Result result = null;
@@ -371,7 +371,7 @@ public class LoginController extends SimpleController {
 
             // 返回成功并清理对应账户和 IP 的登录失败计数
             Map<String, Object> data = Maps.newHashMap();
-            data.put("homeUrl", resultUrl);
+            data.put("url", resultUrl);
             result = new Result(Result.SUCCESS, "用户验证通过!", data);
 
             isValidateCodeLogin(loginName, false, true);

@@ -46,12 +46,20 @@ public class SystemSecurityTask {
      */
     @Async
     public void checkRiskUserDevice(String loginName, String deviceCode, String ip, String userAgent) {
+        checkRiskUserDevice(null,loginName,deviceCode,ip,userAgent);
+    }
+
+    /**
+     * 异常设备登录提醒（登录尝试）
+     */
+    @Async
+    public void checkRiskUserDevice(String appId,String loginName, String deviceCode, String ip, String userAgent) {
         try {
             User user = UserUtils.getUserByLoginNameOrMobile(loginName);
             if (user == null) {
                 return;
             }
-            UserDevice entity = userDeviceService.checkExist(user.getId(), deviceCode, ip, userAgent);
+            UserDevice entity = userDeviceService.checkExist(appId,user.getId(), deviceCode, ip, userAgent);
             if (entity == null) {
                 String msg = buildAlertMessage("异常设备登录尝试！", loginName, ip, userAgent);
                 sendMessage(msg);
@@ -66,11 +74,19 @@ public class SystemSecurityTask {
      */
     @Async
     public void checkRiskUserDevice(SessionInfo sessionInfo) {
+        checkRiskUserDevice(null,sessionInfo);
+    }
+
+    /**
+     * 异常设备登录提醒（登录成功）
+     */
+    @Async
+    public void checkRiskUserDevice(String appId,SessionInfo sessionInfo) {
         if (sessionInfo == null) {
             return;
         }
         try {
-            UserDevice entity = userDeviceService.checkExist(sessionInfo.getUserId(), sessionInfo.getDeviceCode(), sessionInfo.getIp(), sessionInfo.getUserAgent());
+            UserDevice entity = userDeviceService.checkExist(appId,sessionInfo.getUserId(), sessionInfo.getDeviceCode(), sessionInfo.getIp(), sessionInfo.getUserAgent());
             if (entity == null) {
                 String msg = buildAlertMessage("异常设备登录成功！", sessionInfo.getLoginName(), sessionInfo.getIp(), sessionInfo.getUserAgent());
                 sendMessage(msg);
@@ -119,17 +135,23 @@ public class SystemSecurityTask {
             logger.error("发送安全预警消息失败", e);
         }
     }
-
     /**
      * 记录用户登录设备信息
      */
     @Async
     public void saveOrUpdateUserDevice(SessionInfo sessionInfo) {
+        saveOrUpdateUserDevice(null,sessionInfo);
+    }
+    /**
+     * 记录用户登录设备信息
+     */
+    @Async
+    public void saveOrUpdateUserDevice(String appId,SessionInfo sessionInfo) {
         if (sessionInfo == null) {
             return;
         }
         try {
-            userDeviceService.saveOrUpdate(sessionInfo);
+            userDeviceService.saveOrUpdate(appId,sessionInfo);
         } catch (Exception e) {
             logger.error("保存或更新用户设备信息失败, userId: {}", sessionInfo.getUserId(), e);
         }

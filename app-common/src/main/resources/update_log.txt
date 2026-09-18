@@ -10,6 +10,7 @@ CREATE TABLE `t_sys_user_device`  (
   `create_time` datetime(0) DEFAULT NULL COMMENT '创建时间',
   `update_user` varchar(36) DEFAULT NULL COMMENT '更新者',
   `update_time` datetime(0) DEFAULT NULL COMMENT '更新时间',
+  `app_id` varchar(36) DEFAULT NULL COMMENT '应用ID',
   `user_id` varchar(36) DEFAULT NULL COMMENT '用户ID',
   `user_name` varchar(64) DEFAULT NULL COMMENT '用户名称',
   `user_type` varchar(36) DEFAULT NULL COMMENT '用户名称',
