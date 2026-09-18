@@ -1,7 +1,6 @@
 ﻿2026-09-17
 4.2.20260624.15
 1、用户登录设备信息记录以及预警
-
 DROP TABLE IF EXISTS `t_sys_user_device`;
 CREATE TABLE `t_sys_user_device`  (
   `id` varchar(36)  NOT NULL COMMENT '主键ID UUID',
@@ -28,6 +27,10 @@ CREATE TABLE `t_sys_user_device`  (
   INDEX `user_id`(`user_id`) USING BTREE,
   INDEX `create_time`(`create_time`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COMMENT = '用户登录设备' ROW_FORMAT = DYNAMIC;
+
+INSERT INTO t_sys_resource (ID, STATUS, VERSION, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME, NAME, CODE, URL, SORT, ICON_CLS, ICON, MARK_URL, TYPE, PARENT_ID, PARENT_IDS) VALUES ('01a0b456850a7427b8d2de23d2270133', '0', 3, '1', '2026-09-18 19:46:04', '1', '2026-09-18 20:58:55', '用户设备管理', 'sys:userDevice:view', '/a/sys/userDevice', 100, '', null, '', '0', 'c02bcd465534419f8bbeb3eb1965f5ad', 'null1,c02bcd465534419f8bbeb3eb1965f5ad,');
+INSERT INTO t_sys_resource (ID, STATUS, VERSION, CREATE_USER, CREATE_TIME, UPDATE_USER, UPDATE_TIME, NAME, CODE, URL, SORT, ICON_CLS, ICON, MARK_URL, TYPE, PARENT_ID, PARENT_IDS) VALUES ('01a0b49994ef7818a659fa94481d786d', '0', 1, '1', '2026-09-18 20:59:19', '1', '2026-09-18 20:59:19', '编辑', 'sys:userDevice:edit', '', 1400, '', null, '', '1', '01a0b456850a7427b8d2de23d2270133', 'null1,c02bcd465534419f8bbeb3eb1965f5ad,01a0b456850a7427b8d2de23d2270133,');
+
 
 2026-09-05
 4.2.20260624.13

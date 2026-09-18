@@ -6,28 +6,29 @@
 package com.eryansky.modules.sys.service;
 
 import com.eryansky.common.orm.Page;
+import com.eryansky.common.orm._enum.GenericEnumUtils;
 import com.eryansky.common.orm.model.Parameter;
 import com.eryansky.common.orm.mybatis.interceptor.BaseInterceptor;
+import com.eryansky.common.utils.DateUtils;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
 import com.eryansky.core.security.SessionInfo;
+import com.eryansky.modules.sys._enum.DeviceType;
 import com.eryansky.modules.sys._enum.YesOrNo;
 import com.eryansky.modules.sys.vo.GeoIP;
 import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.AppUtils;
 import com.google.common.collect.Lists;
 import javax.annotation.Resource;
+import org.eclipse.jdt.internal.compiler.env.IGenericType;
 import org.springframework.stereotype.Service;
 import com.eryansky.modules.sys.mapper.UserDevice;
 import com.eryansky.modules.sys.dao.UserDeviceDao;
 import com.eryansky.core.orm.mybatis.service.PCrudService;
 
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * 用户登录设备 service
@@ -64,6 +65,21 @@ public class UserDeviceService extends PCrudService<UserDeviceDao, UserDevice, S
         entity.setEntityPage(page);
         return page.setResult(dao.findList(entity));
     }
+
+    public Page<UserDevice> findPage(Page<UserDevice> page,
+                                     UserDevice entity,
+                                     Date beginLastLoginTime,
+                                     Date endLastLoginTime) {
+        Parameter parameter = Parameter.newPageParameter(page);
+        parameter.put(DataEntity.FIELD_STATUS,DataEntity.STATUS_NORMAL);
+        parameter.put("query",entity.getQuery());
+        parameter.put("deviceType",entity.getDeviceType());
+        parameter.put("beginLastLoginTime",beginLastLoginTime != null ? DateUtils.getDateStart(beginLastLoginTime):null);
+        parameter.put("endLastLoginTime",endLastLoginTime != null ? DateUtils.getDateEnd(endLastLoginTime):null);
+        return page.setResult(dao.findQueryList(parameter));
+    }
+
+
 
 
     /**
@@ -130,7 +146,7 @@ public class UserDeviceService extends PCrudService<UserDeviceDao, UserDevice, S
         entity.setIps(JsonMapper.getInstance().toJson(updatedIps));
         entity.setLocation(location);
         entity.setDeviceId(deviceId);
-        entity.setDeviceType(deviceType);
+        entity.setDeviceType(GenericEnumUtils.getDescriptionByValue(DeviceType.class,deviceType,deviceType));
         entity.setDeviceName(deviceName); // 修正拼写错误 setDeviceNamme -> setDeviceName
         entity.setLastLoginTime(Calendar.getInstance().getTime());
 
