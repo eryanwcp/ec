@@ -1,23 +1,18 @@
-package com.eryansky.modules.sys.service;
+package com.eryansky.core.ip;
 
 import com.eryansky.common.utils.http.HttpCompoents;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.utils.net.IpUtils;
-import com.eryansky.configure.DBConfigurer;
-import com.eryansky.modules.sys.vo.GeoIP;
+import com.eryansky.core.ip.dto.GeoIP;
 import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.CacheConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-@Transactional(value = DBConfigurer.TX_MANAGER_NAME,readOnly = true)
-@Service
-public class IpService {
+public class IpDefaultProvider implements IpAPI {
 
-    private static final Logger log = Logger.getLogger(IpService.class);
+    private static final Logger log = Logger.getLogger(IpDefaultProvider.class);
     private static final String BASE_API_URL = "https://api.seeip.org";
 
 
@@ -25,6 +20,7 @@ public class IpService {
      * 根据 IP 获取地理位置 (带缓存)
      */
     @Cacheable(value = {CacheConstants.CACHE_GEO_IP})
+    @Override
     public GeoIP getLocationByIp(String ip) {
         if (StringUtils.isBlank(ip) || IpUtils.isInternalAddr(ip)) {
             GeoIP local = new GeoIP();

@@ -1,4 +1,4 @@
-package com.eryansky.modules.sys.vo;
+package com.eryansky.core.ip.dto;
 
 import com.eryansky.common.utils.StringUtils;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,6 +14,10 @@ public class GeoIP implements Serializable {
      * Autonomous System Number (ASN) + Internet Service Provider (ISP) name.
      */
     private String organization;
+    /**
+     * ISP name
+     */
+    private String isp;
     /**
      * Two-letter continent code.
      */
@@ -38,7 +42,11 @@ public class GeoIP implements Serializable {
      */
     private Integer offset;
     private Integer asn;
+    @JsonProperty("asn_organization")
+    private String asnOrganization;
     private String region;
+    @JsonProperty("region_code")
+    private String regionCode;
     /**
      * Postal/zip code.
      */
@@ -169,5 +177,29 @@ public class GeoIP implements Serializable {
 
     public void setPostalCode(String postalCode) {
         this.postalCode = postalCode;
+    }
+
+    public String getIsp() {
+        return isp;
+    }
+
+    public void setIsp(String isp) {
+        this.isp = isp;
+    }
+
+    public String getAsnOrganization() {
+        return asnOrganization;
+    }
+
+    public void setAsnOrganization(String asnOrganization) {
+        this.asnOrganization = asnOrganization;
+    }
+
+    public String getRegionCode() {
+        return regionCode;
+    }
+
+    public void setRegionCode(String regionCode) {
+        this.regionCode = regionCode;
     }
 }
