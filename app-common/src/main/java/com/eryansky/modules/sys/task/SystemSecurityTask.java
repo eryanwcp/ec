@@ -8,10 +8,10 @@ import com.eryansky.core.security.SessionInfo;
 import com.eryansky.modules.notice.utils.MessageUtils;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.mapper.UserDevice;
-import com.eryansky.modules.sys.service.IpService;
+import com.eryansky.core.ip.IpAPI;
 import com.eryansky.modules.sys.service.UserDeviceService;
 import com.eryansky.modules.sys.utils.UserUtils;
-import com.eryansky.modules.sys.vo.GeoIP;
+import com.eryansky.core.ip.dto.GeoIP;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Lists;
 import javax.annotation.Resource;
@@ -39,7 +39,7 @@ public class SystemSecurityTask {
     private UserDeviceService userDeviceService;
 
     @Resource
-    private IpService ipService;
+    private IpAPI ipAPI;
 
     /**
      * 异常设备登录提醒（登录尝试）
@@ -100,7 +100,7 @@ public class SystemSecurityTask {
      * 构建报警消息文本
      */
     private String buildAlertMessage(String eventType, String loginName, String ip, String userAgent) {
-        GeoIP geoIP = ipService.getLocationByIp(ip);
+        GeoIP geoIP = ipAPI.getLocationByIp(ip);
         String locationStr = Optional.ofNullable(geoIP)
                 .map(GeoIP::toFormatLocation)
                 .map(loc -> "[" + loc + "]")

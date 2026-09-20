@@ -9,22 +9,20 @@ import com.eryansky.common.orm.Page;
 import com.eryansky.common.orm._enum.GenericEnumUtils;
 import com.eryansky.common.orm.model.Parameter;
 import com.eryansky.common.orm.mybatis.interceptor.BaseInterceptor;
-import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.common.utils.DateUtils;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.mapper.JsonMapper;
-import com.eryansky.common.web.springmvc.SpringMVCHolder;
+import com.eryansky.core.ip.IpAPI;
 import com.eryansky.core.orm.mybatis.entity.DataEntity;
 import com.eryansky.core.security.SessionInfo;
 import com.eryansky.modules.sys._enum.DeviceType;
 import com.eryansky.modules.sys._enum.YesOrNo;
-import com.eryansky.modules.sys.vo.GeoIP;
+import com.eryansky.core.ip.dto.GeoIP;
 import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.AppUtils;
 import com.google.common.collect.Lists;
 import javax.annotation.Resource;
-import org.eclipse.jdt.internal.compiler.env.IGenericType;
 import org.springframework.stereotype.Service;
 import com.eryansky.modules.sys.mapper.UserDevice;
 import com.eryansky.modules.sys.dao.UserDeviceDao;
@@ -41,7 +39,7 @@ import java.util.*;
 public class UserDeviceService extends PCrudService<UserDeviceDao, UserDevice, String> {
 
     @Resource
-    private IpService ipService;
+    private IpAPI ipAPI;
 
     public List<UserDevice> findByUserId(String appId,String userId, String deviceId) {
         Parameter parameter = Parameter.newParameter();
@@ -142,7 +140,7 @@ public class UserDeviceService extends PCrudService<UserDeviceDao, UserDevice, S
 
 
         // 3. 获取客户端 IP 及位置信息
-        GeoIP geoIP = ipService.getLocationByIp(ip);
+        GeoIP geoIP = ipAPI.getLocationByIp(ip);
         String location = Optional.ofNullable(geoIP)
                 .map(GeoIP::toFormatLocation)
                 .orElse(null);
