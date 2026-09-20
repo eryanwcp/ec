@@ -61,7 +61,7 @@ public class SystemSecurityTask {
             }
             UserDevice entity = userDeviceService.checkExist(appId,user.getId(), deviceCode, ip, userAgent);
             if (entity == null) {
-                String msg = buildAlertMessage("设备登录尝试！", loginName, ip, userAgent);
+                String msg = buildAlertMessage("设备登录尝试！", loginName, ip, deviceCode,userAgent);
                 sendMessage(msg);
             }
         } catch (Exception e) {
@@ -88,7 +88,7 @@ public class SystemSecurityTask {
         try {
             UserDevice entity = userDeviceService.checkExist(appId,sessionInfo.getUserId(), sessionInfo.getDeviceCode(), sessionInfo.getIp(), sessionInfo.getUserAgent());
             if (entity == null) {
-                String msg = buildAlertMessage("设备首次登录成功！", sessionInfo.getLoginName(), sessionInfo.getIp(), sessionInfo.getUserAgent());
+                String msg = buildAlertMessage("设备首次登录成功！", sessionInfo.getLoginName(), sessionInfo.getIp(), sessionInfo.getDeviceCode(),sessionInfo.getUserAgent());
                 sendMessage(msg);
             }
         } catch (Exception e) {
@@ -99,19 +99,20 @@ public class SystemSecurityTask {
     /**
      * 构建报警消息文本
      */
-    private String buildAlertMessage(String eventType, String loginName, String ip, String userAgent) {
+    private String buildAlertMessage(String eventType, String loginName, String ip, String deviceCode,String userAgent) {
         GeoIP geoIP = ipAPI.getLocationByIp(ip);
         String locationStr = Optional.ofNullable(geoIP)
                 .map(GeoIP::toFormatLocation)
                 .map(loc -> "[" + loc + "]")
                 .orElse("");
 
-        return String.format("安全提醒：%s时间：%s，用户：%s，IP：%s%s，设备：%s。%s",
+        return String.format("安全提醒：%s时间：%s，用户：%s，IP：%s%s，设备：%s %s。%s",
                 eventType,
                 DateUtils.getDateTime(),
                 loginName,
                 ip,
                 locationStr,
+                deviceCode,
                 userAgent,
                 SpringContextHolder.getApplicationContext().getId());
     }

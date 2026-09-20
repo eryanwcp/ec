@@ -200,18 +200,14 @@ public class Collections3 {
     public static <T> List<T>  aggregate(Collection<T> a,Collection<T> b){
         List<T> list = new ArrayList<T>();
         if (a != null) {
-            Iterator it = a.iterator();
-            while (it.hasNext()) {
-                T o = (T)it.next();
+            for (T o : a) {
                 if (!list.contains(o)) {
                     list.add(o);
                 }
             }
         }
         if (b != null) {
-            Iterator it = b.iterator();
-            while (it.hasNext()) {
-                T o = (T) it.next();
+            for (T o : b) {
                 if (!list.contains(o))
                     list.add(o);
             }
