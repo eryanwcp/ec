@@ -61,11 +61,11 @@ public class SystemSecurityTask {
             }
             UserDevice entity = userDeviceService.checkExist(appId,user.getId(), deviceCode, ip, userAgent);
             if (entity == null) {
-                String msg = buildAlertMessage("异常设备登录尝试！", loginName, ip, userAgent);
+                String msg = buildAlertMessage("设备登录尝试！", loginName, ip, userAgent);
                 sendMessage(msg);
             }
         } catch (Exception e) {
-            logger.error("检查异常设备登录尝试失败, loginName: {}, ip: {}", loginName, ip, e);
+            logger.error("检查设备登录尝试失败, loginName: {}, ip: {}", loginName, ip, e);
         }
     }
 
@@ -88,11 +88,11 @@ public class SystemSecurityTask {
         try {
             UserDevice entity = userDeviceService.checkExist(appId,sessionInfo.getUserId(), sessionInfo.getDeviceCode(), sessionInfo.getIp(), sessionInfo.getUserAgent());
             if (entity == null) {
-                String msg = buildAlertMessage("异常设备登录成功！", sessionInfo.getLoginName(), sessionInfo.getIp(), sessionInfo.getUserAgent());
+                String msg = buildAlertMessage("设备首次登录成功！", sessionInfo.getLoginName(), sessionInfo.getIp(), sessionInfo.getUserAgent());
                 sendMessage(msg);
             }
         } catch (Exception e) {
-            logger.error("检查异常设备登录成功失败, userId: {}, ip: {}", sessionInfo.getUserId(), sessionInfo.getIp(), e);
+            logger.error("检查设备首次登录成功失败, userId: {}, ip: {}", sessionInfo.getUserId(), sessionInfo.getIp(), e);
         }
     }
 
