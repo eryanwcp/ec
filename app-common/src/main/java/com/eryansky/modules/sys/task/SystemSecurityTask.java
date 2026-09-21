@@ -11,7 +11,7 @@ import com.eryansky.modules.sys.mapper.UserDevice;
 import com.eryansky.core.ip.IpAPI;
 import com.eryansky.modules.sys.service.UserDeviceService;
 import com.eryansky.modules.sys.utils.UserUtils;
-import com.eryansky.core.ip.dto.GeoIP;
+import com.eryansky.client.common.dto.GeoIP;
 import com.eryansky.utils.AppConstants;
 import com.google.common.collect.Lists;
 import javax.annotation.Resource;

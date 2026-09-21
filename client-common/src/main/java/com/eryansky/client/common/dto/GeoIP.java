@@ -1,4 +1,4 @@
-package com.eryansky.core.ip.dto;
+package com.eryansky.client.common.dto;
 
 import com.eryansky.common.utils.StringUtils;
 import com.fasterxml.jackson.annotation.JsonProperty;
