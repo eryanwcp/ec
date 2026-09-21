@@ -3,7 +3,7 @@ package com.eryansky.core.ip;
 import com.eryansky.common.utils.http.HttpCompoents;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.utils.net.IpUtils;
-import com.eryansky.core.ip.dto.GeoIP;
+import com.eryansky.client.common.dto.GeoIP;
 import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.CacheConstants;
 import com.google.common.collect.Maps;
