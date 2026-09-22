@@ -11,7 +11,7 @@ public class IpAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(IpAPI.class)
-    public IpAPI defaultIpAPI() {
+    public IpAPI ipDefaultProvider() {
         return new IpDefaultProvider();
     }
 }
