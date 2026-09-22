@@ -18,7 +18,7 @@ import com.eryansky.core.orm.mybatis.entity.DataEntity;
 import com.eryansky.core.security.SessionInfo;
 import com.eryansky.modules.sys._enum.DeviceType;
 import com.eryansky.modules.sys._enum.YesOrNo;
-import com.eryansky.core.ip.dto.GeoIP;
+import com.eryansky.client.common.dto.GeoIP;
 import com.eryansky.utils.AppConstants;
 import com.eryansky.utils.AppUtils;
 import com.google.common.collect.Lists;
