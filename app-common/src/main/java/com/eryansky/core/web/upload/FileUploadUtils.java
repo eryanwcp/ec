@@ -83,18 +83,30 @@ public class FileUploadUtils {
 
     static {
         // 图片类
-        registerMimeTypes("jpg", "image/jpeg");
-//        registerMimeTypes("jpg", "image/jpeg","image/png","image/png","image/gif","image/bmp","image/x-ms-bmp","image/webp","image/x-icon", "image/vnd.microsoft.icon","image/tiff");//兼容写法
-        registerMimeTypes("jpeg", "image/jpeg");
-        registerMimeTypes("png", "image/png");
-        registerMimeTypes("gif", "image/gif");
-        registerMimeTypes("bmp", "image/bmp", "image/x-ms-bmp");
-        registerMimeTypes("webp", "image/webp");
-        registerMimeTypes("ico", "image/x-icon", "image/vnd.microsoft.icon");
-        registerMimeTypes("tif", "image/tiff");
-        registerMimeTypes("tiff", "image/tiff");
-        registerMimeTypes("heic", "image/heic", "image/heif");
-        registerMimeTypes("heif", "image/heic", "image/heif");
+//        registerMimeTypes("jpg", "image/jpeg");
+//        registerMimeTypes("jpeg", "image/jpeg");
+//        registerMimeTypes("png", "image/png");
+//        registerMimeTypes("gif", "image/gif");
+//        registerMimeTypes("bmp", "image/bmp", "image/x-ms-bmp");
+//        registerMimeTypes("webp", "image/webp");
+//        registerMimeTypes("ico", "image/x-icon", "image/vnd.microsoft.icon");
+//        registerMimeTypes("tif", "image/tiff");
+//        registerMimeTypes("tiff", "image/tiff");
+//        registerMimeTypes("heic", "image/heic", "image/heif");
+//        registerMimeTypes("heif", "image/heic", "image/heif");
+
+
+        registerMimeTypes("jpg", "image/jpeg","image/png","image/png","image/gif","image/bmp","image/x-ms-bmp","image/webp","image/x-icon", "image/vnd.microsoft.icon","image/tiff","image/heic","image/heif");//兼容写法
+        registerMimeTypes("jpeg", "image/jpeg","image/png","image/png","image/gif","image/bmp","image/x-ms-bmp","image/webp","image/x-icon", "image/vnd.microsoft.icon","image/tiff","image/heic","image/heif");//兼容写法
+        registerMimeTypes("png", "image/jpeg","image/png","image/png","image/gif","image/bmp","image/x-ms-bmp","image/webp","image/x-icon", "image/vnd.microsoft.icon","image/tiff","image/heic","image/heif");//兼容写法
+        registerMimeTypes("gif", "image/jpeg","image/png","image/png","image/gif","image/bmp","image/x-ms-bmp","image/webp","image/x-icon", "image/vnd.microsoft.icon","image/tiff","image/heic","image/heif");//兼容写法
+        registerMimeTypes("bmp", "image/jpeg","image/png","image/png","image/gif","image/bmp","image/x-ms-bmp","image/webp","image/x-icon", "image/vnd.microsoft.icon","image/tiff","image/heic","image/heif");//兼容写法
+        registerMimeTypes("webp", "image/jpeg","image/png","image/png","image/gif","image/bmp","image/x-ms-bmp","image/webp","image/x-icon", "image/vnd.microsoft.icon","image/tiff","image/heic","image/heif");//兼容写法
+        registerMimeTypes("ico", "image/jpeg","image/png","image/png","image/gif","image/bmp","image/x-ms-bmp","image/webp","image/x-icon", "image/vnd.microsoft.icon","image/tiff","image/heic","image/heif");//兼容写法
+        registerMimeTypes("tif", "image/jpeg","image/png","image/png","image/gif","image/bmp","image/x-ms-bmp","image/webp","image/x-icon", "image/vnd.microsoft.icon","image/tiff","image/heic","image/heif");//兼容写法
+        registerMimeTypes("tiff", "image/jpeg","image/png","image/png","image/gif","image/bmp","image/x-ms-bmp","image/webp","image/x-icon", "image/vnd.microsoft.icon","image/tiff","image/heic","image/heif");//兼容写法
+        registerMimeTypes("heic", "image/jpeg","image/png","image/png","image/gif","image/bmp","image/x-ms-bmp","image/webp","image/x-icon", "image/vnd.microsoft.icon","image/tiff","image/heic","image/heif");//兼容写法
+        registerMimeTypes("image/jpeg","image/png","image/png","image/gif","image/bmp","image/x-ms-bmp","image/webp","image/x-icon", "image/vnd.microsoft.icon","image/tiff","image/heic","image/heif");//兼容写法
 
         // 文档类
         registerMimeTypes("pdf", "application/pdf");
