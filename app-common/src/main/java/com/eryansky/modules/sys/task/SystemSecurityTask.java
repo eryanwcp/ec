@@ -106,14 +106,14 @@ public class SystemSecurityTask {
                 .map(loc -> "[" + loc + "]")
                 .orElse("");
 
-        return String.format("安全提醒：%s时间：%s，用户：%s，IP：%s%s，设备：%s %s。%s",
+        return String.format("安全提醒：%s时间：%s，用户：%s，IP：%s%s，设备：%s%s。%s",
                 eventType,
                 DateUtils.getDateTime(),
                 loginName,
                 ip,
                 locationStr,
-                deviceCode,
-                userAgent,
+                deviceCode != null ? (deviceCode + " ") : "",
+                userAgent != null ? userAgent : "",
                 SpringContextHolder.getApplicationContext().getId());
     }
 

@@ -61,9 +61,6 @@ public class GeoIP implements Serializable {
         if (StringUtils.isNotBlank(country)) sb.append(country);
         if (StringUtils.isNotBlank(region)) sb.append("-").append(region);
         if (StringUtils.isNotBlank(city)) sb.append("-").append(city);
-        if(StringUtils.isBlank(sb.toString())){
-            return "局域网";
-        }
         return sb.toString();
     }
 
