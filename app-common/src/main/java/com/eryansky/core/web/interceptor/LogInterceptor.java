@@ -12,6 +12,7 @@ import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.utils.WebUtils;
+import com.eryansky.core.security.interceptor.RestDefaultAuthorityInterceptor;
 import com.eryansky.core.security.jwt.JWTUtils;
 import com.eryansky.modules.sys.mapper.User;
 import com.eryansky.modules.sys.event.SysLogEvent;
@@ -42,7 +43,6 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -242,16 +242,9 @@ public class LogInterceptor implements HandlerInterceptor {
 				log.setUserAgent(UserAgentUtils.getHTTPUserAgent(request));
 				log.setDeviceType(UserAgentUtils.getDeviceType(request).toString());
 				log.setBrowserType(UserAgentUtils.getBrowser(request).getName());
-				Map<String, List<String>> headers = WebUtils.getHeaders(request);
-				userLoginName = Collections3.getFirst(headers.get("appCode"));
+				userLoginName = WebUtils.getHeaderIgnoreCaseOrParameter(request, "appCode");
 				if (StringUtils.isBlank(userLoginName)) {
-					userLoginName = Collections3.getFirst(headers.get("appcode"));
-				}
-				if (StringUtils.isBlank(userLoginName)) {
-					userLoginName = request.getParameter("appCode");
-				}
-				if (StringUtils.isBlank(userLoginName)) {
-					String access_token = Collections3.getFirst(headers.get("access_token"));
+					String access_token = WebUtils.getHeaderIgnoreCaseOrParameter(request, RestDefaultAuthorityInterceptor.HEADER_ACCESS_TOEKN, RestDefaultAuthorityInterceptor.PARAM_ACCESS_TOKEN);
 					if (StringUtils.isNotBlank(access_token)) {
 						try {
 							userLoginName = JWTUtils.getUsername(access_token);

@@ -10,7 +10,6 @@ import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.common.utils.Exceptions;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.UserAgentUtils;
-import com.eryansky.common.utils.collections.Collections3;
 import com.eryansky.common.utils.mapper.JsonMapper;
 import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
@@ -18,6 +17,7 @@ import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.aop.annotation.Logging;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
+import com.eryansky.core.security.interceptor.RestDefaultAuthorityInterceptor;
 import com.eryansky.core.security.jwt.JWTUtils;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys.event.SysLogEvent;
@@ -117,17 +117,9 @@ public class SysLogAspect {
                     log.setUserAgent(UserAgentUtils.getHTTPUserAgent(request));
                     log.setDeviceType(UserAgentUtils.getDeviceType(request).toString());
                     log.setBrowserType(UserAgentUtils.getBrowser(request).getName());
-
-                    Map<String, List<String>> headers = WebUtils.getHeaders(request);
-                    userLoginName = Collections3.getFirst(headers.get("appCode"));
+                    userLoginName  = WebUtils.getHeaderIgnoreCaseOrParameter(request, "appCode");
                     if(StringUtils.isBlank(userLoginName)){
-                        userLoginName = Collections3.getFirst(headers.get("appcode"));
-                    }
-                    if(StringUtils.isBlank(userLoginName)){
-                        userLoginName = request.getParameter("appCode");
-                    }
-                    if(StringUtils.isBlank(userLoginName)){
-                        String access_token = Collections3.getFirst(headers.get("access_token"));
+                        String access_token = WebUtils.getHeaderIgnoreCaseOrParameter(request, RestDefaultAuthorityInterceptor.HEADER_ACCESS_TOEKN, RestDefaultAuthorityInterceptor.PARAM_ACCESS_TOKEN);
                         if(StringUtils.isNotBlank(access_token)){
                             try {
                                 userLoginName = JWTUtils.getUsername(access_token);
