@@ -18,7 +18,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
 
-        <caffeine.version>3.2.4</caffeine.version>
+        <caffeine.version>3.3.0</caffeine.version>
         <lettuce.version>6.8.2.RELEASE</lettuce.version>
         <fory.version>1.7.4</fory.version>
         <spotbugs-annotations.version>4.10.4</spotbugs-annotations.version>
