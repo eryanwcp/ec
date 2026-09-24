@@ -69,6 +69,7 @@
         <table id="contentTable" class="table table-striped table-bordered table-condensed">
             <thead>
             <tr>
+                <th>应用ID</th>
                 <th>用户ID</th>
                 <th>用户信息</th>
                 <th>设备标识</th>
@@ -85,6 +86,7 @@
             <tbody>
             {{#result}}
             <tr>
+                <td>{{appId}}</td>
                 <td>{{userId}}</td>
                 <td>【{{userTypeView}}】{{userName}}</td>
                 <td>{{deviceId}}</td>
@@ -128,7 +130,7 @@
                         <div class="span6">
                             <div class="span3"><label>关键字：</label></div>
                             <div class="span9">
-                                <input name="query" type="text" th:value="${model.query}" class="input-xlarge" placeholder="用户 / 设备 / IP / 位置" /></div>
+                                <input name="query" type="text" th:value="${model.query}" class="input-xlarge" placeholder="APP / 用户 / 设备 / IP / 位置" /></div>
                         </div>
                         <div class="span6">
                             <div class="span3"><label>设备类型：</label></div>
