@@ -41,7 +41,7 @@ import java.util.Arrays;
 /**
  * DB configuration for data source, MyBatis and transaction management.
  *
- * Author: Eryan
+ * @author Eryan
  */
 @Configuration(proxyBeanMethods = false)
 public class DBConfigurer {
