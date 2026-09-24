@@ -1,7 +1,3 @@
-/**
-*  Copyright (c) ${productName} 2013-${year} ${productUrl}
-*
-*/
 package ${daoPackage};
 
 import com.eryansky.common.orm.mybatis.MyBatisDao;

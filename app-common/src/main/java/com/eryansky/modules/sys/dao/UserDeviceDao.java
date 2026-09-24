@@ -1,7 +1,3 @@
-/**
-*  Copyright (c) XXX有限公司 2013-2026 https://github.com/eryanwcp/ec
-*
-*/
 package com.eryansky.modules.sys.dao;
 
 import com.eryansky.common.orm.model.Parameter;

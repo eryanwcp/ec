@@ -14,7 +14,7 @@ public class Resources {
      * 模块名称 子模块可以设置为“package1.package2”
      */
     public static final String MODULE = "sys";
-    public static final String AUTHOR = "eryan";
+    public static final String AUTHOR = "Eryan";
     public static final String PRODUCT_NAME = "XXX有限公司";
     public static final String PRODUCT_URL = "https://github.com/eryanwcp/ec";
 
