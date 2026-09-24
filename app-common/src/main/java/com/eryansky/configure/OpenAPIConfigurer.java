@@ -1,8 +1,3 @@
-/**
- * Copyright (c) 2012-2026 http://www.eryansky.com
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- */
 package com.eryansky.configure;
 
 import com.eryansky.core.security.annotation.RequiresPermissions;

@@ -1,7 +1,3 @@
-/**
-*  Copyright (c) 2012-2026 https://www.eryansky.com
-*
-*/
 package com.eryansky.modules.notice.dao;
 
 import com.eryansky.common.orm.model.Parameter;
