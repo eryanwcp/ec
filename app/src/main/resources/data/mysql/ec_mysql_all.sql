@@ -24622,7 +24622,7 @@ CREATE TABLE `t_sys_user`  (
 -- ----------------------------
 -- Records of t_sys_user
 -- ----------------------------
-INSERT INTO `t_sys_user`(`ID`, `STATUS`, `VERSION`, `CREATE_USER`, `CREATE_TIME`, `UPDATE_USER`, `UPDATE_TIME`, `LOGIN_NAME`, `CODE`, `ORIGINAL_PASSWORD`, `PASSWORD`, `NAME`, `SEX`, `BIRTHDAY`, `PHOTO`, `EMAIL`, `PERSON_EMAIL`, `MOBILE`, `TEL`, `QQ`, `ADDRESS`, `DEFAULT_ORGAN_ID`, `SORT`, `USER_TYPE`, `REMARK`, `weixin`, `position`, `extend_attr`, `biz_code`) VALUES ('1', '0', 0, NULL, NULL, '1', '2020-04-28 14:17:13', 'admin', NULL, '7e0cd7be3e66d4a8', '79b2cf0337180351d2dcc5ee9d625481', '管理员', '2', NULL, NULL, 'eryanwcp@gmail.com', '', '15879034026', '', '', '', '1', 1, '0', '', NULL, NULL, NULL, NULL);
+INSERT INTO `t_sys_user`(`ID`, `STATUS`, `VERSION`, `CREATE_USER`, `CREATE_TIME`, `UPDATE_USER`, `UPDATE_TIME`, `LOGIN_NAME`, `CODE`, `ORIGINAL_PASSWORD`, `PASSWORD`, `NAME`, `SEX`, `BIRTHDAY`, `PHOTO`, `EMAIL`, `PERSON_EMAIL`, `MOBILE`, `TEL`, `QQ`, `ADDRESS`, `DEFAULT_ORGAN_ID`, `SORT`, `USER_TYPE`, `REMARK`, `weixin`, `position`, `extend_attr`, `biz_code`) VALUES ('1', '0', 0, NULL, NULL, '1', '2020-04-28 14:17:13', 'admin', NULL, '7e0cd7be3e66d4a8', '79b2cf0337180351d2dcc5ee9d625481', '管理员', '2', NULL, NULL, '', '', '', '', '', '', '1', 1, '0', '', NULL, NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for t_sys_user_organ
