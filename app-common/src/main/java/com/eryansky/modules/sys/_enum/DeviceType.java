@@ -8,12 +8,12 @@ import com.eryansky.common.orm._enum.IGenericEnum;
  */
 public enum DeviceType implements IGenericEnum<DeviceType> {
 
-    UNKNOWN("0", "UNKNOWN"),
+    PC("5", "PC"),
+    Android("3", "Android"),
     iPhone("1", "iPhone"),
     iPad("2", "iPad"),
-    Android("3", "Android"),
     WinPhone("4", "WinPhone"),
-    PC("5", "PC");
+    UNKNOWN("0", "UNKNOWN");
 
     /**
      * 值 String型
