@@ -1,8 +1,3 @@
-/*!
- * Copyright (c) 2012-2026 https://www.eryansky.com
- * <p/>
- * Licensed under the Apache License, Version 2.0 (the "License");
- */
 html,body {scrollbar-face-color:#ffffff;scrollbar-highlight-color:#ffffff;scrollbar-darkshadow-color:#ffffff;padding:0;}
 img {max-width:auto;} h1 {font-size:30px;} h1, h2, h3, h4, h5, h6 {margin:0;} a {outline: none;} a:active {star:expression(this.onFocus=this.blur());}
 body,label,input,button,select,textarea,.uneditable-input,.navbar-search .search-query {font-family:Helvetica, Georgia, Arial, sans-serif, 宋体;font-size:13px;_font-size:12px;}

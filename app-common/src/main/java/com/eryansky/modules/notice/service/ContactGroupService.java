@@ -1,7 +1,3 @@
-/**
-*  Copyright (c) 2012-2026 https://www.eryansky.com
-*
-*/
 package com.eryansky.modules.notice.service;
 
 import com.eryansky.common.exception.DaoException;
