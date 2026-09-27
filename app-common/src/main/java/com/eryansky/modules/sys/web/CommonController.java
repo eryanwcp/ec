@@ -36,25 +36,6 @@ import java.util.*;
 @RequestMapping(value = "${adminPath}/common")
 public class CommonController extends SimpleController {
 
-    @Resource
-    private SystemService systemService;
-
-    /**
-     * JsonP跨域输出示例
-     *
-     * @param callbackName 回调方法
-     * @return
-     */
-    @PostMapping(value = "mashup", produces = MediaTypes.JAVASCRIPT_UTF_8)
-    @ResponseBody
-    public String mashup(@RequestParam("callback") String callbackName) {
-
-        // 设置需要被格式化为JSON字符串的内容.
-        Map<String, String> map = Collections.singletonMap("content", "<p>你好，世界！</p>");
-
-        // 渲染返回结果.
-        return JsonMapper.getInstance().toJsonP(callbackName, map);
-    }
 
     @Logging(value = "'RPC服务'+#requestData.get(\"serviceName\").asText()+'.'+#requestData.get(\"serviceMethod\").asText()",logType = LogType.access,requestHeaders = true)
     @DecryptRequestBody()
