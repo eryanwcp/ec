@@ -195,14 +195,14 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                 notPermittedPermission(request, response, requestUrl, "未授权应用：AccessToken无效" + clientId, metadata.defaultEncryptResponseBody);
                 return false;
             }
+
+            // RPC 细粒度权限校验
+            if (!checkRpcPermissions(metadata.rpcPermissions, oAuth2Client)) {
+                notPermittedPermission(request, response, requestUrl, "无权限访问该RPC接口", metadata.defaultEncryptResponseBody);
+                return false;
+            }
         } else {
             notPermittedPermission(request, response, requestUrl, "未识别参数:Header['" + RPCUtils.HEADER_AUTH_TYPE + "']", metadata.defaultEncryptResponseBody);
-            return false;
-        }
-
-        // 3. RPC 细粒度权限校验
-        if (!checkRpcPermissions(metadata.rpcPermissions, oAuth2Client)) {
-            notPermittedPermission(request, response, requestUrl, "无权限访问该RPC接口", metadata.defaultEncryptResponseBody);
             return false;
         }
 
