@@ -1,5 +1,6 @@
 package com.eryansky.core.security.interceptor;
 
+import com.eryansky.client.common.rpc.RPCPermissions;
 import com.eryansky.common.model.R;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
@@ -58,12 +59,14 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
      */
     private static class RestAnnotationMetadata {
         final RestApi restApi;
+        final RPCPermissions rpcPermissions;
         final boolean restApiRequired;
         final boolean requiresUserSkip; // requiresUser != null && !requiresUser.required()
         final boolean defaultEncryptResponseBody;
 
-        public RestAnnotationMetadata(RestApi restApi, boolean restApiRequired, boolean requiresUserSkip, boolean defaultEncryptResponseBody) {
+        public RestAnnotationMetadata(RestApi restApi, RPCPermissions rpcPermissions, boolean restApiRequired, boolean requiresUserSkip, boolean defaultEncryptResponseBody) {
             this.restApi = restApi;
+            this.rpcPermissions = rpcPermissions;
             this.restApiRequired = restApiRequired;
             this.requiresUserSkip = requiresUserSkip;
             this.defaultEncryptResponseBody = defaultEncryptResponseBody;
@@ -234,6 +237,11 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
             restApi = AppUtils.getAnnotation(beanType, RestApi.class);
         }
 
+        RPCPermissions rpcPermissions = handlerMethod.getMethodAnnotation(RPCPermissions.class);
+        if (rpcPermissions == null) {
+            rpcPermissions = AppUtils.getAnnotation(beanType, RPCPermissions.class);
+        }
+
         RequiresUser requiresUser = handlerMethod.getMethodAnnotation(RequiresUser.class);
         if (requiresUser == null) {
             requiresUser = AppUtils.getAnnotation(beanType, RequiresUser.class);
@@ -250,7 +258,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                 && Boolean.parseBoolean(encryptResponseBody.enable())
                 && (encryptResponseBody.handle() == EncryptRPCResponseBodyAdvice.class);
 
-        return new RestAnnotationMetadata(restApi, restApiRequired, requiresUserSkip, defaultEncryptResponseBody);
+        return new RestAnnotationMetadata(restApi, rpcPermissions, restApiRequired, requiresUserSkip, defaultEncryptResponseBody);
     }
 
     /**
