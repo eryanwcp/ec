@@ -34,8 +34,15 @@ public class OAuth2Client implements Serializable {
      * 允许重定向的回调地址白名单列表
      */
     private List<String> redirectUris;
+    /**
+     * 授权列表
+     */
+    private List<String> permissions;
 
     public OAuth2Client() {
+        this.permissions = new java.util.ArrayList<>();
+        this.redirectUris = new java.util.ArrayList<>();
+        this.clientIps = new java.util.ArrayList<>();
     }
 
     public String getClientName() {
@@ -95,6 +102,18 @@ public class OAuth2Client implements Serializable {
      */
     public OAuth2Client setRedirectUris(List<String> redirectUris) {
         this.redirectUris = redirectUris;
+        return this;
+    }
+
+    public List<String> getPermissions() {
+        return permissions;
+    }
+
+    /**
+     * 设置授权列表并返回当前对象，支持链式调用
+     */
+    public OAuth2Client setPermissions(List<String> permissions) {
+        this.permissions = permissions;
         return this;
     }
 }

@@ -1,5 +1,7 @@
 package com.eryansky.core.security.interceptor;
 
+import com.eryansky.client.common._enum.Logical;
+import com.eryansky.client.common.rpc.RPCPermissions;
 import com.eryansky.common.model.R;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
@@ -27,6 +29,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -45,6 +48,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
     public static final String SESSION_KEY_REST_AUTHORITY = "REST_AUTHORITY";
     public static final String SESSION_TAG_NAME = "loginUser";
     public static final String SYSTEM_PREFIX_NAME = "内部系统";
+
     public static final String PARAM_ACCESS_TOKEN = "access_token";
     public static final String HEADER_ACCESS_TOEKN = "Access-Token";
 
@@ -58,12 +62,18 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
      */
     private static class RestAnnotationMetadata {
         final RestApi restApi;
+        final RPCPermissions rpcPermissions;
         final boolean restApiRequired;
         final boolean requiresUserSkip; // requiresUser != null && !requiresUser.required()
         final boolean defaultEncryptResponseBody;
 
-        public RestAnnotationMetadata(RestApi restApi, boolean restApiRequired, boolean requiresUserSkip, boolean defaultEncryptResponseBody) {
+        public RestAnnotationMetadata(RestApi restApi,
+                                      RPCPermissions rpcPermissions,
+                                      boolean restApiRequired,
+                                      boolean requiresUserSkip,
+                                      boolean defaultEncryptResponseBody) {
             this.restApi = restApi;
+            this.rpcPermissions = rpcPermissions;
             this.restApiRequired = restApiRequired;
             this.requiresUserSkip = requiresUserSkip;
             this.defaultEncryptResponseBody = defaultEncryptResponseBody;
@@ -130,8 +140,11 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
         // 2. 认证类型与密钥校验
         String authType = WebUtils.getHeaderIgnoreCase(request, RPCUtils.HEADER_AUTH_TYPE);
         String encrypt = WebUtils.getHeaderIgnoreCase(request, RPCUtils.HEADER_ENCRYPT);
-        String accessToken = WebUtils.getHeaderIgnoreCaseOrParameter(request,HEADER_ACCESS_TOEKN, PARAM_ACCESS_TOKEN);
+        String accessToken = WebUtils.getHeaderIgnoreCaseOrParameter(request, HEADER_ACCESS_TOEKN, PARAM_ACCESS_TOKEN);
         String applicationId = WebUtils.getHeaderIgnoreCase(request, RPCUtils.HEADER_APPLICATION_ID);
+
+        OAuth2Client oAuth2Client = null;
+
         // 内置 Auth 认证
         if (RPCUtils.AUTH_TYPE.equals(authType)) {
             String apiKey = WebUtils.getHeaderIgnoreCase(request, RPCUtils.HEADER_X_API_KEY);
@@ -139,6 +152,7 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                 notPermittedPermission(request, response, requestUrl, "未识别参数:Header['" + RPCUtils.HEADER_X_API_KEY + "']", metadata.defaultEncryptResponseBody);
                 return false;
             }
+
             String defaultApiKey = AppConstants.getRestDefaultApiKey();
             if (!defaultApiKey.equals(apiKey)) {
                 notPermittedPermission(request, response, requestUrl, "未授权访问:Header['" + RPCUtils.HEADER_X_API_KEY + "']=" + apiKey, metadata.defaultEncryptResponseBody);
@@ -151,7 +165,6 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                 notPermittedPermission(request, response, requestUrl, "未识别参数:Header['" + HEADER_ACCESS_TOEKN + "']", metadata.defaultEncryptResponseBody);
                 return false;
             }
-
             String clientId;
             try {
                 clientId = JWTUtils.getUsername(accessToken);
@@ -159,10 +172,9 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                 notPermittedPermission(request, response, requestUrl, "AccessToken格式无效", metadata.defaultEncryptResponseBody);
                 return false;
             }
-
             applicationId = clientId;
             List<OAuth2Client> oauth2Clients = AppConstants.getOauth2ClientList();
-            OAuth2Client oAuth2Client = oauth2Clients.stream()
+            oAuth2Client = oauth2Clients.stream()
                     .filter(v -> StringUtils.isEquals(v.getClientId(), clientId))
                     .findFirst()
                     .orElse(null);
@@ -183,55 +195,65 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
                 notPermittedPermission(request, response, requestUrl, "未授权应用：AccessToken无效" + clientId, metadata.defaultEncryptResponseBody);
                 return false;
             }
+
+            // RPC 细粒度权限校验
+            if (!checkRpcPermissions(metadata.rpcPermissions, oAuth2Client)) {
+                notPermittedPermission(request, response, requestUrl, "无权限访问该RPC接口", metadata.defaultEncryptResponseBody);
+                return false;
+            }
         } else {
             notPermittedPermission(request, response, requestUrl, "未识别参数:Header['" + RPCUtils.HEADER_AUTH_TYPE + "']", metadata.defaultEncryptResponseBody);
             return false;
         }
 
-        // 认证通过，保存 Session 信息
+        // 认证与授权通过，保存 Session 信息
         HttpSession httpSession = request.getSession();
         String suffix = Optional.ofNullable(applicationId).map(id -> "[" + id + "]").orElse("");
         httpSession.setAttribute(SESSION_TAG_NAME, SYSTEM_PREFIX_NAME + suffix);
         httpSession.setAttribute(RPCUtils.HEADER_AUTH_TYPE, authType);
-        httpSession.setAttribute(RPCUtils.HEADER_ENCRYPT, encrypt);
 
         return true;
     }
 
     /**
-     * 根据客户端请求返回 JSON（判断是否需要加密）
+     * 校验 RPC 权限逻辑
      */
-    private void renderJson(HttpServletRequest request, HttpServletResponse response, R<Boolean> r, boolean defaultEncryptResponseBody) {
-        String requestUrl = request.getRequestURI().replace("//", "/");
-        logger.warn("{} {} {}", IpUtils.getIpAddr0(request), JsonMapper.toJsonString(WebUtils.getHeaders(request)), requestUrl);
-
-        String encrypt = WebUtils.getHeaderIgnoreCase(request, RPCUtils.HEADER_ENCRYPT);
-        String encryptKey = WebUtils.getHeaderIgnoreCase(request, RPCUtils.HEADER_ENCRYPT_KEY);
-
-        if (defaultEncryptResponseBody && StringUtils.isNotBlank(encrypt) && StringUtils.isNotBlank(encryptKey)) {
-            try {
-                byte[] encryptData = RequestEncryptUtils.encryptDataByRequest(encrypt, encryptKey, JsonMapper.getInstance().writeValueAsBytes(r));
-                WebUtils.render(response, WebUtils.JSON_TYPE, encryptData);
-                return;
-            } catch (Exception e) {
-                logger.error("加密渲染响应失败: {}", e.getMessage(), e);
-                WebUtils.renderJson(response, r);
-                return;
-            }
+    private boolean checkRpcPermissions(RPCPermissions rpcPermissions, OAuth2Client client) {
+        if (rpcPermissions == null) {
+            return true; // 未配置权限注解，默认放行
         }
 
-        WebUtils.renderJson(response, r);
+        String[] requiredPermissions = rpcPermissions.value();
+        if (requiredPermissions == null || requiredPermissions.length == 0) {
+            return true;
+        }
+
+        // 若无客户端对象（如简单 API Key 验证场景）或未配置权限列表，拦截访问
+        if (client == null || Collections3.isEmpty(client.getPermissions())) {
+            return false;
+        }
+
+        List<String> clientPermissions = client.getPermissions();
+
+        // 判定逻辑运算符 AND / OR
+        Logical logical = rpcPermissions.logical();
+        if (logical == Logical.AND) {
+            return Arrays.stream(requiredPermissions).allMatch(clientPermissions::contains);
+        } else {
+            return Arrays.stream(requiredPermissions).anyMatch(clientPermissions::contains);
+        }
     }
 
-    /**
-     * 解析 HandlerMethod 及 Class 上的 RestApi 和 RequiresUser 注解
-     */
     private RestAnnotationMetadata parseRestAnnotationMetadata(HandlerMethod handlerMethod) {
         Class<?> beanType = handlerMethod.getBeanType();
-
         RestApi restApi = handlerMethod.getMethodAnnotation(RestApi.class);
         if (restApi == null) {
             restApi = AppUtils.getAnnotation(beanType, RestApi.class);
+        }
+
+        RPCPermissions rpcPermissions = handlerMethod.getMethodAnnotation(RPCPermissions.class);
+        if (rpcPermissions == null) {
+            rpcPermissions = AppUtils.getAnnotation(beanType, RPCPermissions.class);
         }
 
         RequiresUser requiresUser = handlerMethod.getMethodAnnotation(RequiresUser.class);
@@ -246,11 +268,9 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
 
         boolean restApiRequired = restApi != null && restApi.required();
         boolean requiresUserSkip = requiresUser != null && !requiresUser.required();
-        boolean defaultEncryptResponseBody = encryptResponseBody != null
-                && Boolean.parseBoolean(encryptResponseBody.enable())
-                && (encryptResponseBody.handle() == EncryptRPCResponseBodyAdvice.class);
+        boolean defaultEncryptResponseBody = encryptResponseBody != null && Boolean.parseBoolean(encryptResponseBody.enable()) && (encryptResponseBody.handle() == EncryptRPCResponseBodyAdvice.class);
 
-        return new RestAnnotationMetadata(restApi, restApiRequired, requiresUserSkip, defaultEncryptResponseBody);
+        return new RestAnnotationMetadata(restApi, rpcPermissions, restApiRequired, requiresUserSkip, defaultEncryptResponseBody);
     }
 
     /**
@@ -286,11 +306,37 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
         return configWhiteList.stream().anyMatch(v -> "*".equals(v) || com.eryansky.j2cache.util.IpUtils.checkIPMatching(v, ip));
     }
 
+
     /**
      * 未授权/拒绝权限响应处理
      */
     private void notPermittedPermission(HttpServletRequest request, HttpServletResponse response, String requestUrl, String msg, boolean defaultEncryptResponseBody) throws ServletException, IOException {
-        R<Boolean> result = new R<>(false).setCode(R.NO_PERMISSION).setMsg(msg);
+        R<Boolean> result = new R<Boolean>(false).setCode(R.NO_PERMISSION).setMsg(msg);
         renderJson(request, response, result, defaultEncryptResponseBody);
+    }
+
+    /**
+     * 根据客户端请求返回 JSON（判断是否需要加密）
+     */
+    private void renderJson(HttpServletRequest request, HttpServletResponse response, R<Boolean> r, boolean defaultEncryptResponseBody) {
+        String requestUrl = request.getRequestURI().replace("//", "/");
+        logger.warn("{} {} {}", IpUtils.getIpAddr0(request), JsonMapper.toJsonString(WebUtils.getHeaders(request)), requestUrl);
+
+        String encrypt = WebUtils.getHeaderIgnoreCase(request, RPCUtils.HEADER_ENCRYPT);
+        String encryptKey = WebUtils.getHeaderIgnoreCase(request, RPCUtils.HEADER_ENCRYPT_KEY);
+
+        if (defaultEncryptResponseBody && StringUtils.isNotBlank(encrypt) && StringUtils.isNotBlank(encryptKey)) {
+            try {
+                byte[] encryptData = RequestEncryptUtils.encryptDataByRequest(encrypt, encryptKey, JsonMapper.getInstance().writeValueAsBytes(r));
+                WebUtils.render(response, WebUtils.JSON_TYPE, encryptData);
+                return;
+            } catch (Exception e) {
+                logger.error("加密渲染响应失败: {}", e.getMessage(), e);
+                WebUtils.renderJson(response, r);
+                return;
+            }
+        }
+
+        WebUtils.renderJson(response, r);
     }
 }
