@@ -1,5 +1,6 @@
 package com.eryansky.core.rpc.utils;
 
+import com.eryansky.client.common._enum.Logical;
 import com.eryansky.client.common.rpc.RPCExchange;
 import com.eryansky.client.common.rpc.RPCMethodConfig;
 import com.eryansky.client.common.rpc.RPCPermissions;
@@ -9,7 +10,6 @@ import com.eryansky.common.utils.encode.RSAUtils;
 import com.eryansky.common.utils.encode.Sm4Utils;
 import com.eryansky.core.rpc.consumer.ConsumerExecutor;
 import com.eryansky.core.security.SecurityUtils;
-import com.eryansky.core.security._enum.Logical;
 import com.eryansky.encrypt.config.EncryptProvider;
 import com.eryansky.encrypt.enums.CipherMode;
 import com.eryansky.utils.AppConstants;
