@@ -147,17 +147,11 @@ public class RestDefaultAuthorityInterceptor implements AsyncHandlerInterceptor 
 
         // 内置 Auth 认证
         if (RPCUtils.AUTH_TYPE.equals(authType)) {
-
             String apiKey = WebUtils.getHeaderIgnoreCase(request, RPCUtils.HEADER_X_API_KEY);
             if (apiKey == null) {
                 notPermittedPermission(request, response, requestUrl, "未识别参数:Header['" + RPCUtils.HEADER_X_API_KEY + "']", metadata.defaultEncryptResponseBody);
                 return false;
             }
-            List<OAuth2Client> oauth2Clients = AppConstants.getOauth2ClientList();
-            oAuth2Client = oauth2Clients.stream()
-                    .filter(v -> StringUtils.isEquals(v.getClientId(), apiKey))
-                    .findFirst()
-                    .orElse(null);
 
             String defaultApiKey = AppConstants.getRestDefaultApiKey();
             if (!defaultApiKey.equals(apiKey)) {
