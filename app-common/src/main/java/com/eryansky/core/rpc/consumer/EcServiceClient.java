@@ -94,8 +94,8 @@ public class EcServiceClient {
             List<ConsumerHolder.RPCMethod> urlCoreMethod = consumerInfo.getUrlCoreMethod();
             ConsumerHolder.RPCMethod rm = urlCoreMethod.stream().filter(v -> v.getAlias().equals(serviceMethod)).findFirst().orElse(null);
 
-            Boolean isPermitted = RPCUtils.isPermitted(rm.getClass(), rm.getMethod());
-            if (null != isPermitted && !isPermitted) {
+            boolean isPermitted = RPCUtils.isPermitted(rm.getClass(), rm.getMethod());
+            if (!isPermitted) {
                 r = R.fail(false,"未授权或会话信息已失效！");
                 return r;
             }
