@@ -7,6 +7,11 @@
     <th:block th:replace="~{include/meta :: meta}"></th:block>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0">
     <meta name="apple-mobile-web-app-capable" content="yes" />
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        var isPermittedEdit = /*[[${T(com.eryansky.core.security.SecurityUtils).isPermitted('sys:session:edit')}]]*/ false;
+        /*]]>*/
+    </script>
     <script type="text/javascript" th:src="${ctxStatic}+'/app/mobile/modules/sys/session'+${yuicompressor}+'.js?_='+${sysInitTime}" charset="utf-8"></script>
 </head>
 <body>

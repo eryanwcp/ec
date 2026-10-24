@@ -65,11 +65,6 @@ $(function () {
             field: 'mobileSensitive',
             width: 120
         }, {
-            title: '真实手机号',
-            field: 'mobile',
-            width: 120,
-            hidden: true
-        }, {
             title: '部门',
             field: 'loginOrganName',
             width: 200,
