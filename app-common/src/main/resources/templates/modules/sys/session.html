@@ -5,6 +5,11 @@
 <head>
     <title>在线用户</title>
     <th:block th:replace="~{include/meta :: meta}"></th:block>
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        var isPermittedEdit = /*[[${T(com.eryansky.core.security.SecurityUtils).isPermitted('sys:session:edit')}]]*/ false;
+        /*]]>*/
+    </script>
     <script type="text/javascript" th:src="${ctxStatic}+'/app/modules/sys/session'+${yuicompressor}+'.js?_='+${sysInitTime}" charset="utf-8"></script>
 </head>
 <body>

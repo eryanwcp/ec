@@ -73,7 +73,7 @@ public class SessionController extends SimpleController {
         Datagrid<SessionInfo> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
         String json = JsonMapper.getInstance().toJson(dg,
                 SessionInfo.class,
-                new String[]{"id","sessionId","host","userType","loginName","name","mobileSensitive","mobile","ip","loginOrganName","systemDeviceType","deviceCode","appVersion","loginTime","updateTime"});
+                new String[]{"id","sessionId","host","userType","loginName","name","mobileSensitive","ip","loginOrganName","systemDeviceType","deviceCode","appVersion","loginTime","updateTime"});
         return renderString(response, json, WebUtils.JSON_TYPE);
     }
     /**
@@ -116,7 +116,7 @@ public class SessionController extends SimpleController {
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"detail"})
     public String detail(HttpServletResponse response,String sessionId) {
         SessionInfo sessionInfo = SecurityUtils.getSessionInfo(sessionId);
-        String json = SecurityUtils.isCurrentUserAdmin() ? JsonMapper.getInstance().toJson(sessionInfo):JsonMapper.getInstance().toJsonWithExcludeProperties(sessionInfo, SessionInfo.class, new String[]{"token","refreshToken"});
+        String json = SecurityUtils.isCurrentUserAdmin() ? JsonMapper.getInstance().toJson(sessionInfo):JsonMapper.getInstance().toJsonWithExcludeProperties(sessionInfo, SessionInfo.class, new String[]{"token","refreshToken","mobile"});
         return renderString(response, json, WebUtils.JSON_TYPE);
     }
 
