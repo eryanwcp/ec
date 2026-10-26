@@ -50,7 +50,7 @@
         <commons-pool2.version>2.13.1</commons-pool2.version>
         <druid-version>1.2.28</druid-version>
         <mariadb.driver.version>3.5.10</mariadb.driver.version>
-        <mysql.driver.version>26.7.0</mysql.driver.version>
+        <mysql.driver.version>26.10.0</mysql.driver.version>
         <db2.driver.version>10.1</db2.driver.version>
 
         <httpclient5.version>5.6.3</httpclient5.version>
