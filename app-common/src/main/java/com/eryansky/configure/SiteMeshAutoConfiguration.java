@@ -5,7 +5,6 @@ import org.sitemesh.config.ConfigurableSiteMeshFilter;
 import org.sitemesh.config.MetaTagBasedDecoratorSelector;
 import org.sitemesh.config.RequestAttributeDecoratorSelector;
 import org.sitemesh.content.tagrules.TagRuleBundle;
-import org.sitemesh.content.tagrules.html.Sm2TagRuleBundle;
 import org.sitemesh.webapp.WebAppContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
