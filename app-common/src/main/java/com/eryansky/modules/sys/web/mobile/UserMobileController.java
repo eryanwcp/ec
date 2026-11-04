@@ -81,9 +81,21 @@ public class UserMobileController extends SimpleController {
                          @RequestParam(name = "encrypt",required = false) String paramEncrypt,
                          @RequestParam(name = "type", required = false) String type,
                          @RequestParam(name = "ps", required = false) String password,
-                         @RequestParam(name = "newPs", required = true) String newPassword,
+                         @RequestParam(name = "newPs", required = false) String newPassword,
                          @RequestParam(name = "token", required = false) String token,
+                         @RequestBody(required = false) JsonNode requestData,
                          HttpServletRequest request) {
+
+        if(requestData != null){
+            id = StringUtils.isBlank(id) ? Optional.ofNullable(requestData.get("id")).filter(node -> !node.isNull()).map(JsonNode::asText).orElse(null) : id;
+            loginName = StringUtils.isBlank(loginName) ? Optional.ofNullable(requestData.get("ln")).filter(node -> !node.isNull()).map(JsonNode::asText).orElse(null) : loginName;
+            paramEncrypt = StringUtils.isBlank(paramEncrypt) ? Optional.ofNullable(requestData.get("encrypt")).filter(node -> !node.isNull()).map(JsonNode::asText).orElse(null) : paramEncrypt;
+            type = StringUtils.isBlank(type) ? Optional.ofNullable(requestData.get("type")).filter(node -> !node.isNull()).map(JsonNode::asText).orElse(null) : type;
+            password = StringUtils.isBlank(password) ? Optional.ofNullable(requestData.get("ps")).filter(node -> !node.isNull()).map(JsonNode::asText).orElse(null) : password;
+            newPassword = StringUtils.isBlank(newPassword) ? Optional.ofNullable(requestData.get("newPs")).filter(node -> !node.isNull()).map(JsonNode::asText).orElse(null) : newPassword;
+            token = StringUtils.isBlank(token) ? Optional.ofNullable(requestData.get("token")).filter(node -> !node.isNull()).map(JsonNode::asText).orElse(null) : token;
+        }
+
         if(StringUtils.isEquals(paramEncrypt,"true")){//兼容方案 客户端升级后删除
             request.setAttribute("ignoreEncrypt",true);
         }
@@ -196,7 +208,7 @@ public class UserMobileController extends SimpleController {
                 .map(JsonNode::asText)
                 .orElse(null);
         request.setAttribute("ignoreEncrypt",true);
-        return savePs(id,loginName,"false",type,password,newPassword,token,request);
+        return savePs(id,loginName,"false",type,password,newPassword,token,requestData,request);
     }
 
 
