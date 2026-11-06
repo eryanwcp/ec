@@ -35,7 +35,7 @@ $(function () {
             field: 'id',
             width: 360,
             hidden: true, formatter: function (value, rowData, rowIndex) {
-                return "<a target='_blank' href='" + ctxAdmin + "/sys/session/detail?id=" + rowData['id'] + "'>" + value + "</a>";
+                return "<a target='_blank' href='" + ctxAdmin + "/sys/session/detail?sessionId=" + rowData['sessionId'] + "'>" + value + "</a>";
             }
         },{
             title: 'SESSIONID',
