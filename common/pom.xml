@@ -35,10 +35,10 @@
         <cglib-nodep.version>3.3.0</cglib-nodep.version>
         <slf4j.version>1.7.36</slf4j.version>
 
-        <guava.version>33.7.2-jre</guava.version>
+        <guava.version>33.8.0-jre</guava.version>
         <dozer.version>6.5.2</dozer.version>
         <freemarker.version>2.3.35</freemarker.version>
-        <jsoup.version>1.23.2</jsoup.version>
+        <jsoup.version>1.24.1</jsoup.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
