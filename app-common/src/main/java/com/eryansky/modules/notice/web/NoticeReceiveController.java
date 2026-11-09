@@ -104,6 +104,12 @@ public class NoticeReceiveController extends SimpleController {
         Page<NoticeReceiveInfoSimpleVo> page = new Page<>(SpringMVCHolder.getRequest());
         noticeQueryVo.syncEndTime();
         page = noticeReceiveInfoService.findNoticePageByUserId(page, sessionInfo.getUserId(), noticeQueryVo);
+        if(Collections3.isNotEmpty(page.getResult())){
+            NoticeReceiveInfoSimpleVo model = page.getResult().get(0);
+            if(model == null || !sessionInfo.getUserId().equals(model.getUserId())) {
+                throw new ActionException("无权操作该记录或记录不存在！");
+            }
+        }
         return new Datagrid<>(page.getTotalCount(), page.getResult());
     }
 
@@ -118,6 +124,14 @@ public class NoticeReceiveController extends SimpleController {
     public Datagrid<NoticeReceiveInfoSimpleVo> readInfoDatagrid(@PathVariable String id) {
         Page<NoticeReceiveInfoSimpleVo> page = new Page<>(SpringMVCHolder.getRequest());
         page = noticeReceiveInfoService.findNoticeReceiveInfoPageByNoticeId(page, id);
+        if(Collections3.isNotEmpty(page.getResult())){
+            NoticeReceiveInfoSimpleVo model = page.getResult().get(0);
+            SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
+            if(model == null || !sessionInfo.getUserId().equals(model.getUserId())) {
+                throw new ActionException("无权操作该记录或记录不存在！");
+            }
+        }
+
         return new Datagrid<>(page.getTotalCount(), page.getResult());
     }
 
@@ -133,6 +147,10 @@ public class NoticeReceiveController extends SimpleController {
     @GetMapping(value = "info")
     public ModelAndView info(@ModelAttribute("model") NoticeReceiveInfo model, HttpServletRequest request, HttpServletResponse response) {
         ModelAndView modelAndView = new ModelAndView("modules/notice/noticeReceiveInfo.html");
+        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
+        if(model == null || !sessionInfo.getUserId().equals(model.getUserId())) {
+            throw new ActionException("无权操作该记录或记录不存在！");
+        }
         noticeReceiveInfoService.updateReadById(model.getId());
         modelAndView.addObject("model", model);
         return modelAndView;
@@ -249,6 +267,10 @@ public class NoticeReceiveController extends SimpleController {
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"detail"})
     @ResponseBody
     public Result detail(@ModelAttribute("model") NoticeReceiveInfo model) {
+        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
+        if(StringUtils.isEquals(model.getUserId(),sessionInfo.getUserId())){
+            throw new ActionException("非法请求！");
+        }
         return Result.successResult().setObj(model);
     }
 }
