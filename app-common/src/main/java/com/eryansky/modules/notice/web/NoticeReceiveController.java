@@ -269,7 +269,7 @@ public class NoticeReceiveController extends SimpleController {
     public Result detail(@ModelAttribute("model") NoticeReceiveInfo model) {
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         if(StringUtils.isEquals(model.getUserId(),sessionInfo.getUserId())){
-            throw new ActionException("非法请求！");
+            throw new ActionException("无权操作该记录或记录不存在！");
         }
         return Result.successResult().setObj(model);
     }
