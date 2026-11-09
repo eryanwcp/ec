@@ -1,5 +1,6 @@
 package com.eryansky.modules.notice.web;
 
+import com.eryansky.common.exception.ActionException;
 import com.eryansky.common.model.Result;
 import com.eryansky.common.orm.Page;
 import com.eryansky.common.utils.StringUtils;
@@ -100,6 +101,10 @@ public class MessageReceiveController extends SimpleController {
     public ModelAndView info(@ModelAttribute("model")  MessageReceive model, HttpServletRequest request, HttpServletResponse response) {
         ModelAndView modelAndView = new ModelAndView("modules/notice/messageReceiveInfo.html");
         messageReceiveService.setRead(model);
+        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
+        if(!StringUtils.isEquals(model.getUserId(),sessionInfo.getUserId())){
+            throw new ActionException("无权操作该记录或记录不存在！");
+        }
 //        messageTask.setRead(model);
         modelAndView.addObject("model", model);
         return modelAndView;
@@ -115,6 +120,10 @@ public class MessageReceiveController extends SimpleController {
     @PostMapping(value = "setRead")
     @ResponseBody
     public Result setRead(@ModelAttribute("model")  MessageReceive model) {
+        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
+        if(!StringUtils.isEquals(model.getUserId(),sessionInfo.getUserId())){
+            throw new ActionException("无权操作该记录或记录不存在！");
+        }
         messageTask.setRead(model);
         return Result.successResult();
     }
@@ -141,6 +150,10 @@ public class MessageReceiveController extends SimpleController {
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"detail"})
     @ResponseBody
     public Result detail(@ModelAttribute("model") MessageReceive model) {
+        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
+        if(!StringUtils.isEquals(model.getUserId(),sessionInfo.getUserId())){
+            throw new ActionException("无权操作该记录或记录不存在！");
+        }
         return Result.successResult().setObj(model);
     }
 }
