@@ -101,6 +101,7 @@ public class UserController extends SimpleController {
      *
      * @return
      */
+    @RequiresPermissions("sys:user:view")
     @PostMapping(value = {"datagrid"})
     public String datagrid(String organId, String query, String userType,HttpServletRequest request,HttpServletResponse response) {
         Page<User> page = new Page<>(SpringMVCHolder.getRequest());
