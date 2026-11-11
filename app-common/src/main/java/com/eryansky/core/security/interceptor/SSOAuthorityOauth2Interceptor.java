@@ -1,5 +1,6 @@
 package com.eryansky.core.security.interceptor;
 
+import com.eryansky.common.model.R;
 import com.eryansky.common.orm._enum.StatusState;
 import com.eryansky.common.spring.SpringContextHolder;
 import com.eryansky.common.utils.StringUtils;
@@ -59,6 +60,14 @@ public class SSOAuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
         }
 
         logger.debug("token:{}", token);
+
+        if (SecurityUtils.isTokenBlacklisted(token)) {
+            if (!response.isCommitted()) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                WebUtils.renderJson(response, new R<>(false).setCode(R.NO_PERMISSION).setMsg("Token已失效！"));
+            }
+            return false;
+        }
 
         // 2. 检查用户是否已登录
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();

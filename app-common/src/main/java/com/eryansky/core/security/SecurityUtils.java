@@ -55,6 +55,7 @@ public class SecurityUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityUtils.class);
 
+    public static final String CACHE_TOKEN_BLACKLIST_REGION = "cache_security_token_blacklist";
 
 
     /**
@@ -693,8 +694,8 @@ public class SecurityUtils {
      * @return
      */
     public static void setOrRefreshSessionInfoToken(SessionInfo sessionInfo, String secret) {
-        sessionInfo.setToken(JWTUtils.sign(sessionInfo.getLoginName(), null == secret ? StringUtils.EMPTY : secret, 7 * 24 * 60 * 60 * 1000L));
-        sessionInfo.setRefreshToken(JWTUtils.sign(sessionInfo.getLoginName(), null == secret ? StringUtils.EMPTY : secret, 14 * 24 * 60 * 60 * 1000L));
+        sessionInfo.setToken(JWTUtils.sign(sessionInfo.getLoginName(), null == secret ? StringUtils.EMPTY : secret, 1 * 24 * 60 * 60 * 1000L));
+        sessionInfo.setRefreshToken(JWTUtils.sign(sessionInfo.getLoginName(), null == secret ? StringUtils.EMPTY : secret, 7 * 24 * 60 * 60 * 1000L));
         sessionInfo.setId(Encrypt.md5(sessionInfo.getToken()));
     }
 
@@ -971,6 +972,8 @@ public class SecurityUtils {
             Static.userService.logout(_sessionInfo.getUserId(), securityType);
             removeSession(_sessionInfo.getId());
             removeSession(Encrypt.md5(_sessionInfo.getRefreshToken()));
+            addTokenToBlacklist(_sessionInfo.getToken());
+            addTokenToBlacklist(_sessionInfo.getRefreshToken());
         }
         removeSession(sessionId);
         if (invalidate) {
@@ -999,8 +1002,24 @@ public class SecurityUtils {
         SessionInfo _sessionInfo = getSessionInfo(sessionId);
         if (_sessionInfo != null) {
             Static.userService.logout(_sessionInfo.getUserId(), securityType);
+            addTokenToBlacklist(_sessionInfo.getToken());
+            addTokenToBlacklist(_sessionInfo.getRefreshToken());
         }
         Static.applicationSessionContext.removeSessionInfo(sessionId);
+    }
+
+    private static void addTokenToBlacklist(String token) {
+        if (StringUtils.isNotBlank(token)) {
+            CacheUtils.getCacheChannel().set(CACHE_TOKEN_BLACKLIST_REGION, Encrypt.md5(token), Boolean.TRUE);
+        }
+    }
+
+    /**
+     * 检查Token是否已被注销。
+     */
+    public static boolean isTokenBlacklisted(String token) {
+        return StringUtils.isNotBlank(token)
+                && CacheUtils.get(CACHE_TOKEN_BLACKLIST_REGION, Encrypt.md5(token)) != null;
     }
 
     /**
@@ -1133,6 +1152,9 @@ public class SecurityUtils {
      * @return
      */
     public static SessionInfo getSessionInfoByTokenOrRefreshToken(String token) {
+        if (isTokenBlacklisted(token)) {
+            return null;
+        }
         List<SessionInfo> list = findSessionInfoList();
         return list.stream().filter(sessionInfo -> token.equals(sessionInfo.getToken()) || token.equals(sessionInfo.getRefreshToken())).findFirst().orElse(null);
     }
@@ -1143,6 +1165,9 @@ public class SecurityUtils {
      * @return
      */
     public static SessionInfo getSessionInfoByTokenOrRefreshTokenWithMd5(String token) {
+        if (isTokenBlacklisted(token)) {
+            return null;
+        }
         String sessionInfoId = Encrypt.md5(token);
         return getSessionInfoById(sessionInfoId);
     }
@@ -1270,4 +1295,3 @@ public class SecurityUtils {
         return CacheUtils.get(LOCK_URL_LIMIT_REGION, userId);
     }
 }
-
