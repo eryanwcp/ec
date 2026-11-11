@@ -4,6 +4,7 @@ import com.eryansky.common.orm.model.Parameter;
 import com.eryansky.common.orm.mybatis.interceptor.BaseInterceptor;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.collections.Collections3;
+import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.modules.sys._enum.UserPasswordUpdateType;
 import com.eryansky.modules.sys._enum.YesOrNo;
 import com.eryansky.modules.sys.mapper.Organ;
@@ -93,6 +94,7 @@ public class SystemAspect implements InitializingBean, DisposableBean {
             return;
         }
         UserUtils.addUserPasswordUpdate(returnObj, UserPasswordUpdateType.UserInit.getValue());
+        SecurityUtils.offLineByUserId(returnObj.getId());
     }
 
 
@@ -108,6 +110,7 @@ public class SystemAspect implements InitializingBean, DisposableBean {
            return;
        }
         UserUtils.addUserPasswordUpdate(returnObj, UserPasswordUpdateType.UserUpdate.getValue());
+        SecurityUtils.offLineByUserId(returnObj.getId());
     }
 
     /**
@@ -125,6 +128,7 @@ public class SystemAspect implements InitializingBean, DisposableBean {
         userIds.forEach(userId->{
             User user = UserUtils.getUser(userId);
             UserUtils.addUserPasswordUpdate(user, UserPasswordUpdateType.SystemReset.getValue());
+            SecurityUtils.offLineByUserId(userId);
         });
         if(args.length >= 3){
             String tipMessage = (String) args[2];
