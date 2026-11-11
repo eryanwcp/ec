@@ -561,7 +561,6 @@ public class DiskController extends SimpleController {
      * @param fileId   文件ID
      * @param downloadType   attachment、inline
      */
-    @RestApi
     @Logging(logType = LogType.access, data = "#JsonMapper.toJson(#fileId)", value = "接口文件")
     @GetMapping(value = {"restFileDownload/{fileId}"})
     public ModelAndView restFileDownload(HttpServletResponse response,
