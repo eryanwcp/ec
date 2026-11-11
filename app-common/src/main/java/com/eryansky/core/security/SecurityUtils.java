@@ -740,7 +740,7 @@ public class SecurityUtils {
      * @return
      */
     public static boolean verifyUserToken(String token,String username,String secret) {
-        return JWTUtils.verify(token, username,  null == secret ? StringUtils.EMPTY : secret);
+        return !isTokenBlacklisted(token) && JWTUtils.verify(token, username,  null == secret ? StringUtils.EMPTY : secret);
     }
 
     /**
@@ -982,8 +982,7 @@ public class SecurityUtils {
             Static.userService.logout(_sessionInfo.getUserId(), securityType);
             removeSession(_sessionInfo.getId());
             removeSession(Encrypt.md5(_sessionInfo.getRefreshToken()));
-            addTokenToBlacklist(_sessionInfo.getToken());
-            addTokenToBlacklist(_sessionInfo.getRefreshToken());
+            revokeSessionTokens(_sessionInfo);
         }
         removeSession(sessionId);
         if (invalidate) {
@@ -1012,8 +1011,7 @@ public class SecurityUtils {
         SessionInfo _sessionInfo = getSessionInfo(sessionId);
         if (_sessionInfo != null) {
             Static.userService.logout(_sessionInfo.getUserId(), securityType);
-            addTokenToBlacklist(_sessionInfo.getToken());
-            addTokenToBlacklist(_sessionInfo.getRefreshToken());
+            revokeSessionTokens(_sessionInfo);
         }
         Static.applicationSessionContext.removeSessionInfo(sessionId);
     }
@@ -1022,6 +1020,17 @@ public class SecurityUtils {
         if (StringUtils.isNotBlank(token)) {
             CacheUtils.getCacheChannel().set(CACHE_TOKEN_BLACKLIST_REGION, Encrypt.md5(token), Boolean.TRUE);
         }
+    }
+
+    /**
+     * 批量将 Session 中的 Token 存入黑名单
+     */
+    public static void revokeSessionTokens(SessionInfo sessionInfo) {
+        if (sessionInfo == null) {
+            return;
+        }
+        addTokenToBlacklist(sessionInfo.getToken());
+        addTokenToBlacklist(sessionInfo.getRefreshToken());
     }
 
     /**
