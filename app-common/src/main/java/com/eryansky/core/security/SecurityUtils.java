@@ -707,7 +707,7 @@ public class SecurityUtils {
      * @return
      */
     public static boolean verifySessionInfoToken(String token,String username, String secret) {
-        return JWTUtils.verify(token, username,  null == secret ? StringUtils.EMPTY : secret);
+        return !isTokenBlacklisted(token) && JWTUtils.verify(token, username,  null == secret ? StringUtils.EMPTY : secret);
     }
 
 
