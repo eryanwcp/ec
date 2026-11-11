@@ -949,6 +949,16 @@ public class SecurityUtils {
 
 
     /**
+     * 用户下线（根据用户ID）
+     * @param userId 用户ID
+     */
+    public static void offLineByUserId(String userId) {
+        List<SessionInfo> sessionInfos = SecurityUtils.findSessionInfoList();
+        sessionInfos.stream().filter(v->v.getUserId().equals(userId)).forEach(sessionInfo -> removeSession(sessionInfo.getSessionId(), SecurityType.offline,false));
+    }
+
+
+    /**
      * 将用户信息从session中移除
      *
      * @param sessionId session ID
