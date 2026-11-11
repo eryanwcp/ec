@@ -53,10 +53,13 @@ public class SessionController extends SimpleController {
     @PostMapping(value = {"onLineSessions"})
     public String onlineDatagrid(HttpServletRequest request, HttpServletResponse response, String query) {
         Page<SessionInfo> page = new Page<>(request);
+        SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         if(SecurityUtils.isPermitted("sys:session:view")){
             page = SecurityUtils.findSessionInfoPage(page,null,query);
         }else{
-            page.autoResult(Lists.newArrayList(SecurityUtils.getCurrentSessionInfo()));
+            if(sessionInfo != null){
+                page.autoResult(Lists.newArrayList(sessionInfo));
+            }
         }
 
         Datagrid<SessionInfo> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
