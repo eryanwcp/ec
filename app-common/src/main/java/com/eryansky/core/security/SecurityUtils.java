@@ -701,13 +701,14 @@ public class SecurityUtils {
 
     /**
      * 用户Token信息 校验
+     * 排除token黑名单
      * @param token
      * @param username
      * @param secret
      * @return
      */
     public static boolean verifySessionInfoToken(String token,String username, String secret) {
-        return !isTokenBlacklisted(token) && JWTUtils.verify(token, username,  null == secret ? StringUtils.EMPTY : secret);
+        return JWTUtils.verify(token, username,  null == secret ? StringUtils.EMPTY : secret) && !isTokenBlacklisted(token);
     }
 
 
@@ -723,6 +724,7 @@ public class SecurityUtils {
 
     /**
      * 用户Token信息 校验
+     * 排除token黑名单
      * @param token
      * @param user
      * @return
@@ -740,7 +742,7 @@ public class SecurityUtils {
      * @return
      */
     public static boolean verifyUserToken(String token,String username,String secret) {
-        return !isTokenBlacklisted(token) && JWTUtils.verify(token, username,  null == secret ? StringUtils.EMPTY : secret);
+        return  JWTUtils.verify(token, username,  null == secret ? StringUtils.EMPTY : secret) && !isTokenBlacklisted(token);
     }
 
     /**
@@ -834,8 +836,8 @@ public class SecurityUtils {
             //Authorization 请求头或请求参数
             if (sessionInfo == null && autoAuthorizationSession) {
                 String token = AppUtils.extractToken(request);
-                if (StringUtils.isNotBlank(token)) {
-                    sessionInfo = StringUtils.isNotBlank(token) ? getSessionInfoByTokenOrRefreshTokenWithMd5(token) : null;
+                if (StringUtils.isNotBlank(token) && !isTokenBlacklisted(token)) {
+                    sessionInfo = getSessionInfoByTokenOrRefreshTokenWithMd5(token);
                 }
             }
         } catch (Exception e) {
