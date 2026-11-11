@@ -55,7 +55,7 @@ public class SessionController extends SimpleController {
         Page<SessionInfo> page = new Page<>(request);
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
         if(SecurityUtils.isPermitted("sys:session:view")){
-            page = SecurityUtils.findSessionInfoPage(page,null,query);
+            page = SecurityUtils.findSessionInfoPage(page,(sessionInfo.isSuperUser() || SecurityUtils.isPermittedMaxRoleDataScope()) ? null:sessionInfo.getLoginCompanyId(),query);
         }else{
             if(sessionInfo != null){
                 page.autoResult(Lists.newArrayList(sessionInfo));
