@@ -701,13 +701,14 @@ public class SecurityUtils {
 
     /**
      * 用户Token信息 校验
+     * 排除token黑名单
      * @param token
      * @param username
      * @param secret
      * @return
      */
     public static boolean verifySessionInfoToken(String token,String username, String secret) {
-        return !isTokenBlacklisted(token) && JWTUtils.verify(token, username,  null == secret ? StringUtils.EMPTY : secret);
+        return JWTUtils.verify(token, username,  null == secret ? StringUtils.EMPTY : secret) && !isTokenBlacklisted(token);
     }
 
 
@@ -723,6 +724,7 @@ public class SecurityUtils {
 
     /**
      * 用户Token信息 校验
+     * 排除token黑名单
      * @param token
      * @param user
      * @return
@@ -740,7 +742,7 @@ public class SecurityUtils {
      * @return
      */
     public static boolean verifyUserToken(String token,String username,String secret) {
-        return !isTokenBlacklisted(token) && JWTUtils.verify(token, username,  null == secret ? StringUtils.EMPTY : secret);
+        return  JWTUtils.verify(token, username,  null == secret ? StringUtils.EMPTY : secret) && !isTokenBlacklisted(token);
     }
 
     /**
@@ -835,7 +837,7 @@ public class SecurityUtils {
             if (sessionInfo == null && autoAuthorizationSession) {
                 String token = AppUtils.extractToken(request);
                 if (StringUtils.isNotBlank(token)) {
-                    sessionInfo = StringUtils.isNotBlank(token) ? getSessionInfoByTokenOrRefreshTokenWithMd5(token) : null;
+                    sessionInfo = StringUtils.isNotBlank(token) && !isTokenBlacklisted(token)? getSessionInfoByTokenOrRefreshTokenWithMd5(token) : null;
                 }
             }
         } catch (Exception e) {
@@ -1184,9 +1186,6 @@ public class SecurityUtils {
      * @return
      */
     public static SessionInfo getSessionInfoByTokenOrRefreshTokenWithMd5(String token) {
-        if (isTokenBlacklisted(token)) {
-            return null;
-        }
         String sessionInfoId = Encrypt.md5(token);
         return getSessionInfoById(sessionInfoId);
     }
