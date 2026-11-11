@@ -836,8 +836,8 @@ public class SecurityUtils {
             //Authorization 请求头或请求参数
             if (sessionInfo == null && autoAuthorizationSession) {
                 String token = AppUtils.extractToken(request);
-                if (StringUtils.isNotBlank(token)) {
-                    sessionInfo = StringUtils.isNotBlank(token) && !isTokenBlacklisted(token)? getSessionInfoByTokenOrRefreshTokenWithMd5(token) : null;
+                if (StringUtils.isNotBlank(token) && !isTokenBlacklisted(token)) {
+                    sessionInfo = getSessionInfoByTokenOrRefreshTokenWithMd5(token);
                 }
             }
         } catch (Exception e) {
