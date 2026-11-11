@@ -67,7 +67,7 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
         if (SecurityUtils.isTokenBlacklisted(token)) {
             if (!response.isCommitted()) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                WebUtils.renderJson(response, new R<>(false).setCode(R.NO_PERMISSION).setMsg("Token已失效！"));
+                WebUtils.renderJson(response, new R<>(false).setCode(R.NO_PERMISSION).setMsg("Token已失效！"+token));
             }
             return false;
         }
