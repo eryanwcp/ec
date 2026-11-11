@@ -16,6 +16,7 @@ import com.eryansky.core.web.annotation.Mobile;
 import com.eryansky.core.web.annotation.MobileValue;
 import com.eryansky.modules.sys._enum.LogType;
 import com.eryansky.modules.sys.mapper.Log;
+import com.google.common.collect.Lists;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -48,10 +49,16 @@ public class SessionController extends SimpleController {
      *
      * @return
      */
+//    @RequiresPermissions("sys:session:view")
     @PostMapping(value = {"onLineSessions"})
     public String onlineDatagrid(HttpServletRequest request, HttpServletResponse response, String query) {
         Page<SessionInfo> page = new Page<>(request);
-        page = SecurityUtils.findSessionInfoPage(page,null,query);
+        if(SecurityUtils.isPermitted("sys:session:view")){
+            page = SecurityUtils.findSessionInfoPage(page,null,query);
+        }else{
+            page.autoResult(Lists.newArrayList(SecurityUtils.getCurrentSessionInfo()));
+        }
+
         Datagrid<SessionInfo> dg = new Datagrid<>(page.getTotalCount(), page.getResult());
         String json = JsonMapper.getInstance().toJson(dg,
                 SessionInfo.class,
