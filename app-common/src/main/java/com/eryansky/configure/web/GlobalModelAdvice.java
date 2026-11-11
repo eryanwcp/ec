@@ -2,6 +2,8 @@ package com.eryansky.configure.web;
 
 import com.eryansky.common.utils.encode.Cryptos;
 import com.eryansky.common.utils.encode.Sm4Utils;
+import com.eryansky.core.security.SecurityUtils;
+import com.eryansky.core.security.SessionInfo;
 import com.eryansky.encrypt.config.EncryptProvider;
 import com.eryansky.encrypt.enums.CipherMode;
 import com.eryansky.utils.AppConstants;
@@ -105,6 +107,15 @@ public class GlobalModelAdvice {
     @ModelAttribute("appFullName")
     public String appFullName(HttpServletRequest request) {
         return AppConstants.getAppFullName();
+    }
+
+
+    /**
+     * 每次请求进入 Controller 前，自动从 request 属性中提取 sessionInfo
+     */
+    @ModelAttribute("sessionInfo")
+    public SessionInfo populateSessionInfo(HttpServletRequest request) {
+        return SecurityUtils.getCurrentSessionInfo(request);
     }
 
 }

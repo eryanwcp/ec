@@ -86,10 +86,6 @@ public class AuthorityInterceptor implements AsyncHandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) throws Exception {
         //登录用户
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo();
-        request.setAttribute(ATTR_SESSIONINFO,sessionInfo);
-        if(null != sessionInfo){
-            response.setHeader(ATTR_AUTHORIZATION, sessionInfo.getToken());
-        }
         String requestUrl = request.getRequestURI().replace("//","/");
         if(logger.isDebugEnabled()){
             logger.debug(request.getSession().getId() + ":" + request.getHeader("Authorization") + ":" + requestUrl);
