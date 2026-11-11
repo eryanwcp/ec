@@ -911,7 +911,6 @@ public class UserController extends SimpleController {
      */
     @RequestMapping(method = {RequestMethod.GET,RequestMethod.POST},value = {"detail"})
     @ResponseBody
-    @RestApi()
     public Result detail(@ModelAttribute("model") User model) {
         if (model == null) {
             return Result.errorResult().setMsg("用户不存在");
