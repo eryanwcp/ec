@@ -1,10 +1,12 @@
 package com.eryansky.core.security.interceptor;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.eryansky.common.model.R;
 import com.eryansky.common.utils.StringUtils;
 import com.eryansky.common.utils.encode.Encrypt;
 import com.eryansky.common.utils.net.IpUtils;
 import com.eryansky.common.web.springmvc.SpringMVCHolder;
+import com.eryansky.common.web.utils.WebUtils;
 import com.eryansky.core.security.SecurityUtils;
 import com.eryansky.core.security.SessionInfo;
 import com.eryansky.core.security.annotation.PrepareOauth2;
@@ -61,6 +63,15 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        String token = AppUtils.extractToken(request);
+        if (SecurityUtils.isTokenBlacklisted(token)) {
+            if (!response.isCommitted()) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                WebUtils.renderJson(response, new R<>(false).setCode(R.NO_PERMISSION).setMsg("Token已失效！"));
+            }
+            return false;
+        }
+
         // 已登录用户
         SessionInfo sessionInfo = SecurityUtils.getCurrentSessionInfo(request, false);
         if (null != sessionInfo) {
@@ -84,7 +95,6 @@ public class AuthorityOauth2Interceptor implements AsyncHandlerInterceptor {
                 return true;
             }
 
-            String token = AppUtils.extractToken(request);
             if (StringUtils.isNotBlank(token)) {
                 String lockKey = "lock_oauth2_token:" + Encrypt.md5(token);
                 CacheUtils.getCacheChannel().lock(lockKey, 5, 10, new DefaultLockCallback<Boolean>(false, false) {
