@@ -33,12 +33,10 @@ import java.util.Map;
 
 /**
  * 代理访问服务
- * 白名单机制，无需登录授权
  *
  * @author Eryan
  * @date 2015-12-14
  */
-@RequiresUser(required = false)
 @Controller
 @RequestMapping(value = "${adminPath}/sys/proxy")
 public class ProxyController extends SimpleController {
