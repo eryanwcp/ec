@@ -201,7 +201,7 @@ public class ProxyController extends SimpleController {
         if (WebUtils.isAjaxRequest(request)) {
             WebUtils.renderJson(response, Result.errorResult().setObj(errorMsg));
         } else {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, errorMsg);
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, errorMsg);
         }
     }
 }
