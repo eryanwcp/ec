@@ -471,11 +471,42 @@ public class DiskUtils {
      * @param fileId
      * @return
      */
+    public static String getOauthFileUrl(String fileId) {
+        if (StringUtils.isBlank(fileId)) {
+            return null;
+        }
+        String ctx = StringUtils.EMPTY;
+        try {
+            ctx = WebUtils.getAppURL(SpringMVCHolder.getRequest());
+        } catch (Exception e) {
+        }
+        return ctx + AppConstants.getAdminPath() + "/disk/innerFileDownload/" + fileId;
+    }
+
+    /**
+     * 获取文件路径
+     *
+     * @param fileId
+     * @return
+     */
     public static String getFileSrc(String fileId) {
         if (StringUtils.isBlank(fileId)) {
             return null;
         }
         return AppUtils.getAppURL() + AppConstants.getAdminPath() + "/disk/fileDownload/" + fileId;
+    }
+
+    /**
+     * 获取文件路径
+     *
+     * @param fileId
+     * @return
+     */
+    public static String getOauthFileSrc(String fileId) {
+        if (StringUtils.isBlank(fileId)) {
+            return null;
+        }
+        return AppUtils.getAppURL() + AppConstants.getAdminPath() + "/disk/innerFileDownload/" + fileId;
     }
 
     /**
