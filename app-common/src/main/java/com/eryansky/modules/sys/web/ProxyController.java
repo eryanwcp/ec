@@ -115,6 +115,9 @@ public class ProxyController extends SimpleController {
             headers.put(header, request.getHeader(header));
         }
 
+        headers.put("Referer", contentUrl);
+//        headers.put("Referer", url);
+
         HttpPoolCompoents httpPoolCompoents = HttpPoolCompoents.getInstance();
         Response remoteResponse = null;
         HttpEntity entity = null;
