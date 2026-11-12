@@ -107,8 +107,14 @@ public class ProxyController extends SimpleController {
         Enumeration<String> enumeration = request.getHeaderNames();
         while (enumeration.hasMoreElements()) {
             String header = enumeration.nextElement();
+            // 过滤掉原本的 Host 头，防止目标服务器校验 Host 不匹配返回 403
+            if ("host".equalsIgnoreCase(header)) {
+                continue;
+            }
             headers.put(header, request.getHeader(header));
         }
+        headers.put("Referer", contentUrl);
+//        headers.put("Referer", url);
 
         HttpPoolCompoents httpPoolCompoents = HttpPoolCompoents.getInstance();
         Response remoteResponse = null;
