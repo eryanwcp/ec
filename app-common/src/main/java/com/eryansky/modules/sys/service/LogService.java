@@ -116,9 +116,9 @@ public class LogService extends CrudService<LogDao, Log> {
      * @return
      */
     public int clear(String id) {
-        int reslutCount = super.clear(id);
-        logger.debug("清除日志：{}", reslutCount);
-        return reslutCount;
+        int resultCount = super.clear(id);
+        logger.debug("清除日志：{}", resultCount);
+        return resultCount;
     }
 
     /**
@@ -127,17 +127,15 @@ public class LogService extends CrudService<LogDao, Log> {
      * @return
      */
     public int clearAll() {
-        int reslutCount = super.clearAll();
-        logger.debug("清空日志：{}", reslutCount);
-        return reslutCount;
+        int resultCount = super.clearAll();
+        logger.debug("清空日志：{}", resultCount);
+        return resultCount;
     }
 
     /**
      * 清空有效期之外的日志
      *
      * @param day 保留时间 （天）
-     * @throws DaoException
-     * @throws SystemException
      */
     public int clearInvalidLog(int day) {
         if (day < 0) {
