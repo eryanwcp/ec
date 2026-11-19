@@ -54,12 +54,12 @@ public class UserDeviceService extends PCrudService<UserDeviceDao, UserDevice, S
         parameter.put("appId", appId);
         parameter.put("userId", userId);
         parameter.put("query", query);
-        return page.setResult(dao.findByUserId(parameter));
+        return page.autoResult(dao.findByUserId(parameter));
     }
 
     public Page<UserDevice> findPage(Page<UserDevice> page, UserDevice entity) {
         entity.setEntityPage(page);
-        return page.setResult(dao.findList(entity));
+        return page.autoResult(dao.findList(entity));
     }
 
     public Page<UserDevice> findPage(Page<UserDevice> page,
@@ -73,7 +73,7 @@ public class UserDeviceService extends PCrudService<UserDeviceDao, UserDevice, S
         parameter.put("deviceType",entity.getDeviceType());
         parameter.put("beginLastLoginTime",beginLastLoginTime != null ? DateUtils.getDateStart(beginLastLoginTime):null);
         parameter.put("endLastLoginTime",endLastLoginTime != null ? DateUtils.getDateEnd(endLastLoginTime):null);
-        return page.setResult(dao.findQueryList(parameter));
+        return page.autoResult(dao.findQueryList(parameter));
     }
 
 
